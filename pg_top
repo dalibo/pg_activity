@@ -1,0 +1,427 @@
+#!/usr/bin/env python
+"""
+pg_top utility
+version: 0.1 DEV
+author: Julien Tachoires <julmon@gmail.com>
+license: BSD-3 license
+"""
+
+import os
+import sys
+if os.name != 'posix':
+	sys.exit('FATAL: Platform not supported.')
+import time
+import curses
+import atexit
+from datetime import datetime, timedelta
+import psutil
+import psycopg2
+import psycopg2.extras
+import re
+from optparse import OptionParser
+import optparse
+
+"""
+Called at exit time.
+Rollback to default values.
+"""
+def at_exit_curses():
+	win.keypad(0)
+	curses.nocbreak()
+	curses.echo()
+	curses.endwin()
+
+"""
+Curses initialization
+"""
+win = curses.initscr()
+win.keypad(1)
+curses.noecho()
+curses.cbreak()
+# use colors
+curses.start_color()
+curses.use_default_colors()
+# register at_exit function
+atexit.register(at_exit_curses)
+curses.endwin()
+lineno = 0
+# define some color pairs
+C_BLACK_GREEN = 1
+C_CYAN = 2
+C_RED = 3
+C_GREEN = 4
+C_YELLOW = 5
+C_MAGENTA = 6
+curses.init_pair(C_BLACK_GREEN, curses.COLOR_BLACK, curses.COLOR_GREEN)
+curses.init_pair(C_CYAN, curses.COLOR_CYAN, curses.COLOR_BLACK)
+curses.init_pair(C_RED, curses.COLOR_RED, curses.COLOR_BLACK)
+curses.init_pair(C_GREEN, curses.COLOR_GREEN, curses.COLOR_BLACK)
+curses.init_pair(C_YELLOW, curses.COLOR_YELLOW, curses.COLOR_BLACK)
+curses.init_pair(C_MAGENTA, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
+
+"""
+Strip and replace some special characters.
+"""
+def clean_str(string):
+	msg = str(string)
+	msg = msg.replace("\n", " ")
+	msg = re.sub(r'\s+', r' ', msg)
+	msg = msg.replace("FATAL:", "")
+	msg = re.sub(r'^\s', r'', msg)
+	msg = re.sub(r'\s$', r'', msg)
+	return msg
+
+"""
+Connect to a PostgreSQL server and returns
+cursor & connector.
+"""
+def pg_connect(host = 'localhost', port = 5432, user = 'postgres', password = None):
+	conn = psycopg2.connect(
+			database = 'postgres',
+			host = host,
+			port = port,
+			user = user,
+			password = password
+		)
+	cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+	conn.set_isolation_level(0)
+	return (cur, conn)
+
+"""
+Get PostgreSQL server version
+"""
+def pg_get_version(cur, conn):
+	cur.execute("BEGIN")
+	query = """
+	SELECT version() AS pg_version
+	"""
+	res = cur.execute(query)
+	ret = cur.fetchone()
+	cur.execute("COMMIT")
+	return ret['pg_version']
+
+"""
+Get PostgreSQL short & numeric version from
+a string (SELECT version())
+"""
+def pg_get_num_version(text_version):
+	res = re.match(r'^PostgreSQL ([0-9]+)\.([0-9]+)\.([0-9]+)', text_version)
+	if res is not None:
+		r = res.group(1)
+		if int(res.group(2)) < 10:
+			r += '0'
+		r += res.group(2)
+		if int(res.group(3)) < 10:
+			r += '0'
+		r += res.group(3)
+		return (res.group(0), int(r))
+	return None
+
+"""
+Get activity from pg_stat_activity view
+"""
+def pg_get_activities(cur, conn, pg_num_version):
+	if pg_num_version >= 90200:
+		# PostgreSQL 9.2.0 and more
+		query = """
+		SELECT
+			pg_stat_activity.pid AS pid,
+			pg_stat_activity.datname AS database,
+			EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
+			pg_stat_activity.waiting AS wait,
+			pg_stat_activity.usename AS user,
+			pg_stat_activity.query AS query
+		FROM
+			pg_stat_activity
+		WHERE
+			state <> 'idle'
+		ORDER BY
+			EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
+		"""
+	elif pg_num_version < 90200:
+		# PostgreSQL prior to 9.2.0
+		query = """
+		SELECT
+			pg_stat_activity.pid AS pid,
+			pg_stat_activity.datname AS database,
+			EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
+			pg_stat_activity.waiting AS wait,
+			pg_stat_activity.usename AS user,
+			pg_stat_activity.query AS query
+		FROM
+			pg_stat_activity
+		WHERE
+			current_query <> '<IDLE>'
+		ORDER BY
+			EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
+		"""
+	cur.execute("BEGIN")
+	res = cur.execute(query)
+	ret = cur.fetchall()
+	cur.execute("COMMIT")
+	return ret
+
+"""
+Get system informations (CPU, memory, IO read & write)
+for each process PID -- retreived from pg_stat_activity -- with
+psutil module.
+"""
+def sys_get_proc(queries):
+	process = {}
+	for sq in queries:
+		p = psutil.Process(sq['pid'])
+		p._meminfo = p.get_memory_info()
+		p._io_counters = p.get_io_counters()
+		p._io_time = time.time()
+		p._mempercent = p.get_memory_percent()
+		p._cpu_percent = p.get_cpu_percent(interval=0)
+		p._cpu_times = p.get_cpu_times()
+		p._pg_user = sq['user']
+		p._pg_database = sq['database']
+		p._pg_duration = sq['duration']
+		p._pg_wait = sq['wait']
+		p._pg_query = clean_str(sq['query'])
+		p._io_read_delta = 0
+		p._io_write_delta = 0
+		process[sq['pid']] = p
+	return process
+
+"""
+"""
+def poll(interval, cursor, connector, process = None, pg_num_version = None):
+	
+	win.timeout(1000 * interval)
+	k = win.getch()
+	if k == ord('q'):
+		exit()
+	curses.flushinp()
+	
+	queries =  pg_get_activities(cursor, connector, pg_num_version)
+	new_procs = sys_get_proc(queries)
+	procs_status = {}
+	procs = []
+	# then retrieve the same info again
+	for pid,p in new_procs.items():
+		try:
+			if process.has_key(pid):
+				n_pg_duration = p._pg_duration
+				n_pg_query = p._pg_query
+				n_io_counters = p.get_io_counters()
+				n_io_time = time.time()
+				p = process[pid]
+				p._pg_duration = n_pg_duration
+				p._pg_query = n_pg_query
+				p._io_read_delta = (n_io_counters.read_bytes - p._io_counters.read_bytes)/(n_io_time - p._io_time)
+				p._io_write_delta = (n_io_counters.write_bytes - p._io_counters.write_bytes)/(n_io_time - p._io_time)
+				p._io_counters = n_io_counters
+				p._io_time = n_io_time
+			else:
+				p._io_counters = p.get_io_counters()
+			p._meminfo = p.get_memory_info()
+			p._mempercent = p.get_memory_percent()
+			p._cpu_percent = p.get_cpu_percent(interval=0)
+			p._cpu_times = p.get_cpu_times()
+			p._name = p.name
+			new_procs[pid] = p
+			procs.append(p)
+			try:
+				procs_status[str(p.status)] += 1
+			except KeyError:
+				procs_status[str(p.status)] = 1
+		except psutil.NoSuchProcess:
+			pass
+
+	# return processes sorted by query duration
+	disp_procs = sorted(procs, key=lambda p: p._pg_duration, reverse=True)
+	return (disp_procs, procs_status, new_procs)
+
+"""
+"""
+def print_line(line, highlight=False):
+	global lineno
+	try:
+		if highlight:
+			line += " " * (win.getmaxyx()[1] - len(line))
+			win.addstr(lineno, 0, line, curses.color_pair(C_BLACK_GREEN))
+		else:
+			win.addstr(line, 0)
+	except curses.error:
+		lineno = 0
+		win.refresh()
+		raise
+	else:
+		lineno += 1
+"""
+"""
+def print_word(word, color = 0):
+	win.addstr(word, color)
+
+"""
+"""
+def bytes2human(n):
+	symbols = ('K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y')
+	prefix = {}
+	for i, s in enumerate(symbols):
+		prefix[s] = 1 << (i+1)*10
+	for s in reversed(symbols):
+		if n >= prefix[s]:
+			value = int(float(n) / prefix[s])
+			return '%s%s' % (value, s)
+	return "%sB" % n
+
+"""
+"""
+def print_header(procs_status, pg_version):
+
+	version = "%s" % (pg_version)
+	print_line(version)
+	print_line("")
+	return 0
+
+	"""Print system-related info, above the process list."""
+	def get_dashes(perc):
+		dashes =  "|" * int((float(perc) / 10 * 4))
+		empty_dashes = " " * (40 - len(dashes))
+		return dashes, empty_dashes
+
+	"""
+	# cpu usage
+	for cpu_num, perc in enumerate(psutil.cpu_percent(interval=0, percpu=True)):
+		dashes, empty_dashes = get_dashes(perc)
+		print_line(" CPU%-2s [%s%s] %5s%%" % (cpu_num, dashes, empty_dashes,
+											  perc))
+	"""
+	# physmem usage (on linux we include buffers and cached values
+	# to match htop results)
+	phymem = psutil.phymem_usage()
+	dashes, empty_dashes = get_dashes(phymem.percent)
+	buffers = getattr(psutil, 'phymem_buffers', lambda: 0)()
+	cached = getattr(psutil, 'cached_phymem', lambda: 0)()
+	used = phymem.total - (phymem.free + buffers + cached)
+	line = " Mem   [%s%s] %5s%% %6s/%s" % (
+		dashes, empty_dashes,
+		phymem.percent,
+		str(int(used / 1024 / 1024)) + "M",
+		str(int(phymem.total / 1024 / 1024)) + "M"
+	)
+	print_line(line)
+
+	# swap usage
+	vmem = psutil.virtmem_usage()
+	dashes, empty_dashes = get_dashes(vmem.percent)
+	line = " Swap  [%s%s] %5s%% %6s/%s" % (
+		dashes, empty_dashes,
+		vmem.percent,
+		str(int(vmem.used / 1024 / 1024)) + "M",
+		str(int(vmem.total / 1024 / 1024)) + "M"
+	)
+	print_line(line)
+
+	# processes number and status
+	st = []
+	for x, y in procs_status.items():
+		if y:
+			st.append("%s=%s" % (x, y))
+	st.sort(key=lambda x: x[:3] in ('run', 'sle'), reverse=1)
+#	print_line(" Processes: %s (%s)" % (len(procs), ' '.join(st)))
+	# load average, uptime
+	uptime = datetime.now() - datetime.fromtimestamp(psutil.BOOT_TIME)
+	av1, av2, av3 = os.getloadavg()
+	line = " Load average: %.2f %.2f %.2f  Uptime: %s" \
+			% (av1, av2, av3, str(uptime).split('.')[0])
+	print_line(line)
+
+"""
+"""
+def refresh_window(procs, procs_status, pg_version):
+	"""Print results on screen by using curses."""
+ 	# curses.endwin()
+	templ = "%-6s %-8s %5s %4s %6s %7s %9s %2s  %2s"
+	templ2 = "%5s %4s %6s %7s "
+	win.erase()
+	header = templ % ("PID", "DATABASE", "CPU%", "MEM%", "READ/s", "WRITE/s", "TIME+", "W", "Query")
+	print_header(procs_status, pg_version)
+	# print_line("")
+	print_line(header, highlight=True)
+	win.refresh()
+	for p in procs:
+		# TIME+ column shows process CPU cumulative time and it
+		# is expressed as: "mm:ss.ms"
+		if p._pg_duration < 0:
+			p._pg_duration = 0
+		ctime = timedelta(seconds=float(p._pg_duration))
+		ctime = "%s:%s.%s" % (ctime.seconds // 60,
+							  str((ctime.seconds % 60)).zfill(2),
+							  str(ctime.microseconds)[:2])
+		line = templ2 % (
+						p._cpu_percent,
+						round(p._mempercent, 1),
+						bytes2human(p._io_read_delta),
+						bytes2human(p._io_write_delta)
+						)
+		try:
+			print_word("%-6s " % (p.pid,), curses.color_pair(C_CYAN))
+			print_word("%-8s " % (p._pg_database[:8],), curses.A_UNDERLINE | curses.color_pair(0))
+ 			print_line(line)
+			if p._pg_duration < 3:
+				print_word("%9s " % (ctime,), curses.color_pair(C_GREEN))
+			elif p._pg_duration >= 3 and p._pg_duration < 5:
+				print_word("%9s " % (ctime,), curses.color_pair(C_YELLOW))
+			else:
+				print_word("%9s " % (ctime,), curses.color_pair(C_RED))
+			if p._pg_wait:
+				print_word("%2s " % ("Y",), curses.color_pair(C_RED) | curses.A_BOLD)
+			else:
+				print_word("%2s " % ("N",), curses.color_pair(C_GREEN) | curses.A_BOLD)
+							
+			print_word(" %2s\n" % (p._pg_query,))
+		except curses.error as e:
+			print str(e)
+			return 0
+			break
+		win.refresh()
+	# win.refresh()
+
+"""
+main
+"""
+def main():
+	global lineno
+	try:
+		parser = OptionParser(add_help_option=False)
+		parser.add_option("-U", "--username", dest="username", default="postgres", help="database user name (default: \"postgres\")", metavar="USERNAME")
+		parser.add_option("-p", "--port", dest="port", default="5432", help="database server port (default: \"5432\")", metavar="PORT")
+		parser.add_option("-h", "--host", dest="host", help="database server host or socket directory (default: \"local socket\")", metavar="HOSTNAME")
+		parser.add_option("--help", dest="help", action="store_true", help="show this help message and exit")
+    
+		(options, args) = parser.parse_args()
+		if options.help is True:
+			print(parser.format_help().strip())
+			return 0
+		password = os.environ.get('PGPASSWORD')
+		
+		# (cur, conn) = pg_connect(host = options.host, port = options.port, user = options.username, password = password)
+		try:
+			(cur, conn) = pg_connect(host = options.host, port = options.port, user = options.username, password = password)
+		except psycopg2.Error, e:
+			print "ERROR: %s" % (clean_str(str(e),))
+			return 0
+		pg_version = pg_get_version(cur, conn)
+		(pg_short_version, pg_num_version) = pg_get_num_version(pg_version)
+		# top part
+		interval = 0
+		queries =  pg_get_activities(cur, conn, pg_num_version)
+		procs = sys_get_proc(queries)
+		while 1:
+			(disp_procs, procs_status, new_procs) = poll(interval, cur, conn, procs, pg_num_version)
+			procs = new_procs
+			lineno = 0
+			refresh_window(disp_procs, procs_status, pg_short_version)
+			interval = 1
+	except psutil.error.AccessDenied as e:
+		print "FATAL: Can't acces IO informations for process %s" % (str(e),)
+	except (KeyboardInterrupt, SystemExit):
+		pass
+
+if __name__ == '__main__':
+	main()
