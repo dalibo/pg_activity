@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-pg_top utility
+pg_activity utility
 version: 0.1 DEV
 author: Julien Tachoires <julmon@gmail.com>
 license: BSD-3 license

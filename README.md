@@ -1,7 +1,7 @@
-pg_top
-------
+pg_activity
+===========
 
-	PostgreSQL top like application for database activities monitoring.
+	PostgreSQL top like application for database activity monitoring.
 
 Dependencies
 ------------
@@ -24,7 +24,6 @@ Usage
 		--help                Show this help message and exit.
 
 	Display Options, you can exclude some columns by using them :
-		
 		--no-database       Disable DATABASE.
     	--no-client         Disable CLIENT.
     	--no-cpu            Disable CPU%.
