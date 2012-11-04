@@ -36,4 +36,4 @@ Usage
 Screenshot
 ----------
 
-![pg_activity screenshot](./screenshot.png)
+![pg_activity screenshot](https://raw.github.com/julmon/pg_activity/master/screenshot.png)
