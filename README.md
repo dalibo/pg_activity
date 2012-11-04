@@ -36,4 +36,4 @@ Usage
 Screenshot
 ----------
 
-	![pg_activity screenshot](screenshot.png)
+![pg_activity screenshot](./screenshot.png)
