@@ -24,11 +24,16 @@ Usage
 		--help                Show this help message and exit.
 
 	Display Options, you can exclude some columns by using them :
-		--no-database       Disable DATABASE.
-    	--no-client         Disable CLIENT.
-    	--no-cpu            Disable CPU%.
-    	--no-mem            Disable MEM%.
-    	--no-read           Disable READ/s.
-    	--no-write          Disable WRITE/s.
-    	--no-time           Disable TIME+.
-    	--no-wait           Disable W.
+		--no-database         Disable DATABASE.
+    	--no-client           Disable CLIENT.
+    	--no-cpu              Disable CPU%.
+    	--no-mem              Disable MEM%.
+    	--no-read             Disable READ/s.
+    	--no-write            Disable WRITE/s.
+    	--no-time             Disable TIME+.
+    	--no-wait             Disable W.
+
+Screenshot
+----------
+
+	![pg_activity screenshot](screenshot.png)
