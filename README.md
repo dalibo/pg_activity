@@ -1,12 +1,12 @@
 pg_top
-======
+------
 
 	PostgreSQL top like application for database activities monitoring.
 
-Depandancies
+Dependencies
 ------------
 
-	Python > 2.6
+	Python >= 2.6
 	psycopg2
 	psutil
 
@@ -23,12 +23,13 @@ Usage
 		-C, --no-color        Disable color usage.
 		--help                Show this help message and exit.
 
-		Display Options, you can exclude some columns by using them :
-	--no-database       Disable DATABASE.
-    --no-client         Disable CLIENT.
-    --no-cpu            Disable CPU%.
-    --no-mem            Disable MEM%.
-    --no-read           Disable READ/s.
-    --no-write          Disable WRITE/s.
-    --no-time           Disable TIME+.
-    --no-wait           Disable W.
+	Display Options, you can exclude some columns by using them :
+		
+		--no-database       Disable DATABASE.
+    	--no-client         Disable CLIENT.
+    	--no-cpu            Disable CPU%.
+    	--no-mem            Disable MEM%.
+    	--no-read           Disable READ/s.
+    	--no-write          Disable WRITE/s.
+    	--no-time           Disable TIME+.
+    	--no-wait           Disable W.
