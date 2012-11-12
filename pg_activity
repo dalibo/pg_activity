@@ -3,7 +3,32 @@
 pg_activity utility
 version: 0.1 DEV
 author: Julien Tachoires <julmon@gmail.com>
-license: BSD-3 license
+license: New BSD License
+
+Copyright (c) 2012, Julien Tachoires
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * Neither the name of pg_activity nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL JULIEN TACHOIRES BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 import os
@@ -49,7 +74,7 @@ curses.curs_set(0)
 curses.start_color()
 curses.use_default_colors()
 # register at_exit function
-atexit.register(at_exit_curses)
+# atexit.register(at_exit_curses)
 lineno = 0
 curses.endwin()
 
@@ -82,7 +107,7 @@ PGTOP_FLAG_NONE = None
 PGTOP_FLAGS_COL = PGTOP_FLAG_DATABASE | PGTOP_FLAG_CPU | PGTOP_FLAG_MEM | PGTOP_FLAG_READ | PGTOP_FLAG_WRITE | PGTOP_FLAG_TIME | PGTOP_FLAG_WAIT
 pgtop_cols = {
 	'pid'		: {'n': 1, 'name': 'PID', 'template_h': '%-6s ', 'flag': PGTOP_FLAG_NONE, 'mandatory': True},
-	'database'	: {'n': 2, 'name': 'DATABASE', 'template_h': '%-8s ', 'flag': PGTOP_FLAG_DATABASE, 'mandatory': False},
+	'database'	: {'n': 2, 'name': 'DATABASE', 'template_h': '%-16s ', 'flag': PGTOP_FLAG_DATABASE, 'mandatory': False},
 	'client'	: {'n': 3, 'name': 'CLIENT', 'template_h': '%16s ', 'flag': PGTOP_FLAG_CLIENT, 'mandatory': False},
 	'cpu'		: {'n': 4, 'name': 'CPU%', 'template_h': '%5s ', 'flag': PGTOP_FLAG_CPU, 'mandatory': False},
 	'mem'		: {'n': 5, 'name': 'MEM%', 'template_h': '%4s ', 'flag': PGTOP_FLAG_MEM, 'mandatory': False},
@@ -92,6 +117,12 @@ pgtop_cols = {
 	'wait'		: {'n': 9, 'name': 'W', 'template_h': '%2s ', 'flag': PGTOP_FLAG_WAIT, 'mandatory': False},
 	'query'		: {'n': 10, 'name': 'Query', 'template_h': ' %2s', 'flag': PGTOP_FLAG_NONE, 'mandatory': True},
 }
+
+# display query mode
+PGTOP_VERBOSE_MODE = 2
+PGTOP_TRUNCATE = 1
+PGTOP_WRAP_NOINDENT = 2
+PGTOP_WRAP = 3
 
 """
 Replace colors by white.
@@ -129,7 +160,7 @@ def pg_connect(host = 'localhost', port = 5432, user = 'postgres', password = No
 			host = host,
 			port = port,
 			user = user,
-			password = password
+			password = str(password)
 		)
 	cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 	conn.set_isolation_level(0)
@@ -238,6 +269,8 @@ def sys_get_proc(queries):
 			process[sq['pid']] = p
 		except psutil.error.NoSuchProcess as e:
 			pass
+		except psutil.error.AccessDenied as e:
+			pass
 	return process
 
 """
@@ -266,7 +299,7 @@ def pause():
 Poll activities.
 """
 def poll(interval, cursor, connector, process = None, pg_num_version = None):
-	
+	global PGTOP_VERBOSE_MODE	
 	win.timeout(1000 * interval)
 	k = win.getch()
 	if k == ord('q'):
@@ -274,10 +307,15 @@ def poll(interval, cursor, connector, process = None, pg_num_version = None):
 		exit()
 	if k == ord(' '):
 		pause()
+	if k == ord('v'):
+		PGTOP_VERBOSE_MODE += 1
+		if PGTOP_VERBOSE_MODE > 3:
+			PGTOP_VERBOSE_MODE = 1
 	curses.flushinp()
 	
 	queries =  pg_get_activities(cursor, connector, pg_num_version)
 	new_procs = sys_get_proc(queries)
+
 	procs_status = {}
 	procs = []
 	for pid,p in new_procs.items():
@@ -298,10 +336,9 @@ def poll(interval, cursor, connector, process = None, pg_num_version = None):
 				p._io_time = n_io_time
 			else:
 				p._io_counters = p.get_io_counters()
-			p._meminfo = p.get_memory_info()
+			
 			p._mempercent = p.get_memory_percent()
 			p._cpu_percent = p.get_cpu_percent(interval=0)
-			p._cpu_times = p.get_cpu_times()
 			p._name = p.name
 			new_procs[pid] = p
 			procs.append(p)
@@ -310,6 +347,8 @@ def poll(interval, cursor, connector, process = None, pg_num_version = None):
 			except KeyError:
 				procs_status[str(p.status)] = 1
 		except psutil.NoSuchProcess:
+			pass
+		except psutil.error.AccessDenied as e:
 			pass
 
 	# return processes sorted by query duration
@@ -333,11 +372,21 @@ def print_line(line, highlight=False):
 		raise
 	else:
 		lineno += 1
+
 """
 Simple curses wrapper for word printing
 """
 def print_word(word, color = 0):
 	win.addstr(word, color)
+
+
+def print_string(lineno, colno, word, color = 0):
+	global PGTOP_VERBOSE_MODE
+	if PGTOP_VERBOSE_MODE != PGTOP_WRAP_NOINDENT:
+		win.addstr(lineno, colno, word, color)
+	else:
+		win.addstr(word, color)
+	return len(word)
 
 """
 """
@@ -356,6 +405,7 @@ def bytes2human(n):
 """
 def get_cols_header(flag):
 	ret = ''
+	indent = ''
 	r = [0] * 11
 	for key, val in pgtop_cols.items():
 		if val['mandatory'] or (not val['mandatory'] and val['flag'] & flag):
@@ -363,11 +413,13 @@ def get_cols_header(flag):
 	for val in r:
 		if val is not 0:
 			ret += val['template_h'] % val['name']
-	return ret
+			if val['name'] is not 'Query':
+				indent += val['template_h'] % ' '
+	return (ret, indent)
 
 """
 """
-def print_header(procs_status, pg_version, hostname, user, host, port):
+def print_header(procs_status, pg_version, hostname, user, host, port, io):
 	version = " %s" % (pg_version)
 	print_word(version)
 	print_word(" - ")
@@ -388,51 +440,49 @@ def print_header(procs_status, pg_version, hostname, user, host, port):
 	buffers = getattr(psutil, 'phymem_buffers', lambda: 0)()
 	cached = getattr(psutil, 'cached_phymem', lambda: 0)()
 	used = phymem.total - (phymem.free + buffers + cached)
-	line = "  mem.: %5s%% %9s/%s\n" % (
-		phymem.percent,
-		str(int(used / 1024 / 1024)) + "M",
-		str(int(phymem.total / 1024 / 1024)) + "M"
-	)
+	line = "  Mem.: %5s%% %9s/%s\n" % (phymem.percent, str(int(used / 1024 / 1024)) + "M", str(int(phymem.total / 1024 / 1024)) + "M")
 	print_line(line)
 
 	# swap usage
 	vmem = psutil.virtmem_usage()
-	line = "  swap: %5s%% %9s/%s\n" % (
-		vmem.percent,
-		str(int(vmem.used / 1024 / 1024)) + "M",
-		str(int(vmem.total / 1024 / 1024)) + "M"
-	)
+	line = "  Swap: %5s%% %9s/%s\n" % (vmem.percent, str(int(vmem.used / 1024 / 1024)) + "M", str(int(vmem.total / 1024 / 1024)) + "M")
 	print_line(line)
 
 	# load average, uptime
 	av1, av2, av3 = os.getloadavg()
-	line = "  load:   %.2f %.2f %.2f\n" % (av1, av2, av3)
+	line = "  Load:   %.2f %.2f %.2f" % (av1, av2, av3)
+	line += " 	I/O Disks: READ %6s/s - %6s WRITE %6s/s - %6s\n" % (bytes2human(io['read_bytes']), int(io['read_count']), bytes2human(io['write_bytes']), int(io['write_count']))
 	print_line(line)
 
 """
 """
-def refresh_window(procs, procs_status, extras, flag, cols_header):
+def refresh_window(procs, procs_status, extras, flag, cols_header, indent, io):
+	global PGTOP_VERBOSE_MODE
 	(pg_version, hostname, user, host, port) = extras
 	"""Print results on screen by using curses."""
 	win.erase()
-	print_header(procs_status, pg_version, hostname, user, host, port)
+	print_header(procs_status, pg_version, hostname, user, host, port, io)
 	print_line(cols_header, highlight=True)
-	win.refresh()
+	# win.refresh()
+	lineno = 6
+	colno = 0
+	(maxy, maxx) = win.getmaxyx()
 	for p in procs:
 		try:
-			print_word("%-6s " % (p.pid,), curses.color_pair(C_CYAN))
+			colno = 0
+			colno += print_string(lineno, colno, "%-6s " % (p.pid,), curses.color_pair(C_CYAN))
 			if flag & PGTOP_FLAG_DATABASE:
-				print_word("%-8s " % (p._pg_database[:8],), curses.A_UNDERLINE | curses.color_pair(0))
+				colno += print_string(lineno, colno, "%-16s " % (p._pg_database[:16],), curses.A_UNDERLINE | curses.color_pair(0))
  			if flag & PGTOP_FLAG_CLIENT:
-				print_word("%16s " % (str(p._pg_client)[:16],), curses.color_pair(C_CYAN))
+				colno += print_string(lineno, colno, "%16s " % (str(p._pg_client)[:16],), curses.color_pair(C_CYAN))
 			if flag & PGTOP_FLAG_CPU:
-				print_word("%5s " % (p._cpu_percent,))
+				colno += print_string(lineno, colno, "%5s " % (p._cpu_percent,))
 			if flag & PGTOP_FLAG_MEM:
-				print_word("%4s " % (round(p._mempercent, 1),))
+				colno += print_string(lineno, colno, "%4s " % (round(p._mempercent, 1),))
 			if flag & PGTOP_FLAG_READ:
-				print_word("%6s " % (bytes2human(p._io_read_delta),))
+				colno += print_string(lineno, colno, "%6s " % (bytes2human(p._io_read_delta),))
 			if flag & PGTOP_FLAG_WRITE:
-				print_word("%7s " % (bytes2human(p._io_write_delta),))
+				colno += print_string(lineno, colno, "%7s " % (bytes2human(p._io_write_delta),))
 			if flag & PGTOP_FLAG_TIME:
 				if p._pg_duration < 0:
 					p._pg_duration = 0
@@ -441,19 +491,48 @@ def refresh_window(procs, procs_status, extras, flag, cols_header):
 					mic = '%.6d' % (ctime.microseconds)
 					ctime = "%s:%s.%s" % (str((ctime.seconds // 60)).zfill(2), str((ctime.seconds % 60)).zfill(2), str(mic)[:2])
 				if p._pg_duration < 1:
-					print_word(" %.6f " % (p._pg_duration,), curses.color_pair(C_GREEN))
+					colno += print_string(lineno, colno, " %.6f " % (p._pg_duration,), curses.color_pair(C_GREEN))
 				elif p._pg_duration >= 1 and p._pg_duration < 3:
-					print_word("%9s " % (ctime,), curses.color_pair(C_YELLOW))
+					colno += print_string(lineno, colno, "%9s " % (ctime,), curses.color_pair(C_YELLOW))
 				else:
-					print_word("%9s " % (ctime,), curses.color_pair(C_RED))
+					colno += print_string(lineno, colno, "%9s " % (ctime,), curses.color_pair(C_RED))
 			if flag & PGTOP_FLAG_WAIT:
 				if p._pg_wait:
-					print_word("%2s " % ("Y",), curses.color_pair(C_RED) | curses.A_BOLD)
+					colno += print_string(lineno, colno, "%2s " % ("Y",), curses.color_pair(C_RED) | curses.A_BOLD)
 				else:
-					print_word("%2s " % ("N",), curses.color_pair(C_GREEN) | curses.A_BOLD)
-							
-			print_word(" %2s\n" % (p._pg_query,))
+					colno += print_string(lineno, colno, "%2s " % ("N",), curses.color_pair(C_GREEN) | curses.A_BOLD)
+
+			dif = maxx - len(indent) - 1
+			if PGTOP_VERBOSE_MODE == PGTOP_TRUNCATE:
+				query = p._pg_query[:dif]
+				colno += print_string(lineno, colno, " %2s\n" % (query,))
+			elif PGTOP_VERBOSE_MODE == PGTOP_WRAP:
+				query = p._pg_query
+				query_wrote = ''
+				offset = 0
+				if len(query) > dif:
+					query_part = query[offset:dif]
+					print_string(lineno, colno, " %2s" % (query_part,))
+					query_wrote += query_part
+					offset = len(query_wrote)
+					if PGTOP_VERBOSE_MODE == PGTOP_WRAP_NOINDENT:
+						dif = maxx
+						p_indent = ''
+					else:
+						p_indent = indent
+					while (len(query) - offset > 0):	
+						query_part = query[offset:(dif+offset)]
+						lineno += 1
+						print_string(lineno, 0, "%2s" % (p_indent + ' '+ query_part,))
+						query_wrote += query_part
+						offset = len(query_wrote)
+				else:
+					colno += print_string(lineno, colno, " %2s\n" % (query,))
+			elif PGTOP_VERBOSE_MODE == PGTOP_WRAP_NOINDENT:
+				colno += print_string(lineno, colno, " %2s\n" % (p._pg_query,))
+			lineno += 1
 		except curses.error as e:
+			# raise e
 			break
 		win.refresh()
 
@@ -467,29 +546,31 @@ def main():
 		parser = OptionParser(add_help_option=False)
 		parser.add_option("-U", "--username", dest="username", default="postgres", help="Database user name (default: \"postgres\").", metavar="USERNAME")
 		parser.add_option("-p", "--port", dest="port", default="5432", help="Database server port (default: \"5432\").", metavar="PORT")
-		parser.add_option("-h", "--host", dest="host", help="Database server host or socket directory (default: \"local socket\").", metavar="HOSTNAME")
-		parser.add_option("-C", "--no-color", dest="nocolor", action="store_true", help="Disable color usage.")
+		parser.add_option("-h", "--host", dest="host", help="Database server host or socket directory (default: \"local socket\").", metavar="HOSTNAME", default="localhost")
+		parser.add_option("-C", "--no-color", dest="nocolor", action="store_true", help="Disable color usage.", default="false")
 		group = OptionGroup(parser, "Display Options, you can exclude some columns by using them ")
-		group.add_option("--no-database", dest="nodb", action="store_true", help="Disable DATABASE.")
-		group.add_option("--no-client", dest="noclient", action="store_true", help="Disable CLIENT.")
-		group.add_option("--no-cpu", dest="nocpu", action="store_true", help="Disable CPU%.")
-		group.add_option("--no-mem", dest="nomem", action="store_true", help="Disable MEM%.")
-		group.add_option("--no-read", dest="noread", action="store_true", help="Disable READ/s.")
-		group.add_option("--no-write", dest="nowrite", action="store_true", help="Disable WRITE/s.")
-		group.add_option("--no-time", dest="notime", action="store_true", help="Disable TIME+.")
-		group.add_option("--no-wait", dest="nowait", action="store_true", help="Disable W.")
+		group.add_option("--no-database", dest="nodb", action="store_true", help="Disable DATABASE.", default="false")
+		group.add_option("--no-client", dest="noclient", action="store_true", help="Disable CLIENT.", default="false")
+		group.add_option("--no-cpu", dest="nocpu", action="store_true", help="Disable CPU%.", default="false")
+		group.add_option("--no-mem", dest="nomem", action="store_true", help="Disable MEM%.", default="false")
+		group.add_option("--no-read", dest="noread", action="store_true", help="Disable READ/s.", default="false")
+		group.add_option("--no-write", dest="nowrite", action="store_true", help="Disable WRITE/s.", default="false")
+		group.add_option("--no-time", dest="notime", action="store_true", help="Disable TIME+.", default="false")
+		group.add_option("--no-wait", dest="nowait", action="store_true", help="Disable W.", default="false")
 		parser.add_option_group(group)
-		parser.add_option("--help", dest="help", action="store_true", help="Show this help message and exit.")
+		parser.add_option("--help", dest="help", action="store_true", help="Show this help message and exit.", default="false")
     
 		(options, args) = parser.parse_args()
 		if options.help is True:
+			at_exit_curses()
 			print(parser.format_help().strip())
-			exit()
+			return 0
 		password = os.environ.get('PGPASSWORD')
 		
 		try:
 			(cur, conn) = pg_connect(host = options.host, port = options.port, user = options.username, password = password)
-		except psycopg2.Error, e:
+		except psycopg2.Error as e:
+			at_exit_curses()
 			print "FATAL: %s" % (clean_str(str(e),))
 			return 0
 		pg_version = pg_get_version(cur, conn)
@@ -499,6 +580,7 @@ def main():
 		queries =  pg_get_activities(cur, conn, pg_num_version)
 		procs = sys_get_proc(queries)
 		hostname = socket.gethostname()
+		
 		# color ?
 		if options.nocolor == True:
 			set_nocolor()
@@ -521,21 +603,45 @@ def main():
 			flag -= PGTOP_FLAG_TIME
 		if options.nowait is True:
 			flag -= PGTOP_FLAG_WAIT
-	
-		cols_header = get_cols_header(flag)
-	
+		
+		# highlighted header
+		(cols_header, indent) = get_cols_header(flag)
+
+		
+		# main loop
+		disks_io = None
 		while 1:
+			
 			(disp_procs, procs_status, new_procs) = poll(interval, cur, conn, procs, pg_num_version)
+			new_disks_io = {'io':psutil.disk_io_counters(), 'time':time.time()}
+			delta_disks_io = {'read_count': 0, 'write_count': 0, 'read_bytes': 0.0, 'write_bytes': 0.0}
+			if disks_io is not None:
+				delta_disks_io['read_count'] = (new_disks_io['io'].read_count - disks_io['io'].read_count)/(new_disks_io['time'] - disks_io['time'])
+				delta_disks_io['write_count'] = (new_disks_io['io'].write_count - disks_io['io'].write_count)/(new_disks_io['time'] - disks_io['time'])
+				delta_disks_io['read_bytes'] = (new_disks_io['io'].read_bytes - disks_io['io'].read_bytes)/(new_disks_io['time'] - disks_io['time'])
+				delta_disks_io['write_bytes'] = (new_disks_io['io'].write_bytes - disks_io['io'].write_bytes)/(new_disks_io['time'] - disks_io['time'])
+			disks_io = new_disks_io
+			
 			procs = new_procs
 			lineno = 0
-			refresh_window(disp_procs, procs_status, (pg_short_version, hostname, options.username, options.host, options.port), flag, cols_header)
+			refresh_window(disp_procs, procs_status, (pg_short_version, hostname, options.username, options.host, options.port), flag, cols_header, indent, delta_disks_io)
 			interval = 1
+	
 	except psutil.error.AccessDenied as e:
+		at_exit_curses()
 		print "FATAL: Can't acces IO informations for process %s" % (str(e),)
-	except (KeyboardInterrupt, SystemExit):
-		pass
+		return 0
+	except (KeyboardInterrupt, SystemExit) as e:
+		at_exit_curses()
+		return 0
 	except Exception as e:
-		print "FATAL: %s" % (str(e),)	
+		at_exit_curses()
+		print "FATAL: %s" % (str(e),)
+		return 0
+	except curses.error as e:
+		at_exit_curses()
+		print "FATAL: %s" % (str(e),)
+		return 0
 
 if __name__ == '__main__':
 	main()
