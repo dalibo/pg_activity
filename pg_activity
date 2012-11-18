@@ -87,6 +87,7 @@ C_YELLOW = 5
 C_MAGENTA = 6
 C_WHITE = 7
 C_BLACK_CYAN = 8
+C_RED_BLACK = 9
 # Columns
 PGTOP_FLAG_DATABASE = 1
 PGTOP_FLAG_CLIENT = 2
@@ -132,13 +133,14 @@ def set_nocolor():
 	# curses.A_BOLD = 0
 	# curses.A_UNDERLINE = 0
 	curses.init_pair(C_BLACK_GREEN, curses.COLOR_BLACK, curses.COLOR_WHITE)
-	curses.init_pair(C_CYAN, curses.COLOR_WHITE, curses.COLOR_BLACK)
-	curses.init_pair(C_RED, curses.COLOR_WHITE, curses.COLOR_BLACK)
-	curses.init_pair(C_GREEN, curses.COLOR_WHITE, curses.COLOR_BLACK)
-	curses.init_pair(C_YELLOW, curses.COLOR_WHITE, curses.COLOR_BLACK)
-	curses.init_pair(C_MAGENTA, curses.COLOR_WHITE, curses.COLOR_BLACK)
-	curses.init_pair(C_WHITE, curses.COLOR_WHITE, curses.COLOR_BLACK)
-	curses.init_pair(C_BLACK_CYAN, curses.COLOR_WHITE, curses.COLOR_BLACK)
+	curses.init_pair(C_CYAN, curses.COLOR_WHITE, -1)
+	curses.init_pair(C_RED, curses.COLOR_WHITE, -1)
+	curses.init_pair(C_RED_BLACK, curses.COLOR_WHITE, curses.COLOR_BLACK)
+	curses.init_pair(C_GREEN, curses.COLOR_WHITE, -1)
+	curses.init_pair(C_YELLOW, curses.COLOR_WHITE, -1)
+	curses.init_pair(C_MAGENTA, curses.COLOR_WHITE, -1)
+	curses.init_pair(C_WHITE, curses.COLOR_WHITE, -1)
+	curses.init_pair(C_BLACK_CYAN, curses.COLOR_WHITE, -1)
 
 """
 Set colors.
@@ -147,12 +149,13 @@ def set_color():
 	global PGTOP_COLOR
 	PGTOP_COLOR = True
 	curses.init_pair(C_BLACK_GREEN, curses.COLOR_BLACK, curses.COLOR_GREEN)
-	curses.init_pair(C_CYAN, curses.COLOR_CYAN, curses.COLOR_BLACK)
-	curses.init_pair(C_RED, curses.COLOR_RED, curses.COLOR_BLACK)
-	curses.init_pair(C_GREEN, curses.COLOR_GREEN, curses.COLOR_BLACK)
-	curses.init_pair(C_YELLOW, curses.COLOR_YELLOW, curses.COLOR_BLACK)
-	curses.init_pair(C_MAGENTA, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
-	curses.init_pair(C_WHITE, curses.COLOR_WHITE, curses.COLOR_BLACK)
+	curses.init_pair(C_CYAN, curses.COLOR_CYAN, -1)
+	curses.init_pair(C_RED, curses.COLOR_RED, -1)
+	curses.init_pair(C_RED_BLACK, curses.COLOR_RED, curses.COLOR_BLACK)
+	curses.init_pair(C_GREEN, curses.COLOR_GREEN, -1)
+	curses.init_pair(C_YELLOW, curses.COLOR_YELLOW, -1)
+	curses.init_pair(C_MAGENTA, curses.COLOR_MAGENTA, -1)
+	curses.init_pair(C_WHITE, curses.COLOR_WHITE, -1)
 	curses.init_pair(C_BLACK_CYAN, curses.COLOR_BLACK, curses.COLOR_CYAN)
 
 """
@@ -300,9 +303,12 @@ def pause():
 	line += " " * (int(x/2) - len(msg))
 	line += msg
 	line += " " * (x - len(line) - 0)
-	win.addstr(4, 0, line, curses.color_pair(C_RED)|curses.A_REVERSE|curses.A_BOLD)
+	win.addstr(4, 0, line, curses.color_pair(C_RED_BLACK)|curses.A_REVERSE|curses.A_BOLD)
 	while 1:
-		k = win.getch()
+		try:
+			k = win.getch()
+		except KeyboardInterrupt as e:
+			raise e
 		if k == ord('q'):
 			curses.endwin()
 			exit()
@@ -321,7 +327,10 @@ def poll(interval, cursor, connector, process = None, pg_num_version = None):
 	global PGTOP_SORT
 
 	win.timeout(1000 * interval)
-	k = win.getch()
+	try:
+		k = win.getch()
+	except KeyboardInterrupt as e:
+		raise e
 	if k == ord('q'):
 		curses.endwin()
 		exit()
@@ -386,6 +395,8 @@ def poll(interval, cursor, connector, process = None, pg_num_version = None):
 			pass
 		except psutil.error.AccessDenied as e:
 			pass
+		except Exception as e:
+			raise e
 
 	# return processes sorted by query duration
 	if PGTOP_SORT == 't':
@@ -409,24 +420,6 @@ def poll(interval, cursor, connector, process = None, pg_num_version = None):
 	return (disp_procs, procs_status, new_procs)
 
 """
-Simple curses wrapper for line printing
-"""
-def print_line(line, highlight=False):
-	global lineno
-	try:
-		if highlight:
-			line += " " * (win.getmaxyx()[1] - len(line))
-			win.addstr(lineno, 0, line, curses.color_pair(C_BLACK_GREEN))
-		else:
-			win.addstr(line, 0)
-	except curses.error:
-		lineno = 0
-		win.refresh()
-		raise
-	else:
-		lineno += 1
-
-"""
 Simple curses wrapper for word printing
 """
 def print_word(word, color = 0):
@@ -436,6 +429,11 @@ def print_word(word, color = 0):
 def print_string(lineno, colno, word, color = 0):
 	win.addstr(lineno, colno, word, color)
 	return len(word)
+
+
+def add_blank(line, offset = 0): 
+	line += " " * (win.getmaxyx()[1] - (len(line) + offset))
+	return line
 
 """
 """
@@ -467,6 +465,7 @@ def get_indent(flag):
 
 def print_cols_header(flag):
 	global PGTOP_SORT
+	global lineno
 	line = ''
 	disp = ''
 	x = 0
@@ -491,38 +490,40 @@ def print_cols_header(flag):
 			line += disp
 			win.addstr(lineno, x, disp, color_highlight)
 			x += len(disp)
+	
+	lineno += 1
 
 """
 """
 def print_header(procs_status, pg_version, hostname, user, host, port, io):
 	global PGTOP_MAX_IOPS
+	global lineno
+	lineno = 0
+	colno = 0
 	version = " %s" % (pg_version)
-	print_word(version)
-	print_word(" - ")
-	print_word(hostname, curses.A_BOLD)
-	print_word(" - ")
-	print_word(user, curses.color_pair(C_CYAN))
-	print_word('@')
-	print_word(host, curses.color_pair(C_CYAN))
-	print_word(':')
-	print_word(port, curses.color_pair(C_CYAN))
-	print_word("\n")
-	print_line("")
-	print_line("")
+	colno = print_string(lineno, colno, version)
+	colno += print_string(lineno, colno, " - ")
+	colno += print_string(lineno, colno, hostname, curses.A_BOLD)
+	colno += print_string(lineno, colno, " - ")
+	colno += print_string(lineno, colno, user, curses.color_pair(C_CYAN))
+	colno += print_string(lineno, colno, "@")
+	colno += print_string(lineno, colno, host, curses.color_pair(C_CYAN))
+	colno += print_string(lineno, colno, ":")
+	colno += print_string(lineno, colno, port, curses.color_pair(C_CYAN))
 
-	# physmem usage (on linux we include buffers and cached values
-	# to match htop results)
 	phymem = psutil.phymem_usage()
 	buffers = getattr(psutil, 'phymem_buffers', lambda: 0)()
 	cached = getattr(psutil, 'cached_phymem', lambda: 0)()
 	used = phymem.total - (phymem.free + buffers + cached)
 	line = "  Mem.: %5s%% %9s/%s\n" % (phymem.percent, str(int(used / 1024 / 1024)) + "M", str(int(phymem.total / 1024 / 1024)) + "M")
-	print_line(line)
+	lineno += 1
+	colno = print_string(lineno, 0, line)
 
 	# swap usage
 	vmem = psutil.virtmem_usage()
 	line = "  Swap: %5s%% %9s/%s\n" % (vmem.percent, str(int(vmem.used / 1024 / 1024)) + "M", str(int(vmem.total / 1024 / 1024)) + "M")
-	print_line(line)
+	lineno += 1
+	colno = print_string(lineno, 0, line)
 
 	# load average, uptime
 	if (int(io['read_count'])+int(io['write_count'])) > PGTOP_MAX_IOPS:
@@ -530,19 +531,20 @@ def print_header(procs_status, pg_version, hostname, user, host, port, io):
 	av1, av2, av3 = os.getloadavg()
 	line = "  Load:   %.2f %.2f %.2f" % (av1, av2, av3)
 	line += " 	I/O Disks READ: %8s/s - %6sIO/s WRITE: %8s/s - %6sIO/s MAX: %sIO/s\n" % (bytes2human(io['read_bytes']), int(io['read_count']), bytes2human(io['write_bytes']), int(io['write_count']), PGTOP_MAX_IOPS)
-	print_line(line)
+	lineno += 1
+	colno = print_string(lineno, 0, line)
 
 """
 """
 def refresh_window(procs, procs_status, extras, flag, indent, io):
+	global lineno
 	global PGTOP_VERBOSE_MODE
 	(pg_version, hostname, user, host, port) = extras
 	"""Print results on screen by using curses."""
 	win.erase()
 	print_header(procs_status, pg_version, hostname, user, host, port, io)
+	lineno += 2
 	print_cols_header(flag)
-	# win.refresh()
-	lineno = 6
 	colno = 0
 	(maxy, maxx) = win.getmaxyx()
 	for p in procs:
@@ -583,14 +585,14 @@ def refresh_window(procs, procs_status, extras, flag, indent, io):
 			dif = maxx - len(indent) - 1
 			if PGTOP_VERBOSE_MODE == PGTOP_TRUNCATE:
 				query = p._pg_query[:dif]
-				colno += print_string(lineno, colno, " %2s\n" % (query,))
+				colno += print_string(lineno, colno, " %s\n" % (add_blank(query,len(indent)),))
 			elif PGTOP_VERBOSE_MODE == PGTOP_WRAP or  PGTOP_VERBOSE_MODE == PGTOP_WRAP_NOINDENT:
 				query = p._pg_query
 				query_wrote = ''
 				offset = 0
 				if len(query) > dif:
 					query_part = query[offset:dif]
-					print_string(lineno, colno, " %2s" % (query_part,))
+					print_string(lineno, colno, " %s" % (add_blank(query_part,len(indent)),))
 					query_wrote += query_part
 					offset = len(query_wrote)
 					if PGTOP_VERBOSE_MODE == PGTOP_WRAP_NOINDENT:
@@ -601,24 +603,24 @@ def refresh_window(procs, procs_status, extras, flag, indent, io):
 					while (len(query) - offset > 0):	
 						query_part = query[offset:(dif+offset)]
 						lineno += 1
-						print_string(lineno, 0, "%2s" % (p_indent + ' '+ query_part,))
+						print_string(lineno, 0, "%s" % (add_blank(p_indent + ' '+ query_part, len(indent))))
 						query_wrote += query_part
 						offset = len(query_wrote)
 				else:
-					colno += print_string(lineno, colno, " %2s\n" % (query,))
+					colno += print_string(lineno, colno, " %s\n" % (add_blank(query, len(indent)),))
 			lineno += 1
 		except curses.error as e:
-			# raise e
 			break
-		win.refresh()
+		
+		for l in range(lineno, (win.getmaxyx()[0]-1)):
+			print_string(l, 0, add_blank(' '))
+		# win.refresh()
 
 """
 main
 """
 def main():
-	global lineno
 	try:
-		
 		parser = OptionParser(add_help_option=False)
 		parser.add_option("-U", "--username", dest="username", default="postgres", help="Database user name (default: \"postgres\").", metavar="USERNAME")
 		parser.add_option("-p", "--port", dest="port", default="5432", help="Database server port (default: \"5432\").", metavar="PORT")
@@ -681,7 +683,7 @@ def main():
 			flag -= PGTOP_FLAG_TIME
 		if options.nowait is True:
 			flag -= PGTOP_FLAG_WAIT
-		
+
 		# indentation
 		indent = get_indent(flag)
 
@@ -698,24 +700,26 @@ def main():
 				delta_disks_io['read_bytes'] = (new_disks_io['io'].read_bytes - disks_io['io'].read_bytes)/(new_disks_io['time'] - disks_io['time'])
 				delta_disks_io['write_bytes'] = (new_disks_io['io'].write_bytes - disks_io['io'].write_bytes)/(new_disks_io['time'] - disks_io['time'])
 			disks_io = new_disks_io
-			
+	
 			procs = new_procs
-			lineno = 0
 			refresh_window(disp_procs, procs_status, (pg_short_version, hostname, options.username, options.host, options.port), flag, indent, delta_disks_io)
 			interval = 1
-	
+
 	except psutil.error.AccessDenied as e:
 		at_exit_curses()
 		print "FATAL: Can't acces IO informations for process %s" % (str(e),)
 		return 0
-	except (KeyboardInterrupt, SystemExit) as e:
-		at_exit_curses()
-		return 0
-	except Exception as e:
+	except curses.error as e:
 		at_exit_curses()
 		print "FATAL: %s" % (str(e),)
 		return 0
-	except curses.error as e:
+	except SystemExit as e:
+		at_exit_curses()
+		return 0
+	except KeyboardInterrupt as e:
+		at_exit_curses()
+		return 0
+	except Exception as e:
 		at_exit_curses()
 		print "FATAL: %s" % (str(e),)
 		return 0
