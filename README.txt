@@ -43,8 +43,3 @@ Interactives commands
 	m		Sort by MEM%, descending
 	t		Sort by TIME+, descending
 	Space	Pause on/off
-
-Screenshot
-----------
-
-![pg_activity screenshot](https://raw.github.com/julmon/pg_activity/master/docs/imgs/screenshot.png)

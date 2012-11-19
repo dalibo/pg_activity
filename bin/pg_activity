@@ -73,8 +73,6 @@ curses.curs_set(0)
 # use colors
 curses.start_color()
 curses.use_default_colors()
-# register at_exit function
-# atexit.register(at_exit_curses)
 lineno = 0
 curses.endwin()
 
@@ -326,6 +324,7 @@ def poll(interval, cursor, connector, process = None, pg_num_version = None):
 	global PGTOP_COLOR
 	global PGTOP_SORT
 
+	# Keyboard interactions
 	win.timeout(1000 * interval)
 	try:
 		k = win.getch()
@@ -357,8 +356,10 @@ def poll(interval, cursor, connector, process = None, pg_num_version = None):
 		PGTOP_SORT = 't'
 		
 	curses.flushinp()
-
+	
+	# poll postgresql activity
 	queries =  pg_get_activities(cursor, connector, pg_num_version)
+	# get resource usage for each process
 	new_procs = sys_get_proc(queries)
 
 	procs_status = {}
@@ -391,6 +392,9 @@ def poll(interval, cursor, connector, process = None, pg_num_version = None):
 				procs_status[str(p.status)] += 1
 			except KeyError:
 				procs_status[str(p.status)] = 1
+			except Exception as e:
+				raise e
+
 		except psutil.NoSuchProcess:
 			pass
 		except psutil.error.AccessDenied as e:
@@ -425,12 +429,15 @@ Simple curses wrapper for word printing
 def print_word(word, color = 0):
 	win.addstr(word, color)
 
-
+"""
+"""
 def print_string(lineno, colno, word, color = 0):
 	win.addstr(lineno, colno, word, color)
 	return len(word)
 
 
+"""
+"""
 def add_blank(line, offset = 0): 
 	line += " " * (win.getmaxyx()[1] - (len(line) + offset))
 	return line
@@ -462,7 +469,8 @@ def get_indent(flag):
 				indent += val['template_h'] % ' '
 	return indent
 
-
+"""
+"""
 def print_cols_header(flag):
 	global PGTOP_SORT
 	global lineno
@@ -540,7 +548,6 @@ def refresh_window(procs, procs_status, extras, flag, indent, io):
 	global lineno
 	global PGTOP_VERBOSE_MODE
 	(pg_version, hostname, user, host, port) = extras
-	"""Print results on screen by using curses."""
 	win.erase()
 	print_header(procs_status, pg_version, hostname, user, host, port, io)
 	lineno += 2
@@ -614,7 +621,6 @@ def refresh_window(procs, procs_status, extras, flag, indent, io):
 		
 		for l in range(lineno, (win.getmaxyx()[0]-1)):
 			print_string(l, 0, add_blank(' '))
-		# win.refresh()
 
 """
 main
@@ -724,5 +730,7 @@ def main():
 		print "FATAL: %s" % (str(e),)
 		return 0
 
+"""
+"""
 if __name__ == '__main__':
 	main()
