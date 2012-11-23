@@ -1,0 +1,101 @@
+=head1 SYNOPSIS
+
+B<pg_activity> [-UphC]
+
+=head1 DESCRIPTION
+
+pg_activity is a htop like application for PostgreSQL server activity monitoring.
+
+=head1 COMMAND-LINE OPTIONS
+
+=over 2
+
+=item B<-U USERNAME>, B<--username=USERNAME>
+
+	Database user name (default: "postgres").
+
+=item B<-p PORT>, B<--port=PORT>
+
+	Database server port (default: "5432").
+
+=item B<-h HOSTNAME>, B<--host=HOSTNAME>
+
+	Database server host or socket directory (default: "local socket").
+
+=item B<-C>, B<--no-color>
+
+	Disable color usage.
+
+=item B<--help>
+
+	Show this help message and exit.
+
+=back
+
+=head1 DISPLAY OPTIONS
+
+=over 2
+
+=item B<--no-database>
+
+	Disable DATABASE.
+
+=item B<--no-client>
+
+	Disable CLIENT.
+
+=item B<--no-cpu>
+
+	Disable CPU%.
+
+=item B<--no-mem>
+
+	Disable MEM%.
+
+=item B<--no-read>
+
+	Disable READ/s.
+
+=item B<--no-write>
+
+	Disable WRITE/s.
+
+=item B<--no-time>
+
+	Disable TIME+.
+
+=item B<--no-wait>
+
+	Disable W.
+
+=back
+
+=head1 INTERACTIVE COMMANDS
+
+=over 2
+
+=item B<C>     Activate/deactivate colors.
+
+=item B<r>     Sort by READ/s, descending.
+
+=item B<w>     Sort by WRITE/s, descending.
+
+=item B<c>     Sort by CPU%, descending.
+
+=item B<m>     Sort by MEM%, descending.
+
+=item B<t>     Sort by TIME+, descending.
+
+=item B<Space> Pause on/off.
+
+=item B<v>     Change queries display mode: full, truncated, indented
+
+=back
+
+=head1 EXAMPLES
+
+PGPASSWORD='mypassword' pg_activity -U pgadmin -h 127.0.0.1 --no-client -C
+	
+pg_activity -h /tmp
+
+=cut
