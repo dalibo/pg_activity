@@ -9,6 +9,8 @@ Dependencies
 	Python >= 2.6
 	psycopg2 >= 2.2.1
 	psutil >= 0.5.1
+	# for installation from sources :
+	setuptools >= 0.6.14
 
 Usage
 -----
@@ -43,6 +45,7 @@ Interactives commands
 	m		Sort by MEM%, descending
 	t		Sort by TIME+, descending
 	Space	Pause on/off
+	v		Change queries display mode: full, truncated, indented
 
 Screenshot
 ----------

@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 """
 pg_activity utility
 version: 0.1 DEV
@@ -31,10 +32,17 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
+PGTOP_VERSION="0.1.0 DEV"
+
+
 import os
 import sys
 if os.name != 'posix':
 	sys.exit('FATAL: Platform not supported.')
+import getpass
+if getpass.getuser() != 'postgres':
+	sys.exit('FATAL: Must be run as postgres.')
+import signal
 import time
 import curses
 import atexit
@@ -61,8 +69,15 @@ def at_exit_curses():
 	curses.endwin()
 
 """
-Curses initialization
+Function called on a kill
 """
+def signal_handler(signal, frame):
+	at_exit_curses()
+	print "FATAL: Killed."
+	sys.exit(0)
+
+
+# Curses initialization
 curses.setupterm()
 win = curses.initscr()
 win.keypad(1)
@@ -75,6 +90,7 @@ curses.start_color()
 curses.use_default_colors()
 lineno = 0
 curses.endwin()
+
 
 # define some color pairs
 C_BLACK_GREEN = 1
@@ -223,7 +239,7 @@ def pg_get_activities(cur, conn, pg_num_version):
 		query = """
 		SELECT
 			pg_stat_activity.pid AS pid,
-			pg_stat_activity.datname AS database,
+			CASE WHEN LENGTH(pg_stat_activity.datname) > 16 THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$') ELSE pg_stat_activity.datname END AS database,
 			pg_stat_activity.client_addr AS client,
 			EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
 			pg_stat_activity.waiting AS wait,
@@ -241,7 +257,7 @@ def pg_get_activities(cur, conn, pg_num_version):
 		query = """
 		SELECT
 			pg_stat_activity.procpid AS pid,
-			pg_stat_activity.datname AS database,
+			CASE WHEN LENGTH(pg_stat_activity.datname) > 16 THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$') ELSE pg_stat_activity.datname END AS database,
 			pg_stat_activity.client_addr AS client,
 			EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
 			pg_stat_activity.waiting AS wait,
@@ -424,12 +440,13 @@ def poll(interval, cursor, connector, process = None, pg_num_version = None):
 	return (disp_procs, procs_status, new_procs)
 
 """
-Simple curses wrapper for word printing
+Simple curses wrapper for word printing.
 """
 def print_word(word, color = 0):
 	win.addstr(word, color)
 
 """
+Print a string at position (lineno, colno) and returns its length.
 """
 def print_string(lineno, colno, word, color = 0):
 	win.addstr(lineno, colno, word, color)
@@ -437,12 +454,14 @@ def print_string(lineno, colno, word, color = 0):
 
 
 """
+Complete string with white spaces from the end of string to the end of line.
 """
 def add_blank(line, offset = 0): 
 	line += " " * (win.getmaxyx()[1] - (len(line) + offset))
 	return line
 
 """
+Convert a size into a human readable format.
 """
 def bytes2human(n):
 	symbols = ('K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y')
@@ -456,6 +475,7 @@ def bytes2human(n):
 	return "%.2fB" % n
 
 """
+Returns identation for Query column.
 """
 def get_indent(flag):
 	indent = ''
@@ -470,6 +490,7 @@ def get_indent(flag):
 	return indent
 
 """
+Print columns headers
 """
 def print_cols_header(flag):
 	global PGTOP_SORT
@@ -502,6 +523,7 @@ def print_cols_header(flag):
 	lineno += 1
 
 """
+Print window header
 """
 def print_header(procs_status, pg_version, hostname, user, host, port, io):
 	global PGTOP_MAX_IOPS
@@ -542,7 +564,9 @@ def print_header(procs_status, pg_version, hostname, user, host, port, io):
 	lineno += 1
 	colno = print_string(lineno, 0, line)
 
+
 """
+Refresh the window
 """
 def refresh_window(procs, procs_status, extras, flag, indent, io):
 	global lineno
@@ -559,7 +583,8 @@ def refresh_window(procs, procs_status, extras, flag, indent, io):
 			colno = 0
 			colno += print_string(lineno, colno, "%-6s " % (p.pid,), curses.color_pair(C_CYAN))
 			if flag & PGTOP_FLAG_DATABASE:
-				colno += print_string(lineno, colno, "%-16s " % (p._pg_database[:16],), curses.A_UNDERLINE | curses.color_pair(0))
+				colno += print_string(lineno, colno, "%-16s" % (p._pg_database[:16],), curses.A_UNDERLINE | curses.color_pair(0))
+				colno += print_string(lineno, colno, " ", curses.color_pair(0))
  			if flag & PGTOP_FLAG_CLIENT:
 				colno += print_string(lineno, colno, "%16s " % (str(p._pg_client)[:16],), curses.color_pair(C_CYAN))
 			if flag & PGTOP_FLAG_CPU:
@@ -627,7 +652,7 @@ main
 """
 def main():
 	try:
-		parser = OptionParser(add_help_option=False)
+		parser = OptionParser(add_help_option=False, version="%prog "+PGTOP_VERSION)
 		parser.add_option("-U", "--username", dest="username", default="postgres", help="Database user name (default: \"postgres\").", metavar="USERNAME")
 		parser.add_option("-p", "--port", dest="port", default="5432", help="Database server port (default: \"5432\").", metavar="PORT")
 		parser.add_option("-h", "--host", dest="host", help="Database server host or socket directory (default: \"local socket\").", metavar="HOSTNAME", default="localhost")
@@ -648,15 +673,15 @@ def main():
 		if options.help is True:
 			at_exit_curses()
 			print(parser.format_help().strip())
-			return 0
+			sys.exit(0)
+		
 		password = os.environ.get('PGPASSWORD')
 		
 		try:
 			(cur, conn) = pg_connect(host = options.host, port = options.port, user = options.username, password = password)
 		except psycopg2.Error as e:
 			at_exit_curses()
-			print "FATAL: %s" % (clean_str(str(e),))
-			return 0
+			sys.exit("FATAL: %s" % (clean_str(str(e),)))
 		pg_version = pg_get_version(cur, conn)
 		(pg_short_version, pg_num_version) = pg_get_num_version(pg_version)
 		# top part
@@ -696,7 +721,7 @@ def main():
 		# main loop
 		disks_io = None
 		while 1:
-			
+			# poll process
 			(disp_procs, procs_status, new_procs) = poll(interval, cur, conn, procs, pg_num_version)
 			new_disks_io = {'io':psutil.disk_io_counters(), 'time':time.time()}
 			delta_disks_io = {'read_count': 0, 'write_count': 0, 'read_bytes': 0.0, 'write_bytes': 0.0}
@@ -708,29 +733,26 @@ def main():
 			disks_io = new_disks_io
 	
 			procs = new_procs
+			# refresh the winodw
 			refresh_window(disp_procs, procs_status, (pg_short_version, hostname, options.username, options.host, options.port), flag, indent, delta_disks_io)
 			interval = 1
 
 	except psutil.error.AccessDenied as e:
 		at_exit_curses()
-		print "FATAL: Can't acces IO informations for process %s" % (str(e),)
-		return 0
+		sys.exit("FATAL: Can't acces IO informations for process %s" % (str(e),))
 	except curses.error as e:
 		at_exit_curses()
-		print "FATAL: %s" % (str(e),)
-		return 0
-	except SystemExit as e:
-		at_exit_curses()
-		return 0
+		sys.exit("FATAL: %s" % (str(e),))
 	except KeyboardInterrupt as e:
 		at_exit_curses()
-		return 0
+		sys.exit(0)
 	except Exception as e:
 		at_exit_curses()
-		print "FATAL: %s" % (str(e),)
-		return 0
+		sys.exit("FATAL: %s" % (str(e),))
 
 """
+Call the main function
 """
 if __name__ == '__main__':
+	signal.signal(signal.SIGTERM, signal_handler)
 	main()
