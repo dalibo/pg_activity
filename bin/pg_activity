@@ -335,7 +335,7 @@ def pause():
 """
 Poll activities.
 """
-def poll(interval, cursor, connector, process = None, pg_num_version = None):
+def poll(interval, cursor, connector, flag, process = None, pg_num_version = None):
 	global PGTOP_VERBOSE_MODE
 	global PGTOP_COLOR
 	global PGTOP_SORT
@@ -360,13 +360,13 @@ def poll(interval, cursor, connector, process = None, pg_num_version = None):
 			set_nocolor()
 		else:
 			set_color()
-	if k == ord('c'):
+	if k == ord('c') and (flag & PGTOP_FLAG_CPU):
 		PGTOP_SORT = 'c'
-	if k == ord('m'):
+	if k == ord('m') and (flag & PGTOP_FLAG_MEM):
 		PGTOP_SORT = 'm'
-	if k == ord('r'):
+	if k == ord('r') and (flag & PGTOP_FLAG_READ):
 		PGTOP_SORT = 'r'
-	if k == ord('w'):
+	if k == ord('w') and (flag & PGTOP_FLAG_WRITE):
 		PGTOP_SORT = 'w'
 	if k == ord('t'):
 		PGTOP_SORT = 't'
@@ -717,12 +717,14 @@ def main():
 
 		# indentation
 		indent = get_indent(flag)
-
 		# main loop
 		disks_io = None
 		while 1:
+			if len(indent) > (win.getmaxyx()[1] - 2):
+				raise Exception('Window\'s too small, %s chars are required.' % (len(indent),))
+			
 			# poll process
-			(disp_procs, procs_status, new_procs) = poll(interval, cur, conn, procs, pg_num_version)
+			(disp_procs, procs_status, new_procs) = poll(interval, cur, conn, flag, procs, pg_num_version)
 			new_disks_io = {'io':psutil.disk_io_counters(), 'time':time.time()}
 			delta_disks_io = {'read_count': 0, 'write_count': 0, 'read_bytes': 0.0, 'write_bytes': 0.0}
 			if disks_io is not None:
