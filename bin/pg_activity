@@ -194,23 +194,22 @@ def pg_connect(host = 'localhost', port = 5432, user = 'postgres', password = No
 			host = host,
 			port = port,
 			user = user,
-			password = str(password)
+			password = str(password),
+			connection_factory=psycopg2.extras.DictConnection	
 		)
-	cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 	conn.set_isolation_level(0)
-	return (cur, conn)
+	return conn
 
 """
 Get PostgreSQL server version
 """
-def pg_get_version(cur, conn):
-	cur.execute("BEGIN")
+def pg_get_version(conn):
 	query = """
 	SELECT version() AS pg_version
 	"""
+	cur = conn.cursor()
 	res = cur.execute(query)
 	ret = cur.fetchone()
-	cur.execute("COMMIT")
 	return ret['pg_version']
 
 """
@@ -233,7 +232,7 @@ def pg_get_num_version(text_version):
 """
 Get activity from pg_stat_activity view
 """
-def pg_get_activities(cur, conn, pg_num_version):
+def pg_get_activities(conn, pg_num_version):
 	if pg_num_version >= 90200:
 		# PostgreSQL 9.2.0 and more
 		query = """
@@ -270,10 +269,9 @@ def pg_get_activities(cur, conn, pg_num_version):
 		ORDER BY
 			EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
 		"""
-	cur.execute("BEGIN")
+	cur = conn.cursor()
 	res = cur.execute(query)
 	ret = cur.fetchall()
-	cur.execute("COMMIT")
 	return ret
 
 """
@@ -335,7 +333,7 @@ def pause():
 """
 Poll activities.
 """
-def poll(interval, cursor, connector, flag, process = None, pg_num_version = None):
+def poll(interval, connector, flag, process = None, pg_num_version = None):
 	global PGTOP_VERBOSE_MODE
 	global PGTOP_COLOR
 	global PGTOP_SORT
@@ -374,7 +372,7 @@ def poll(interval, cursor, connector, flag, process = None, pg_num_version = Non
 	curses.flushinp()
 	
 	# poll postgresql activity
-	queries =  pg_get_activities(cursor, connector, pg_num_version)
+	queries =  pg_get_activities(connector, pg_num_version)
 	# get resource usage for each process
 	new_procs = sys_get_proc(queries)
 
@@ -678,15 +676,15 @@ def main():
 		password = os.environ.get('PGPASSWORD')
 		
 		try:
-			(cur, conn) = pg_connect(host = options.host, port = options.port, user = options.username, password = password)
+			conn = pg_connect(host = options.host, port = options.port, user = options.username, password = password)
 		except psycopg2.Error as e:
 			at_exit_curses()
 			sys.exit("FATAL: %s" % (clean_str(str(e),)))
-		pg_version = pg_get_version(cur, conn)
+		pg_version = pg_get_version(conn)
 		(pg_short_version, pg_num_version) = pg_get_num_version(pg_version)
 		# top part
 		interval = 0
-		queries =  pg_get_activities(cur, conn, pg_num_version)
+		queries =  pg_get_activities(conn, pg_num_version)
 		procs = sys_get_proc(queries)
 		hostname = socket.gethostname()
 		has_color = True
@@ -724,7 +722,7 @@ def main():
 				raise Exception('Window\'s too small, %s chars are required.' % (len(indent),))
 			
 			# poll process
-			(disp_procs, procs_status, new_procs) = poll(interval, cur, conn, flag, procs, pg_num_version)
+			(disp_procs, procs_status, new_procs) = poll(interval, conn, flag, procs, pg_num_version)
 			new_disks_io = {'io':psutil.disk_io_counters(), 'time':time.time()}
 			delta_disks_io = {'read_count': 0, 'write_count': 0, 'read_bytes': 0.0, 'write_bytes': 0.0}
 			if disks_io is not None:
