@@ -539,28 +539,45 @@ def print_header(procs_status, pg_version, hostname, user, host, port, io):
 	colno += print_string(lineno, colno, ":")
 	colno += print_string(lineno, colno, port, curses.color_pair(C_CYAN))
 
-	phymem = psutil.phymem_usage()
-	buffers = getattr(psutil, 'phymem_buffers', lambda: 0)()
-	cached = getattr(psutil, 'cached_phymem', lambda: 0)()
+	try:
+		# psutil >= 0.6.0
+		phymem = psutil.virtual_memory()
+		buffers = psutil.virtual_memory().buffers
+		cached = psutil.virtual_memory().cached
+		vmem = psutil.swap_memory()
+	except AttributeError:
+		# psutil > 0.4.0 and < 0.6.0
+		phymem = psutil.phymem_usage()
+		buffers = getattr(psutil, 'phymem_buffers', lambda: 0)()
+		cached = getattr(psutil, 'cached_phymem', lambda: 0)()
+		vmem = psutil.virtmem_usage()
+
 	used = phymem.total - (phymem.free + buffers + cached)
-	line = "  Mem.: %5s%% %9s/%s\n" % (phymem.percent, str(int(used / 1024 / 1024)) + "M", str(int(phymem.total / 1024 / 1024)) + "M")
 	lineno += 1
-	colno = print_string(lineno, 0, line)
+	line = "  Mem.: %5s%% %9s/%s " % (phymem.percent, str(int(used / 1024 / 1024)) + "M", str(int(phymem.total / 1024 / 1024)) + "M")
+	colno_io = print_string(lineno, 0, line)
+	
+	if (int(io['read_count'])+int(io['write_count'])) > PGTOP_MAX_IOPS:
+		PGTOP_MAX_IOPS = (int(io['read_count'])+int(io['write_count']))
+	
+	line_io = " | IO Disks Max : %s IOPs" % (PGTOP_MAX_IOPS,)
+	colno = print_string(lineno, colno_io, line_io)
 
 	# swap usage
-	vmem = psutil.virtmem_usage()
 	line = "  Swap: %5s%% %9s/%s\n" % (vmem.percent, str(int(vmem.used / 1024 / 1024)) + "M", str(int(vmem.total / 1024 / 1024)) + "M")
 	lineno += 1
 	colno = print_string(lineno, 0, line)
+	line_io = " | Read : %8s/s - %6s IOPs" % (bytes2human(io['read_bytes']), int(io['read_count']),)
+	colno = print_string(lineno, colno_io, line_io)
 
 	# load average, uptime
-	if (int(io['read_count'])+int(io['write_count'])) > PGTOP_MAX_IOPS:
-		PGTOP_MAX_IOPS = (int(io['read_count'])+int(io['write_count']))
 	av1, av2, av3 = os.getloadavg()
 	line = "  Load:   %.2f %.2f %.2f" % (av1, av2, av3)
-	line += " 	I/O Disks READ: %8s/s - %6sIO/s WRITE: %8s/s - %6sIO/s MAX: %sIO/s\n" % (bytes2human(io['read_bytes']), int(io['read_count']), bytes2human(io['write_bytes']), int(io['write_count']), PGTOP_MAX_IOPS)
+	# line += " 	I/O Disks READ: %8s/s - %6sIO/s WRITE: %8s/s - %6sIO/s MAX: %sIO/s\n" % (bytes2human(io['read_bytes']), int(io['read_count']), bytes2human(io['write_bytes']), int(io['write_count']), PGTOP_MAX_IOPS)
 	lineno += 1
 	colno = print_string(lineno, 0, line)
+	line_io = " | Write: %8s/s - %6s IOPs" % (bytes2human(io['write_bytes']), int(io['write_count']),)
+	colno = print_string(lineno, colno_io, line_io)
 
 
 """
