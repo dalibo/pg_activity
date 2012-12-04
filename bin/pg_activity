@@ -539,16 +539,16 @@ def print_header(procs_status, pg_version, hostname, user, host, port, io):
 	colno += print_string(lineno, colno, ":")
 	colno += print_string(lineno, colno, port, curses.color_pair(C_CYAN))
 
-	phymem = psutil.phymem_usage()
-	buffers = getattr(psutil, 'phymem_buffers', lambda: 0)()
-	cached = getattr(psutil, 'cached_phymem', lambda: 0)()
+	phymem = psutil.virtual_memory()
+	buffers = psutil.virtual_memory().buffers 
+	cached = psutil.virtual_memory().cached 
 	used = phymem.total - (phymem.free + buffers + cached)
 	line = "  Mem.: %5s%% %9s/%s\n" % (phymem.percent, str(int(used / 1024 / 1024)) + "M", str(int(phymem.total / 1024 / 1024)) + "M")
 	lineno += 1
 	colno = print_string(lineno, 0, line)
 
 	# swap usage
-	vmem = psutil.virtmem_usage()
+	vmem = psutil.swap_memory()
 	line = "  Swap: %5s%% %9s/%s\n" % (vmem.percent, str(int(vmem.used / 1024 / 1024)) + "M", str(int(vmem.total / 1024 / 1024)) + "M")
 	lineno += 1
 	colno = print_string(lineno, 0, line)
