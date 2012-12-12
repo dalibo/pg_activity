@@ -30,6 +30,10 @@ pg_activity is a htop like application for PostgreSQL server activity monitoring
 
 	Show this help message and exit.
 
+=item B<--version>
+
+	Show program's version number and exit.
+
 =back
 
 =head1 DISPLAY OPTIONS
@@ -90,12 +94,32 @@ pg_activity is a htop like application for PostgreSQL server activity monitoring
 
 =item B<v>     Change queries display mode: full, truncated, indented
 
+=item B<UP / DOWN> Go to "navigation" mode
+
+=item B<q>     Quit
+
+=back
+
+=head1 NAVIGATION MODE
+
+=over 2
+	
+=item B<UP>    Move up the cursor
+
+=item B<DOWN>  Move down the cursor
+
+=item B<k>     Cancel the backend
+
+=item B<Space> Back to activity
+
+=item B<q>     Quit
+
 =back
 
 =head1 EXAMPLES
 
 PGPASSWORD='mypassword' pg_activity -U pgadmin -h 127.0.0.1 --no-client -C
-	
+
 pg_activity -h /tmp
 
 =cut

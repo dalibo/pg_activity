@@ -2,7 +2,7 @@
 
 """
 pg_activity utility
-version: 0.1 DEV
+version: 0.2.0 DEV
 author: Julien Tachoires <julmon@gmail.com>
 license: New BSD License
 
@@ -32,7 +32,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-PGTOP_VERSION="0.1.1"
+PGTOP_VERSION="0.2.0"
 
 
 import os
@@ -90,7 +90,8 @@ curses.start_color()
 curses.use_default_colors()
 lineno = 0
 curses.endwin()
-
+win.scrollok(0)
+lines = []
 
 # define some color pairs
 C_BLACK_GREEN = 1
@@ -113,7 +114,8 @@ PGTOP_FLAG_TIME = 64
 PGTOP_FLAG_WAIT = 128
 PGTOP_FLAG_NONE = None
 PGTOP_FLAGS_COL = PGTOP_FLAG_DATABASE | PGTOP_FLAG_CPU | PGTOP_FLAG_MEM | PGTOP_FLAG_READ | PGTOP_FLAG_WRITE | PGTOP_FLAG_TIME | PGTOP_FLAG_WAIT
-pgtop_cols = {
+
+PGTOP_COLS = {
 	'pid'		: {'n': 1, 'name': 'PID', 'template_h': '%-6s ', 'flag': PGTOP_FLAG_NONE, 'mandatory': True},
 	'database'	: {'n': 2, 'name': 'DATABASE', 'template_h': '%-16s ', 'flag': PGTOP_FLAG_DATABASE, 'mandatory': False},
 	'client'	: {'n': 3, 'name': 'CLIENT', 'template_h': '%16s ', 'flag': PGTOP_FLAG_CLIENT, 'mandatory': False},
@@ -124,6 +126,22 @@ pgtop_cols = {
 	'time'		: {'n': 8, 'name': 'TIME+', 'template_h': '%9s ', 'flag': PGTOP_FLAG_TIME, 'mandatory': False},
 	'wait'		: {'n': 9, 'name': 'W', 'template_h': '%2s ', 'flag': PGTOP_FLAG_WAIT, 'mandatory': False},
 	'query'		: {'n': 10, 'name': 'Query', 'template_h': ' %2s', 'flag': PGTOP_FLAG_NONE, 'mandatory': True},
+}
+
+PGTOP_LINE_COLORS = {
+	'pid'			: {'default': curses.color_pair(C_CYAN), 'cursor': curses.color_pair(C_CYAN)|curses.A_REVERSE, 'lock': curses.color_pair(C_RED)},
+	'database'		: {'default': curses.A_UNDERLINE | curses.color_pair(0), 'cursor': curses.color_pair(C_CYAN)|curses.A_REVERSE, 'lock': curses.color_pair(C_RED)},
+	'client'		: {'default': curses.color_pair(C_CYAN), 'cursor': curses.color_pair(C_CYAN)|curses.A_REVERSE, 'lock': curses.color_pair(C_RED)},
+	'cpu'			: {'default': curses.color_pair(0), 'cursor': curses.color_pair(C_CYAN)|curses.A_REVERSE, 'lock': curses.color_pair(C_RED)},
+	'mem'			: {'default': curses.color_pair(0), 'cursor': curses.color_pair(C_CYAN)|curses.A_REVERSE, 'lock': curses.color_pair(C_RED)},
+	'read'			: {'default': curses.color_pair(0), 'cursor': curses.color_pair(C_CYAN)|curses.A_REVERSE, 'lock': curses.color_pair(C_RED)},
+	'write'			: {'default': curses.color_pair(0), 'cursor': curses.color_pair(C_CYAN)|curses.A_REVERSE, 'lock': curses.color_pair(C_RED)},
+	'time_red'		: {'default': curses.color_pair(C_RED), 'cursor': curses.color_pair(C_CYAN)|curses.A_REVERSE, 'lock': curses.color_pair(C_RED)},
+	'time_yellow'	: {'default': curses.color_pair(C_YELLOW), 'cursor': curses.color_pair(C_CYAN)|curses.A_REVERSE, 'lock': curses.color_pair(C_RED)},
+	'time_green'	: {'default': curses.color_pair(C_GREEN), 'cursor': curses.color_pair(C_CYAN)|curses.A_REVERSE, 'lock': curses.color_pair(C_RED)},
+	'wait_green'	: {'default': curses.color_pair(C_GREEN) | curses.A_BOLD, 'cursor': curses.color_pair(C_CYAN)|curses.A_REVERSE, 'lock': curses.color_pair(C_RED)},
+	'wait_red'		: {'default': curses.color_pair(C_RED) | curses.A_BOLD, 'cursor': curses.color_pair(C_CYAN)|curses.A_REVERSE, 'lock': curses.color_pair(C_RED)},
+	'query'			: {'default': curses.color_pair(0), 'cursor': curses.color_pair(C_CYAN)|curses.A_REVERSE, 'lock': curses.color_pair(C_RED)}
 }
 
 # display query mode
@@ -144,8 +162,6 @@ Replace colors by white.
 def set_nocolor():
 	global PGTOP_COLOR
 	PGTOP_COLOR = False
-	# curses.A_BOLD = 0
-	# curses.A_UNDERLINE = 0
 	curses.init_pair(C_BLACK_GREEN, curses.COLOR_BLACK, curses.COLOR_WHITE)
 	curses.init_pair(C_CYAN, curses.COLOR_WHITE, -1)
 	curses.init_pair(C_RED, curses.COLOR_WHITE, -1)
@@ -211,6 +227,18 @@ def pg_get_version(conn):
 	res = cur.execute(query)
 	ret = cur.fetchone()
 	return ret['pg_version']
+
+"""
+Cancel a backend
+"""
+def pg_cancel_backend(conn, pid):
+	query = """
+	SELECT pg_cancel_backend(%s) AS canceled
+	"""
+	cur = conn.cursor()
+	res = cur.execute(query, (pid,))
+	ret = cur.fetchone()
+	return ret['canceled']
 
 """
 Get PostgreSQL short & numeric version from
@@ -316,6 +344,7 @@ def pause():
 	line += msg
 	line += " " * (x - len(line) - 0)
 	win.addstr(4, 0, line, curses.color_pair(C_RED_BLACK)|curses.A_REVERSE|curses.A_BOLD)
+	current_pos = -1
 	while 1:
 		try:
 			k = win.getch()
@@ -326,14 +355,119 @@ def pause():
 			exit()
 		if k == ord(' '):
 			curses.flushinp()
-			win.addstr((y-1), 0, " ", curses.color_pair(0))
 			return 0
 		curses.flushinp()
 
 """
+Display interactive mode menu bar
+"""
+def help_key_interactive(y):
+	colno = print_string((y - 1), 0, "<k>", curses.color_pair(0))
+	colno += print_string((y - 1), colno, "Backend cancel    ", curses.color_pair(C_CYAN)|curses.A_REVERSE)
+	colno += print_string((y - 1), colno, "<Space>", curses.color_pair(0))
+	colno += print_string((y - 1), colno, "Back to activity    ", curses.color_pair(C_CYAN)|curses.A_REVERSE)
+	colno += print_string((y - 1), colno, "<q>", curses.color_pair(0))
+	colno += print_string((y - 1), colno, "Quit    ", curses.color_pair(C_CYAN)|curses.A_REVERSE)
+	colno += print_string((y - 1), colno, add_blank(" "), curses.color_pair(C_CYAN)|curses.A_REVERSE)
+
+"""
+Ask for canceling a backend
+"""
+def ask_cancel_backend(y, pid, connector):
+	colno = print_string((y - 1), 0, "Cancel the backend with PID %s ? <Y/N>" % (str(pid),), curses.color_pair(0))
+	colno += print_string((y - 1), colno, add_blank(" "), curses.color_pair(C_CYAN)|curses.A_REVERSE)
+	while 1:
+		try:
+			k = win.getch()
+		except KeyboardInterrupt as e:
+			raise e
+		# quit
+		if k == ord('q'):
+			curses.endwin()
+			exit()
+		# yes
+		if k == ord('y') or k == ord('Y'):
+			res = pg_cancel_backend(connector, str(pid))
+			time.sleep(1)
+			return 1
+		# no
+		if k == ord('n') or k == ord('N') or k == ord(' '):
+			return 0
+
+"""
+Interactive mode trigged on KEY_UP or KEY_DOWN key press
+If no key hit during 3 seconds, exit this mode
+"""
+def interactive(process, flag, indent, connector):
+	global lines
+	global PGTOP_VERBOSE_MODE
+	# Force truncated display
+	old_verbose_mode = PGTOP_VERBOSE_MODE
+	PGTOP_VERBOSE_MODE = PGTOP_TRUNCATE
+
+	# Refresh lines with this verbose mode	
+	(y,x) = win.getmaxyx()
+	scroll_window(process, flag, indent, 0)
+	
+	help_key_interactive(y)
+
+	current_pos = 0
+	# refresh_line(process[current_pos], flag, indent, 'cursor', lines[current_pos][1])
+	offset = 0
+	refresh_line(process[current_pos], flag, indent, 'cursor', lines[current_pos] - offset)
+	t_active = time.time()
+	# raise Exception(str(lines))
+	while 1:
+		try:
+			k = win.getch()
+		except KeyboardInterrupt as e:
+			raise e
+		# quit
+		if k == ord('q'):
+			curses.endwin()
+			exit()
+		# cancel the backend attached to this PID
+		if k == ord('k'):
+			res = ask_cancel_backend(y, process[current_pos].pid, connector)
+			PGTOP_VERBOSE_MODE = old_verbose_mode
+			curses.flushinp()
+			return 0
+		# Move cursor
+		if k == curses.KEY_DOWN or k == curses.KEY_UP:
+			t_active = time.time()
+			if k == curses.KEY_UP and current_pos > 0:
+				if (lines[current_pos] - offset) < 7:
+					offset -= 1
+					scroll_window(process, flag, indent, offset)
+					help_key_interactive(y)
+
+				if current_pos < len(process):
+					refresh_line(process[current_pos], flag, indent, 'default', lines[current_pos] - offset)
+				current_pos -= 1
+			if k == curses.KEY_DOWN and current_pos < (len(process) - 1):
+				if (lines[current_pos] - offset) >= (y - 2):
+					offset += 1
+					scroll_window(process, flag, indent, offset)
+					help_key_interactive(y)
+
+				if current_pos >= 0:
+					refresh_line(process[current_pos], flag, indent, 'default', lines[current_pos] - offset)
+				current_pos += 1
+			refresh_line(process[current_pos], flag, indent, 'cursor', lines[current_pos] - offset)
+		# quit interactive mode
+		if k == ord(' '):
+			PGTOP_VERBOSE_MODE = old_verbose_mode
+			curses.flushinp()
+			return 0
+		curses.flushinp()
+		if time.time() - t_active > 3:
+			PGTOP_VERBOSE_MODE = old_verbose_mode
+			return 0
+
+"""
 Poll activities.
 """
-def poll(interval, connector, flag, process = None, pg_num_version = None):
+def poll(interval, connector, flag, indent, process = None, pg_num_version = None, disp_proc = None):
 	global PGTOP_VERBOSE_MODE
 	global PGTOP_COLOR
 	global PGTOP_SORT
@@ -347,17 +481,24 @@ def poll(interval, connector, flag, process = None, pg_num_version = None):
 	if k == ord('q'):
 		curses.endwin()
 		exit()
+	# PAUSE mode
 	if k == ord(' '):
 		pause()
+	# interactive mode
+	if k == curses.KEY_DOWN or k == curses.KEY_UP:
+		interactive(disp_proc, flag, indent, connector)
+	# change verbosity
 	if k == ord('v'):
 		PGTOP_VERBOSE_MODE += 1
 		if PGTOP_VERBOSE_MODE > 3:
 			PGTOP_VERBOSE_MODE = 1
+	# turnoff/on colors
 	if k == ord('C'):
 		if PGTOP_COLOR is True:
 			set_nocolor()
 		else:
 			set_color()
+	# sorts
 	if k == ord('c') and (flag & PGTOP_FLAG_CPU):
 		PGTOP_SORT = 'c'
 	if k == ord('m') and (flag & PGTOP_FLAG_MEM):
@@ -447,7 +588,10 @@ def print_word(word, color = 0):
 Print a string at position (lineno, colno) and returns its length.
 """
 def print_string(lineno, colno, word, color = 0):
-	win.addstr(lineno, colno, word, color)
+	try:
+		win.addstr(lineno, colno, word, color)
+	except curses.error:
+		pass
 	return len(word)
 
 
@@ -478,7 +622,7 @@ Returns identation for Query column.
 def get_indent(flag):
 	indent = ''
 	r = [0] * 11
-	for key, val in pgtop_cols.items():
+	for key, val in PGTOP_COLS.items():
 		if val['mandatory'] or (not val['mandatory'] and val['flag'] & flag):
 			r[int(val['n'])] = val
 	for val in r:
@@ -497,7 +641,7 @@ def print_cols_header(flag):
 	disp = ''
 	x = 0
 	r = [0] * 11
-	for key, val in pgtop_cols.items():
+	for key, val in PGTOP_COLS.items():
 		if val['mandatory'] or (not val['mandatory'] and val['flag'] & flag):
 			r[int(val['n'])] = val
 	for val in r:
@@ -526,6 +670,7 @@ Print window header
 def print_header(procs_status, pg_version, hostname, user, host, port, io):
 	global PGTOP_MAX_IOPS
 	global lineno
+	
 	lineno = 0
 	colno = 0
 	version = " %s" % (pg_version)
@@ -573,94 +718,131 @@ def print_header(procs_status, pg_version, hostname, user, host, port, io):
 	# load average, uptime
 	av1, av2, av3 = os.getloadavg()
 	line = "  Load:   %.2f %.2f %.2f" % (av1, av2, av3)
-	# line += " 	I/O Disks READ: %8s/s - %6sIO/s WRITE: %8s/s - %6sIO/s MAX: %sIO/s\n" % (bytes2human(io['read_bytes']), int(io['read_count']), bytes2human(io['write_bytes']), int(io['write_count']), PGTOP_MAX_IOPS)
 	lineno += 1
 	colno = print_string(lineno, 0, line)
 	line_io = " | Write: %8s/s - %6s IOPs" % (bytes2human(io['write_bytes']), int(io['write_count']),)
 	colno = print_string(lineno, colno_io, line_io)
-
 
 """
 Refresh the window
 """
 def refresh_window(procs, procs_status, extras, flag, indent, io):
 	global lineno
-	global PGTOP_VERBOSE_MODE
+	global lines
+
+	lines = []
+	
 	(pg_version, hostname, user, host, port) = extras
 	win.erase()
 	print_header(procs_status, pg_version, hostname, user, host, port, io)
 	lineno += 2
+	line_trunc = lineno
 	print_cols_header(flag)
 	colno = 0
-	(maxy, maxx) = win.getmaxyx()
 	for p in procs:
 		try:
-			colno = 0
-			colno += print_string(lineno, colno, "%-6s " % (p.pid,), curses.color_pair(C_CYAN))
-			if flag & PGTOP_FLAG_DATABASE:
-				colno += print_string(lineno, colno, "%-16s" % (p._pg_database[:16],), curses.A_UNDERLINE | curses.color_pair(0))
-				colno += print_string(lineno, colno, " ", curses.color_pair(0))
- 			if flag & PGTOP_FLAG_CLIENT:
-				colno += print_string(lineno, colno, "%16s " % (str(p._pg_client)[:16],), curses.color_pair(C_CYAN))
-			if flag & PGTOP_FLAG_CPU:
-				colno += print_string(lineno, colno, "%5s " % (p._cpu_percent,))
-			if flag & PGTOP_FLAG_MEM:
-				colno += print_string(lineno, colno, "%4s " % (round(p._mem_percent, 1),))
-			if flag & PGTOP_FLAG_READ:
-				colno += print_string(lineno, colno, "%8s " % (bytes2human(p._io_read_delta),))
-			if flag & PGTOP_FLAG_WRITE:
-				colno += print_string(lineno, colno, "%8s " % (bytes2human(p._io_write_delta),))
-			if flag & PGTOP_FLAG_TIME:
-				if p._pg_duration < 0:
-					p._pg_duration = 0
-				if p._pg_duration >= 1:
-					ctime = timedelta(seconds=float(p._pg_duration))
-					mic = '%.6d' % (ctime.microseconds)
-					ctime = "%s:%s.%s" % (str((ctime.seconds // 60)).zfill(2), str((ctime.seconds % 60)).zfill(2), str(mic)[:2])
-				if p._pg_duration < 1:
-					colno += print_string(lineno, colno, " %.6f " % (p._pg_duration,), curses.color_pair(C_GREEN))
-				elif p._pg_duration >= 1 and p._pg_duration < 3:
-					colno += print_string(lineno, colno, "%9s " % (ctime,), curses.color_pair(C_YELLOW))
-				else:
-					colno += print_string(lineno, colno, "%9s " % (ctime,), curses.color_pair(C_RED))
-			if flag & PGTOP_FLAG_WAIT:
-				if p._pg_wait:
-					colno += print_string(lineno, colno, "%2s " % ("Y",), curses.color_pair(C_RED) | curses.A_BOLD)
-				else:
-					colno += print_string(lineno, colno, "%2s " % ("N",), curses.color_pair(C_GREEN) | curses.A_BOLD)
-
-			dif = maxx - len(indent) - 1
-			if PGTOP_VERBOSE_MODE == PGTOP_TRUNCATE:
-				query = p._pg_query[:dif]
-				colno += print_string(lineno, colno, " %s\n" % (add_blank(query,len(indent)),))
-			elif PGTOP_VERBOSE_MODE == PGTOP_WRAP or  PGTOP_VERBOSE_MODE == PGTOP_WRAP_NOINDENT:
-				query = p._pg_query
-				query_wrote = ''
-				offset = 0
-				if len(query) > dif:
-					query_part = query[offset:dif]
-					print_string(lineno, colno, " %s" % (add_blank(query_part,len(indent)),))
-					query_wrote += query_part
-					offset = len(query_wrote)
-					if PGTOP_VERBOSE_MODE == PGTOP_WRAP_NOINDENT:
-						dif = maxx
-						p_indent = ''
-					else:
-						p_indent = indent
-					while (len(query) - offset > 0):	
-						query_part = query[offset:(dif+offset)]
-						lineno += 1
-						print_string(lineno, 0, "%s" % (add_blank(p_indent + ' '+ query_part, len(indent))))
-						query_wrote += query_part
-						offset = len(query_wrote)
-				else:
-					colno += print_string(lineno, colno, " %s\n" % (add_blank(query, len(indent)),))
-			lineno += 1
+			refresh_line(p, flag, indent, 'default')
+			line_trunc += 1
+			lines.append(line_trunc)
 		except curses.error as e:
 			break
 		
 		for l in range(lineno, (win.getmaxyx()[0]-1)):
 			print_string(l, 0, add_blank(' '))
+
+"""
+Scroll the window
+"""
+def scroll_window(procs, flag, indent, offset = 0):
+	global lineno
+	lineno = 6
+	pos = 0
+	for p in procs:
+		if pos >= offset:
+			try:
+				refresh_line(p, flag, indent, 'default')
+			except curses.error as e:
+				break
+		
+			for l in range(lineno, (win.getmaxyx()[0]-1)):
+				print_string(l, 0, add_blank(' '))
+		pos += 1
+
+"""
+Refresh a line
+"""
+def refresh_line(p, flag, indent, typecolor = 'default', line = None):
+	global lineno
+	if line is not None:
+		l_lineno = line
+	else:
+		l_lineno = lineno
+
+	(maxy, maxx) = win.getmaxyx()
+	colno = 0
+	if l_lineno > maxy:
+		return
+	
+	colno += print_string(l_lineno, colno, "%-6s " % (p.pid,), PGTOP_LINE_COLORS['pid'][typecolor])
+	if flag & PGTOP_FLAG_DATABASE:
+		colno += print_string(l_lineno, colno, "%-16s " % (p._pg_database[:16],), PGTOP_LINE_COLORS['database'][typecolor])
+ 	if flag & PGTOP_FLAG_CLIENT:
+		colno += print_string(l_lineno, colno, "%16s " % (str(p._pg_client)[:16],), PGTOP_LINE_COLORS['client'][typecolor])
+	if flag & PGTOP_FLAG_CPU:
+		colno += print_string(l_lineno, colno, "%5s " % (p._cpu_percent,), PGTOP_LINE_COLORS['cpu'][typecolor])
+	if flag & PGTOP_FLAG_MEM:
+		colno += print_string(l_lineno, colno, "%4s " % (round(p._mem_percent, 1),), PGTOP_LINE_COLORS['mem'][typecolor])
+	if flag & PGTOP_FLAG_READ:
+		colno += print_string(l_lineno, colno, "%8s " % (bytes2human(p._io_read_delta),), PGTOP_LINE_COLORS['read'][typecolor])
+	if flag & PGTOP_FLAG_WRITE:
+		colno += print_string(l_lineno, colno, "%8s " % (bytes2human(p._io_write_delta),), PGTOP_LINE_COLORS['write'][typecolor])
+	if flag & PGTOP_FLAG_TIME:
+		if p._pg_duration < 0:
+			p._pg_duration = 0
+		if p._pg_duration >= 1:
+			ctime = timedelta(seconds=float(p._pg_duration))
+			mic = '%.6d' % (ctime.microseconds)
+			ctime = "%s:%s.%s" % (str((ctime.seconds // 60)).zfill(2), str((ctime.seconds % 60)).zfill(2), str(mic)[:2])
+		if p._pg_duration < 1:
+			colno += print_string(l_lineno, colno, " %.6f " % (p._pg_duration,), PGTOP_LINE_COLORS['time_green'][typecolor])
+		elif p._pg_duration >= 1 and p._pg_duration < 3:
+			colno += print_string(l_lineno, colno, "%9s " % (ctime,), PGTOP_LINE_COLORS['time_yellow'][typecolor])
+		else:
+			colno += print_string(l_lineno, colno, "%9s " % (ctime,), PGTOP_LINE_COLORS['time_red'][typecolor])
+	if flag & PGTOP_FLAG_WAIT:
+		if p._pg_wait:
+			colno += print_string(l_lineno, colno, "%2s " % ('Y',), PGTOP_LINE_COLORS['wait_red'][typecolor])
+		else:
+			colno += print_string(l_lineno, colno, "%2s " % ('N',), PGTOP_LINE_COLORS['wait_green'][typecolor])
+
+	dif = maxx - len(indent) - 1
+	if PGTOP_VERBOSE_MODE == PGTOP_TRUNCATE:
+		query = p._pg_query[:dif]
+		colno += print_string(l_lineno, colno, " %s" % (add_blank(query,len(indent)+1),), PGTOP_LINE_COLORS['query'][typecolor])
+	elif PGTOP_VERBOSE_MODE == PGTOP_WRAP or  PGTOP_VERBOSE_MODE == PGTOP_WRAP_NOINDENT:
+		query = p._pg_query
+		query_wrote = ''
+		offset = 0
+		if len(query) > dif:
+			query_part = query[offset:dif]
+			print_string(l_lineno, colno, " %s" % (add_blank(query_part,len(indent)+1),), PGTOP_LINE_COLORS['query'][typecolor])
+			query_wrote += query_part
+			offset = len(query_wrote)
+			if PGTOP_VERBOSE_MODE == PGTOP_WRAP_NOINDENT:
+				dif = maxx
+				p_indent = ''
+			else:
+				p_indent = indent
+			while (len(query) - offset > 0):	
+				query_part = query[offset:(dif+offset)]
+				l_lineno += 1
+				lineno += 1
+				print_string(l_lineno, 0, "%s" % (add_blank(p_indent + ' '+ query_part, len(indent)+1)), PGTOP_LINE_COLORS['query'][typecolor])
+				query_wrote += query_part
+				offset = len(query_wrote)
+		else:
+			colno += print_string(l_lineno, colno, " %s" % (add_blank(query, len(indent)),), PGTOP_LINE_COLORS['query'][typecolor])
+	lineno += 1
 
 """
 main
@@ -734,12 +916,13 @@ def main():
 		indent = get_indent(flag)
 		# main loop
 		disks_io = None
+		disp_procs = None
 		while 1:
 			if len(indent) > (win.getmaxyx()[1] - 2):
 				raise Exception('Window\'s too small, %s chars are required.' % (len(indent),))
 			
 			# poll process
-			(disp_procs, procs_status, new_procs) = poll(interval, conn, flag, procs, pg_num_version)
+			(disp_procs, procs_status, new_procs) = poll(interval, conn, flag, indent, procs, pg_num_version, disp_procs)
 			new_disks_io = {'io':psutil.disk_io_counters(), 'time':time.time()}
 			delta_disks_io = {'read_count': 0, 'write_count': 0, 'read_bytes': 0.0, 'write_bytes': 0.0}
 			if disks_io is not None:
@@ -765,6 +948,11 @@ def main():
 		sys.exit(0)
 	except Exception as e:
 		at_exit_curses()
+		# DEBUG
+		# import traceback
+		# exc_type, exc_value, exc_traceback = sys.exc_info()
+		# print repr(traceback.format_tb(exc_traceback))
+		# traceback.print_exception(exc_type, exc_value, exc_traceback, limit=2, file=sys.stdout)
 		sys.exit("FATAL: %s" % (str(e),))
 
 """
