@@ -489,7 +489,7 @@ def poll(interval, connector, flag, indent, process = None, pg_num_version = Non
 	if k == ord(' '):
 		pause()
 	# interactive mode
-	if k == curses.KEY_DOWN or k == curses.KEY_UP:
+	if (k == curses.KEY_DOWN or k == curses.KEY_UP) and len(disp_proc) > 0:
 		interactive(disp_proc, flag, indent, connector)
 	# change verbosity
 	if k == ord('v'):
