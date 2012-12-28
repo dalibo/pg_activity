@@ -2,7 +2,7 @@
 
 """
 pg_activity utility
-version: 0.2.0 DEV
+version: 0.2.1
 author: Julien Tachoires <julmon@gmail.com>
 license: New BSD License
 
@@ -32,16 +32,13 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-PGTOP_VERSION="0.2.0"
+PGTOP_VERSION="0.2.1"
 
 
 import os
 import sys
 if os.name != 'posix':
 	sys.exit('FATAL: Platform not supported.')
-import getpass
-if getpass.getuser() != 'postgres':
-	sys.exit('FATAL: Must be run as postgres.')
 import signal
 import time
 import curses
@@ -214,6 +211,11 @@ def pg_connect(host = 'localhost', port = 5432, user = 'postgres', password = No
 			connection_factory=psycopg2.extras.DictConnection	
 		)
 	conn.set_isolation_level(0)
+	cur = conn.cursor()
+	res = cur.execute("SELECT current_setting('is_superuser')")
+	ret = cur.fetchone()
+	if ret[0] != "on":
+		raise Exception, "Must be run with database superuser privileges."
 	return conn
 
 """
@@ -276,6 +278,7 @@ def pg_get_activities(conn, pg_num_version):
 			pg_stat_activity
 		WHERE
 			state <> 'idle'
+			AND pid <> pg_backend_pid()
 		ORDER BY
 			EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
 		"""
@@ -294,6 +297,7 @@ def pg_get_activities(conn, pg_num_version):
 			pg_stat_activity
 		WHERE
 			current_query <> '<IDLE>'
+			AND procpid <> pg_backend_pid()
 		ORDER BY
 			EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
 		"""
@@ -330,7 +334,7 @@ def sys_get_proc(queries):
 		except psutil.error.NoSuchProcess as e:
 			pass
 		except psutil.error.AccessDenied as e:
-			pass
+			raise e
 	return process
 
 """
@@ -550,10 +554,11 @@ def poll(interval, connector, flag, indent, process = None, pg_num_version = Non
 			except Exception as e:
 				raise e
 
-		except psutil.NoSuchProcess:
+		except psutil.error.NoSuchProcess:
 			pass
 		except psutil.error.AccessDenied as e:
-			pass
+			raise Exception(str(e.name))
+			# pass
 		except Exception as e:
 			raise e
 
@@ -937,9 +942,10 @@ def main():
 			refresh_window(disp_procs, procs_status, (pg_short_version, hostname, options.username, options.host, options.port), flag, indent, delta_disks_io)
 			interval = 1
 
-	except psutil.error.AccessDenied as e:
+	except psutil.AccessDenied as e:
 		at_exit_curses()
-		sys.exit("FATAL: Can't acces IO informations for process %s" % (str(e),))
+		import getpass
+		sys.exit("FATAL: Acces denied for user %s, can't acces system informations for process %s" % (getpass.getuser(), str(e),))
 	except curses.error as e:
 		at_exit_curses()
 		sys.exit("FATAL: %s" % (str(e),))
