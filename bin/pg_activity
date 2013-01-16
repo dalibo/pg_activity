@@ -392,7 +392,6 @@ def ask_cancel_backend(y, pid, connector):
 		# yes
 		if k == ord('y') or k == ord('Y'):
 			res = pg_cancel_backend(connector, str(pid))
-			time.sleep(1)
 			return 1
 		# no
 		if k == ord('n') or k == ord('N') or k == ord(' '):
