@@ -2,7 +2,7 @@
 
 """
 pg_activity utility
-version: 0.2.1
+version: 0.2.3
 author: Julien Tachoires <julmon@gmail.com>
 license: New BSD License
 
@@ -32,7 +32,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-PGTOP_VERSION="0.2.1"
+PGTOP_VERSION="0.2.3"
 
 
 import os
@@ -62,7 +62,10 @@ def at_exit_curses():
 	win.erase()
 	curses.nocbreak()
 	curses.echo()
-	curses.curs_set(1)
+	try:
+		curses.curs_set(1)
+	except Exception as e:
+		pass
 	curses.endwin()
 
 """
@@ -80,11 +83,30 @@ win = curses.initscr()
 win.keypad(1)
 curses.noecho()
 curses.cbreak()
-# deactivate cursor
-curses.curs_set(0)
-# use colors
-curses.start_color()
-curses.use_default_colors()
+
+"""
+Some terms like vt100 do not support colors,
+in that case, curses.curs_set() and all curses functions
+related to colors (and probably others) raise an ERR
+"""
+PGTOP_SYS_COLOR = True
+
+try:
+	# deactivate cursor
+	curses.curs_set(0)
+	# use colors
+	curses.start_color()
+	curses.use_default_colors()
+except Exception as e:
+	# Terminal doesn't support curs_set() and colors
+	PGTOP_SYS_COLOR = False
+
+def get_curses_color(color):
+	if PGTOP_SYS_COLOR:
+		return curses.color_pair(color)
+	else:
+		return 0
+
 lineno = 0
 curses.endwin()
 win.scrollok(0)
@@ -126,19 +148,19 @@ PGTOP_COLS = {
 }
 
 PGTOP_LINE_COLORS = {
-	'pid'			: {'default': curses.color_pair(C_CYAN), 'cursor': curses.color_pair(C_CYAN)|curses.A_REVERSE, 'lock': curses.color_pair(C_RED)},
-	'database'		: {'default': curses.A_UNDERLINE | curses.color_pair(0), 'cursor': curses.color_pair(C_CYAN)|curses.A_REVERSE, 'lock': curses.color_pair(C_RED)},
-	'client'		: {'default': curses.color_pair(C_CYAN), 'cursor': curses.color_pair(C_CYAN)|curses.A_REVERSE, 'lock': curses.color_pair(C_RED)},
-	'cpu'			: {'default': curses.color_pair(0), 'cursor': curses.color_pair(C_CYAN)|curses.A_REVERSE, 'lock': curses.color_pair(C_RED)},
-	'mem'			: {'default': curses.color_pair(0), 'cursor': curses.color_pair(C_CYAN)|curses.A_REVERSE, 'lock': curses.color_pair(C_RED)},
-	'read'			: {'default': curses.color_pair(0), 'cursor': curses.color_pair(C_CYAN)|curses.A_REVERSE, 'lock': curses.color_pair(C_RED)},
-	'write'			: {'default': curses.color_pair(0), 'cursor': curses.color_pair(C_CYAN)|curses.A_REVERSE, 'lock': curses.color_pair(C_RED)},
-	'time_red'		: {'default': curses.color_pair(C_RED), 'cursor': curses.color_pair(C_CYAN)|curses.A_REVERSE, 'lock': curses.color_pair(C_RED)},
-	'time_yellow'	: {'default': curses.color_pair(C_YELLOW), 'cursor': curses.color_pair(C_CYAN)|curses.A_REVERSE, 'lock': curses.color_pair(C_RED)},
-	'time_green'	: {'default': curses.color_pair(C_GREEN), 'cursor': curses.color_pair(C_CYAN)|curses.A_REVERSE, 'lock': curses.color_pair(C_RED)},
-	'wait_green'	: {'default': curses.color_pair(C_GREEN) | curses.A_BOLD, 'cursor': curses.color_pair(C_CYAN)|curses.A_REVERSE, 'lock': curses.color_pair(C_RED)},
-	'wait_red'		: {'default': curses.color_pair(C_RED) | curses.A_BOLD, 'cursor': curses.color_pair(C_CYAN)|curses.A_REVERSE, 'lock': curses.color_pair(C_RED)},
-	'query'			: {'default': curses.color_pair(0), 'cursor': curses.color_pair(C_CYAN)|curses.A_REVERSE, 'lock': curses.color_pair(C_RED)}
+	'pid'			: {'default': get_curses_color(C_CYAN), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE, 'lock': get_curses_color(C_RED)},
+	'database'		: {'default': curses.A_UNDERLINE | get_curses_color(0), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE, 'lock': get_curses_color(C_RED)},
+	'client'		: {'default': get_curses_color(C_CYAN), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE, 'lock': get_curses_color(C_RED)},
+	'cpu'			: {'default': get_curses_color(0), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE, 'lock': get_curses_color(C_RED)},
+	'mem'			: {'default': get_curses_color(0), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE, 'lock': get_curses_color(C_RED)},
+	'read'			: {'default': get_curses_color(0), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE, 'lock': get_curses_color(C_RED)},
+	'write'			: {'default': get_curses_color(0), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE, 'lock': get_curses_color(C_RED)},
+	'time_red'		: {'default': get_curses_color(C_RED), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE, 'lock': get_curses_color(C_RED)},
+	'time_yellow'	: {'default': get_curses_color(C_YELLOW), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE, 'lock': get_curses_color(C_RED)},
+	'time_green'	: {'default': get_curses_color(C_GREEN), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE, 'lock': get_curses_color(C_RED)},
+	'wait_green'	: {'default': get_curses_color(C_GREEN) | curses.A_BOLD, 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE, 'lock': get_curses_color(C_RED)},
+	'wait_red'		: {'default': get_curses_color(C_RED) | curses.A_BOLD, 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE, 'lock': get_curses_color(C_RED)},
+	'query'			: {'default': get_curses_color(0), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE, 'lock': get_curses_color(C_RED)}
 }
 
 # display query mode
@@ -148,15 +170,18 @@ PGTOP_WRAP_NOINDENT = 2
 PGTOP_WRAP = 3
 # max IOPs
 PGTOP_MAX_IOPS = 0
-# color ?
-PGTOP_COLOR = True
 # sort
 PGTOP_SORT = 't'
+
+# color ?
+PGTOP_COLOR = True
 
 """
 Replace colors by white.
 """
 def set_nocolor():
+	if not PGTOP_SYS_COLOR:
+		return
 	global PGTOP_COLOR
 	PGTOP_COLOR = False
 	curses.init_pair(C_BLACK_GREEN, curses.COLOR_BLACK, curses.COLOR_WHITE)
@@ -173,6 +198,8 @@ def set_nocolor():
 Set colors.
 """
 def set_color():
+	if not PGTOP_SYS_COLOR:
+		return
 	global PGTOP_COLOR
 	PGTOP_COLOR = True
 	curses.init_pair(C_BLACK_GREEN, curses.COLOR_BLACK, curses.COLOR_GREEN)
@@ -347,7 +374,7 @@ def pause():
 	line += " " * (int(x/2) - len(msg))
 	line += msg
 	line += " " * (x - len(line) - 0)
-	win.addstr(4, 0, line, curses.color_pair(C_RED_BLACK)|curses.A_REVERSE|curses.A_BOLD)
+	win.addstr(4, 0, line, get_curses_color(C_RED_BLACK)|curses.A_REVERSE|curses.A_BOLD)
 	current_pos = -1
 	while 1:
 		try:
@@ -366,20 +393,20 @@ def pause():
 Display interactive mode menu bar
 """
 def help_key_interactive(y):
-	colno = print_string((y - 1), 0, "<k>", curses.color_pair(0))
-	colno += print_string((y - 1), colno, "Backend cancel    ", curses.color_pair(C_CYAN)|curses.A_REVERSE)
-	colno += print_string((y - 1), colno, "<Space>", curses.color_pair(0))
-	colno += print_string((y - 1), colno, "Back to activity    ", curses.color_pair(C_CYAN)|curses.A_REVERSE)
-	colno += print_string((y - 1), colno, "<q>", curses.color_pair(0))
-	colno += print_string((y - 1), colno, "Quit    ", curses.color_pair(C_CYAN)|curses.A_REVERSE)
-	colno += print_string((y - 1), colno, add_blank(" "), curses.color_pair(C_CYAN)|curses.A_REVERSE)
+	colno = print_string((y - 1), 0, "<k>", get_curses_color(0))
+	colno += print_string((y - 1), colno, "Backend cancel    ", get_curses_color(C_CYAN)|curses.A_REVERSE)
+	colno += print_string((y - 1), colno, "<Space>", get_curses_color(0))
+	colno += print_string((y - 1), colno, "Back to activity    ", get_curses_color(C_CYAN)|curses.A_REVERSE)
+	colno += print_string((y - 1), colno, "<q>", get_curses_color(0))
+	colno += print_string((y - 1), colno, "Quit    ", get_curses_color(C_CYAN)|curses.A_REVERSE)
+	colno += print_string((y - 1), colno, add_blank(" "), get_curses_color(C_CYAN)|curses.A_REVERSE)
 
 """
 Ask for canceling a backend
 """
 def ask_cancel_backend(y, pid, connector):
-	colno = print_string((y - 1), 0, "Cancel the backend with PID %s ? <Y/N>" % (str(pid),), curses.color_pair(0))
-	colno += print_string((y - 1), colno, add_blank(" "), curses.color_pair(C_CYAN)|curses.A_REVERSE)
+	colno = print_string((y - 1), 0, "Cancel the backend with PID %s ? <Y/N>" % (str(pid),), get_curses_color(0))
+	colno += print_string((y - 1), colno, add_blank(" "), get_curses_color(C_CYAN)|curses.A_REVERSE)
 	while 1:
 		try:
 			k = win.getch()
@@ -415,11 +442,9 @@ def interactive(process, flag, indent, connector):
 	help_key_interactive(y)
 
 	current_pos = 0
-	# refresh_line(process[current_pos], flag, indent, 'cursor', lines[current_pos][1])
 	offset = 0
 	refresh_line(process[current_pos], flag, indent, 'cursor', lines[current_pos] - offset)
 	t_active = time.time()
-	# raise Exception(str(lines))
 	while 1:
 		try:
 			k = win.getch()
@@ -657,13 +682,13 @@ def print_cols_header(flag):
 				(val['name'] == 'READ/s' and PGTOP_SORT == 'r') or
 				(val['name'] == 'WRITE/s' and PGTOP_SORT == 'w') or
 				(val['name'] == 'TIME+' and PGTOP_SORT == 't')):
-				color_highlight = curses.color_pair(C_BLACK_CYAN)
+				color_highlight = get_curses_color(C_CYAN)
 			else:
-				color_highlight = curses.color_pair(C_BLACK_GREEN)
+				color_highlight = get_curses_color(C_GREEN)
 			if val['name'] == 'Query':
 				disp += " " * (win.getmaxyx()[1] - (len(line) + len(disp)))
 			line += disp
-			win.addstr(lineno, x, disp, color_highlight)
+			win.addstr(lineno, x, disp, color_highlight|curses.A_REVERSE)
 			x += len(disp)
 	
 	lineno += 1
@@ -682,11 +707,11 @@ def print_header(procs_status, pg_version, hostname, user, host, port, io):
 	colno += print_string(lineno, colno, " - ")
 	colno += print_string(lineno, colno, hostname, curses.A_BOLD)
 	colno += print_string(lineno, colno, " - ")
-	colno += print_string(lineno, colno, user, curses.color_pair(C_CYAN))
+	colno += print_string(lineno, colno, user, get_curses_color(C_CYAN))
 	colno += print_string(lineno, colno, "@")
-	colno += print_string(lineno, colno, host, curses.color_pair(C_CYAN))
+	colno += print_string(lineno, colno, host, get_curses_color(C_CYAN))
 	colno += print_string(lineno, colno, ":")
-	colno += print_string(lineno, colno, port, curses.color_pair(C_CYAN))
+	colno += print_string(lineno, colno, port, get_curses_color(C_CYAN))
 
 	try:
 		# psutil >= 0.6.0
