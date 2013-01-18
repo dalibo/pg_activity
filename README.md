@@ -1,7 +1,7 @@
 pg_activity
 ===========
 
-	htop like application for PostgreSQL server activity monitoring.
+	htop like application for local PostgreSQL server activity monitoring.
 
 Dependencies
 ------------
@@ -49,6 +49,8 @@ Interactives commands
 	v			Change queries display mode: full, truncated, indented
 	UP / DOWN	Go to "navigation" mode
 	q			Quit
+	+			Increase refresh time. Maximum value : 9s
+	-			Decrease refesh time. Minimum Value : 1s
 
 Navigation mode
 ---------------

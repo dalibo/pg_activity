@@ -134,6 +134,9 @@ PGTOP_FLAG_WAIT = 128
 PGTOP_FLAG_NONE = None
 PGTOP_FLAGS_COL = PGTOP_FLAG_DATABASE | PGTOP_FLAG_CPU | PGTOP_FLAG_MEM | PGTOP_FLAG_READ | PGTOP_FLAG_WRITE | PGTOP_FLAG_TIME | PGTOP_FLAG_WAIT
 
+# refresh time
+PGTOP_REFRESH_TIME = 1
+
 PGTOP_COLS = {
 	'pid'		: {'n': 1, 'name': 'PID', 'template_h': '%-6s ', 'flag': PGTOP_FLAG_NONE, 'mandatory': True},
 	'database'	: {'n': 2, 'name': 'DATABASE', 'template_h': '%-16s ', 'flag': PGTOP_FLAG_DATABASE, 'mandatory': False},
@@ -499,9 +502,10 @@ def poll(interval, connector, flag, indent, process = None, pg_num_version = Non
 	global PGTOP_VERBOSE_MODE
 	global PGTOP_COLOR
 	global PGTOP_SORT
+	global PGTOP_REFRESH_TIME
 
 	# Keyboard interactions
-	win.timeout(1000 * interval)
+	win.timeout(1000 * PGTOP_REFRESH_TIME * interval)
 	try:
 		k = win.getch()
 	except KeyboardInterrupt as e:
@@ -537,7 +541,11 @@ def poll(interval, connector, flag, indent, process = None, pg_num_version = Non
 		PGTOP_SORT = 'w'
 	if k == ord('t'):
 		PGTOP_SORT = 't'
-		
+	if k == ord('+') and PGTOP_REFRESH_TIME < 9:
+		PGTOP_REFRESH_TIME += 1
+	if k == ord('-') and PGTOP_REFRESH_TIME > 1:
+		PGTOP_REFRESH_TIME -= 1
+			
 	curses.flushinp()
 	
 	# poll postgresql activity
@@ -697,8 +705,8 @@ def print_cols_header(flag):
 Print window header
 """
 def print_header(procs_status, pg_version, hostname, user, host, port, io):
-	global PGTOP_MAX_IOPS
 	global lineno
+	global PGTOP_MAX_IOPS 
 	
 	lineno = 0
 	colno = 0
@@ -712,6 +720,7 @@ def print_header(procs_status, pg_version, hostname, user, host, port, io):
 	colno += print_string(lineno, colno, host, get_curses_color(C_CYAN))
 	colno += print_string(lineno, colno, ":")
 	colno += print_string(lineno, colno, port, get_curses_color(C_CYAN))
+	colno += print_string(lineno, colno, " refresh: %ss" % (PGTOP_REFRESH_TIME,))
 
 	try:
 		# psutil >= 0.6.0
@@ -915,11 +924,9 @@ def main():
 		queries =  pg_get_activities(conn, pg_num_version)
 		procs = sys_get_proc(queries)
 		hostname = socket.gethostname()
-		has_color = True
 		# color ?
 		if options.nocolor == True:
 			set_nocolor()
-			has_color = False
 		else:
 			set_color()	
 		# default flag

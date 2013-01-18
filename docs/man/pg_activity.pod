@@ -98,6 +98,10 @@ pg_activity is a htop like application for PostgreSQL server activity monitoring
 
 =item B<q>     Quit
 
+=item B<+>     Increase refresh time. Maximum value : 9s
+
+=item B<->     Decrease refesh time. Minimum Value : 1s
+
 =back
 
 =head1 NAVIGATION MODE
