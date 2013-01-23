@@ -723,7 +723,7 @@ def print_header(procs_status, pg_version, hostname, user, host, port, io):
 	colno += print_string(lineno, colno, host, get_curses_color(C_CYAN))
 	colno += print_string(lineno, colno, ":")
 	colno += print_string(lineno, colno, port, get_curses_color(C_CYAN))
-	colno += print_string(lineno, colno, " refresh: %ss" % (PGTOP_REFRESH_TIME,))
+	colno += print_string(lineno, colno, " - refresh: %ss" % (PGTOP_REFRESH_TIME,))
 
 	try:
 		# psutil >= 0.6.0
