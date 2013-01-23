@@ -57,6 +57,7 @@ Called at exit time.
 Rollback to default values.
 """
 def at_exit_curses():
+	# Strange behaviour here
 	try:
 		win.keypad(0)
 		win.move(0,0)
@@ -723,7 +724,7 @@ def print_header(procs_status, pg_version, hostname, user, host, port, io):
 	colno += print_string(lineno, colno, host, get_curses_color(C_CYAN))
 	colno += print_string(lineno, colno, ":")
 	colno += print_string(lineno, colno, port, get_curses_color(C_CYAN))
-	colno += print_string(lineno, colno, " - refresh: %ss" % (PGTOP_REFRESH_TIME,))
+	colno += print_string(lineno, colno, " refresh: %ss" % (PGTOP_REFRESH_TIME,))
 
 	try:
 		# psutil >= 0.6.0
