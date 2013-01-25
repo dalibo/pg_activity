@@ -126,6 +126,7 @@ C_MAGENTA = 6
 C_WHITE = 7
 C_BLACK_CYAN = 8
 C_RED_BLACK = 9
+C_GRAY = 10
 # Columns
 PGTOP_FLAG_DATABASE = 1
 PGTOP_FLAG_CLIENT = 2
@@ -156,7 +157,7 @@ PGTOP_COLS = {
 
 PGTOP_LINE_COLORS = {
 	'pid'			: {'default': get_curses_color(C_CYAN), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE, 'lock': get_curses_color(C_RED)},
-	'database'		: {'default': curses.A_UNDERLINE | get_curses_color(0), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE, 'lock': get_curses_color(C_RED)},
+	'database'		: {'default': curses.A_BOLD | get_curses_color(C_GRAY), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE, 'lock': get_curses_color(C_RED)},
 	'client'		: {'default': get_curses_color(C_CYAN), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE, 'lock': get_curses_color(C_RED)},
 	'cpu'			: {'default': get_curses_color(0), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE, 'lock': get_curses_color(C_RED)},
 	'mem'			: {'default': get_curses_color(0), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE, 'lock': get_curses_color(C_RED)},
@@ -200,6 +201,7 @@ def set_nocolor():
 	curses.init_pair(C_MAGENTA, curses.COLOR_WHITE, -1)
 	curses.init_pair(C_WHITE, curses.COLOR_WHITE, -1)
 	curses.init_pair(C_BLACK_CYAN, curses.COLOR_WHITE, -1)
+	curses.init_pair(C_GRAY, curses.COLOR_WHITE, -1)
 
 """
 Set colors.
@@ -218,6 +220,7 @@ def set_color():
 	curses.init_pair(C_MAGENTA, curses.COLOR_MAGENTA, -1)
 	curses.init_pair(C_WHITE, curses.COLOR_WHITE, -1)
 	curses.init_pair(C_BLACK_CYAN, curses.COLOR_BLACK, curses.COLOR_CYAN)
+	curses.init_pair(C_GRAY, 0, -1)
 
 """
 Strip and replace some special characters.
