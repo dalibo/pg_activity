@@ -166,6 +166,13 @@ PGTOP_COLS = {
 		'query'		: {'n': 7, 'name': 'Query', 'template_h': ' %2s', 'flag': PGTOP_FLAG_NONE, 'mandatory': True},
 	},
 	'blocking': {
+		'pid'		: {'n': 1, 'name': 'PID', 'template_h': '%-6s ', 'flag': PGTOP_FLAG_NONE, 'mandatory': True},
+		'database'	: {'n': 2, 'name': 'DATABASE', 'template_h': '%-16s ', 'flag': PGTOP_FLAG_DATABASE, 'mandatory': False},
+		'relation'	: {'n': 3, 'name': 'RELATION', 'template_h': '%9s ', 'flag': PGTOP_FLAG_RELATION, 'mandatory': False},
+		'type'		: {'n': 4, 'name': 'TYPE', 'template_h': '%16s ', 'flag': PGTOP_FLAG_TYPE, 'mandatory': False},
+		'mode'		: {'n': 5, 'name': 'MODE', 'template_h': '%16s ', 'flag': PGTOP_FLAG_MODE, 'mandatory': False},
+		'time'		: {'n': 6, 'name': 'TIME+', 'template_h': '%9s ', 'flag': PGTOP_FLAG_TIME, 'mandatory': False},
+		'query'		: {'n': 7, 'name': 'Query', 'template_h': ' %2s', 'flag': PGTOP_FLAG_NONE, 'mandatory': True},
 	}
 }
 
@@ -289,16 +296,16 @@ def pg_get_version(conn):
 	return ret['pg_version']
 
 """
-Cancel a backend
+Terminate a backend
 """
-def pg_cancel_backend(conn, pid):
+def pg_terminate_backend(conn, pid):
 	query = """
-	SELECT pg_cancel_backend(%s) AS canceled
+	SELECT pg_terminate_backend(%s) AS terminated
 	"""
 	cur = conn.cursor()
 	res = cur.execute(query, (pid,))
 	ret = cur.fetchone()
-	return ret['canceled']
+	return ret['terminated']
 
 """
 Get PostgreSQL short & numeric version from
@@ -324,40 +331,12 @@ def pg_get_activities(conn, pg_num_version):
 	if pg_num_version >= 90200:
 		# PostgreSQL 9.2.0 and more
 		query = """
-		SELECT
-			pg_stat_activity.pid AS pid,
-			CASE WHEN LENGTH(pg_stat_activity.datname) > 16 THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$') ELSE pg_stat_activity.datname END AS database,
-			pg_stat_activity.client_addr AS client,
-			EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
-			pg_stat_activity.waiting AS wait,
-			pg_stat_activity.usename AS user,
-			pg_stat_activity.query AS query
-		FROM
-			pg_stat_activity
-		WHERE
-			state <> 'idle'
-			AND pid <> pg_backend_pid()
-		ORDER BY
-			EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
+SELECT pg_stat_activity.pid AS pid, CASE WHEN LENGTH(pg_stat_activity.datname) > 16 THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$') ELSE pg_stat_activity.datname END AS database, pg_stat_activity.client_addr AS client, EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration, pg_stat_activity.waiting AS wait, pg_stat_activity.usename AS user, pg_stat_activity.query AS query FROM pg_stat_activity WHERE state <> 'idle' AND pid <> pg_backend_pid() ORDER BY EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
 		"""
 	elif pg_num_version < 90200:
 		# PostgreSQL prior to 9.2.0
 		query = """
-		SELECT
-			pg_stat_activity.procpid AS pid,
-			CASE WHEN LENGTH(pg_stat_activity.datname) > 16 THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$') ELSE pg_stat_activity.datname END AS database,
-			pg_stat_activity.client_addr AS client,
-			EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
-			pg_stat_activity.waiting AS wait,
-			pg_stat_activity.usename AS user,
-			pg_stat_activity.current_query AS query
-		FROM
-			pg_stat_activity
-		WHERE
-			current_query <> '<IDLE>'
-			AND procpid <> pg_backend_pid()
-		ORDER BY
-			EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
+SELECT pg_stat_activity.procpid AS pid, CASE WHEN LENGTH(pg_stat_activity.datname) > 16 THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$') ELSE pg_stat_activity.datname END AS database, pg_stat_activity.client_addr AS client, EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration, pg_stat_activity.waiting AS wait, pg_stat_activity.usename AS user, pg_stat_activity.current_query AS query FROM pg_stat_activity WHERE current_query <> '<IDLE>' AND procpid <> pg_backend_pid() ORDER BY EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
 		"""
 	cur = conn.cursor()
 	res = cur.execute(query)
@@ -370,45 +349,30 @@ Get queries locked
 def pg_get_locked(conn, pg_num_version):
 	if pg_num_version >= 90200:
 		query = """
-		SELECT
-			pg_locks.pid AS pid,
-			CASE WHEN LENGTH(pg_stat_activity.datname) > 16 THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$') ELSE pg_stat_activity.datname END AS database,
-			pg_locks.mode AS mode,
-			pg_locks.locktype AS type,
-			pg_locks.relation::regclass AS relation,
-			EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
-			pg_stat_activity.query AS query
-		FROM
-			pg_catalog.pg_locks JOIN pg_catalog.pg_stat_activity ON(pg_catalog.pg_locks.pid = pg_catalog.pg_stat_activity.pid)
-		WHERE
-			NOT pg_catalog.pg_locks.granted
-			AND pg_catalog.pg_stat_activity.pid <> pg_backend_pid()
-		ORDER BY
-			EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
+SELECT pg_locks.pid AS pid, CASE WHEN LENGTH(pg_stat_activity.datname) > 16 THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$') ELSE pg_stat_activity.datname END AS database, pg_locks.mode AS mode, pg_locks.locktype AS type, pg_locks.relation::regclass AS relation, EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration, pg_stat_activity.query AS query FROM pg_catalog.pg_locks JOIN pg_catalog.pg_stat_activity ON(pg_catalog.pg_locks.pid = pg_catalog.pg_stat_activity.pid) WHERE NOT pg_catalog.pg_locks.granted AND pg_catalog.pg_stat_activity.pid <> pg_backend_pid() ORDER BY EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
 		"""
 	elif pg_num_version < 90200:
 		query = """
-		SELECT
-			pg_locks.pid AS pid,
-			CASE WHEN LENGTH(pg_stat_activity.datname) > 16 THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$') ELSE pg_stat_activity.datname END AS database,
-			pg_locks.mode AS mode,
-			pg_locks.locktype AS type,
-			pg_locks.relation::regclass AS relation,
-			EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
-			pg_stat_activity.current_query AS query
-		FROM
-			pg_catalog.pg_locks JOIN pg_catalog.pg_stat_activity ON(pg_catalog.pg_locks.pid = pg_catalog.pg_stat_activity.procpid)
-		WHERE
-			NOT pg_catalog.pg_locks.granted
-			AND  pg_catalog.pg_stat_activity.procpid <> pg_backend_pid()
-		ORDER BY
-			EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
+SELECT pg_locks.pid AS pid, CASE WHEN LENGTH(pg_stat_activity.datname) > 16 THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$') ELSE pg_stat_activity.datname END AS database, pg_locks.mode AS mode, pg_locks.locktype AS type, pg_locks.relation::regclass AS relation, EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration, pg_stat_activity.current_query AS query FROM pg_catalog.pg_locks JOIN pg_catalog.pg_stat_activity ON(pg_catalog.pg_locks.pid = pg_catalog.pg_stat_activity.procpid) WHERE NOT pg_catalog.pg_locks.granted AND  pg_catalog.pg_stat_activity.procpid <> pg_backend_pid() ORDER BY EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
 		"""
 	cur = conn.cursor()
 	res = cur.execute(query)
 	ret = cur.fetchall()
 	return ret
 
+def pg_get_blocking(conn, pg_num_version):
+	if pg_num_version >= 90200:
+		query = """
+SELECT pid, CASE WHEN LENGTH(datname) > 16 THEN SUBSTRING(datname FROM 0 FOR 6)||'...'||SUBSTRING(datname FROM '........$') ELSE datname END AS database, relation, mode, locktype AS type, duration, query FROM (SELECT blocking.pid, pg_stat_activity.query, blocking.mode, pg_stat_activity.datname, blocking.locktype,EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration, blocking.relation::regclass AS relation FROM pg_locks AS blocking JOIN (SELECT transactionid FROM pg_locks WHERE NOT granted) AS blocked ON (blocking.transactionid = blocked.transactionid) JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.pid) WHERE blocking.granted UNION ALL SELECT blocking.pid, pg_stat_activity.query, blocking.mode, pg_stat_activity.datname, blocking.locktype,EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration, blocking.relation::regclass AS relation FROM pg_locks AS blocking JOIN (SELECT database, relation, mode FROM pg_locks WHERE NOT granted AND relation IS NOT NULL) AS blocked ON (blocking.database = blocked.database AND blocking.relation = blocked.relation) JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.pid) WHERE blocking.granted) AS sq GROUP BY pid, query, mode, locktype, duration, datname, relation ORDER BY duration DESC
+		"""
+	elif pg_num_version < 90200:
+		query = """
+SELECT pid, CASE WHEN LENGTH(datname) > 16 THEN SUBSTRING(datname FROM 0 FOR 6)||'...'||SUBSTRING(datname FROM '........$') ELSE datname END AS database, relation, mode, locktype AS type, duration, query FROM (SELECT blocking.pid, pg_stat_activity.current_query AS query, blocking.mode, pg_stat_activity.datname, blocking.locktype,EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration, blocking.relation::regclass AS relation FROM pg_locks AS blocking JOIN (SELECT transactionid FROM pg_locks WHERE NOT granted) AS blocked ON (blocking.transactionid = blocked.transactionid) JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.procpid) WHERE blocking.granted UNION ALL SELECT blocking.pid, pg_stat_activity.current_query AS query, blocking.mode, pg_stat_activity.datname, blocking.locktype,EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration, blocking.relation::regclass AS relation FROM pg_locks AS blocking JOIN (SELECT database, relation, mode FROM pg_locks WHERE NOT granted AND relation IS NOT NULL) AS blocked ON (blocking.database = blocked.database AND blocking.relation = blocked.relation) JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.procpid) WHERE blocking.granted) AS sq GROUP BY pid, query, mode, locktype, duration, datname, relation ORDER BY duration DESC
+		"""
+	cur = conn.cursor()
+	res = cur.execute(query)
+	ret = cur.fetchall()
+	return ret
 
 """
 Get system informations (CPU, memory, IO read & write)
@@ -466,6 +430,9 @@ def pause():
 			return 0
 		curses.flushinp()
 
+"""
+Display current mode
+"""
 def current_position():
 	(y,x) = win.getmaxyx()
 	if PGTOP_MODE == 'activities':
@@ -502,7 +469,7 @@ def change_mode_interactive():
 	colno += print_string((y - 1), colno, "<F2>", get_curses_color(0))
 	colno += print_string((y - 1), colno, "Locked queries	", get_curses_color(C_CYAN)|curses.A_REVERSE)
 	colno += print_string((y - 1), colno, "<F3>", get_curses_color(0))
-	colno += print_string((y - 1), colno, "Blocking queries	", get_curses_color(C_CYAN)|curses.A_REVERSE)
+	colno += print_string((y - 1), colno, "Blocking queries ", get_curses_color(C_CYAN)|curses.A_REVERSE)
 	colno += print_string((y - 1), colno, "<Space>", get_curses_color(0))
 	colno += print_string((y - 1), colno, "Pause	", get_curses_color(C_CYAN)|curses.A_REVERSE)
 	colno += print_string((y - 1), colno, "<q>", get_curses_color(0))
@@ -526,7 +493,7 @@ def ask_cancel_backend(y, pid, connector):
 			exit()
 		# yes
 		if k == ord('y') or k == ord('Y'):
-			res = pg_cancel_backend(connector, str(pid))
+			res = pg_terminate_backend(connector, str(pid))
 			return 1
 		# no
 		if k == ord('n') or k == ord('N') or k == ord(' '):
@@ -600,13 +567,14 @@ def interactive(process, flag, indent, connector):
 			PGTOP_VERBOSE_MODE = old_verbose_mode
 			return 0
 
+"""
+Wrapper around polling
+"""
 def poll(interval, connector, flag, indent, process = None, pg_num_version = None, disp_proc = None):
 	if PGTOP_MODE == 'activities':
 		return poll_activities(interval, connector, flag, indent, process, pg_num_version, disp_proc)
-	elif PGTOP_MODE == 'locked':
-		return poll_locked(interval, connector, flag, indent, process, pg_num_version, disp_proc)
-	elif PGTOP_MODE == 'blocking':
-		return poll_blocking(interval, connector, flag, indent, process, pg_num_version, disp_proc)
+	elif PGTOP_MODE == 'locked' or PGTOP_MODE == 'blocking':
+		return poll_locked_blocking(interval, connector, flag, indent, process, pg_num_version, disp_proc)
 	
 """
 Poll activities.
@@ -632,10 +600,15 @@ def poll_activities(interval, connector, flag, indent, process = None, pg_num_ve
 	# interactive mode
 	if (k == curses.KEY_DOWN or k == curses.KEY_UP) and len(disp_proc) > 0:
 		interactive(disp_proc, flag, indent, connector)
+
 	if (k == curses.KEY_F2):
 		PGTOP_MODE = 'locked'
 		curses.flushinp()
-		return poll_locked(0, connector, flag, indent, None, pg_num_version, None)
+		return poll_locked_blocking(0, connector, flag, indent, None, pg_num_version, None)
+	if (k == curses.KEY_F3):
+		PGTOP_MODE = 'blocking'
+		curses.flushinp()
+		return poll_locked_blocking(0, connector, flag, indent, None, pg_num_version, None)
 	# change verbosity
 	if k == ord('v'):
 		PGTOP_VERBOSE_MODE += 1
@@ -729,7 +702,7 @@ def poll_activities(interval, connector, flag, indent, process = None, pg_num_ve
 """
 Poll locked
 """
-def poll_locked(interval, connector, flag, indent, process = None, pg_num_version = None, disp_proc = None):
+def poll_locked_blocking(interval, connector, flag, indent, process = None, pg_num_version = None, disp_proc = None):
 	global PGTOP_VERBOSE_MODE
 	global PGTOP_SORT
 	global PGTOP_REFRESH_TIME
@@ -750,13 +723,23 @@ def poll_locked(interval, connector, flag, indent, process = None, pg_num_versio
 	# interactive mode
 	if (k == curses.KEY_DOWN or k == curses.KEY_UP) and len(disp_proc) > 0:
 		interactive(disp_proc, flag, indent, connector)
-	
+	# activites mode
 	if (k == curses.KEY_F1):
 		PGTOP_MODE = 'activities'
 		curses.flushinp()
-		queries =  pg_get_activities(connector, pg_num_version)
+		queries = pg_get_activities(connector, pg_num_version)
 		procs = sys_get_proc(queries)
 		return poll_activities(0, connector, flag, indent, procs, pg_num_version, None)
+	# locked queries
+	if (k == curses.KEY_F2):
+		PGTOP_MODE = 'locked'
+		curses.flushinp()
+		return poll_locked_blocking(0, connector, flag, indent, None, pg_num_version, None)
+	# blocking queries
+	if (k == curses.KEY_F3):
+		PGTOP_MODE = 'blocking'
+		curses.flushinp()
+		return poll_locked_blocking(0, connector, flag, indent, None, pg_num_version, None)
 	# change verbosity
 	if k == ord('v'):
 		PGTOP_VERBOSE_MODE += 1
@@ -779,7 +762,10 @@ def poll_locked(interval, connector, flag, indent, process = None, pg_num_versio
 	curses.flushinp()
 	
 	# poll postgresql activity
-	queries =  pg_get_locked(connector, pg_num_version)
+	if PGTOP_MODE == 'locked':
+		queries =  pg_get_locked(connector, pg_num_version)
+	else:
+		queries =  pg_get_blocking(connector, pg_num_version)
 	
 	new_procs = {}
 	for q in queries:
@@ -1013,18 +999,16 @@ def refresh_line(p, flag, indent, typecolor = 'default', line = None):
 			colno += print_string(l_lineno, colno, "%8s " % (bytes2human(p['read']),), PGTOP_LINE_COLORS['read'][typecolor])
 		if flag & PGTOP_FLAG_WRITE:
 			colno += print_string(l_lineno, colno, "%8s " % (bytes2human(p['write']),), PGTOP_LINE_COLORS['write'][typecolor])
-	elif PGTOP_MODE == 'locked':
+	elif PGTOP_MODE == 'locked' or PGTOP_MODE == 'blocking':
 		if flag & PGTOP_FLAG_RELATION:
 			colno += print_string(l_lineno, colno, "%9s " % (str(p['relation'])[:9],), PGTOP_LINE_COLORS['relation'][typecolor])
 		if flag & PGTOP_FLAG_TYPE:
 			colno += print_string(l_lineno, colno, "%16s " % (str(p['type'])[:16],), PGTOP_LINE_COLORS['type'][typecolor])
 		if flag & PGTOP_FLAG_MODE:
-			if p['mode'] == 'ExclusiveLock' or p['mode'] == 'RowExclusiveLock':
+			if p['mode'] == 'ExclusiveLock' or p['mode'] == 'RowExclusiveLock' or p['mode'] == 'AccessExclusiveLock':
 				colno += print_string(l_lineno, colno, "%16s " % (str(p['mode'])[:16],), PGTOP_LINE_COLORS['mode_red'][typecolor])
 			else:
 				colno += print_string(l_lineno, colno, "%16s " % (str(p['mode'])[:16],), PGTOP_LINE_COLORS['mode_yellow'][typecolor])
-	elif PGTOP_MODE == 'blocking':
-		pass
 
 	if flag & PGTOP_FLAG_TIME:
 		if p['duration'] < 0:
@@ -1119,7 +1103,7 @@ def main():
 		elif PGTOP_MODE == 'locked':
 			procs = pg_get_locked(conn, pg_num_version)
 		elif PGTOP_MODE == 'blocking':
-			pass
+			procs = pg_get_blocking(conn, pg_num_version)
 
 		hostname = socket.gethostname()
 		# color ?
@@ -1188,10 +1172,10 @@ def main():
 	except Exception as e:
 		at_exit_curses()
 		# DEBUG
-		import traceback
-		exc_type, exc_value, exc_traceback = sys.exc_info()
-		print repr(traceback.format_tb(exc_traceback))
-		traceback.print_exception(exc_type, exc_value, exc_traceback, limit=2, file=sys.stdout)
+		# import traceback
+		# exc_type, exc_value, exc_traceback = sys.exc_info()
+		# print repr(traceback.format_tb(exc_traceback))
+		# traceback.print_exception(exc_type, exc_value, exc_traceback, limit=2, file=sys.stdout)
 		sys.exit("FATAL: %s" % (str(e),))
 
 """
