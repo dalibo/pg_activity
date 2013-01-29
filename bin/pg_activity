@@ -177,23 +177,23 @@ PGTOP_COLS = {
 }
 
 PGTOP_LINE_COLORS = {
-	'pid'			: {'default': get_curses_color(C_CYAN), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE, 'lock': get_curses_color(C_RED)},
-	'database'		: {'default': curses.A_BOLD | get_curses_color(C_GRAY), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE, 'lock': get_curses_color(C_RED)},
-	'client'		: {'default': get_curses_color(C_CYAN), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE, 'lock': get_curses_color(C_RED)},
-	'cpu'			: {'default': get_curses_color(0), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE, 'lock': get_curses_color(C_RED)},
-	'mem'			: {'default': get_curses_color(0), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE, 'lock': get_curses_color(C_RED)},
-	'read'			: {'default': get_curses_color(0), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE, 'lock': get_curses_color(C_RED)},
-	'write'			: {'default': get_curses_color(0), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE, 'lock': get_curses_color(C_RED)},
-	'time_red'		: {'default': get_curses_color(C_RED), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE, 'lock': get_curses_color(C_RED)},
-	'time_yellow'	: {'default': get_curses_color(C_YELLOW), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE, 'lock': get_curses_color(C_RED)},
-	'time_green'	: {'default': get_curses_color(C_GREEN), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE, 'lock': get_curses_color(C_RED)},
-	'wait_green'	: {'default': get_curses_color(C_GREEN) | curses.A_BOLD, 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE, 'lock': get_curses_color(C_RED)},
-	'wait_red'		: {'default': get_curses_color(C_RED) | curses.A_BOLD, 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE, 'lock': get_curses_color(C_RED)},
-	'query'			: {'default': get_curses_color(0), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE, 'lock': get_curses_color(C_RED)},
-	'relation'		: {'default': get_curses_color(C_CYAN), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE, 'lock': get_curses_color(C_RED)},
-	'type'			: {'default': get_curses_color(0), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE, 'lock': get_curses_color(C_RED)},
-	'mode_yellow'	: {'default': get_curses_color(C_YELLOW)|curses.A_BOLD, 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE, 'lock': get_curses_color(C_RED)},
-	'mode_red'		: {'default': get_curses_color(C_RED)|curses.A_BOLD, 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE, 'lock': get_curses_color(C_RED)}
+	'pid'			: {'default': get_curses_color(C_CYAN), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
+	'database'		: {'default': curses.A_BOLD | get_curses_color(C_GRAY), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
+	'client'		: {'default': get_curses_color(C_CYAN), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
+	'cpu'			: {'default': get_curses_color(0), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
+	'mem'			: {'default': get_curses_color(0), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
+	'read'			: {'default': get_curses_color(0), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
+	'write'			: {'default': get_curses_color(0), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
+	'time_red'		: {'default': get_curses_color(C_RED), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
+	'time_yellow'	: {'default': get_curses_color(C_YELLOW), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
+	'time_green'	: {'default': get_curses_color(C_GREEN), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
+	'wait_green'	: {'default': get_curses_color(C_GREEN) | curses.A_BOLD, 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
+	'wait_red'		: {'default': get_curses_color(C_RED) | curses.A_BOLD, 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
+	'query'			: {'default': get_curses_color(0), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
+	'relation'		: {'default': get_curses_color(C_CYAN), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
+	'type'			: {'default': get_curses_color(0), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
+	'mode_yellow'	: {'default': get_curses_color(C_YELLOW)|curses.A_BOLD, 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
+	'mode_red'		: {'default': get_curses_color(C_RED)|curses.A_BOLD, 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE}
 }
 
 # display query mode
@@ -452,7 +452,7 @@ Display interactive mode menu bar
 """
 def help_key_interactive(y):
 	colno = print_string((y - 1), 0, "<k>", get_curses_color(0))
-	colno += print_string((y - 1), colno, "Backend cancel	", get_curses_color(C_CYAN)|curses.A_REVERSE)
+	colno += print_string((y - 1), colno, "Terminate the backend	", get_curses_color(C_CYAN)|curses.A_REVERSE)
 	colno += print_string((y - 1), colno, "<Space>", get_curses_color(0))
 	colno += print_string((y - 1), colno, "Back to activity	", get_curses_color(C_CYAN)|curses.A_REVERSE)
 	colno += print_string((y - 1), colno, "<q>", get_curses_color(0))
@@ -477,10 +477,10 @@ def change_mode_interactive():
 	colno += print_string((y - 1), colno, add_blank(" "), get_curses_color(C_CYAN)|curses.A_REVERSE)
 
 """
-Ask for canceling a backend
+Ask for terminating a backend
 """
-def ask_cancel_backend(y, pid, connector):
-	colno = print_string((y - 1), 0, "Cancel the backend with PID %s ? <Y/N>" % (str(pid),), get_curses_color(0))
+def ask_terminate_backend(y, pid, connector):
+	colno = print_string((y - 1), 0, "Terminate backend with PID %s ? <Y/N>" % (str(pid),), get_curses_color(0))
 	colno += print_string((y - 1), colno, add_blank(" "), get_curses_color(C_CYAN)|curses.A_REVERSE)
 	while 1:
 		try:
@@ -529,9 +529,9 @@ def interactive(process, flag, indent, connector):
 		if k == ord('q'):
 			curses.endwin()
 			exit()
-		# cancel the backend attached to this PID
+		# terminate the backend attached to this PID
 		if k == ord('k'):
-			res = ask_cancel_backend(y, process[current_pos]['pid'], connector)
+			res = ask_terminate_backend(y, process[current_pos]['pid'], connector)
 			PGTOP_VERBOSE_MODE = old_verbose_mode
 			curses.flushinp()
 			return 0
