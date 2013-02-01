@@ -102,6 +102,14 @@ pg_activity is a htop like application for PostgreSQL server activity monitoring
 
 =item B<->     Decrease refesh time. Minimum Value : 1s
 
+=item B<F1>    Running queries monitoring.
+
+=item B<F2>    Locked queries monitoring.
+
+=item B<F3>    Blocking queries monitoring.
+
+=item B<h>     Help page.
+
 =back
 
 =head1 NAVIGATION MODE
