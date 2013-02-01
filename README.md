@@ -47,9 +47,9 @@ Interactives commands
 	t			Sort by TIME+, descending
 	Space		Pause on/off
 	v			Change queries display mode: full, truncated, indented
-	UP / DOWN	Go to "navigation" mode
+	UP / DOWN	Scroll process list
 	q			Quit
-	+			Increase refresh time. Maximum value : 9s
+	+			Increase refresh time. Maximum value : 3s
 	-			Decrease refesh time. Minimum Value : 1s
 
 Navigation mode
@@ -65,5 +65,3 @@ Screenshot
 ----------
 
 ![pg_activity screenshot](https://raw.github.com/julmon/pg_activity/master/docs/imgs/screenshot.png)
-
-![pg_activity screenshot2](https://raw.github.com/julmon/pg_activity/master/docs/imgs/screenshot2.png)

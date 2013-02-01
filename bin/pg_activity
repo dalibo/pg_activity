@@ -141,7 +141,7 @@ PGTOP_FLAG_MODE = 1024
 PGTOP_FLAG_NONE = None
 
 # refresh time
-PGTOP_REFRESH_TIME = 1
+PGTOP_REFRESH_TIME = 2
 
 PGTOP_COLS = {
 	'activities': {
@@ -474,6 +474,8 @@ def change_mode_interactive():
 	colno += print_string((y - 1), colno, "Pause	", get_curses_color(C_CYAN)|curses.A_REVERSE)
 	colno += print_string((y - 1), colno, "<q>", get_curses_color(0))
 	colno += print_string((y - 1), colno, "Quit	", get_curses_color(C_CYAN)|curses.A_REVERSE)
+	colno += print_string((y - 1), colno, "<h>", get_curses_color(0))
+	colno += print_string((y - 1), colno, "Help	", get_curses_color(C_CYAN)|curses.A_REVERSE)
 	colno += print_string((y - 1), colno, add_blank(" "), get_curses_color(C_CYAN)|curses.A_REVERSE)
 
 """
@@ -635,7 +637,10 @@ def poll_activities(interval, connector, flag, indent, process = None, pg_num_ve
 		PGTOP_REFRESH_TIME += 1
 	if k == ord('-') and PGTOP_REFRESH_TIME > 1:
 		PGTOP_REFRESH_TIME -= 1
-			
+	
+	if k == ord('h'):
+		help_window()
+
 	curses.flushinp()
 	
 	# poll postgresql activity
@@ -758,7 +763,10 @@ def poll_locked_blocking(interval, connector, flag, indent, process = None, pg_n
 		PGTOP_REFRESH_TIME += 1
 	if k == ord('-') and PGTOP_REFRESH_TIME > 1:
 		PGTOP_REFRESH_TIME -= 1
-			
+
+	if k == ord('h'):
+		help_window()
+	
 	curses.flushinp()
 	
 	# poll postgresql activity
@@ -861,7 +869,6 @@ def print_cols_header(flag):
 			line += disp
 			win.addstr(lineno, x, disp, color_highlight|curses.A_REVERSE)
 			x += len(disp)
-	
 	lineno += 1
 
 """
@@ -870,7 +877,6 @@ Print window header
 def print_header(pg_version, hostname, user, host, port, io):
 	global lineno
 	global PGTOP_MAX_IOPS 
-	
 	lineno = 0
 	colno = 0
 	version = " %s" % (pg_version)
@@ -924,6 +930,48 @@ def print_header(pg_version, hostname, user, host, port, io):
 	line_io = " | Write: %8s/s - %6s IOPs" % (bytes2human(io['write_bytes']), int(io['write_count']),)
 	colno = print_string(lineno, colno_io, line_io)
 
+def help_window():
+	win.erase()
+	lineno = 0
+	colno = 0
+	text = "pg_activity %s - (c) 2012-2013 Julien Tachoires" % (PGTOP_VERSION)
+	l = print_string(lineno, 0, text, get_curses_color(C_GREEN)|curses.A_BOLD)
+	lineno += 1
+	text = "Released under New BSD License."
+	l = print_string(lineno, 0, text)
+	lineno += 2
+	l = display_help_key(lineno, 00, 'Up/Down Arrows', 'scroll process list')
+	l = display_help_key(lineno, 45, '             C', 'activate/deactivate colors')
+	lineno +=1
+	l = display_help_key(lineno, 00, '         Space', 'pause')
+	l = display_help_key(lineno, 45, '             r', 'sort by READ/s desc. (activites)')
+	lineno +=1
+	l = display_help_key(lineno, 00, '             v', 'change queries display mode')
+	l = display_help_key(lineno, 45, '             w', 'sort by WRITE/s desc. (activites)')
+	lineno +=1
+	l = display_help_key(lineno, 00, '             q', 'quit')
+	l = display_help_key(lineno, 45, '             c', 'sort by CPU% desc. (activites)')
+	lineno +=1
+	l = display_help_key(lineno, 00, '             +', 'increase refresh time (max:3)')
+	l = display_help_key(lineno, 45, '             m', 'sort by MEM% desc. (activites)')
+	lineno +=1
+	l = display_help_key(lineno, 00, '             -', 'decrease refresh time (min:1)')
+	l = display_help_key(lineno, 45, '             t', 'sort by TIME+ desc. (activites)')
+	
+	lineno += 2
+	l = print_string(lineno, 0, 'Press any key to exit.')	
+	win.timeout(-1)
+	try:
+		k = win.getch()
+	except KeyboardInterrupt as e:
+		raise e
+
+
+def display_help_key(lineno, colno, key, help):
+	l = print_string(lineno, colno, key, get_curses_color(C_CYAN)|curses.A_BOLD)
+	l2 = print_string(lineno, colno + l, ': %s' % (help,))
+	return (colno + l + l2)
+
 """
 Refresh the window
 """
@@ -932,7 +980,6 @@ def refresh_window(procs, extras, flag, indent, io):
 	global lines
 
 	lines = []
-	
 	(pg_version, hostname, user, host, port) = extras
 	win.erase()
 	print_header(pg_version, hostname, user, host, port, io)
@@ -948,7 +995,6 @@ def refresh_window(procs, extras, flag, indent, io):
 			lines.append(line_trunc)
 		except curses.error as e:
 			break
-		
 		for l in range(lineno, (win.getmaxyx()[0]-1)):
 			print_string(l, 0, add_blank(' '))
 	change_mode_interactive()
@@ -966,7 +1012,6 @@ def scroll_window(procs, flag, indent, offset = 0):
 				refresh_line(p, flag, indent, 'default')
 			except curses.error as e:
 				break
-		
 			for l in range(lineno, (win.getmaxyx()[0]-1)):
 				print_string(l, 0, add_blank(' '))
 		pos += 1
@@ -1172,10 +1217,10 @@ def main():
 	except Exception as e:
 		at_exit_curses()
 		# DEBUG
-		# import traceback
-		# exc_type, exc_value, exc_traceback = sys.exc_info()
-		# print repr(traceback.format_tb(exc_traceback))
-		# traceback.print_exception(exc_type, exc_value, exc_traceback, limit=2, file=sys.stdout)
+		import traceback
+		exc_type, exc_value, exc_traceback = sys.exc_info()
+		print repr(traceback.format_tb(exc_traceback))
+		traceback.print_exception(exc_type, exc_value, exc_traceback, limit=2, file=sys.stdout)
 		sys.exit("FATAL: %s" % (str(e),))
 
 """
