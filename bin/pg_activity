@@ -6,19 +6,19 @@ version: 0.3.0
 author: Julien Tachoires <julmon@gmail.com>
 license: New BSD License
 
-Copyright (c) 2012, Julien Tachoires
+Copyright (c) 2012 - 2013, Julien Tachoires
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-	* Redistributions of source code must retain the above copyright
-	  notice, this list of conditions and the following disclaimer.
-	* Redistributions in binary form must reproduce the above copyright
-	  notice, this list of conditions and the following disclaimer in the
-	  documentation and/or other materials provided with the distribution.
-	* Neither the name of pg_activity nor the
-	  names of its contributors may be used to endorse or promote products
-	  derived from this software without specific prior written permission.
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * Neither the name of pg_activity nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -37,7 +37,7 @@ PGTOP_VERSION="0.3.0"
 import os
 import sys
 if os.name != 'posix':
-	sys.exit('FATAL: Platform not supported.')
+    sys.exit('FATAL: Platform not supported.')
 import signal
 import time
 import curses
@@ -56,28 +56,28 @@ Called at exit time.
 Rollback to default values.
 """
 def at_exit_curses():
-	# Strange behaviour here
-	try:
-		win.keypad(0)
-		win.move(0,0)
-		win.erase()
-	except KeyboardInterrupt as e:
-		pass
-	curses.nocbreak()
-	curses.echo()
-	try:
-		curses.curs_set(1)
-	except Exception as e:
-		pass
-	curses.endwin()
+    # Strange behaviour here
+    try:
+        win.keypad(0)
+        win.move(0,0)
+        win.erase()
+    except KeyboardInterrupt as e:
+        pass
+    curses.nocbreak()
+    curses.echo()
+    try:
+        curses.curs_set(1)
+    except Exception as e:
+        pass
+    curses.endwin()
 
 """
 Function called on a kill
 """
 def signal_handler(signal, frame):
-	at_exit_curses()
-	print "FATAL: Killed."
-	sys.exit(0)
+    at_exit_curses()
+    print "FATAL: Killed."
+    sys.exit(0)
 
 
 # Curses initialization
@@ -95,20 +95,20 @@ related to colors (and probably others) raise an ERR
 PGTOP_SYS_COLOR = True
 
 try:
-	# deactivate cursor
-	curses.curs_set(0)
-	# use colors
-	curses.start_color()
-	curses.use_default_colors()
+    # deactivate cursor
+    curses.curs_set(0)
+    # use colors
+    curses.start_color()
+    curses.use_default_colors()
 except Exception as e:
-	# Terminal doesn't support curs_set() and colors
-	PGTOP_SYS_COLOR = False
+    # Terminal doesn't support curs_set() and colors
+    PGTOP_SYS_COLOR = False
 
 def get_curses_color(color):
-	if PGTOP_SYS_COLOR:
-		return curses.color_pair(color)
-	else:
-		return 0
+    if PGTOP_SYS_COLOR:
+        return curses.color_pair(color)
+    else:
+        return 0
 
 lineno = 0
 curses.endwin()
@@ -144,56 +144,56 @@ PGTOP_FLAG_NONE = None
 PGTOP_REFRESH_TIME = 2
 
 PGTOP_COLS = {
-	'activities': {
-		'pid'		: {'n': 1, 'name': 'PID', 'template_h': '%-6s ', 'flag': PGTOP_FLAG_NONE, 'mandatory': True},
-		'database'	: {'n': 2, 'name': 'DATABASE', 'template_h': '%-16s ', 'flag': PGTOP_FLAG_DATABASE, 'mandatory': False},
-		'client'	: {'n': 3, 'name': 'CLIENT', 'template_h': '%16s ', 'flag': PGTOP_FLAG_CLIENT, 'mandatory': False},
-		'cpu'		: {'n': 4, 'name': 'CPU%', 'template_h': '%5s ', 'flag': PGTOP_FLAG_CPU, 'mandatory': False},
-		'mem'		: {'n': 5, 'name': 'MEM%', 'template_h': '%4s ', 'flag': PGTOP_FLAG_MEM, 'mandatory': False},
-		'read'		: {'n': 6, 'name': 'READ/s', 'template_h': '%8s ', 'flag': PGTOP_FLAG_READ, 'mandatory': False},
-		'write'		: {'n': 7, 'name': 'WRITE/s', 'template_h': '%8s ', 'flag': PGTOP_FLAG_WRITE, 'mandatory': False},
-		'time'		: {'n': 8, 'name': 'TIME+', 'template_h': '%9s ', 'flag': PGTOP_FLAG_TIME, 'mandatory': False},
-		'wait'		: {'n': 9, 'name': 'W', 'template_h': '%2s ', 'flag': PGTOP_FLAG_WAIT, 'mandatory': False},
-		'query'		: {'n': 10, 'name': 'Query', 'template_h': ' %2s', 'flag': PGTOP_FLAG_NONE, 'mandatory': True},
-	},
-	'locked': {
-		'pid'		: {'n': 1, 'name': 'PID', 'template_h': '%-6s ', 'flag': PGTOP_FLAG_NONE, 'mandatory': True},
-		'database'	: {'n': 2, 'name': 'DATABASE', 'template_h': '%-16s ', 'flag': PGTOP_FLAG_DATABASE, 'mandatory': False},
-		'relation'	: {'n': 3, 'name': 'RELATION', 'template_h': '%9s ', 'flag': PGTOP_FLAG_RELATION, 'mandatory': False},
-		'type'		: {'n': 4, 'name': 'TYPE', 'template_h': '%16s ', 'flag': PGTOP_FLAG_TYPE, 'mandatory': False},
-		'mode'		: {'n': 5, 'name': 'MODE', 'template_h': '%16s ', 'flag': PGTOP_FLAG_MODE, 'mandatory': False},
-		'time'		: {'n': 6, 'name': 'TIME+', 'template_h': '%9s ', 'flag': PGTOP_FLAG_TIME, 'mandatory': False},
-		'query'		: {'n': 7, 'name': 'Query', 'template_h': ' %2s', 'flag': PGTOP_FLAG_NONE, 'mandatory': True},
-	},
-	'blocking': {
-		'pid'		: {'n': 1, 'name': 'PID', 'template_h': '%-6s ', 'flag': PGTOP_FLAG_NONE, 'mandatory': True},
-		'database'	: {'n': 2, 'name': 'DATABASE', 'template_h': '%-16s ', 'flag': PGTOP_FLAG_DATABASE, 'mandatory': False},
-		'relation'	: {'n': 3, 'name': 'RELATION', 'template_h': '%9s ', 'flag': PGTOP_FLAG_RELATION, 'mandatory': False},
-		'type'		: {'n': 4, 'name': 'TYPE', 'template_h': '%16s ', 'flag': PGTOP_FLAG_TYPE, 'mandatory': False},
-		'mode'		: {'n': 5, 'name': 'MODE', 'template_h': '%16s ', 'flag': PGTOP_FLAG_MODE, 'mandatory': False},
-		'time'		: {'n': 6, 'name': 'TIME+', 'template_h': '%9s ', 'flag': PGTOP_FLAG_TIME, 'mandatory': False},
-		'query'		: {'n': 7, 'name': 'Query', 'template_h': ' %2s', 'flag': PGTOP_FLAG_NONE, 'mandatory': True},
-	}
+    'activities': {
+        'pid'       : {'n': 1, 'name': 'PID', 'template_h': '%-6s ', 'flag': PGTOP_FLAG_NONE, 'mandatory': True},
+        'database'  : {'n': 2, 'name': 'DATABASE', 'template_h': '%-16s ', 'flag': PGTOP_FLAG_DATABASE, 'mandatory': False},
+        'client'    : {'n': 3, 'name': 'CLIENT', 'template_h': '%16s ', 'flag': PGTOP_FLAG_CLIENT, 'mandatory': False},
+        'cpu'       : {'n': 4, 'name': 'CPU%', 'template_h': '%5s ', 'flag': PGTOP_FLAG_CPU, 'mandatory': False},
+        'mem'       : {'n': 5, 'name': 'MEM%', 'template_h': '%4s ', 'flag': PGTOP_FLAG_MEM, 'mandatory': False},
+        'read'      : {'n': 6, 'name': 'READ/s', 'template_h': '%8s ', 'flag': PGTOP_FLAG_READ, 'mandatory': False},
+        'write'     : {'n': 7, 'name': 'WRITE/s', 'template_h': '%8s ', 'flag': PGTOP_FLAG_WRITE, 'mandatory': False},
+        'time'      : {'n': 8, 'name': 'TIME+', 'template_h': '%9s ', 'flag': PGTOP_FLAG_TIME, 'mandatory': False},
+        'wait'      : {'n': 9, 'name': 'W', 'template_h': '%2s ', 'flag': PGTOP_FLAG_WAIT, 'mandatory': False},
+        'query'     : {'n': 10, 'name': 'Query', 'template_h': ' %2s', 'flag': PGTOP_FLAG_NONE, 'mandatory': True},
+    },
+    'locked': {
+        'pid'       : {'n': 1, 'name': 'PID', 'template_h': '%-6s ', 'flag': PGTOP_FLAG_NONE, 'mandatory': True},
+        'database'  : {'n': 2, 'name': 'DATABASE', 'template_h': '%-16s ', 'flag': PGTOP_FLAG_DATABASE, 'mandatory': False},
+        'relation'  : {'n': 3, 'name': 'RELATION', 'template_h': '%9s ', 'flag': PGTOP_FLAG_RELATION, 'mandatory': False},
+        'type'      : {'n': 4, 'name': 'TYPE', 'template_h': '%16s ', 'flag': PGTOP_FLAG_TYPE, 'mandatory': False},
+        'mode'      : {'n': 5, 'name': 'MODE', 'template_h': '%16s ', 'flag': PGTOP_FLAG_MODE, 'mandatory': False},
+        'time'      : {'n': 6, 'name': 'TIME+', 'template_h': '%9s ', 'flag': PGTOP_FLAG_TIME, 'mandatory': False},
+        'query'     : {'n': 7, 'name': 'Query', 'template_h': ' %2s', 'flag': PGTOP_FLAG_NONE, 'mandatory': True},
+    },
+    'blocking': {
+        'pid'       : {'n': 1, 'name': 'PID', 'template_h': '%-6s ', 'flag': PGTOP_FLAG_NONE, 'mandatory': True},
+        'database'  : {'n': 2, 'name': 'DATABASE', 'template_h': '%-16s ', 'flag': PGTOP_FLAG_DATABASE, 'mandatory': False},
+        'relation'  : {'n': 3, 'name': 'RELATION', 'template_h': '%9s ', 'flag': PGTOP_FLAG_RELATION, 'mandatory': False},
+        'type'      : {'n': 4, 'name': 'TYPE', 'template_h': '%16s ', 'flag': PGTOP_FLAG_TYPE, 'mandatory': False},
+        'mode'      : {'n': 5, 'name': 'MODE', 'template_h': '%16s ', 'flag': PGTOP_FLAG_MODE, 'mandatory': False},
+        'time'      : {'n': 6, 'name': 'TIME+', 'template_h': '%9s ', 'flag': PGTOP_FLAG_TIME, 'mandatory': False},
+        'query'     : {'n': 7, 'name': 'Query', 'template_h': ' %2s', 'flag': PGTOP_FLAG_NONE, 'mandatory': True},
+    }
 }
 
 PGTOP_LINE_COLORS = {
-	'pid'			: {'default': get_curses_color(C_CYAN), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
-	'database'		: {'default': curses.A_BOLD | get_curses_color(C_GRAY), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
-	'client'		: {'default': get_curses_color(C_CYAN), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
-	'cpu'			: {'default': get_curses_color(0), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
-	'mem'			: {'default': get_curses_color(0), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
-	'read'			: {'default': get_curses_color(0), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
-	'write'			: {'default': get_curses_color(0), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
-	'time_red'		: {'default': get_curses_color(C_RED), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
-	'time_yellow'	: {'default': get_curses_color(C_YELLOW), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
-	'time_green'	: {'default': get_curses_color(C_GREEN), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
-	'wait_green'	: {'default': get_curses_color(C_GREEN) | curses.A_BOLD, 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
-	'wait_red'		: {'default': get_curses_color(C_RED) | curses.A_BOLD, 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
-	'query'			: {'default': get_curses_color(0), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
-	'relation'		: {'default': get_curses_color(C_CYAN), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
-	'type'			: {'default': get_curses_color(0), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
-	'mode_yellow'	: {'default': get_curses_color(C_YELLOW)|curses.A_BOLD, 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
-	'mode_red'		: {'default': get_curses_color(C_RED)|curses.A_BOLD, 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE}
+    'pid'           : {'default': get_curses_color(C_CYAN), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
+    'database'      : {'default': curses.A_BOLD | get_curses_color(C_GRAY), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
+    'client'        : {'default': get_curses_color(C_CYAN), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
+    'cpu'           : {'default': get_curses_color(0), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
+    'mem'           : {'default': get_curses_color(0), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
+    'read'          : {'default': get_curses_color(0), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
+    'write'         : {'default': get_curses_color(0), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
+    'time_red'      : {'default': get_curses_color(C_RED), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
+    'time_yellow'   : {'default': get_curses_color(C_YELLOW), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
+    'time_green'    : {'default': get_curses_color(C_GREEN), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
+    'wait_green'    : {'default': get_curses_color(C_GREEN) | curses.A_BOLD, 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
+    'wait_red'      : {'default': get_curses_color(C_RED) | curses.A_BOLD, 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
+    'query'         : {'default': get_curses_color(0), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
+    'relation'      : {'default': get_curses_color(C_CYAN), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
+    'type'          : {'default': get_curses_color(0), 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
+    'mode_yellow'   : {'default': get_curses_color(C_YELLOW)|curses.A_BOLD, 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE},
+    'mode_red'      : {'default': get_curses_color(C_RED)|curses.A_BOLD, 'cursor': get_curses_color(C_CYAN)|curses.A_REVERSE}
 }
 
 # display query mode
@@ -212,167 +212,188 @@ PGTOP_COLOR = True
 # default mode : activites, locked, blocking
 PGTOP_MODE = 'activities'
 
+# Does pg_activity is connected to a local PG server ?
+PGTOP_IS_LOCAL = True
+
+# Start line
+PGTOP_START_LINE = 4
+
 """
 Replace colors by white.
 """
 def set_nocolor():
-	if not PGTOP_SYS_COLOR:
-		return
-	global PGTOP_COLOR
-	PGTOP_COLOR = False
-	curses.init_pair(C_BLACK_GREEN, curses.COLOR_BLACK, curses.COLOR_WHITE)
-	curses.init_pair(C_CYAN, curses.COLOR_WHITE, -1)
-	curses.init_pair(C_RED, curses.COLOR_WHITE, -1)
-	curses.init_pair(C_RED_BLACK, curses.COLOR_WHITE, curses.COLOR_BLACK)
-	curses.init_pair(C_GREEN, curses.COLOR_WHITE, -1)
-	curses.init_pair(C_YELLOW, curses.COLOR_WHITE, -1)
-	curses.init_pair(C_MAGENTA, curses.COLOR_WHITE, -1)
-	curses.init_pair(C_WHITE, curses.COLOR_WHITE, -1)
-	curses.init_pair(C_BLACK_CYAN, curses.COLOR_WHITE, -1)
-	curses.init_pair(C_GRAY, curses.COLOR_WHITE, -1)
+    if not PGTOP_SYS_COLOR:
+        return
+    global PGTOP_COLOR
+    PGTOP_COLOR = False
+    curses.init_pair(C_BLACK_GREEN, curses.COLOR_BLACK, curses.COLOR_WHITE)
+    curses.init_pair(C_CYAN, curses.COLOR_WHITE, -1)
+    curses.init_pair(C_RED, curses.COLOR_WHITE, -1)
+    curses.init_pair(C_RED_BLACK, curses.COLOR_WHITE, curses.COLOR_BLACK)
+    curses.init_pair(C_GREEN, curses.COLOR_WHITE, -1)
+    curses.init_pair(C_YELLOW, curses.COLOR_WHITE, -1)
+    curses.init_pair(C_MAGENTA, curses.COLOR_WHITE, -1)
+    curses.init_pair(C_WHITE, curses.COLOR_WHITE, -1)
+    curses.init_pair(C_BLACK_CYAN, curses.COLOR_WHITE, -1)
+    curses.init_pair(C_GRAY, curses.COLOR_WHITE, -1)
 
 """
 Set colors.
 """
 def set_color():
-	if not PGTOP_SYS_COLOR:
-		return
-	global PGTOP_COLOR
-	PGTOP_COLOR = True
-	curses.init_pair(C_BLACK_GREEN, curses.COLOR_BLACK, curses.COLOR_GREEN)
-	curses.init_pair(C_CYAN, curses.COLOR_CYAN, -1)
-	curses.init_pair(C_RED, curses.COLOR_RED, -1)
-	curses.init_pair(C_RED_BLACK, curses.COLOR_RED, curses.COLOR_BLACK)
-	curses.init_pair(C_GREEN, curses.COLOR_GREEN, -1)
-	curses.init_pair(C_YELLOW, curses.COLOR_YELLOW, -1)
-	curses.init_pair(C_MAGENTA, curses.COLOR_MAGENTA, -1)
-	curses.init_pair(C_WHITE, curses.COLOR_WHITE, -1)
-	curses.init_pair(C_BLACK_CYAN, curses.COLOR_BLACK, curses.COLOR_CYAN)
-	curses.init_pair(C_GRAY, 0, -1)
+    if not PGTOP_SYS_COLOR:
+        return
+    global PGTOP_COLOR
+    PGTOP_COLOR = True
+    curses.init_pair(C_BLACK_GREEN, curses.COLOR_BLACK, curses.COLOR_GREEN)
+    curses.init_pair(C_CYAN, curses.COLOR_CYAN, -1)
+    curses.init_pair(C_RED, curses.COLOR_RED, -1)
+    curses.init_pair(C_RED_BLACK, curses.COLOR_RED, curses.COLOR_BLACK)
+    curses.init_pair(C_GREEN, curses.COLOR_GREEN, -1)
+    curses.init_pair(C_YELLOW, curses.COLOR_YELLOW, -1)
+    curses.init_pair(C_MAGENTA, curses.COLOR_MAGENTA, -1)
+    curses.init_pair(C_WHITE, curses.COLOR_WHITE, -1)
+    curses.init_pair(C_BLACK_CYAN, curses.COLOR_BLACK, curses.COLOR_CYAN)
+    curses.init_pair(C_GRAY, 0, -1)
 
 """
 Strip and replace some special characters.
 """
 def clean_str(string):
-	msg = str(string)
-	msg = msg.replace("\n", " ")
-	msg = re.sub(r'\s+', r' ', msg)
-	msg = msg.replace("FATAL:", "")
-	msg = re.sub(r'^\s', r'', msg)
-	msg = re.sub(r'\s$', r'', msg)
-	return msg
+    msg = str(string)
+    msg = msg.replace("\n", " ")
+    msg = re.sub(r'\s+', r' ', msg)
+    msg = msg.replace("FATAL:", "")
+    msg = re.sub(r'^\s', r'', msg)
+    msg = re.sub(r'\s$', r'', msg)
+    return msg
 
 """
 Connect to a PostgreSQL server and returns
 cursor & connector.
 """
 def pg_connect(host = 'localhost', port = 5432, user = 'postgres', password = None):
-	conn = psycopg2.connect(
-			database = 'postgres',
-			host = host,
-			port = port,
-			user = user,
-			password = str(password),
-			connection_factory=psycopg2.extras.DictConnection	
-		)
-	conn.set_isolation_level(0)
-	cur = conn.cursor()
-	res = cur.execute("SELECT current_setting('is_superuser')")
-	ret = cur.fetchone()
-	if ret[0] != "on":
-		raise Exception, "Must be run with database superuser privileges."
-	return conn
+    conn = psycopg2.connect(
+            database = 'postgres',
+            host = host,
+            port = port,
+            user = user,
+            password = str(password),
+            connection_factory=psycopg2.extras.DictConnection    
+        )
+    conn.set_isolation_level(0)
+    cur = conn.cursor()
+    res = cur.execute("SELECT current_setting('is_superuser')")
+    ret = cur.fetchone()
+    if ret[0] != "on":
+        raise Exception, "Must be run with database superuser privileges."
+    return conn
 
 """
 Get PostgreSQL server version
 """
 def pg_get_version(conn):
-	query = """
-	SELECT version() AS pg_version
-	"""
-	cur = conn.cursor()
-	res = cur.execute(query)
-	ret = cur.fetchone()
-	return ret['pg_version']
+    query = """
+    SELECT version() AS pg_version
+    """
+    cur = conn.cursor()
+    res = cur.execute(query)
+    ret = cur.fetchone()
+    return ret['pg_version']
 
 """
 Terminate a backend
 """
 def pg_terminate_backend(conn, pid):
-	query = """
-	SELECT pg_terminate_backend(%s) AS terminated
-	"""
-	cur = conn.cursor()
-	res = cur.execute(query, (pid,))
-	ret = cur.fetchone()
-	return ret['terminated']
+    query = """
+    SELECT pg_terminate_backend(%s) AS terminated
+    """
+    cur = conn.cursor()
+    res = cur.execute(query, (pid,))
+    ret = cur.fetchone()
+    return ret['terminated']
 
 """
 Get PostgreSQL short & numeric version from
 a string (SELECT version())
 """
 def pg_get_num_version(text_version):
-	res = re.match(r'^PostgreSQL ([0-9]+)\.([0-9]+)\.([0-9]+)', text_version)
-	if res is not None:
-		r = res.group(1)
-		if int(res.group(2)) < 10:
-			r += '0'
-		r += res.group(2)
-		if int(res.group(3)) < 10:
-			r += '0'
-		r += res.group(3)
-		return (res.group(0), int(r))
-	return None
+    res = re.match(r'^PostgreSQL ([0-9]+)\.([0-9]+)\.([0-9]+)', text_version)
+    if res is not None:
+        r = res.group(1)
+        if int(res.group(2)) < 10:
+            r += '0'
+        r += res.group(2)
+        if int(res.group(3)) < 10:
+            r += '0'
+        r += res.group(3)
+        return (res.group(0), int(r))
+    return None
 
 """
 Get activity from pg_stat_activity view
 """
 def pg_get_activities(conn, pg_num_version):
-	if pg_num_version >= 90200:
-		# PostgreSQL 9.2.0 and more
-		query = """
+    if pg_num_version >= 90200:
+        # PostgreSQL 9.2.0 and more
+        query = """
 SELECT pg_stat_activity.pid AS pid, CASE WHEN LENGTH(pg_stat_activity.datname) > 16 THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$') ELSE pg_stat_activity.datname END AS database, pg_stat_activity.client_addr AS client, EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration, pg_stat_activity.waiting AS wait, pg_stat_activity.usename AS user, pg_stat_activity.query AS query FROM pg_stat_activity WHERE state <> 'idle' AND pid <> pg_backend_pid() ORDER BY EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
-		"""
-	elif pg_num_version < 90200:
-		# PostgreSQL prior to 9.2.0
-		query = """
+        """
+    elif pg_num_version < 90200:
+        # PostgreSQL prior to 9.2.0
+        query = """
 SELECT pg_stat_activity.procpid AS pid, CASE WHEN LENGTH(pg_stat_activity.datname) > 16 THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$') ELSE pg_stat_activity.datname END AS database, pg_stat_activity.client_addr AS client, EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration, pg_stat_activity.waiting AS wait, pg_stat_activity.usename AS user, pg_stat_activity.current_query AS query FROM pg_stat_activity WHERE current_query <> '<IDLE>' AND procpid <> pg_backend_pid() ORDER BY EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
-		"""
-	cur = conn.cursor()
-	res = cur.execute(query)
-	ret = cur.fetchall()
-	return ret
+        """
+    cur = conn.cursor()
+    res = cur.execute(query)
+    ret = cur.fetchall()
+    return ret
 
 """
 Get queries locked
 """
 def pg_get_locked(conn, pg_num_version):
-	if pg_num_version >= 90200:
-		query = """
+    if pg_num_version >= 90200:
+        query = """
 SELECT pg_locks.pid AS pid, CASE WHEN LENGTH(pg_stat_activity.datname) > 16 THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$') ELSE pg_stat_activity.datname END AS database, pg_locks.mode AS mode, pg_locks.locktype AS type, pg_locks.relation::regclass AS relation, EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration, pg_stat_activity.query AS query FROM pg_catalog.pg_locks JOIN pg_catalog.pg_stat_activity ON(pg_catalog.pg_locks.pid = pg_catalog.pg_stat_activity.pid) WHERE NOT pg_catalog.pg_locks.granted AND pg_catalog.pg_stat_activity.pid <> pg_backend_pid() ORDER BY EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
-		"""
-	elif pg_num_version < 90200:
-		query = """
+        """
+    elif pg_num_version < 90200:
+        query = """
 SELECT pg_locks.pid AS pid, CASE WHEN LENGTH(pg_stat_activity.datname) > 16 THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$') ELSE pg_stat_activity.datname END AS database, pg_locks.mode AS mode, pg_locks.locktype AS type, pg_locks.relation::regclass AS relation, EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration, pg_stat_activity.current_query AS query FROM pg_catalog.pg_locks JOIN pg_catalog.pg_stat_activity ON(pg_catalog.pg_locks.pid = pg_catalog.pg_stat_activity.procpid) WHERE NOT pg_catalog.pg_locks.granted AND  pg_catalog.pg_stat_activity.procpid <> pg_backend_pid() ORDER BY EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
-		"""
-	cur = conn.cursor()
-	res = cur.execute(query)
-	ret = cur.fetchall()
-	return ret
+        """
+    cur = conn.cursor()
+    res = cur.execute(query)
+    ret = cur.fetchall()
+    return ret
 
+"""
+Get blocking queries
+"""
 def pg_get_blocking(conn, pg_num_version):
-	if pg_num_version >= 90200:
-		query = """
+    if pg_num_version >= 90200:
+        query = """
 SELECT pid, CASE WHEN LENGTH(datname) > 16 THEN SUBSTRING(datname FROM 0 FOR 6)||'...'||SUBSTRING(datname FROM '........$') ELSE datname END AS database, relation, mode, locktype AS type, duration, query FROM (SELECT blocking.pid, pg_stat_activity.query, blocking.mode, pg_stat_activity.datname, blocking.locktype,EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration, blocking.relation::regclass AS relation FROM pg_locks AS blocking JOIN (SELECT transactionid FROM pg_locks WHERE NOT granted) AS blocked ON (blocking.transactionid = blocked.transactionid) JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.pid) WHERE blocking.granted UNION ALL SELECT blocking.pid, pg_stat_activity.query, blocking.mode, pg_stat_activity.datname, blocking.locktype,EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration, blocking.relation::regclass AS relation FROM pg_locks AS blocking JOIN (SELECT database, relation, mode FROM pg_locks WHERE NOT granted AND relation IS NOT NULL) AS blocked ON (blocking.database = blocked.database AND blocking.relation = blocked.relation) JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.pid) WHERE blocking.granted) AS sq GROUP BY pid, query, mode, locktype, duration, datname, relation ORDER BY duration DESC
-		"""
-	elif pg_num_version < 90200:
-		query = """
+        """
+    elif pg_num_version < 90200:
+        query = """
 SELECT pid, CASE WHEN LENGTH(datname) > 16 THEN SUBSTRING(datname FROM 0 FOR 6)||'...'||SUBSTRING(datname FROM '........$') ELSE datname END AS database, relation, mode, locktype AS type, duration, query FROM (SELECT blocking.pid, pg_stat_activity.current_query AS query, blocking.mode, pg_stat_activity.datname, blocking.locktype,EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration, blocking.relation::regclass AS relation FROM pg_locks AS blocking JOIN (SELECT transactionid FROM pg_locks WHERE NOT granted) AS blocked ON (blocking.transactionid = blocked.transactionid) JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.procpid) WHERE blocking.granted UNION ALL SELECT blocking.pid, pg_stat_activity.current_query AS query, blocking.mode, pg_stat_activity.datname, blocking.locktype,EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration, blocking.relation::regclass AS relation FROM pg_locks AS blocking JOIN (SELECT database, relation, mode FROM pg_locks WHERE NOT granted AND relation IS NOT NULL) AS blocked ON (blocking.database = blocked.database AND blocking.relation = blocked.relation) JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.procpid) WHERE blocking.granted) AS sq GROUP BY pid, query, mode, locktype, duration, datname, relation ORDER BY duration DESC
-		"""
-	cur = conn.cursor()
-	res = cur.execute(query)
-	ret = cur.fetchall()
-	return ret
+        """
+    cur = conn.cursor()
+    res = cur.execute(query)
+    ret = cur.fetchall()
+    return ret
+
+"""
+Does pg_activity is connected localy ?
+"""
+def pg_is_local(conn):
+    query = "SELECT inet_server_addr(), inet_client_addr()"
+    cur = conn.cursor()
+    res = cur.execute(query)
+    ret = cur.fetchone()
+    if len(ret['inet_server_addr']) == 0 or ret['inet_server_addr'] == ret['inet_client_addr']:
+        return True
+    return False
 
 """
 Get system informations (CPU, memory, IO read & write)
@@ -380,852 +401,891 @@ for each process PID -- retreived previously from pg_stat_activity -- with
 psutil module.
 """
 def sys_get_proc(queries):
-	process = {}
-	for sq in queries:
-		try:
-			p = psutil.Process(sq['pid'])
-			p._meminfo = p.get_memory_info()
-			p._io_counters = p.get_io_counters()
-			p._io_time = time.time()
-			p._mem_percent = p.get_memory_percent()
-			p._cpu_percent = p.get_cpu_percent(interval=0)
-			p._cpu_times = p.get_cpu_times()
-			p._pg_user = sq['user']
-			p._pg_database = sq['database']
-			p._pg_client = sq['client']
-			p._pg_duration = sq['duration']
-			p._pg_wait = sq['wait']
-			p._pg_query = clean_str(sq['query'])
-			p._io_read_delta = 0
-			p._io_write_delta = 0
-			process[sq['pid']] = p
-		except psutil.error.NoSuchProcess as e:
-			pass
-		except psutil.error.AccessDenied as e:
-			raise e
-	return process
+    process = {}
+    if not PGTOP_IS_LOCAL:
+        return process
+
+    for sq in queries:
+        try:
+            p = psutil.Process(sq['pid'])
+            p._meminfo = p.get_memory_info()
+            p._io_counters = p.get_io_counters()
+            p._io_time = time.time()
+            p._mem_percent = p.get_memory_percent()
+            p._cpu_percent = p.get_cpu_percent(interval=0)
+            p._cpu_times = p.get_cpu_times()
+            p._pg_user = sq['user']
+            p._pg_database = sq['database']
+            p._pg_client = sq['client']
+            p._pg_duration = sq['duration']
+            p._pg_wait = sq['wait']
+            p._pg_query = clean_str(sq['query'])
+            p._io_read_delta = 0
+            p._io_write_delta = 0
+            process[sq['pid']] = p
+        except psutil.error.NoSuchProcess as e:
+            pass
+        except psutil.error.AccessDenied as e:
+            raise e
+    return process
 
 """
 PAUSE mode
 """
 def pause():
-	(y,x) = win.getmaxyx()
-	msg = "PAUSE"
-	line = ""
-	line += " " * (int(x/2) - len(msg))
-	line += msg
-	line += " " * (x - len(line) - 0)
-	win.addstr(4, 0, line, get_curses_color(C_RED_BLACK)|curses.A_REVERSE|curses.A_BOLD)
-	current_pos = -1
-	while 1:
-		try:
-			k = win.getch()
-		except KeyboardInterrupt as e:
-			raise e
-		if k == ord('q'):
-			curses.endwin()
-			exit()
-		if k == ord(' '):
-			curses.flushinp()
-			return 0
-		curses.flushinp()
+    (y,x) = win.getmaxyx()
+    msg = "PAUSE"
+    line = ""
+    line += " " * (int(x/2) - len(msg))
+    line += msg
+    line += " " * (x - len(line) - 0)
+    win.addstr(PGTOP_START_LINE, 0, line, get_curses_color(C_RED_BLACK)|curses.A_REVERSE|curses.A_BOLD)
+    current_pos = -1
+    while 1:
+        try:
+            k = win.getch()
+        except KeyboardInterrupt as e:
+            raise e
+        if k == ord('q'):
+            curses.endwin()
+            exit()
+        if k == ord(' '):
+            curses.flushinp()
+            return 0
+        curses.flushinp()
 
 """
 Display current mode
 """
 def current_position():
-	(y,x) = win.getmaxyx()
-	if PGTOP_MODE == 'activities':
-		msg = "RUNNING QUERIES"
-	if PGTOP_MODE == 'locked':
-		msg = "LOCKED QUERIES"
-	if PGTOP_MODE == 'blocking':
-		msg = "BLOCKING QUERIES"
-	line = ""
-	line += " " * (int(x/2) - len(msg))
-	line += msg
-	line += " " * (x - len(line) - 0)
-	win.addstr(4, 0, line, get_curses_color(C_GREEN))
+    (y,x) = win.getmaxyx()
+    if PGTOP_MODE == 'activities':
+        msg = "RUNNING QUERIES"
+    if PGTOP_MODE == 'locked':
+        msg = "LOCKED QUERIES"
+    if PGTOP_MODE == 'blocking':
+        msg = "BLOCKING QUERIES"
+    line = ""
+    line += " " * (int(x/2) - len(msg))
+    line += msg
+    line += " " * (x - len(line) - 0)
+    win.addstr(PGTOP_START_LINE, 0, line, get_curses_color(C_GREEN))
 
 """
 Display interactive mode menu bar
 """
 def help_key_interactive(y):
-	colno = print_string((y - 1), 0, "<k>", get_curses_color(0))
-	colno += print_string((y - 1), colno, "Terminate the backend	", get_curses_color(C_CYAN)|curses.A_REVERSE)
-	colno += print_string((y - 1), colno, "<Space>", get_curses_color(0))
-	colno += print_string((y - 1), colno, "Back to activity	", get_curses_color(C_CYAN)|curses.A_REVERSE)
-	colno += print_string((y - 1), colno, "<q>", get_curses_color(0))
-	colno += print_string((y - 1), colno, "Quit	", get_curses_color(C_CYAN)|curses.A_REVERSE)
-	colno += print_string((y - 1), colno, add_blank(" "), get_curses_color(C_CYAN)|curses.A_REVERSE)
+    colno = print_string((y - 1), 0, "<k>", get_curses_color(0))
+    colno += print_string((y - 1), colno, "Terminate the backend    ", get_curses_color(C_CYAN)|curses.A_REVERSE)
+    colno += print_string((y - 1), colno, "<Space>", get_curses_color(0))
+    colno += print_string((y - 1), colno, "Back to activity    ", get_curses_color(C_CYAN)|curses.A_REVERSE)
+    colno += print_string((y - 1), colno, "<q>", get_curses_color(0))
+    colno += print_string((y - 1), colno, "Quit    ", get_curses_color(C_CYAN)|curses.A_REVERSE)
+    colno += print_string((y - 1), colno, add_blank(" "), get_curses_color(C_CYAN)|curses.A_REVERSE)
 
 """
 Display change mode menu bar
 """
 def change_mode_interactive():
-	(y,x) = win.getmaxyx()
-	colno = print_string((y - 1), 0, "<F1>", get_curses_color(0))
-	colno += print_string((y - 1), colno, "Running queries	", get_curses_color(C_CYAN)|curses.A_REVERSE)
-	colno += print_string((y - 1), colno, "<F2>", get_curses_color(0))
-	colno += print_string((y - 1), colno, "Locked queries	", get_curses_color(C_CYAN)|curses.A_REVERSE)
-	colno += print_string((y - 1), colno, "<F3>", get_curses_color(0))
-	colno += print_string((y - 1), colno, "Blocking queries ", get_curses_color(C_CYAN)|curses.A_REVERSE)
-	colno += print_string((y - 1), colno, "<Space>", get_curses_color(0))
-	colno += print_string((y - 1), colno, "Pause	", get_curses_color(C_CYAN)|curses.A_REVERSE)
-	colno += print_string((y - 1), colno, "<q>", get_curses_color(0))
-	colno += print_string((y - 1), colno, "Quit	", get_curses_color(C_CYAN)|curses.A_REVERSE)
-	colno += print_string((y - 1), colno, "<h>", get_curses_color(0))
-	colno += print_string((y - 1), colno, "Help	", get_curses_color(C_CYAN)|curses.A_REVERSE)
-	colno += print_string((y - 1), colno, add_blank(" "), get_curses_color(C_CYAN)|curses.A_REVERSE)
+    (y,x) = win.getmaxyx()
+    colno = print_string((y - 1), 0, "<F1>", get_curses_color(0))
+    colno += print_string((y - 1), colno, "Running queries    ", get_curses_color(C_CYAN)|curses.A_REVERSE)
+    colno += print_string((y - 1), colno, "<F2>", get_curses_color(0))
+    colno += print_string((y - 1), colno, "Locked queries    ", get_curses_color(C_CYAN)|curses.A_REVERSE)
+    colno += print_string((y - 1), colno, "<F3>", get_curses_color(0))
+    colno += print_string((y - 1), colno, "Blocking queries ", get_curses_color(C_CYAN)|curses.A_REVERSE)
+    colno += print_string((y - 1), colno, "<Space>", get_curses_color(0))
+    colno += print_string((y - 1), colno, "Pause    ", get_curses_color(C_CYAN)|curses.A_REVERSE)
+    colno += print_string((y - 1), colno, "<q>", get_curses_color(0))
+    colno += print_string((y - 1), colno, "Quit    ", get_curses_color(C_CYAN)|curses.A_REVERSE)
+    colno += print_string((y - 1), colno, "<h>", get_curses_color(0))
+    colno += print_string((y - 1), colno, "Help    ", get_curses_color(C_CYAN)|curses.A_REVERSE)
+    colno += print_string((y - 1), colno, add_blank(" "), get_curses_color(C_CYAN)|curses.A_REVERSE)
 
 """
 Ask for terminating a backend
 """
 def ask_terminate_backend(y, pid, connector):
-	colno = print_string((y - 1), 0, "Terminate backend with PID %s ? <Y/N>" % (str(pid),), get_curses_color(0))
-	colno += print_string((y - 1), colno, add_blank(" "), get_curses_color(C_CYAN)|curses.A_REVERSE)
-	while 1:
-		try:
-			k = win.getch()
-		except KeyboardInterrupt as e:
-			raise e
-		# quit
-		if k == ord('q'):
-			curses.endwin()
-			exit()
-		# yes
-		if k == ord('y') or k == ord('Y'):
-			res = pg_terminate_backend(connector, str(pid))
-			return 1
-		# no
-		if k == ord('n') or k == ord('N') or k == ord(' '):
-			return 0
+    colno = print_string((y - 1), 0, "Terminate backend with PID %s ? <Y/N>" % (str(pid),), get_curses_color(0))
+    colno += print_string((y - 1), colno, add_blank(" "), get_curses_color(C_CYAN)|curses.A_REVERSE)
+    while 1:
+        try:
+            k = win.getch()
+        except KeyboardInterrupt as e:
+            raise e
+        # quit
+        if k == ord('q'):
+            curses.endwin()
+            exit()
+        # yes
+        if k == ord('y') or k == ord('Y'):
+            res = pg_terminate_backend(connector, str(pid))
+            return 1
+        # no
+        if k == ord('n') or k == ord('N') or k == ord(' '):
+            return 0
 
 """
 Interactive mode trigged on KEY_UP or KEY_DOWN key press
 If no key hit during 3 seconds, exit this mode
 """
 def interactive(process, flag, indent, connector):
-	global lines
-	global PGTOP_VERBOSE_MODE
-	# Force truncated display
-	old_verbose_mode = PGTOP_VERBOSE_MODE
-	PGTOP_VERBOSE_MODE = PGTOP_TRUNCATE
+    global lines
+    global PGTOP_VERBOSE_MODE
+    # Force truncated display
+    old_verbose_mode = PGTOP_VERBOSE_MODE
+    PGTOP_VERBOSE_MODE = PGTOP_TRUNCATE
 
-	# Refresh lines with this verbose mode	
-	(y,x) = win.getmaxyx()
-	scroll_window(process, flag, indent, 0)
-	
-	help_key_interactive(y)
+    # Refresh lines with this verbose mode    
+    (y,x) = win.getmaxyx()
+    scroll_window(process, flag, indent, 0)
+    
+    help_key_interactive(y)
 
-	current_pos = 0
-	offset = 0
-	refresh_line(process[current_pos], flag, indent, 'cursor', lines[current_pos] - offset)
-	t_active = time.time()
-	while 1:
-		try:
-			k = win.getch()
-		except KeyboardInterrupt as e:
-			raise e
-		# quit
-		if k == ord('q'):
-			curses.endwin()
-			exit()
-		# terminate the backend attached to this PID
-		if k == ord('k'):
-			res = ask_terminate_backend(y, process[current_pos]['pid'], connector)
-			PGTOP_VERBOSE_MODE = old_verbose_mode
-			curses.flushinp()
-			return 0
-		# Move cursor
-		if k == curses.KEY_DOWN or k == curses.KEY_UP:
-			t_active = time.time()
-			if k == curses.KEY_UP and current_pos > 0:
-				if (lines[current_pos] - offset) < 7:
-					offset -= 1
-					scroll_window(process, flag, indent, offset)
-					help_key_interactive(y)
+    current_pos = 0
+    offset = 0
+    refresh_line(process[current_pos], flag, indent, 'cursor', lines[current_pos] - offset)
+    t_active = time.time()
+    while 1:
+        try:
+            k = win.getch()
+        except KeyboardInterrupt as e:
+            raise e
+        # quit
+        if k == ord('q'):
+            curses.endwin()
+            exit()
+        # terminate the backend attached to this PID
+        if k == ord('k'):
+            res = ask_terminate_backend(y, process[current_pos]['pid'], connector)
+            PGTOP_VERBOSE_MODE = old_verbose_mode
+            curses.flushinp()
+            return 0
+        # Move cursor
+        if k == curses.KEY_DOWN or k == curses.KEY_UP:
+            t_active = time.time()
+            if k == curses.KEY_UP and current_pos > 0:
+                if (lines[current_pos] - offset) < (PGTOP_START_LINE + 3):
+                    offset -= 1
+                    scroll_window(process, flag, indent, offset)
+                    help_key_interactive(y)
 
-				if current_pos < len(process):
-					refresh_line(process[current_pos], flag, indent, 'default', lines[current_pos] - offset)
-				current_pos -= 1
-			if k == curses.KEY_DOWN and current_pos < (len(process) - 1):
-				if (lines[current_pos] - offset) >= (y - 2):
-					offset += 1
-					scroll_window(process, flag, indent, offset)
-					help_key_interactive(y)
+                if current_pos < len(process):
+                    refresh_line(process[current_pos], flag, indent, 'default', lines[current_pos] - offset)
+                current_pos -= 1
+            if k == curses.KEY_DOWN and current_pos < (len(process) - 1):
+                if (lines[current_pos] - offset) >= (y - 2):
+                    offset += 1
+                    scroll_window(process, flag, indent, offset)
+                    help_key_interactive(y)
 
-				if current_pos >= 0:
-					refresh_line(process[current_pos], flag, indent, 'default', lines[current_pos] - offset)
-				current_pos += 1
-			refresh_line(process[current_pos], flag, indent, 'cursor', lines[current_pos] - offset)
-		# quit interactive mode
-		if k == ord(' '):
-			PGTOP_VERBOSE_MODE = old_verbose_mode
-			curses.flushinp()
-			return 0
-		curses.flushinp()
-		if time.time() - t_active > 3:
-			PGTOP_VERBOSE_MODE = old_verbose_mode
-			return 0
+                if current_pos >= 0:
+                    refresh_line(process[current_pos], flag, indent, 'default', lines[current_pos] - offset)
+                current_pos += 1
+            refresh_line(process[current_pos], flag, indent, 'cursor', lines[current_pos] - offset)
+        # quit interactive mode
+        if k == ord(' '):
+            PGTOP_VERBOSE_MODE = old_verbose_mode
+            curses.flushinp()
+            return 0
+        curses.flushinp()
+        if time.time() - t_active > 3:
+            PGTOP_VERBOSE_MODE = old_verbose_mode
+            return 0
 
 """
 Wrapper around polling
 """
 def poll(interval, connector, flag, indent, process = None, pg_num_version = None, disp_proc = None):
-	if PGTOP_MODE == 'activities':
-		return poll_activities(interval, connector, flag, indent, process, pg_num_version, disp_proc)
-	elif PGTOP_MODE == 'locked' or PGTOP_MODE == 'blocking':
-		return poll_locked_blocking(interval, connector, flag, indent, process, pg_num_version, disp_proc)
-	
+    if PGTOP_MODE == 'activities':
+        return poll_activities(interval, connector, flag, indent, process, pg_num_version, disp_proc)
+    elif PGTOP_MODE == 'locked' or PGTOP_MODE == 'blocking':
+        return poll_locked_blocking(interval, connector, flag, indent, process, pg_num_version, disp_proc)
+    
 """
 Poll activities.
 """
 def poll_activities(interval, connector, flag, indent, process = None, pg_num_version = None, disp_proc = None):
-	global PGTOP_VERBOSE_MODE
-	global PGTOP_SORT
-	global PGTOP_REFRESH_TIME
-	global PGTOP_MODE
+    global PGTOP_VERBOSE_MODE
+    global PGTOP_SORT
+    global PGTOP_REFRESH_TIME
+    global PGTOP_MODE
 
-	# Keyboard interactions
-	win.timeout(1000 * PGTOP_REFRESH_TIME * interval)
-	try:
-		k = win.getch()
-	except KeyboardInterrupt as e:
-		raise e
-	if k == ord('q'):
-		curses.endwin()
-		exit()
-	# PAUSE mode
-	if k == ord(' '):
-		pause()
-	# interactive mode
-	if (k == curses.KEY_DOWN or k == curses.KEY_UP) and len(disp_proc) > 0:
-		interactive(disp_proc, flag, indent, connector)
+    # Keyboard interactions
+    win.timeout(1000 * PGTOP_REFRESH_TIME * interval)
+    try:
+        k = win.getch()
+    except KeyboardInterrupt as e:
+        raise e
+    if k == ord('q'):
+        curses.endwin()
+        exit()
+    # PAUSE mode
+    if k == ord(' '):
+        pause()
+    # interactive mode
+    if (k == curses.KEY_DOWN or k == curses.KEY_UP) and len(disp_proc) > 0:
+        interactive(disp_proc, flag, indent, connector)
 
-	if (k == curses.KEY_F2):
-		PGTOP_MODE = 'locked'
-		curses.flushinp()
-		return poll_locked_blocking(0, connector, flag, indent, None, pg_num_version, None)
-	if (k == curses.KEY_F3):
-		PGTOP_MODE = 'blocking'
-		curses.flushinp()
-		return poll_locked_blocking(0, connector, flag, indent, None, pg_num_version, None)
-	# change verbosity
-	if k == ord('v'):
-		PGTOP_VERBOSE_MODE += 1
-		if PGTOP_VERBOSE_MODE > 3:
-			PGTOP_VERBOSE_MODE = 1
-	# turnoff/on colors
-	if k == ord('C'):
-		if PGTOP_COLOR is True:
-			set_nocolor()
-		else:
-			set_color()
-	# sorts
-	if k == ord('c') and (flag & PGTOP_FLAG_CPU):
-		PGTOP_SORT = 'c'
-	if k == ord('m') and (flag & PGTOP_FLAG_MEM):
-		PGTOP_SORT = 'm'
-	if k == ord('r') and (flag & PGTOP_FLAG_READ):
-		PGTOP_SORT = 'r'
-	if k == ord('w') and (flag & PGTOP_FLAG_WRITE):
-		PGTOP_SORT = 'w'
-	if k == ord('t'):
-		PGTOP_SORT = 't'
-	if k == ord('+') and PGTOP_REFRESH_TIME < 3:
-		PGTOP_REFRESH_TIME += 1
-	if k == ord('-') and PGTOP_REFRESH_TIME > 1:
-		PGTOP_REFRESH_TIME -= 1
-	
-	if k == ord('h'):
-		help_window()
+    if (k == curses.KEY_F2):
+        PGTOP_MODE = 'locked'
+        curses.flushinp()
+        return poll_locked_blocking(0, connector, flag, indent, None, pg_num_version, None)
+    if (k == curses.KEY_F3):
+        PGTOP_MODE = 'blocking'
+        curses.flushinp()
+        return poll_locked_blocking(0, connector, flag, indent, None, pg_num_version, None)
+    # change verbosity
+    if k == ord('v'):
+        PGTOP_VERBOSE_MODE += 1
+        if PGTOP_VERBOSE_MODE > 3:
+            PGTOP_VERBOSE_MODE = 1
+    # turnoff/on colors
+    if k == ord('C'):
+        if PGTOP_COLOR is True:
+            set_nocolor()
+        else:
+            set_color()
+    # sorts
+    if k == ord('c') and (flag & PGTOP_FLAG_CPU):
+        PGTOP_SORT = 'c'
+    if k == ord('m') and (flag & PGTOP_FLAG_MEM):
+        PGTOP_SORT = 'm'
+    if k == ord('r') and (flag & PGTOP_FLAG_READ):
+        PGTOP_SORT = 'r'
+    if k == ord('w') and (flag & PGTOP_FLAG_WRITE):
+        PGTOP_SORT = 'w'
+    if k == ord('t'):
+        PGTOP_SORT = 't'
+    if k == ord('+') and PGTOP_REFRESH_TIME < 3:
+        PGTOP_REFRESH_TIME += 1
+    if k == ord('-') and PGTOP_REFRESH_TIME > 1:
+        PGTOP_REFRESH_TIME -= 1
+    
+    if k == ord('h'):
+        help_window()
 
-	curses.flushinp()
-	
-	# poll postgresql activity
-	queries =  pg_get_activities(connector, pg_num_version)
-	# get resource usage for each process
-	new_procs = sys_get_proc(queries)
+    curses.flushinp()
+    
+    # poll postgresql activity
+    queries =  pg_get_activities(connector, pg_num_version)
+    if PGTOP_IS_LOCAL:
+        # get resource usage for each process
+        new_procs = sys_get_proc(queries)
 
-	procs = []
-	for pid,p in new_procs.items():
-		try:
-			if process.has_key(pid):
-				n_pg_duration = p._pg_duration
-				n_pg_query = p._pg_query
-				n_pg_client = p._pg_client
-				n_io_counters = p.get_io_counters()
-				n_io_time = time.time()
-				p = process[pid]
-				p._pg_duration = n_pg_duration
-				p._pg_query = n_pg_query
-				p._pg_client = n_pg_client
-				p._io_read_delta = (n_io_counters.read_bytes - p._io_counters.read_bytes)/(n_io_time - p._io_time)
-				p._io_write_delta = (n_io_counters.write_bytes - p._io_counters.write_bytes)/(n_io_time - p._io_time)
-				p._io_counters = n_io_counters
-				p._io_time = n_io_time
-			else:
-				p._io_counters = p.get_io_counters()
-			
-			p._mempercent = p.get_memory_percent()
-			p._cpu_percent = p.get_cpu_percent(interval=0)
-			p._name = p.name
-			new_procs[pid] = p
-			# procs.append(p)
-			procs.append({'pid':pid, 'database':p._pg_database, 'client': p._pg_client, 'cpu': p._cpu_percent, 'mem': p._mempercent, 'read': p._io_read_delta, 'write': p._io_write_delta, 'query': p._pg_query, 'duration': p._pg_duration, 'wait': p._pg_wait})
+        procs = []
+        for pid,p in new_procs.items():
+            try:
+                if process.has_key(pid):
+                    n_pg_duration = p._pg_duration
+                    n_pg_query = p._pg_query
+                    n_pg_client = p._pg_client
+                    n_io_counters = p.get_io_counters()
+                    n_io_time = time.time()
+                    p = process[pid]
+                    p._pg_duration = n_pg_duration
+                    p._pg_query = n_pg_query
+                    p._pg_client = n_pg_client
+                    p._io_read_delta = (n_io_counters.read_bytes - p._io_counters.read_bytes)/(n_io_time - p._io_time)
+                    p._io_write_delta = (n_io_counters.write_bytes - p._io_counters.write_bytes)/(n_io_time - p._io_time)
+                    p._io_counters = n_io_counters
+                    p._io_time = n_io_time
+                else:
+                    p._io_counters = p.get_io_counters()
+            
+                p._mempercent = p.get_memory_percent()
+                p._cpu_percent = p.get_cpu_percent(interval=0)
+                p._name = p.name
+                new_procs[pid] = p
+                # procs.append(p)
+                procs.append({'pid':pid, 'database':p._pg_database, 'client': p._pg_client, 'cpu': p._cpu_percent, 'mem': p._mempercent, 'read': p._io_read_delta, 'write': p._io_write_delta, 'query': p._pg_query, 'duration': p._pg_duration, 'wait': p._pg_wait})
 
-		except psutil.error.NoSuchProcess:
-			pass
-		except psutil.error.AccessDenied as e:
-			raise Exception(str(e.name))
-			# pass
-		except Exception as e:
-			raise e
+            except psutil.error.NoSuchProcess:
+                pass
+            except psutil.error.AccessDenied as e:
+                raise Exception(str(e.name))
+                # pass
+            except Exception as e:
+                raise e
+    else:
+        procs = []
+        new_procs = None
+        for q in queries:
+            procs.append({'pid':q['pid'], 'database': q['database'], 'client': q['client'], 'query': q['query'], 'duration': q['duration'], 'wait': q['wait']})
 
-	# return processes sorted by query duration
-	if PGTOP_SORT == 't':
-		# TIME
-		disp_procs = sorted(procs, key=lambda p: p['duration'], reverse=True)
-	elif PGTOP_SORT == 'c':
-		# CPU
-		disp_procs = sorted(procs, key=lambda p: p['cpu'], reverse=True)
-	elif PGTOP_SORT == 'm':
-		# MEM
-		disp_procs = sorted(procs, key=lambda p: p['mem'], reverse=True)
-	elif PGTOP_SORT == 'r':
-		# READ
-		disp_procs = sorted(procs, key=lambda p: p['read'], reverse=True)
-	elif PGTOP_SORT == 'w':
-		# WRITE
-		disp_procs = sorted(procs, key=lambda p: p['write'], reverse=True)
-	else:
-		disp_procs = sorted(procs, key=lambda p: p['duration'], reverse=True)
-	
-	return (disp_procs, new_procs)
+
+    # return processes sorted by query duration
+    if PGTOP_SORT == 't':
+        # TIME
+        disp_procs = sorted(procs, key=lambda p: p['duration'], reverse=True)
+    elif PGTOP_SORT == 'c':
+        # CPU
+        disp_procs = sorted(procs, key=lambda p: p['cpu'], reverse=True)
+    elif PGTOP_SORT == 'm':
+        # MEM
+        disp_procs = sorted(procs, key=lambda p: p['mem'], reverse=True)
+    elif PGTOP_SORT == 'r':
+        # READ
+        disp_procs = sorted(procs, key=lambda p: p['read'], reverse=True)
+    elif PGTOP_SORT == 'w':
+        # WRITE
+        disp_procs = sorted(procs, key=lambda p: p['write'], reverse=True)
+    else:
+        disp_procs = sorted(procs, key=lambda p: p['duration'], reverse=True)
+    
+    return (disp_procs, new_procs)
 
 """
-Poll locked
+Poll locked or blocking queries
 """
 def poll_locked_blocking(interval, connector, flag, indent, process = None, pg_num_version = None, disp_proc = None):
-	global PGTOP_VERBOSE_MODE
-	global PGTOP_SORT
-	global PGTOP_REFRESH_TIME
-	global PGTOP_MODE
+    global PGTOP_VERBOSE_MODE
+    global PGTOP_SORT
+    global PGTOP_REFRESH_TIME
+    global PGTOP_MODE
 
-	# Keyboard interactions
-	win.timeout(1000 * PGTOP_REFRESH_TIME * interval)
-	try:
-		k = win.getch()
-	except KeyboardInterrupt as e:
-		raise e
-	if k == ord('q'):
-		curses.endwin()
-		exit()
-	# PAUSE mode
-	if k == ord(' '):
-		pause()
-	# interactive mode
-	if (k == curses.KEY_DOWN or k == curses.KEY_UP) and len(disp_proc) > 0:
-		interactive(disp_proc, flag, indent, connector)
-	# activites mode
-	if (k == curses.KEY_F1):
-		PGTOP_MODE = 'activities'
-		curses.flushinp()
-		queries = pg_get_activities(connector, pg_num_version)
-		procs = sys_get_proc(queries)
-		return poll_activities(0, connector, flag, indent, procs, pg_num_version, None)
-	# locked queries
-	if (k == curses.KEY_F2):
-		PGTOP_MODE = 'locked'
-		curses.flushinp()
-		return poll_locked_blocking(0, connector, flag, indent, None, pg_num_version, None)
-	# blocking queries
-	if (k == curses.KEY_F3):
-		PGTOP_MODE = 'blocking'
-		curses.flushinp()
-		return poll_locked_blocking(0, connector, flag, indent, None, pg_num_version, None)
-	# change verbosity
-	if k == ord('v'):
-		PGTOP_VERBOSE_MODE += 1
-		if PGTOP_VERBOSE_MODE > 3:
-			PGTOP_VERBOSE_MODE = 1
-	# turnoff/on colors
-	if k == ord('C'):
-		if PGTOP_COLOR is True:
-			set_nocolor()
-		else:
-			set_color()
-	# sorts
-	if k == ord('t'):
-		PGTOP_SORT = 't'
-	if k == ord('+') and PGTOP_REFRESH_TIME < 3:
-		PGTOP_REFRESH_TIME += 1
-	if k == ord('-') and PGTOP_REFRESH_TIME > 1:
-		PGTOP_REFRESH_TIME -= 1
+    # Keyboard interactions
+    win.timeout(1000 * PGTOP_REFRESH_TIME * interval)
+    try:
+        k = win.getch()
+    except KeyboardInterrupt as e:
+        raise e
+    if k == ord('q'):
+        curses.endwin()
+        exit()
+    # PAUSE mode
+    if k == ord(' '):
+        pause()
+    # interactive mode
+    if (k == curses.KEY_DOWN or k == curses.KEY_UP) and len(disp_proc) > 0:
+        interactive(disp_proc, flag, indent, connector)
+    # activites mode
+    if (k == curses.KEY_F1):
+        PGTOP_MODE = 'activities'
+        curses.flushinp()
+        queries = pg_get_activities(connector, pg_num_version)
+        procs = sys_get_proc(queries)
+        return poll_activities(0, connector, flag, indent, procs, pg_num_version, None)
+    # locked queries
+    if (k == curses.KEY_F2):
+        PGTOP_MODE = 'locked'
+        curses.flushinp()
+        return poll_locked_blocking(0, connector, flag, indent, None, pg_num_version, None)
+    # blocking queries
+    if (k == curses.KEY_F3):
+        PGTOP_MODE = 'blocking'
+        curses.flushinp()
+        return poll_locked_blocking(0, connector, flag, indent, None, pg_num_version, None)
+    # change verbosity
+    if k == ord('v'):
+        PGTOP_VERBOSE_MODE += 1
+        if PGTOP_VERBOSE_MODE > 3:
+            PGTOP_VERBOSE_MODE = 1
+    # turnoff/on colors
+    if k == ord('C'):
+        if PGTOP_COLOR is True:
+            set_nocolor()
+        else:
+            set_color()
+    # sorts
+    if k == ord('t'):
+        PGTOP_SORT = 't'
+    if k == ord('+') and PGTOP_REFRESH_TIME < 3:
+        PGTOP_REFRESH_TIME += 1
+    if k == ord('-') and PGTOP_REFRESH_TIME > 1:
+        PGTOP_REFRESH_TIME -= 1
 
-	if k == ord('h'):
-		help_window()
-	
-	curses.flushinp()
-	
-	# poll postgresql activity
-	if PGTOP_MODE == 'locked':
-		queries =  pg_get_locked(connector, pg_num_version)
-	else:
-		queries =  pg_get_blocking(connector, pg_num_version)
-	
-	new_procs = {}
-	for q in queries:
-		new_procs[q['pid']] = q
-	
-	# return processes sorted by query duration
-	if PGTOP_SORT == 't':
-		# TIME
-		disp_procs = sorted(queries, key=lambda q: q['duration'], reverse=True)
-	else:
-		disp_procs = sorted(queries, key=lambda q: q['duration'], reverse=True)
-	
-	return (disp_procs, new_procs)
+    if k == ord('h'):
+        help_window()
+    
+    curses.flushinp()
+    
+    # poll postgresql activity
+    if PGTOP_MODE == 'locked':
+        queries =  pg_get_locked(connector, pg_num_version)
+    else:
+        queries =  pg_get_blocking(connector, pg_num_version)
+    
+    new_procs = {}
+    for q in queries:
+        new_procs[q['pid']] = q
+    
+    # return processes sorted by query duration
+    if PGTOP_SORT == 't':
+        # TIME
+        disp_procs = sorted(queries, key=lambda q: q['duration'], reverse=True)
+    else:
+        disp_procs = sorted(queries, key=lambda q: q['duration'], reverse=True)
+    
+    return (disp_procs, new_procs)
 
 """
 Simple curses wrapper for word printing.
 """
 def print_word(word, color = 0):
-	win.addstr(word, color)
+    win.addstr(word, color)
 
 """
 Print a string at position (lineno, colno) and returns its length.
 """
 def print_string(lineno, colno, word, color = 0):
-	try:
-		win.addstr(lineno, colno, word, color)
-	except curses.error:
-		pass
-	return len(word)
+    try:
+        win.addstr(lineno, colno, word, color)
+    except curses.error:
+        pass
+    return len(word)
 
 """
 Complete string with white spaces from the end of string to the end of line.
 """
 def add_blank(line, offset = 0): 
-	line += " " * (win.getmaxyx()[1] - (len(line) + offset))
-	return line
+    line += " " * (win.getmaxyx()[1] - (len(line) + offset))
+    return line
 
 """
 Convert a size into a human readable format.
 """
 def bytes2human(n):
-	symbols = ('K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y')
-	prefix = {}
-	for i, s in enumerate(symbols):
-		prefix[s] = 1 << (i+1)*10
-	for s in reversed(symbols):
-		if n >= prefix[s]:
-			value = '%.2f' % float(float(n) / float(prefix[s]))
-			return '%s%s' % (value, s)
-	return "%.2fB" % n
+    symbols = ('K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y')
+    prefix = {}
+    for i, s in enumerate(symbols):
+        prefix[s] = 1 << (i+1)*10
+    for s in reversed(symbols):
+        if n >= prefix[s]:
+            value = '%.2f' % float(float(n) / float(prefix[s]))
+            return '%s%s' % (value, s)
+    return "%.2fB" % n
 
 """
 Returns identation for Query column.
 """
 def get_indent(flag):
-	indent = ''
-	r = [0] * 11
-	for key, val in PGTOP_COLS[PGTOP_MODE].items():
-		if val['mandatory'] or (not val['mandatory'] and val['flag'] & flag):
-			r[int(val['n'])] = val
-	for val in r:
-		if val is not 0:
-			if val['name'] is not 'Query':
-				indent += val['template_h'] % ' '
-	return indent
+    indent = ''
+    r = [0] * 11
+    for key, val in PGTOP_COLS[PGTOP_MODE].items():
+        if val['mandatory'] or (not val['mandatory'] and val['flag'] & flag):
+            r[int(val['n'])] = val
+    for val in r:
+        if val is not 0:
+            if val['name'] is not 'Query':
+                indent += val['template_h'] % ' '
+    return indent
 
 """
 Print columns headers
 """
 def print_cols_header(flag):
-	global lineno
-	line = ''
-	disp = ''
-	x = 0
-	r = [0] * 11
-	for key, val in PGTOP_COLS[PGTOP_MODE].items():
-		if val['mandatory'] or (not val['mandatory'] and val['flag'] & flag):
-			r[int(val['n'])] = val
-	for val in r:
-		if val is not 0:
-			disp = val['template_h'] % val['name']
-			if (
-				(val['name'] == 'CPU%' and PGTOP_SORT == 'c') or
-				(val['name'] == 'MEM%' and PGTOP_SORT == 'm') or
-				(val['name'] == 'READ/s' and PGTOP_SORT == 'r') or
-				(val['name'] == 'WRITE/s' and PGTOP_SORT == 'w') or
-				(val['name'] == 'TIME+' and PGTOP_SORT == 't')):
-				color_highlight = get_curses_color(C_CYAN)
-			else:
-				color_highlight = get_curses_color(C_GREEN)
-			if val['name'] == 'Query':
-				disp += " " * (win.getmaxyx()[1] - (len(line) + len(disp)))
-			line += disp
-			win.addstr(lineno, x, disp, color_highlight|curses.A_REVERSE)
-			x += len(disp)
-	lineno += 1
+    global lineno
+    line = ''
+    disp = ''
+    x = 0
+    r = [0] * 11
+    for key, val in PGTOP_COLS[PGTOP_MODE].items():
+        if val['mandatory'] or (not val['mandatory'] and val['flag'] & flag):
+            r[int(val['n'])] = val
+    for val in r:
+        if val is not 0:
+            disp = val['template_h'] % val['name']
+            if (
+                (val['name'] == 'CPU%' and PGTOP_SORT == 'c') or
+                (val['name'] == 'MEM%' and PGTOP_SORT == 'm') or
+                (val['name'] == 'READ/s' and PGTOP_SORT == 'r') or
+                (val['name'] == 'WRITE/s' and PGTOP_SORT == 'w') or
+                (val['name'] == 'TIME+' and PGTOP_SORT == 't')):
+                color_highlight = get_curses_color(C_CYAN)
+            else:
+                color_highlight = get_curses_color(C_GREEN)
+            if val['name'] == 'Query':
+                disp += " " * (win.getmaxyx()[1] - (len(line) + len(disp)))
+            line += disp
+            win.addstr(lineno, x, disp, color_highlight|curses.A_REVERSE)
+            x += len(disp)
+    lineno += 1
 
 """
 Print window header
 """
 def print_header(pg_version, hostname, user, host, port, io):
-	global lineno
-	global PGTOP_MAX_IOPS 
-	lineno = 0
-	colno = 0
-	version = " %s" % (pg_version)
-	colno = print_string(lineno, colno, version)
-	colno += print_string(lineno, colno, " - ")
-	colno += print_string(lineno, colno, hostname, curses.A_BOLD)
-	colno += print_string(lineno, colno, " - ")
-	colno += print_string(lineno, colno, user, get_curses_color(C_CYAN))
-	colno += print_string(lineno, colno, "@")
-	colno += print_string(lineno, colno, host, get_curses_color(C_CYAN))
-	colno += print_string(lineno, colno, ":")
-	colno += print_string(lineno, colno, port, get_curses_color(C_CYAN))
-	colno += print_string(lineno, colno, " - refresh: %ss" % (PGTOP_REFRESH_TIME,))
+    global lineno
+    global PGTOP_MAX_IOPS 
+    lineno = 0
+    colno = 0
+    version = " %s" % (pg_version)
+    colno = print_string(lineno, colno, version)
+    colno += print_string(lineno, colno, " - ")
+    colno += print_string(lineno, colno, hostname, curses.A_BOLD)
+    colno += print_string(lineno, colno, " - ")
+    colno += print_string(lineno, colno, user, get_curses_color(C_CYAN))
+    colno += print_string(lineno, colno, "@")
+    colno += print_string(lineno, colno, host, get_curses_color(C_CYAN))
+    colno += print_string(lineno, colno, ":")
+    colno += print_string(lineno, colno, port, get_curses_color(C_CYAN))
+    colno += print_string(lineno, colno, " - refresh: %ss" % (PGTOP_REFRESH_TIME,))
+    
+    # If not local connection, don't get and display system informations
+    if not PGTOP_IS_LOCAL:
+        return
+    
+    try:
+        # psutil >= 0.6.0
+        phymem = psutil.virtual_memory()
+        buffers = psutil.virtual_memory().buffers
+        cached = psutil.virtual_memory().cached
+        vmem = psutil.swap_memory()
+    except AttributeError:
+        # psutil > 0.4.0 and < 0.6.0
+        phymem = psutil.phymem_usage()
+        buffers = getattr(psutil, 'phymem_buffers', lambda: 0)()
+        cached = getattr(psutil, 'cached_phymem', lambda: 0)()
+        vmem = psutil.virtmem_usage()
 
-	try:
-		# psutil >= 0.6.0
-		phymem = psutil.virtual_memory()
-		buffers = psutil.virtual_memory().buffers
-		cached = psutil.virtual_memory().cached
-		vmem = psutil.swap_memory()
-	except AttributeError:
-		# psutil > 0.4.0 and < 0.6.0
-		phymem = psutil.phymem_usage()
-		buffers = getattr(psutil, 'phymem_buffers', lambda: 0)()
-		cached = getattr(psutil, 'cached_phymem', lambda: 0)()
-		vmem = psutil.virtmem_usage()
+    used = phymem.total - (phymem.free + buffers + cached)
+    lineno += 1
+    line = "  Mem.: %5s%% %9s/%s " % (phymem.percent, str(int(used / 1024 / 1024)) + "M", str(int(phymem.total / 1024 / 1024)) + "M")
+    colno_io = print_string(lineno, 0, line)
+    
+    if (int(io['read_count'])+int(io['write_count'])) > PGTOP_MAX_IOPS:
+        PGTOP_MAX_IOPS = (int(io['read_count'])+int(io['write_count']))
+    
+    line_io = " | IO Disks Max : %s IOPs" % (PGTOP_MAX_IOPS,)
+    colno = print_string(lineno, colno_io, line_io)
 
-	used = phymem.total - (phymem.free + buffers + cached)
-	lineno += 1
-	line = "  Mem.: %5s%% %9s/%s " % (phymem.percent, str(int(used / 1024 / 1024)) + "M", str(int(phymem.total / 1024 / 1024)) + "M")
-	colno_io = print_string(lineno, 0, line)
-	
-	if (int(io['read_count'])+int(io['write_count'])) > PGTOP_MAX_IOPS:
-		PGTOP_MAX_IOPS = (int(io['read_count'])+int(io['write_count']))
-	
-	line_io = " | IO Disks Max : %s IOPs" % (PGTOP_MAX_IOPS,)
-	colno = print_string(lineno, colno_io, line_io)
+    # swap usage
+    line = "  Swap: %5s%% %9s/%s\n" % (vmem.percent, str(int(vmem.used / 1024 / 1024)) + "M", str(int(vmem.total / 1024 / 1024)) + "M")
+    lineno += 1
+    colno = print_string(lineno, 0, line)
+    line_io = " | Read : %8s/s - %6s IOPs" % (bytes2human(io['read_bytes']), int(io['read_count']),)
+    colno = print_string(lineno, colno_io, line_io)
 
-	# swap usage
-	line = "  Swap: %5s%% %9s/%s\n" % (vmem.percent, str(int(vmem.used / 1024 / 1024)) + "M", str(int(vmem.total / 1024 / 1024)) + "M")
-	lineno += 1
-	colno = print_string(lineno, 0, line)
-	line_io = " | Read : %8s/s - %6s IOPs" % (bytes2human(io['read_bytes']), int(io['read_count']),)
-	colno = print_string(lineno, colno_io, line_io)
+    # load average, uptime
+    av1, av2, av3 = os.getloadavg()
+    line = "  Load:   %.2f %.2f %.2f" % (av1, av2, av3)
+    lineno += 1
+    colno = print_string(lineno, 0, line)
+    line_io = " | Write: %8s/s - %6s IOPs" % (bytes2human(io['write_bytes']), int(io['write_count']),)
+    colno = print_string(lineno, colno_io, line_io)
 
-	# load average, uptime
-	av1, av2, av3 = os.getloadavg()
-	line = "  Load:   %.2f %.2f %.2f" % (av1, av2, av3)
-	lineno += 1
-	colno = print_string(lineno, 0, line)
-	line_io = " | Write: %8s/s - %6s IOPs" % (bytes2human(io['write_bytes']), int(io['write_count']),)
-	colno = print_string(lineno, colno_io, line_io)
-
+"""
+Display help window
+"""
 def help_window():
-	win.erase()
-	lineno = 0
-	colno = 0
-	text = "pg_activity %s - (c) 2012-2013 Julien Tachoires" % (PGTOP_VERSION)
-	l = print_string(lineno, 0, text, get_curses_color(C_GREEN)|curses.A_BOLD)
-	lineno += 1
-	text = "Released under New BSD License."
-	l = print_string(lineno, 0, text)
-	lineno += 2
-	l = display_help_key(lineno, 00, 'Up/Down Arrows', 'scroll process list')
-	l = display_help_key(lineno, 45, '             C', 'activate/deactivate colors')
-	lineno +=1
-	l = display_help_key(lineno, 00, '         Space', 'pause')
-	l = display_help_key(lineno, 45, '             r', 'sort by READ/s desc. (activites)')
-	lineno +=1
-	l = display_help_key(lineno, 00, '             v', 'change queries display mode')
-	l = display_help_key(lineno, 45, '             w', 'sort by WRITE/s desc. (activites)')
-	lineno +=1
-	l = display_help_key(lineno, 00, '             q', 'quit')
-	l = display_help_key(lineno, 45, '             c', 'sort by CPU% desc. (activites)')
-	lineno +=1
-	l = display_help_key(lineno, 00, '             +', 'increase refresh time (max:3)')
-	l = display_help_key(lineno, 45, '             m', 'sort by MEM% desc. (activites)')
-	lineno +=1
-	l = display_help_key(lineno, 00, '             -', 'decrease refresh time (min:1)')
-	l = display_help_key(lineno, 45, '             t', 'sort by TIME+ desc. (activites)')
-	
-	lineno += 2
-	l = print_string(lineno, 0, 'Press any key to exit.')	
-	win.timeout(-1)
-	try:
-		k = win.getch()
-	except KeyboardInterrupt as e:
-		raise e
+    win.erase()
+    lineno = 0
+    colno = 0
+    text = "pg_activity %s - (c) 2012-2013 Julien Tachoires" % (PGTOP_VERSION)
+    l = print_string(lineno, 0, text, get_curses_color(C_GREEN)|curses.A_BOLD)
+    lineno += 1
+    text = "Released under New BSD License."
+    l = print_string(lineno, 0, text)
+    lineno += 2
+    l = display_help_key(lineno, 00, 'Up/Down Arrows', 'scroll process list')
+    l = display_help_key(lineno, 45, '             C', 'activate/deactivate colors')
+    lineno +=1
+    l = display_help_key(lineno, 00, '         Space', 'pause')
+    l = display_help_key(lineno, 45, '             r', 'sort by READ/s desc. (activites)')
+    lineno +=1
+    l = display_help_key(lineno, 00, '             v', 'change queries display mode')
+    l = display_help_key(lineno, 45, '             w', 'sort by WRITE/s desc. (activites)')
+    lineno +=1
+    l = display_help_key(lineno, 00, '             q', 'quit')
+    l = display_help_key(lineno, 45, '             c', 'sort by CPU% desc. (activites)')
+    lineno +=1
+    l = display_help_key(lineno, 00, '             +', 'increase refresh time (max:3)')
+    l = display_help_key(lineno, 45, '             m', 'sort by MEM% desc. (activites)')
+    lineno +=1
+    l = display_help_key(lineno, 00, '             -', 'decrease refresh time (min:1)')
+    l = display_help_key(lineno, 45, '             t', 'sort by TIME+ desc. (activites)')
+    
+    lineno += 2
+    l = print_string(lineno, 0, 'Press any key to exit.')    
+    win.timeout(-1)
+    try:
+        k = win.getch()
+    except KeyboardInterrupt as e:
+        raise e
 
-
+"""
+Display help key
+"""
 def display_help_key(lineno, colno, key, help):
-	l = print_string(lineno, colno, key, get_curses_color(C_CYAN)|curses.A_BOLD)
-	l2 = print_string(lineno, colno + l, ': %s' % (help,))
-	return (colno + l + l2)
+    l = print_string(lineno, colno, key, get_curses_color(C_CYAN)|curses.A_BOLD)
+    l2 = print_string(lineno, colno + l, ': %s' % (help,))
+    return (colno + l + l2)
 
 """
 Refresh the window
 """
 def refresh_window(procs, extras, flag, indent, io):
-	global lineno
-	global lines
+    global lineno
+    global lines
 
-	lines = []
-	(pg_version, hostname, user, host, port) = extras
-	win.erase()
-	print_header(pg_version, hostname, user, host, port, io)
-	lineno += 2
-	line_trunc = lineno
-	current_position()
-	print_cols_header(flag)
-	colno = 0
-	for p in procs:
-		try:
-			refresh_line(p, flag, indent, 'default')
-			line_trunc += 1
-			lines.append(line_trunc)
-		except curses.error as e:
-			break
-		for l in range(lineno, (win.getmaxyx()[0]-1)):
-			print_string(l, 0, add_blank(' '))
-	change_mode_interactive()
+    lines = []
+    (pg_version, hostname, user, host, port) = extras
+    win.erase()
+    print_header(pg_version, hostname, user, host, port, io)
+    lineno += 2
+    line_trunc = lineno
+    current_position()
+    print_cols_header(flag)
+    colno = 0
+    for p in procs:
+        try:
+            refresh_line(p, flag, indent, 'default')
+            line_trunc += 1
+            lines.append(line_trunc)
+        except curses.error as e:
+            break
+        for l in range(lineno, (win.getmaxyx()[0]-1)):
+            print_string(l, 0, add_blank(' '))
+    change_mode_interactive()
 
 """
 Scroll the window
 """
 def scroll_window(procs, flag, indent, offset = 0):
-	global lineno
-	lineno = 6
-	pos = 0
-	for p in procs:
-		if pos >= offset:
-			try:
-				refresh_line(p, flag, indent, 'default')
-			except curses.error as e:
-				break
-			for l in range(lineno, (win.getmaxyx()[0]-1)):
-				print_string(l, 0, add_blank(' '))
-		pos += 1
+    global lineno
+    lineno = (PGTOP_START_LINE + 2)
+    pos = 0
+    for p in procs:
+        if pos >= offset:
+            try:
+                refresh_line(p, flag, indent, 'default')
+            except curses.error as e:
+                break
+            for l in range(lineno, (win.getmaxyx()[0]-1)):
+                print_string(l, 0, add_blank(' '))
+        pos += 1
 
 """
 Refresh a line for activities mode
 """
 def refresh_line(p, flag, indent, typecolor = 'default', line = None):
-	global lineno
-	if line is not None:
-		l_lineno = line
-	else:
-		l_lineno = lineno
+    global lineno
+    if line is not None:
+        l_lineno = line
+    else:
+        l_lineno = lineno
 
-	(maxy, maxx) = win.getmaxyx()
-	colno = 0
-	if l_lineno > maxy:
-		return
-	colno += print_string(l_lineno, colno, "%-6s " % (p['pid'],), PGTOP_LINE_COLORS['pid'][typecolor])
-	if flag & PGTOP_FLAG_DATABASE:
-		colno += print_string(l_lineno, colno, "%-16s " % (p['database'][:16],), PGTOP_LINE_COLORS['database'][typecolor])
- 	if PGTOP_MODE == 'activities':
-		if flag & PGTOP_FLAG_CLIENT:
-			colno += print_string(l_lineno, colno, "%16s " % (str(p['client'])[:16],), PGTOP_LINE_COLORS['client'][typecolor])
-		if flag & PGTOP_FLAG_CPU:
-			colno += print_string(l_lineno, colno, "%5s " % (p['cpu'],), PGTOP_LINE_COLORS['cpu'][typecolor])
-		if flag & PGTOP_FLAG_MEM:
-			colno += print_string(l_lineno, colno, "%4s " % (round(p['mem'], 1),), PGTOP_LINE_COLORS['mem'][typecolor])
-		if flag & PGTOP_FLAG_READ:
-			colno += print_string(l_lineno, colno, "%8s " % (bytes2human(p['read']),), PGTOP_LINE_COLORS['read'][typecolor])
-		if flag & PGTOP_FLAG_WRITE:
-			colno += print_string(l_lineno, colno, "%8s " % (bytes2human(p['write']),), PGTOP_LINE_COLORS['write'][typecolor])
-	elif PGTOP_MODE == 'locked' or PGTOP_MODE == 'blocking':
-		if flag & PGTOP_FLAG_RELATION:
-			colno += print_string(l_lineno, colno, "%9s " % (str(p['relation'])[:9],), PGTOP_LINE_COLORS['relation'][typecolor])
-		if flag & PGTOP_FLAG_TYPE:
-			colno += print_string(l_lineno, colno, "%16s " % (str(p['type'])[:16],), PGTOP_LINE_COLORS['type'][typecolor])
-		if flag & PGTOP_FLAG_MODE:
-			if p['mode'] == 'ExclusiveLock' or p['mode'] == 'RowExclusiveLock' or p['mode'] == 'AccessExclusiveLock':
-				colno += print_string(l_lineno, colno, "%16s " % (str(p['mode'])[:16],), PGTOP_LINE_COLORS['mode_red'][typecolor])
-			else:
-				colno += print_string(l_lineno, colno, "%16s " % (str(p['mode'])[:16],), PGTOP_LINE_COLORS['mode_yellow'][typecolor])
+    (maxy, maxx) = win.getmaxyx()
+    colno = 0
+    if l_lineno > maxy:
+        return
+    colno += print_string(l_lineno, colno, "%-6s " % (p['pid'],), PGTOP_LINE_COLORS['pid'][typecolor])
+    if flag & PGTOP_FLAG_DATABASE:
+        colno += print_string(l_lineno, colno, "%-16s " % (p['database'][:16],), PGTOP_LINE_COLORS['database'][typecolor])
+    if PGTOP_MODE == 'activities':
+        if flag & PGTOP_FLAG_CLIENT:
+            colno += print_string(l_lineno, colno, "%16s " % (str(p['client'])[:16],), PGTOP_LINE_COLORS['client'][typecolor])
+        if flag & PGTOP_FLAG_CPU:
+            colno += print_string(l_lineno, colno, "%5s " % (p['cpu'],), PGTOP_LINE_COLORS['cpu'][typecolor])
+        if flag & PGTOP_FLAG_MEM:
+            colno += print_string(l_lineno, colno, "%4s " % (round(p['mem'], 1),), PGTOP_LINE_COLORS['mem'][typecolor])
+        if flag & PGTOP_FLAG_READ:
+            colno += print_string(l_lineno, colno, "%8s " % (bytes2human(p['read']),), PGTOP_LINE_COLORS['read'][typecolor])
+        if flag & PGTOP_FLAG_WRITE:
+            colno += print_string(l_lineno, colno, "%8s " % (bytes2human(p['write']),), PGTOP_LINE_COLORS['write'][typecolor])
+    elif PGTOP_MODE == 'locked' or PGTOP_MODE == 'blocking':
+        if flag & PGTOP_FLAG_RELATION:
+            colno += print_string(l_lineno, colno, "%9s " % (str(p['relation'])[:9],), PGTOP_LINE_COLORS['relation'][typecolor])
+        if flag & PGTOP_FLAG_TYPE:
+            colno += print_string(l_lineno, colno, "%16s " % (str(p['type'])[:16],), PGTOP_LINE_COLORS['type'][typecolor])
+        if flag & PGTOP_FLAG_MODE:
+            if p['mode'] == 'ExclusiveLock' or p['mode'] == 'RowExclusiveLock' or p['mode'] == 'AccessExclusiveLock':
+                colno += print_string(l_lineno, colno, "%16s " % (str(p['mode'])[:16],), PGTOP_LINE_COLORS['mode_red'][typecolor])
+            else:
+                colno += print_string(l_lineno, colno, "%16s " % (str(p['mode'])[:16],), PGTOP_LINE_COLORS['mode_yellow'][typecolor])
 
-	if flag & PGTOP_FLAG_TIME:
-		if p['duration'] < 0:
-			p['duration'] = 0
-		if p['duration'] >= 1:
-			ctime = timedelta(seconds=float(p['duration']))
-			mic = '%.6d' % (ctime.microseconds)
-			ctime = "%s:%s.%s" % (str((ctime.seconds // 60)).zfill(2), str((ctime.seconds % 60)).zfill(2), str(mic)[:2])
-		if p['duration'] < 1:
-			colno += print_string(l_lineno, colno, " %.6f " % (p['duration'],), PGTOP_LINE_COLORS['time_green'][typecolor])
-		elif p['duration'] >= 1 and p['duration'] < 3:
-			colno += print_string(l_lineno, colno, "%9s " % (ctime,), PGTOP_LINE_COLORS['time_yellow'][typecolor])
-		else:
-			colno += print_string(l_lineno, colno, "%9s " % (ctime,), PGTOP_LINE_COLORS['time_red'][typecolor])
-	if PGTOP_MODE == 'activities' and flag & PGTOP_FLAG_WAIT:
-		if p['wait']:
-			colno += print_string(l_lineno, colno, "%2s " % ('Y',), PGTOP_LINE_COLORS['wait_red'][typecolor])
-		else:
-			colno += print_string(l_lineno, colno, "%2s " % ('N',), PGTOP_LINE_COLORS['wait_green'][typecolor])
+    if flag & PGTOP_FLAG_TIME:
+        if p['duration'] < 0:
+            p['duration'] = 0
+        if p['duration'] >= 1:
+            ctime = timedelta(seconds=float(p['duration']))
+            mic = '%.6d' % (ctime.microseconds)
+            ctime = "%s:%s.%s" % (str((ctime.seconds // 60)).zfill(2), str((ctime.seconds % 60)).zfill(2), str(mic)[:2])
+        if p['duration'] < 1:
+            colno += print_string(l_lineno, colno, " %.6f " % (p['duration'],), PGTOP_LINE_COLORS['time_green'][typecolor])
+        elif p['duration'] >= 1 and p['duration'] < 3:
+            colno += print_string(l_lineno, colno, "%9s " % (ctime,), PGTOP_LINE_COLORS['time_yellow'][typecolor])
+        else:
+            colno += print_string(l_lineno, colno, "%9s " % (ctime,), PGTOP_LINE_COLORS['time_red'][typecolor])
+    if PGTOP_MODE == 'activities' and flag & PGTOP_FLAG_WAIT:
+        if p['wait']:
+            colno += print_string(l_lineno, colno, "%2s " % ('Y',), PGTOP_LINE_COLORS['wait_red'][typecolor])
+        else:
+            colno += print_string(l_lineno, colno, "%2s " % ('N',), PGTOP_LINE_COLORS['wait_green'][typecolor])
 
-	dif = maxx - len(indent) - 1
-	if PGTOP_VERBOSE_MODE == PGTOP_TRUNCATE:
-		query = p['query'][:dif]
-		colno += print_string(l_lineno, colno, " %s" % (add_blank(query,len(indent)+1),), PGTOP_LINE_COLORS['query'][typecolor])
-	elif PGTOP_VERBOSE_MODE == PGTOP_WRAP or  PGTOP_VERBOSE_MODE == PGTOP_WRAP_NOINDENT:
-		query = p['query']
-		query_wrote = ''
-		offset = 0
-		if len(query) > dif:
-			query_part = query[offset:dif]
-			print_string(l_lineno, colno, " %s" % (add_blank(query_part,len(indent)+1),), PGTOP_LINE_COLORS['query'][typecolor])
-			query_wrote += query_part
-			offset = len(query_wrote)
-			if PGTOP_VERBOSE_MODE == PGTOP_WRAP_NOINDENT:
-				dif = maxx
-				p_indent = ''
-			else:
-				p_indent = indent
-			while (len(query) - offset > 0):	
-				query_part = query[offset:(dif+offset)]
-				l_lineno += 1
-				lineno += 1
-				print_string(l_lineno, 0, "%s" % (add_blank(p_indent + ' '+ query_part, len(indent)+1)), PGTOP_LINE_COLORS['query'][typecolor])
-				query_wrote += query_part
-				offset = len(query_wrote)
-		else:
-			colno += print_string(l_lineno, colno, " %s" % (add_blank(query, len(indent)),), PGTOP_LINE_COLORS['query'][typecolor])
-	lineno += 1
+    dif = maxx - len(indent) - 1
+    if PGTOP_VERBOSE_MODE == PGTOP_TRUNCATE:
+        query = p['query'][:dif]
+        colno += print_string(l_lineno, colno, " %s" % (add_blank(query,len(indent)+1),), PGTOP_LINE_COLORS['query'][typecolor])
+    elif PGTOP_VERBOSE_MODE == PGTOP_WRAP or  PGTOP_VERBOSE_MODE == PGTOP_WRAP_NOINDENT:
+        query = p['query']
+        query_wrote = ''
+        offset = 0
+        if len(query) > dif:
+            query_part = query[offset:dif]
+            print_string(l_lineno, colno, " %s" % (add_blank(query_part,len(indent)+1),), PGTOP_LINE_COLORS['query'][typecolor])
+            query_wrote += query_part
+            offset = len(query_wrote)
+            if PGTOP_VERBOSE_MODE == PGTOP_WRAP_NOINDENT:
+                dif = maxx
+                p_indent = ''
+            else:
+                p_indent = indent
+            while (len(query) - offset > 0):    
+                query_part = query[offset:(dif+offset)]
+                l_lineno += 1
+                lineno += 1
+                print_string(l_lineno, 0, "%s" % (add_blank(p_indent + ' '+ query_part, len(indent)+1)), PGTOP_LINE_COLORS['query'][typecolor])
+                query_wrote += query_part
+                offset = len(query_wrote)
+        else:
+            colno += print_string(l_lineno, colno, " %s" % (add_blank(query, len(indent)),), PGTOP_LINE_COLORS['query'][typecolor])
+    lineno += 1
 
 """
 main
 """
 def main():
-	try:
-		parser = OptionParser(add_help_option=False, version="%prog "+PGTOP_VERSION, description="htop like application for local PostgreSQL server activity monitoring.")
-		parser.add_option("-U", "--username", dest="username", default="postgres", help="Database user name (default: \"postgres\").", metavar="USERNAME")
-		parser.add_option("-p", "--port", dest="port", default="5432", help="Database server port (default: \"5432\").", metavar="PORT")
-		parser.add_option("-h", "--host", dest="host", help="Database server host or socket directory (default: \"local socket\").", metavar="HOSTNAME", default="localhost")
-		parser.add_option("-C", "--no-color", dest="nocolor", action="store_true", help="Disable color usage.", default="false")
-		group = OptionGroup(parser, "Display Options, you can exclude some columns by using them ")
-		group.add_option("--no-database", dest="nodb", action="store_true", help="Disable DATABASE.", default="false")
-		group.add_option("--no-client", dest="noclient", action="store_true", help="Disable CLIENT.", default="false")
-		group.add_option("--no-cpu", dest="nocpu", action="store_true", help="Disable CPU%.", default="false")
-		group.add_option("--no-mem", dest="nomem", action="store_true", help="Disable MEM%.", default="false")
-		group.add_option("--no-read", dest="noread", action="store_true", help="Disable READ/s.", default="false")
-		group.add_option("--no-write", dest="nowrite", action="store_true", help="Disable WRITE/s.", default="false")
-		group.add_option("--no-time", dest="notime", action="store_true", help="Disable TIME+.", default="false")
-		group.add_option("--no-wait", dest="nowait", action="store_true", help="Disable W.", default="false")
-		parser.add_option_group(group)
-		parser.add_option("--help", dest="help", action="store_true", help="Show this help message and exit.", default="false")
-	
-		(options, args) = parser.parse_args()
-		if options.help is True:
-			at_exit_curses()
-			print(parser.format_help().strip())
-			sys.exit(0)
-		
-		password = os.environ.get('PGPASSWORD')
-		
-		try:
-			conn = pg_connect(host = options.host, port = options.port, user = options.username, password = password)
-		except psycopg2.Error as e:
-			at_exit_curses()
-			sys.exit("FATAL: %s" % (clean_str(str(e),)))
-		pg_version = pg_get_version(conn)
-		(pg_short_version, pg_num_version) = pg_get_num_version(pg_version)
-		# top part
-		interval = 0
-		if PGTOP_MODE == 'activities':
-			queries =  pg_get_activities(conn, pg_num_version)
-			procs = sys_get_proc(queries)
-		elif PGTOP_MODE == 'locked':
-			procs = pg_get_locked(conn, pg_num_version)
-		elif PGTOP_MODE == 'blocking':
-			procs = pg_get_blocking(conn, pg_num_version)
+    global PGTOP_IS_LOCAL
+    global PGTOP_START_LINE
+    try:
+        parser = OptionParser(add_help_option=False, version="%prog "+PGTOP_VERSION, description="htop like application for local PostgreSQL server activity monitoring.")
+        parser.add_option("-U", "--username", dest="username", default="postgres", help="Database user name (default: \"postgres\").", metavar="USERNAME")
+        parser.add_option("-p", "--port", dest="port", default="5432", help="Database server port (default: \"5432\").", metavar="PORT")
+        parser.add_option("-h", "--host", dest="host", help="Database server host or socket directory (default: \"local socket\").", metavar="HOSTNAME", default="localhost")
+        parser.add_option("-C", "--no-color", dest="nocolor", action="store_true", help="Disable color usage.", default="false")
+        group = OptionGroup(parser, "Display Options, you can exclude some columns by using them ")
+        group.add_option("--no-database", dest="nodb", action="store_true", help="Disable DATABASE.", default="false")
+        group.add_option("--no-client", dest="noclient", action="store_true", help="Disable CLIENT.", default="false")
+        group.add_option("--no-cpu", dest="nocpu", action="store_true", help="Disable CPU%.", default="false")
+        group.add_option("--no-mem", dest="nomem", action="store_true", help="Disable MEM%.", default="false")
+        group.add_option("--no-read", dest="noread", action="store_true", help="Disable READ/s.", default="false")
+        group.add_option("--no-write", dest="nowrite", action="store_true", help="Disable WRITE/s.", default="false")
+        group.add_option("--no-time", dest="notime", action="store_true", help="Disable TIME+.", default="false")
+        group.add_option("--no-wait", dest="nowait", action="store_true", help="Disable W.", default="false")
+        parser.add_option_group(group)
+        parser.add_option("--help", dest="help", action="store_true", help="Show this help message and exit.", default="false")
+    
+        (options, args) = parser.parse_args()
+        if options.help is True:
+            at_exit_curses()
+            print(parser.format_help().strip())
+            sys.exit(0)
+        
+        password = os.environ.get('PGPASSWORD')
+        
+        try:
+            conn = pg_connect(host = options.host, port = options.port, user = options.username, password = password)
+        except psycopg2.Error as e:
+            at_exit_curses()
+            sys.exit("FATAL: %s" % (clean_str(str(e),)))
+        pg_version = pg_get_version(conn)
+        (pg_short_version, pg_num_version) = pg_get_num_version(pg_version)
+        
+        hostname = socket.gethostname()
+        
+        # does pg_activity runing against local PG instance
+        if not pg_is_local(conn):
+            PGTOP_IS_LOCAL = False
+            PGTOP_START_LINE = 1
+            hostname = options.host
+        # top part
+        interval = 0
+        if PGTOP_MODE == 'activities':
+            queries =  pg_get_activities(conn, pg_num_version)
+            procs = sys_get_proc(queries)
+        elif PGTOP_MODE == 'locked':
+            procs = pg_get_locked(conn, pg_num_version)
+        elif PGTOP_MODE == 'blocking':
+            procs = pg_get_blocking(conn, pg_num_version)
 
-		hostname = socket.gethostname()
-		# color ?
-		if options.nocolor == True:
-			set_nocolor()
-		else:
-			set_color()	
-		# default flag
-		flag = PGTOP_FLAG_DATABASE | PGTOP_FLAG_CLIENT | PGTOP_FLAG_CPU | PGTOP_FLAG_MEM | PGTOP_FLAG_READ | PGTOP_FLAG_WRITE | PGTOP_FLAG_TIME | PGTOP_FLAG_WAIT | PGTOP_FLAG_RELATION | PGTOP_FLAG_TYPE | PGTOP_FLAG_MODE
-		if options.nodb is True:
-			flag -= PGTOP_FLAG_DATABASE
-		if options.nocpu is True:
-			flag -= PGTOP_FLAG_CPU
-		if options.noclient is True:
-			flag -= PGTOP_FLAG_CLIENT
-		if options.nomem is True:
-			flag -= PGTOP_FLAG_MEM
-		if options.noread is True:
-			flag -= PGTOP_FLAG_READ
-		if options.nowrite is True:
-			flag -= PGTOP_FLAG_WRITE
-		if options.notime is True:
-			flag -= PGTOP_FLAG_TIME
-		if options.nowait is True:
-			flag -= PGTOP_FLAG_WAIT
+        # color ?
+        if options.nocolor == True:
+            set_nocolor()
+        else:
+            set_color()    
+        # default flag
+        flag = PGTOP_FLAG_DATABASE | PGTOP_FLAG_CLIENT | PGTOP_FLAG_CPU | PGTOP_FLAG_MEM | PGTOP_FLAG_READ | PGTOP_FLAG_WRITE | PGTOP_FLAG_TIME | PGTOP_FLAG_WAIT | PGTOP_FLAG_RELATION | PGTOP_FLAG_TYPE | PGTOP_FLAG_MODE
+        if options.nodb is True:
+            flag -= PGTOP_FLAG_DATABASE
+        if options.nocpu is True:
+            flag -= PGTOP_FLAG_CPU
+        if options.noclient is True:
+            flag -= PGTOP_FLAG_CLIENT
+        if options.nomem is True:
+            flag -= PGTOP_FLAG_MEM
+        if options.noread is True:
+            flag -= PGTOP_FLAG_READ
+        if options.nowrite is True:
+            flag -= PGTOP_FLAG_WRITE
+        if options.notime is True:
+            flag -= PGTOP_FLAG_TIME
+        if options.nowait is True:
+            flag -= PGTOP_FLAG_WAIT
+        
+        if not PGTOP_IS_LOCAL and (flag & PGTOP_FLAG_CPU):
+            flag -= PGTOP_FLAG_CPU
+        if not PGTOP_IS_LOCAL and (flag & PGTOP_FLAG_MEM):
+            flag -= PGTOP_FLAG_MEM
+        if not PGTOP_IS_LOCAL and (flag & PGTOP_FLAG_READ):
+            flag -= PGTOP_FLAG_READ
+        if not PGTOP_IS_LOCAL and (flag & PGTOP_FLAG_WRITE):
+            flag -= PGTOP_FLAG_WRITE
+         
+        # indentation
+        indent = get_indent(flag)
+        # main loop
+        disks_io = None
+        disp_procs = None
+        while 1:
+            if len(indent) > (win.getmaxyx()[1] - 2):
+                raise Exception('Window\'s too small, %s chars are required.' % (len(indent),))
+            
+            # poll process
+            old_pgtop_mode = PGTOP_MODE
+            (disp_procs, new_procs) = poll(interval, conn, flag, indent, procs, pg_num_version, disp_procs)
+            if PGTOP_MODE != old_pgtop_mode:
+                indent = get_indent(flag)
+            
+            if PGTOP_IS_LOCAL:
+                new_disks_io = {'io':psutil.disk_io_counters(), 'time':time.time()}
+                delta_disks_io = {'read_count': 0, 'write_count': 0, 'read_bytes': 0.0, 'write_bytes': 0.0}
+                if disks_io is not None:
+                    delta_disks_io['read_count'] = (new_disks_io['io'].read_count - disks_io['io'].read_count)/(new_disks_io['time'] - disks_io['time'])
+                    delta_disks_io['write_count'] = (new_disks_io['io'].write_count - disks_io['io'].write_count)/(new_disks_io['time'] - disks_io['time'])
+                    delta_disks_io['read_bytes'] = (new_disks_io['io'].read_bytes - disks_io['io'].read_bytes)/(new_disks_io['time'] - disks_io['time'])
+                    delta_disks_io['write_bytes'] = (new_disks_io['io'].write_bytes - disks_io['io'].write_bytes)/(new_disks_io['time'] - disks_io['time'])
+                disks_io = new_disks_io
+            else:
+                delta_disks_io = None
+    
+            procs = new_procs
+            # refresh the winodw
+            refresh_window(disp_procs, (pg_short_version, hostname, options.username, options.host, options.port), flag, indent, delta_disks_io)
+            interval = 1
 
-		# indentation
-		indent = get_indent(flag)
-		# main loop
-		disks_io = None
-		disp_procs = None
-		while 1:
-			if len(indent) > (win.getmaxyx()[1] - 2):
-				raise Exception('Window\'s too small, %s chars are required.' % (len(indent),))
-			
-			# poll process
-			old_pgtop_mode = PGTOP_MODE
-			(disp_procs, new_procs) = poll(interval, conn, flag, indent, procs, pg_num_version, disp_procs)
-			if PGTOP_MODE != old_pgtop_mode:
-				indent = get_indent(flag)
-			
-			new_disks_io = {'io':psutil.disk_io_counters(), 'time':time.time()}
-			delta_disks_io = {'read_count': 0, 'write_count': 0, 'read_bytes': 0.0, 'write_bytes': 0.0}
-			if disks_io is not None:
-				delta_disks_io['read_count'] = (new_disks_io['io'].read_count - disks_io['io'].read_count)/(new_disks_io['time'] - disks_io['time'])
-				delta_disks_io['write_count'] = (new_disks_io['io'].write_count - disks_io['io'].write_count)/(new_disks_io['time'] - disks_io['time'])
-				delta_disks_io['read_bytes'] = (new_disks_io['io'].read_bytes - disks_io['io'].read_bytes)/(new_disks_io['time'] - disks_io['time'])
-				delta_disks_io['write_bytes'] = (new_disks_io['io'].write_bytes - disks_io['io'].write_bytes)/(new_disks_io['time'] - disks_io['time'])
-			disks_io = new_disks_io
-	
-			procs = new_procs
-			# refresh the winodw
-			refresh_window(disp_procs, (pg_short_version, hostname, options.username, options.host, options.port), flag, indent, delta_disks_io)
-			interval = 1
-
-	except psutil.AccessDenied as e:
-		at_exit_curses()
-		import getpass
-		sys.exit("FATAL: Acces denied for user %s, can't acces system informations for process %s" % (getpass.getuser(), str(e),))
-	except curses.error as e:
-		at_exit_curses()
-		sys.exit("FATAL: %s" % (str(e),))
-	except KeyboardInterrupt as e:
-		at_exit_curses()
-		sys.exit(0)
-	except Exception as e:
-		at_exit_curses()
-		# DEBUG
-		import traceback
-		exc_type, exc_value, exc_traceback = sys.exc_info()
-		print repr(traceback.format_tb(exc_traceback))
-		traceback.print_exception(exc_type, exc_value, exc_traceback, limit=2, file=sys.stdout)
-		sys.exit("FATAL: %s" % (str(e),))
+    except psutil.AccessDenied as e:
+        at_exit_curses()
+        import getpass
+        sys.exit("FATAL: Acces denied for user %s, can't acces system informations for process %s" % (getpass.getuser(), str(e),))
+    except curses.error as e:
+        at_exit_curses()
+        sys.exit("FATAL: %s" % (str(e),))
+    except KeyboardInterrupt as e:
+        at_exit_curses()
+        sys.exit(0)
+    except Exception as e:
+        at_exit_curses()
+        # DEBUG
+        import traceback
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        traceback.print_exception(exc_type, exc_value, exc_traceback, file=sys.stdout)
+        sys.exit("FATAL: %s" % (str(e),))
 
 """
 Call the main function
 """
 if __name__ == '__main__':
-	signal.signal(signal.SIGTERM, signal_handler)
-	main()
+    signal.signal(signal.SIGTERM, signal_handler)
+    main()
