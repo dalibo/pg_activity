@@ -697,14 +697,12 @@ def poll_activities(interval, connector, flag, indent, process = None, pg_num_ve
                 p._cpu_percent = p.get_cpu_percent(interval=0)
                 p._name = p.name
                 new_procs[pid] = p
-                # procs.append(p)
                 procs.append({'pid':pid, 'database':p._pg_database, 'client': p._pg_client, 'cpu': p._cpu_percent, 'mem': p._mempercent, 'read': p._io_read_delta, 'write': p._io_write_delta, 'query': p._pg_query, 'duration': p._pg_duration, 'wait': p._pg_wait})
 
             except psutil.error.NoSuchProcess:
                 pass
-            except psutil.error.AccessDenied as e:
-                raise Exception(str(e.name))
-                # pass
+            except psutil.error.AccessDenied:
+                pass
             except Exception as e:
                 raise e
     else:
