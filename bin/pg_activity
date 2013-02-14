@@ -2,7 +2,7 @@
 
 """
 pg_activity utility
-version: 0.3.1
+version: 0.3.2
 author: Julien Tachoires <julmon@gmail.com>
 license: New BSD License
 
@@ -32,7 +32,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-PGTOP_VERSION="0.3.1"
+PGTOP_VERSION="0.3.2"
 
 import os
 import sys
@@ -387,11 +387,11 @@ SELECT pid, CASE WHEN LENGTH(datname) > 16 THEN SUBSTRING(datname FROM 0 FOR 6)|
 Does pg_activity is connected localy ?
 """
 def pg_is_local(conn):
-    query = "SELECT inet_server_addr(), inet_client_addr()"
+    query = "SELECT inet_server_addr() AS inet_server_addr, inet_client_addr() AS inet_client_addr"
     cur = conn.cursor()
     res = cur.execute(query)
     ret = cur.fetchone()
-    if len(ret['inet_server_addr']) == 0 or ret['inet_server_addr'] == ret['inet_client_addr']:
+    if len(str(ret['inet_server_addr'])) == 0 or ret['inet_server_addr'] == ret['inet_client_addr']:
         return True
     return False
 
