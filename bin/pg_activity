@@ -279,7 +279,7 @@ def pg_connect(host = 'localhost', port = 5432, user = 'postgres', password = No
             port = port,
             user = user,
             password = str(password),
-            connection_factory=psycopg2.extras.DictConnection    
+            connection_factory=psycopg2.extras.DictConnection
         )
     conn.set_isolation_level(0)
     cur = conn.cursor()
@@ -288,6 +288,24 @@ def pg_connect(host = 'localhost', port = 5432, user = 'postgres', password = No
     if ret[0] != "on":
         raise Exception, "Must be run with database superuser privileges."
     return conn
+
+"""
+Verify if the user running pg_activity can acces to 
+system informations for a postgres process
+"""
+def pg_is_local_acces():
+    for p in psutil.process_iter():
+        if p.name == 'postgres':
+            try:
+                proc = psutil.Process(p.pid)
+                proc.get_io_counters()
+                proc.get_cpu_times()
+                return True
+            except psutil.AccessDenied:
+                return False
+            except Exception:
+                return False
+    return False
 
 """
 Get PostgreSQL server version
@@ -426,7 +444,7 @@ def sys_get_proc(queries):
         except psutil.error.NoSuchProcess as e:
             pass
         except psutil.error.AccessDenied as e:
-            raise e
+            pass
     return process
 
 """
@@ -699,9 +717,9 @@ def poll_activities(interval, connector, flag, indent, process = None, pg_num_ve
                 new_procs[pid] = p
                 procs.append({'pid':pid, 'database':p._pg_database, 'client': p._pg_client, 'cpu': p._cpu_percent, 'mem': p._mempercent, 'read': p._io_read_delta, 'write': p._io_write_delta, 'query': p._pg_query, 'duration': p._pg_duration, 'wait': p._pg_wait})
 
-            except psutil.error.NoSuchProcess:
+            except psutil.NoSuchProcess:
                 pass
-            except psutil.error.AccessDenied:
+            except psutil.AccessDenied:
                 pass
             except Exception as e:
                 raise e
@@ -1188,6 +1206,11 @@ def main():
             PGTOP_IS_LOCAL = False
             PGTOP_START_LINE = 1
             hostname = options.host
+        elif not pg_is_local_acces():
+            PGTOP_IS_LOCAL = False
+            PGTOP_START_LINE = 1
+            hostname = options.host
+
         # top part
         interval = 0
         if PGTOP_MODE == 'activities':
