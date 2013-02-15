@@ -293,7 +293,7 @@ def pg_connect(host = 'localhost', port = 5432, user = 'postgres', password = No
 Verify if the user running pg_activity can acces to 
 system informations for a postgres process
 """
-def pg_is_local_acces():
+def pg_is_local_access():
     for p in psutil.process_iter():
         if p.name == 'postgres':
             try:
@@ -1206,7 +1206,8 @@ def main():
             PGTOP_IS_LOCAL = False
             PGTOP_START_LINE = 1
             hostname = options.host
-        elif not pg_is_local_acces():
+        # if not connected to a local pg server, then go to degraded mode
+        elif not pg_is_local_access():
             PGTOP_IS_LOCAL = False
             PGTOP_START_LINE = 1
             hostname = options.host
