@@ -148,7 +148,7 @@ PGTOP_COLS = {
         'pid'       : {'n': 1, 'name': 'PID', 'template_h': '%-6s ', 'flag': PGTOP_FLAG_NONE, 'mandatory': True},
         'database'  : {'n': 2, 'name': 'DATABASE', 'template_h': '%-16s ', 'flag': PGTOP_FLAG_DATABASE, 'mandatory': False},
         'client'    : {'n': 3, 'name': 'CLIENT', 'template_h': '%16s ', 'flag': PGTOP_FLAG_CLIENT, 'mandatory': False},
-        'cpu'       : {'n': 4, 'name': 'CPU%', 'template_h': '%5s ', 'flag': PGTOP_FLAG_CPU, 'mandatory': False},
+        'cpu'       : {'n': 4, 'name': 'CPU%', 'template_h': '%6s ', 'flag': PGTOP_FLAG_CPU, 'mandatory': False},
         'mem'       : {'n': 5, 'name': 'MEM%', 'template_h': '%4s ', 'flag': PGTOP_FLAG_MEM, 'mandatory': False},
         'read'      : {'n': 6, 'name': 'READ/s', 'template_h': '%8s ', 'flag': PGTOP_FLAG_READ, 'mandatory': False},
         'write'     : {'n': 7, 'name': 'WRITE/s', 'template_h': '%8s ', 'flag': PGTOP_FLAG_WRITE, 'mandatory': False},
@@ -1093,7 +1093,7 @@ def refresh_line(p, flag, indent, typecolor = 'default', line = None):
         if flag & PGTOP_FLAG_CLIENT:
             colno += print_string(l_lineno, colno, "%16s " % (str(p['client'])[:16],), PGTOP_LINE_COLORS['client'][typecolor])
         if flag & PGTOP_FLAG_CPU:
-            colno += print_string(l_lineno, colno, "%5s " % (p['cpu'],), PGTOP_LINE_COLORS['cpu'][typecolor])
+            colno += print_string(l_lineno, colno, "%6s " % (p['cpu'],), PGTOP_LINE_COLORS['cpu'][typecolor])
         if flag & PGTOP_FLAG_MEM:
             colno += print_string(l_lineno, colno, "%4s " % (round(p['mem'], 1),), PGTOP_LINE_COLORS['mem'][typecolor])
         if flag & PGTOP_FLAG_READ:
