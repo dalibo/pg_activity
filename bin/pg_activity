@@ -630,7 +630,9 @@ def poll_activities(interval, connector, flag, indent, process = None, pg_num_ve
     global PGTOP_MODE
 
     # Keyboard interactions
-    win.timeout(1000 * PGTOP_REFRESH_TIME * interval)
+    win.timeout(int(1000 * PGTOP_REFRESH_TIME * interval))
+    t_start = time.time()
+    known = False
     try:
         k = win.getch()
     except KeyboardInterrupt as e:
@@ -641,15 +643,16 @@ def poll_activities(interval, connector, flag, indent, process = None, pg_num_ve
     # PAUSE mode
     if k == ord(' '):
         pause()
+        known = True
     # interactive mode
     if (k == curses.KEY_DOWN or k == curses.KEY_UP) and len(disp_proc) > 0:
         interactive(disp_proc, flag, indent, connector)
-
-    if (k == curses.KEY_F2):
+        known = True
+    if (k == curses.KEY_F2 or k == ord('2')):
         PGTOP_MODE = 'locked'
         curses.flushinp()
         return poll_locked_blocking(0, connector, flag, indent, None, pg_num_version, None)
-    if (k == curses.KEY_F3):
+    if (k == curses.KEY_F3 or k == ord('3')):
         PGTOP_MODE = 'blocking'
         curses.flushinp()
         return poll_locked_blocking(0, connector, flag, indent, None, pg_num_version, None)
@@ -658,33 +661,49 @@ def poll_activities(interval, connector, flag, indent, process = None, pg_num_ve
         PGTOP_VERBOSE_MODE += 1
         if PGTOP_VERBOSE_MODE > 3:
             PGTOP_VERBOSE_MODE = 1
+        known = True
     # turnoff/on colors
     if k == ord('C'):
         if PGTOP_COLOR is True:
             set_nocolor()
         else:
             set_color()
+        known = True
     # sorts
-    if k == ord('c') and (flag & PGTOP_FLAG_CPU):
+    if k == ord('c') and (flag & PGTOP_FLAG_CPU) and PGTOP_SORT != 'c':
         PGTOP_SORT = 'c'
-    if k == ord('m') and (flag & PGTOP_FLAG_MEM):
+        known = True
+    if k == ord('m') and (flag & PGTOP_FLAG_MEM) and PGTOP_SORT != 'm':
         PGTOP_SORT = 'm'
-    if k == ord('r') and (flag & PGTOP_FLAG_READ):
+        known = True
+    if k == ord('r') and (flag & PGTOP_FLAG_READ) and PGTOP_SORT != 'r':
         PGTOP_SORT = 'r'
-    if k == ord('w') and (flag & PGTOP_FLAG_WRITE):
+        known = True
+    if k == ord('w') and (flag & PGTOP_FLAG_WRITE) and PGTOP_SORT != 'w':
         PGTOP_SORT = 'w'
-    if k == ord('t'):
+        known = True
+    if k == ord('t') and PGTOP_SORT != 't':
         PGTOP_SORT = 't'
+        known = True
     if k == ord('+') and PGTOP_REFRESH_TIME < 3:
         PGTOP_REFRESH_TIME += 1
+        known = True
     if k == ord('-') and PGTOP_REFRESH_TIME > 1:
         PGTOP_REFRESH_TIME -= 1
-    
+        known = True
+    # Refresh
+    if k == ord('R'):
+        known = True
+     
     if k == ord('h'):
         help_window()
+        known = True
 
     curses.flushinp()
-    
+    t_end = time.time() 
+    if k > -1 and not known and (t_end - t_start) < (PGTOP_REFRESH_TIME * interval):
+        return poll_activities(((PGTOP_REFRESH_TIME * interval) - (t_end - t_start))/PGTOP_REFRESH_TIME, connector, flag, indent, process, pg_num_version, disp_proc)
+
     # poll postgresql activity
     queries =  pg_get_activities(connector, pg_num_version)
     if PGTOP_IS_LOCAL:
@@ -760,8 +779,11 @@ def poll_locked_blocking(interval, connector, flag, indent, process = None, pg_n
     global PGTOP_REFRESH_TIME
     global PGTOP_MODE
 
+    t_start = time.time()
+    known = False
     # Keyboard interactions
-    win.timeout(1000 * PGTOP_REFRESH_TIME * interval)
+    win.timeout(int(1000 * PGTOP_REFRESH_TIME * interval))
+    
     try:
         k = win.getch()
     except KeyboardInterrupt as e:
@@ -772,23 +794,25 @@ def poll_locked_blocking(interval, connector, flag, indent, process = None, pg_n
     # PAUSE mode
     if k == ord(' '):
         pause()
+        known = True
     # interactive mode
     if (k == curses.KEY_DOWN or k == curses.KEY_UP) and len(disp_proc) > 0:
         interactive(disp_proc, flag, indent, connector)
+        known = True
     # activites mode
-    if (k == curses.KEY_F1):
+    if (k == curses.KEY_F1 or k == ord('1')):
         PGTOP_MODE = 'activities'
         curses.flushinp()
         queries = pg_get_activities(connector, pg_num_version)
         procs = sys_get_proc(queries)
         return poll_activities(0, connector, flag, indent, procs, pg_num_version, None)
     # locked queries
-    if (k == curses.KEY_F2):
+    if ((k == curses.KEY_F2 or k == ord('2')) and PGTOP_MODE != 'locked'):
         PGTOP_MODE = 'locked'
         curses.flushinp()
         return poll_locked_blocking(0, connector, flag, indent, None, pg_num_version, None)
     # blocking queries
-    if (k == curses.KEY_F3):
+    if ((k == curses.KEY_F3 or k == ord('3')) and PGTOP_MODE != 'blocking'):
         PGTOP_MODE = 'blocking'
         curses.flushinp()
         return poll_locked_blocking(0, connector, flag, indent, None, pg_num_version, None)
@@ -797,15 +821,18 @@ def poll_locked_blocking(interval, connector, flag, indent, process = None, pg_n
         PGTOP_VERBOSE_MODE += 1
         if PGTOP_VERBOSE_MODE > 3:
             PGTOP_VERBOSE_MODE = 1
+        known = True
     # turnoff/on colors
     if k == ord('C'):
         if PGTOP_COLOR is True:
             set_nocolor()
         else:
             set_color()
+        known = True
     # sorts
-    if k == ord('t'):
+    if k == ord('t') and PGTOP_SORT != 't':
         PGTOP_SORT = 't'
+        known = True
     if k == ord('+') and PGTOP_REFRESH_TIME < 3:
         PGTOP_REFRESH_TIME += 1
     if k == ord('-') and PGTOP_REFRESH_TIME > 1:
@@ -813,9 +840,17 @@ def poll_locked_blocking(interval, connector, flag, indent, process = None, pg_n
 
     if k == ord('h'):
         help_window()
+        known = True
     
+    # Refresh
+    if k == ord('R'):
+        known = True
+     
     curses.flushinp()
-    
+    t_end = time.time() 
+    if k > -1 and not known and (t_end - t_start) < (PGTOP_REFRESH_TIME * interval):
+        return poll_locked_blocking(((PGTOP_REFRESH_TIME * interval) - (t_end - t_start))/PGTOP_REFRESH_TIME, connector, flag, indent, process, pg_num_version, disp_proc)
+ 
     # poll postgresql activity
     if PGTOP_MODE == 'locked':
         queries =  pg_get_locked(connector, pg_num_version)
