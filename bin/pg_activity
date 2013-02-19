@@ -261,12 +261,30 @@ Strip and replace some special characters.
 """
 def clean_str(string):
     msg = str(string)
-    msg = msg.replace("\n", " ")
+    msg = msg.replace('\n', ' ')
     msg = re.sub(r'\s+', r' ', msg)
     msg = msg.replace("FATAL:", "")
     msg = re.sub(r'^\s', r'', msg)
     msg = re.sub(r'\s$', r'', msg)
     return msg
+
+"""
+Get postgres' password using ~/.pgpass file.
+
+http://www.postgresql.org/docs/9.2/static/libpq-pgpass.html
+http://wiki.postgresql.org/wiki/Pgpass
+"""
+def get_pgpass(pgpass = None):
+    if pgpass is None:
+        from os.path import expanduser
+        home = expanduser('~')
+        pgpass = '%s/.pgpass' % (str(home),)
+    with open(pgpass, 'r') as fp:
+        content = fp.read()
+        res = re.match(r'^([^:]+):([^:]+):([^:]+):([^:]+):(.*)$', content)
+        if res is not None:
+            return res.group(1, 2, 3, 4, 5)
+    raise Exception('pgpass not found')
 
 """
 Connect to a PostgreSQL server and returns
@@ -1225,7 +1243,14 @@ def main():
             sys.exit(0)
         
         password = os.environ.get('PGPASSWORD')
-        
+        if password is None:
+            # pgpass file handling
+            try:
+                (pgpass_host, pgpass_port, pgpass_database, pgpass_user, pgpass_password) = get_pgpass(os.environ.get('PGPASSFILE'))
+                if pgpass_host == options.host and pgpass_port == options.port and pgpass_user == options.username and pgpass_database == 'postgres':
+                    password = pgpass_password
+            except Exception as e:
+                pass
         try:
             conn = pg_connect(host = options.host, port = options.port, user = options.username, password = password)
         except psycopg2.Error as e:
