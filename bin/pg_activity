@@ -2,7 +2,7 @@
 
 """
 pg_activity utility
-version: 0.3.3
+version: 0.3.4
 author: Julien Tachoires <julmon@gmail.com>
 license: New BSD License
 
@@ -32,7 +32,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-PGTOP_VERSION="0.3.3"
+PGTOP_VERSION="0.3.4"
 
 import os
 import sys
@@ -524,11 +524,11 @@ Display change mode menu bar
 """
 def change_mode_interactive():
     (y,x) = win.getmaxyx()
-    colno = print_string((y - 1), 0, "<F1>", get_curses_color(0))
+    colno = print_string((y - 1), 0, "<F1/1>", get_curses_color(0))
     colno += print_string((y - 1), colno, "Running queries    ", get_curses_color(C_CYAN)|curses.A_REVERSE)
-    colno += print_string((y - 1), colno, "<F2>", get_curses_color(0))
+    colno += print_string((y - 1), colno, "<F2/2>", get_curses_color(0))
     colno += print_string((y - 1), colno, "Locked queries    ", get_curses_color(C_CYAN)|curses.A_REVERSE)
-    colno += print_string((y - 1), colno, "<F3>", get_curses_color(0))
+    colno += print_string((y - 1), colno, "<F3/3>", get_curses_color(0))
     colno += print_string((y - 1), colno, "Blocking queries ", get_curses_color(C_CYAN)|curses.A_REVERSE)
     colno += print_string((y - 1), colno, "<Space>", get_curses_color(0))
     colno += print_string((y - 1), colno, "Pause    ", get_curses_color(C_CYAN)|curses.A_REVERSE)

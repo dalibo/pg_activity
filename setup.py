@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name = 'pg_activity',
-    version = '0.3.3',
+    version = '0.3.4',
     author = 'Julien Tachoires',
     author_email = 'julmon@gmail.com',
     scripts = ['bin/pg_activity'],
