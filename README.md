@@ -51,10 +51,11 @@ Interactives commands
 	q			Quit
 	+			Increase refresh time. Maximum value : 3s
 	-			Decrease refesh time. Minimum Value : 1s
-	F1			Running queries monitoring
-	F2			Locked queries monitoring
-	F3			Blocking queries monitoring
+	F1/1		Running queries monitoring
+	F2/2		Locked queries monitoring
+	F3/3		Blocking queries monitoring
 	h			Help page
+    R           Refresh
 
 Navigation mode
 ---------------
