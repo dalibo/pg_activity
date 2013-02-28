@@ -218,6 +218,9 @@ PGTOP_IS_LOCAL = True
 # Start line
 PGTOP_START_LINE = 4
 
+# Window's size
+(PGTOP_MAXY, PGTOP_MAXX) = win.getmaxyx()
+
 """
 Replace colors by white.
 """
@@ -329,9 +332,7 @@ def pg_is_local_access():
 Get PostgreSQL server version
 """
 def pg_get_version(conn):
-    query = """
-    SELECT version() AS pg_version
-    """
+    query = "SELECT version() AS pg_version"
     cur = conn.cursor()
     res = cur.execute(query)
     ret = cur.fetchone()
@@ -341,9 +342,7 @@ def pg_get_version(conn):
 Terminate a backend
 """
 def pg_terminate_backend(conn, pid):
-    query = """
-    SELECT pg_terminate_backend(%s) AS terminated
-    """
+    query = "SELECT pg_terminate_backend(%s) AS terminated"
     cur = conn.cursor()
     res = cur.execute(query, (pid,))
     ret = cur.fetchone()
@@ -365,6 +364,16 @@ def pg_get_num_version(text_version):
         r += res.group(3)
         return (res.group(0), int(r))
     return None
+
+"""
+Get current transaction ID
+"""
+def pg_get_txid_current(conn,):
+    query = "SELECT EXTRACT(EPOCH FROM NOW()) AS timestamp, txid_current() AS txid"
+    cur = conn.cursor()
+    res = cur.execute(query,)
+    ret = cur.fetchone()
+    return (ret['timestamp'], ret['txid'])
 
 """
 Get activity from pg_stat_activity view
@@ -469,12 +478,11 @@ def sys_get_proc(queries):
 PAUSE mode
 """
 def pause():
-    (y,x) = win.getmaxyx()
     msg = "PAUSE"
     line = ""
-    line += " " * (int(x/2) - len(msg))
+    line += " " * (int(PGTOP_MAXX/2) - len(msg))
     line += msg
-    line += " " * (x - len(line) - 0)
+    line += " " * (PGTOP_MAXX - len(line) - 0)
     win.addstr(PGTOP_START_LINE, 0, line, get_curses_color(C_RED_BLACK)|curses.A_REVERSE|curses.A_BOLD)
     current_pos = -1
     while 1:
@@ -494,7 +502,6 @@ def pause():
 Display current mode
 """
 def current_position():
-    (y,x) = win.getmaxyx()
     if PGTOP_MODE == 'activities':
         msg = "RUNNING QUERIES"
     if PGTOP_MODE == 'locked':
@@ -502,9 +509,9 @@ def current_position():
     if PGTOP_MODE == 'blocking':
         msg = "BLOCKING QUERIES"
     line = ""
-    line += " " * (int(x/2) - len(msg))
+    line += " " * (int(PGTOP_MAXX/2) - len(msg))
     line += msg
-    line += " " * (x - len(line) - 0)
+    line += " " * (PGTOP_MAXX - len(line) - 0)
     win.addstr(PGTOP_START_LINE, 0, line, get_curses_color(C_GREEN))
 
 """
@@ -523,20 +530,19 @@ def help_key_interactive(y):
 Display change mode menu bar
 """
 def change_mode_interactive():
-    (y,x) = win.getmaxyx()
-    colno = print_string((y - 1), 0, "<F1/1>", get_curses_color(0))
-    colno += print_string((y - 1), colno, "Running queries    ", get_curses_color(C_CYAN)|curses.A_REVERSE)
-    colno += print_string((y - 1), colno, "<F2/2>", get_curses_color(0))
-    colno += print_string((y - 1), colno, "Locked queries    ", get_curses_color(C_CYAN)|curses.A_REVERSE)
-    colno += print_string((y - 1), colno, "<F3/3>", get_curses_color(0))
-    colno += print_string((y - 1), colno, "Blocking queries ", get_curses_color(C_CYAN)|curses.A_REVERSE)
-    colno += print_string((y - 1), colno, "<Space>", get_curses_color(0))
-    colno += print_string((y - 1), colno, "Pause    ", get_curses_color(C_CYAN)|curses.A_REVERSE)
-    colno += print_string((y - 1), colno, "<q>", get_curses_color(0))
-    colno += print_string((y - 1), colno, "Quit    ", get_curses_color(C_CYAN)|curses.A_REVERSE)
-    colno += print_string((y - 1), colno, "<h>", get_curses_color(0))
-    colno += print_string((y - 1), colno, "Help    ", get_curses_color(C_CYAN)|curses.A_REVERSE)
-    colno += print_string((y - 1), colno, add_blank(" "), get_curses_color(C_CYAN)|curses.A_REVERSE)
+    colno = print_string((PGTOP_MAXY - 1), 0, "<F1/1>", get_curses_color(0))
+    colno += print_string((PGTOP_MAXY - 1), colno, "Running queries    ", get_curses_color(C_CYAN)|curses.A_REVERSE)
+    colno += print_string((PGTOP_MAXY - 1), colno, "<F2/2>", get_curses_color(0))
+    colno += print_string((PGTOP_MAXY - 1), colno, "Locked queries    ", get_curses_color(C_CYAN)|curses.A_REVERSE)
+    colno += print_string((PGTOP_MAXY - 1), colno, "<F3/3>", get_curses_color(0))
+    colno += print_string((PGTOP_MAXY - 1), colno, "Blocking queries ", get_curses_color(C_CYAN)|curses.A_REVERSE)
+    colno += print_string((PGTOP_MAXY - 1), colno, "<Space>", get_curses_color(0))
+    colno += print_string((PGTOP_MAXY - 1), colno, "Pause    ", get_curses_color(C_CYAN)|curses.A_REVERSE)
+    colno += print_string((PGTOP_MAXY - 1), colno, "<q>", get_curses_color(0))
+    colno += print_string((PGTOP_MAXY - 1), colno, "Quit    ", get_curses_color(C_CYAN)|curses.A_REVERSE)
+    colno += print_string((PGTOP_MAXY - 1), colno, "<h>", get_curses_color(0))
+    colno += print_string((PGTOP_MAXY - 1), colno, "Help    ", get_curses_color(C_CYAN)|curses.A_REVERSE)
+    colno += print_string((PGTOP_MAXY - 1), colno, add_blank(" "), get_curses_color(C_CYAN)|curses.A_REVERSE)
 
 """
 Ask for terminating a backend
@@ -573,10 +579,9 @@ def interactive(process, flag, indent, connector):
     PGTOP_VERBOSE_MODE = PGTOP_TRUNCATE
 
     # Refresh lines with this verbose mode    
-    (y,x) = win.getmaxyx()
     scroll_window(process, flag, indent, 0)
     
-    help_key_interactive(y)
+    help_key_interactive(PGTOP_MAXY)
 
     current_pos = 0
     offset = 0
@@ -593,7 +598,7 @@ def interactive(process, flag, indent, connector):
             exit()
         # terminate the backend attached to this PID
         if k == ord('k'):
-            res = ask_terminate_backend(y, process[current_pos]['pid'], connector)
+            res = ask_terminate_backend(PGTOP_MAXY, process[current_pos]['pid'], connector)
             PGTOP_VERBOSE_MODE = old_verbose_mode
             curses.flushinp()
             return 0
@@ -604,16 +609,16 @@ def interactive(process, flag, indent, connector):
                 if (lines[current_pos] - offset) < (PGTOP_START_LINE + 3):
                     offset -= 1
                     scroll_window(process, flag, indent, offset)
-                    help_key_interactive(y)
+                    help_key_interactive(PGTOP_MAXY)
 
                 if current_pos < len(process):
                     refresh_line(process[current_pos], flag, indent, 'default', lines[current_pos] - offset)
                 current_pos -= 1
             if k == curses.KEY_DOWN and current_pos < (len(process) - 1):
-                if (lines[current_pos] - offset) >= (y - 2):
+                if (lines[current_pos] - offset) >= (PGTOP_MAXY - 2):
                     offset += 1
                     scroll_window(process, flag, indent, offset)
-                    help_key_interactive(y)
+                    help_key_interactive(PGTOP_MAXY)
 
                 if current_pos >= 0:
                     refresh_line(process[current_pos], flag, indent, 'default', lines[current_pos] - offset)
@@ -908,7 +913,7 @@ def print_string(lineno, colno, word, color = 0):
 Complete string with white spaces from the end of string to the end of line.
 """
 def add_blank(line, offset = 0): 
-    line += " " * (win.getmaxyx()[1] - (len(line) + offset))
+    line += " " * (PGTOP_MAXX - (len(line) + offset))
     return line
 
 """
@@ -965,7 +970,7 @@ def print_cols_header(flag):
             else:
                 color_highlight = get_curses_color(C_GREEN)
             if val['name'] == 'Query':
-                disp += " " * (win.getmaxyx()[1] - (len(line) + len(disp)))
+                disp += " " * (PGTOP_MAXX - (len(line) + len(disp)))
             line += disp
             win.addstr(lineno, x, disp, color_highlight|curses.A_REVERSE)
             x += len(disp)
@@ -974,7 +979,7 @@ def print_cols_header(flag):
 """
 Print window header
 """
-def print_header(pg_version, hostname, user, host, port, io):
+def print_header(pg_version, hostname, user, host, port, io, tps):
     global lineno
     global PGTOP_MAX_IOPS 
     lineno = 0
@@ -989,7 +994,9 @@ def print_header(pg_version, hostname, user, host, port, io):
     colno += print_string(lineno, colno, host, get_curses_color(C_CYAN))
     colno += print_string(lineno, colno, ":")
     colno += print_string(lineno, colno, port, get_curses_color(C_CYAN))
-    colno += print_string(lineno, colno, " - refresh: %ss" % (PGTOP_REFRESH_TIME,))
+    colno += print_string(lineno, colno, " - TPS: ")
+    colno += print_string(lineno, colno, "%6s" % (tps,), get_curses_color(C_CYAN))
+    colno += print_string(lineno, colno, " - ref.: %ss" % (PGTOP_REFRESH_TIME,))
     
     # If not local connection, don't get and display system informations
     if not PGTOP_IS_LOCAL:
@@ -1084,14 +1091,14 @@ def display_help_key(lineno, colno, key, help):
 """
 Refresh the window
 """
-def refresh_window(procs, extras, flag, indent, io):
+def refresh_window(procs, extras, flag, indent, io, tps):
     global lineno
     global lines
 
     lines = []
     (pg_version, hostname, user, host, port) = extras
     win.erase()
-    print_header(pg_version, hostname, user, host, port, io)
+    print_header(pg_version, hostname, user, host, port, io, tps)
     lineno += 2
     line_trunc = lineno
     current_position()
@@ -1104,7 +1111,7 @@ def refresh_window(procs, extras, flag, indent, io):
             lines.append(line_trunc)
         except curses.error as e:
             break
-        for l in range(lineno, (win.getmaxyx()[0]-1)):
+        for l in range(lineno, (PGTOP_MAXX-1)):
             print_string(l, 0, add_blank(' '))
     change_mode_interactive()
 
@@ -1121,7 +1128,7 @@ def scroll_window(procs, flag, indent, offset = 0):
                 refresh_line(p, flag, indent, 'default')
             except curses.error as e:
                 break
-            for l in range(lineno, (win.getmaxyx()[0]-1)):
+            for l in range(lineno, (PGTOP_MAXX-1)):
                 print_string(l, 0, add_blank(' '))
         pos += 1
 
@@ -1135,9 +1142,8 @@ def refresh_line(p, flag, indent, typecolor = 'default', line = None):
     else:
         l_lineno = lineno
 
-    (maxy, maxx) = win.getmaxyx()
     colno = 0
-    if l_lineno > maxy:
+    if l_lineno > PGTOP_MAXY:
         return
     colno += print_string(l_lineno, colno, "%-6s " % (p['pid'],), PGTOP_LINE_COLORS['pid'][typecolor])
     if flag & PGTOP_FLAG_DATABASE:
@@ -1183,7 +1189,7 @@ def refresh_line(p, flag, indent, typecolor = 'default', line = None):
         else:
             colno += print_string(l_lineno, colno, "%2s " % ('N',), PGTOP_LINE_COLORS['wait_green'][typecolor])
 
-    dif = maxx - len(indent) - 1
+    dif = PGTOP_MAXX - len(indent) - 1
     if PGTOP_VERBOSE_MODE == PGTOP_TRUNCATE:
         query = p['query'][:dif]
         colno += print_string(l_lineno, colno, " %s" % (add_blank(query,len(indent)+1),), PGTOP_LINE_COLORS['query'][typecolor])
@@ -1197,7 +1203,7 @@ def refresh_line(p, flag, indent, typecolor = 'default', line = None):
             query_wrote += query_part
             offset = len(query_wrote)
             if PGTOP_VERBOSE_MODE == PGTOP_WRAP_NOINDENT:
-                dif = maxx
+                dif = PGTOP_MAXX
                 p_indent = ''
             else:
                 p_indent = indent
@@ -1218,6 +1224,9 @@ main
 def main():
     global PGTOP_IS_LOCAL
     global PGTOP_START_LINE
+    global PGTOP_MAXX
+    global PGTOP_MAXY
+
     try:
         parser = OptionParser(add_help_option=False, version="%prog "+PGTOP_VERSION, description="htop like application for local PostgreSQL server activity monitoring.")
         parser.add_option("-U", "--username", dest="username", default="postgres", help="Database user name (default: \"postgres\").", metavar="USERNAME")
@@ -1320,8 +1329,12 @@ def main():
         # main loop
         disks_io = None
         disp_procs = None
+        # init num. of TX
+        (tps_time, tps_nb_tx) = pg_get_txid_current(conn)
+        
         while 1:
-            if len(indent) > (win.getmaxyx()[1] - 2):
+            (PGTOP_MAXY, PGTOP_MAXX) = win.getmaxyx()
+            if len(indent) > (PGTOP_MAXX - 2):
                 raise Exception('Window\'s too small, %s chars are required.' % (len(indent),))
             
             # poll process
@@ -1344,7 +1357,12 @@ def main():
     
             procs = new_procs
             # refresh the winodw
-            refresh_window(disp_procs, (pg_short_version, hostname, options.username, options.host, options.port), flag, indent, delta_disks_io)
+            (n_tps_time, n_tps_nb_tx) = pg_get_txid_current(conn)
+            tps = int((n_tps_nb_tx - tps_nb_tx) / (n_tps_time - tps_time))
+            tps_time = n_tps_time
+            tps_nb_tx = n_tps_nb_tx
+            
+            refresh_window(disp_procs, (pg_short_version, hostname, options.username, options.host, options.port), flag, indent, delta_disks_io, tps)
             interval = 1
 
     except psutil.AccessDenied as e:
