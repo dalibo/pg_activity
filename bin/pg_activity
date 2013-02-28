@@ -104,6 +104,9 @@ except Exception as e:
     # Terminal doesn't support curs_set() and colors
     PGTOP_SYS_COLOR = False
 
+"""
+Wrapper around curses.color_pair()
+"""
 def get_curses_color(color):
     if PGTOP_SYS_COLOR:
         return curses.color_pair(color)
@@ -221,6 +224,8 @@ PGTOP_START_LINE = 4
 # Window's size
 (PGTOP_MAXY, PGTOP_MAXX) = win.getmaxyx()
 
+PGTOP_BUFFER = None
+
 """
 Replace colors by white.
 """
@@ -287,7 +292,7 @@ def get_pgpass(pgpass = None):
         res = re.match(r'^([^:]+):([^:]+):([^:]+):([^:]+):(.*)$', content)
         if res is not None:
             return res.group(1, 2, 3, 4, 5)
-    raise Exception('pgpass not found')
+    raise Exception('pgpass file not found')
 
 """
 Connect to a PostgreSQL server and returns
@@ -475,15 +480,34 @@ def sys_get_proc(queries):
     return process
 
 """
-PAUSE mode
+Verifiy if the window's size is enough
 """
-def pause():
+def check_window_size():
+    global PGTOP_MAXY
+    global PGTOP_MAXX
+    (PGTOP_MAXY, PGTOP_MAXX) = win.getmaxyx()
+    if PGTOP_BUFFER and PGTOP_BUFFER.has_key('indent') and len(PGTOP_BUFFER['indent']) > (PGTOP_MAXX - 2):
+        raise Exception('Window\'s too small, %s chars are required.' % (len(PGTOP_BUFFER['indent']),))
+
+
+"""
+Returns PAUSE message, depending of the line size
+"""
+def get_pause_msg():
     msg = "PAUSE"
     line = ""
     line += " " * (int(PGTOP_MAXX/2) - len(msg))
     line += msg
     line += " " * (PGTOP_MAXX - len(line) - 0)
-    win.addstr(PGTOP_START_LINE, 0, line, get_curses_color(C_RED_BLACK)|curses.A_REVERSE|curses.A_BOLD)
+    return line
+
+"""
+PAUSE mode
+"""
+def pause():
+    global PGTOP_MAXY
+    global PGTOP_MAXX
+    print_string(PGTOP_START_LINE, 0, get_pause_msg(), get_curses_color(C_RED_BLACK)|curses.A_REVERSE|curses.A_BOLD)
     current_pos = -1
     while 1:
         try:
@@ -496,6 +520,11 @@ def pause():
         if k == ord(' '):
             curses.flushinp()
             return 0
+        
+        if k == curses.KEY_RESIZE and PGTOP_BUFFER is not None and PGTOP_BUFFER.has_key('procs'):
+            check_window_size()
+            refresh_window(PGTOP_BUFFER['procs'], PGTOP_BUFFER['extras'], PGTOP_BUFFER['flag'], PGTOP_BUFFER['indent'], PGTOP_BUFFER['io'], PGTOP_BUFFER['tps'])
+            print_string(PGTOP_START_LINE, 0, get_pause_msg(), get_curses_color(C_RED_BLACK)|curses.A_REVERSE|curses.A_BOLD)
         curses.flushinp()
 
 """
@@ -512,7 +541,7 @@ def current_position():
     line += " " * (int(PGTOP_MAXX/2) - len(msg))
     line += msg
     line += " " * (PGTOP_MAXX - len(line) - 0)
-    win.addstr(PGTOP_START_LINE, 0, line, get_curses_color(C_GREEN))
+    print_string(PGTOP_START_LINE, 0, line, get_curses_color(C_GREEN))
 
 """
 Display interactive mode menu bar
@@ -565,6 +594,9 @@ def ask_terminate_backend(y, pid, connector):
             return 1
         # no
         if k == ord('n') or k == ord('N') or k == ord(' '):
+            return 0
+        # resize => exit
+        if k == curses.KEY_RESIZE:
             return 0
 
 """
@@ -625,7 +657,7 @@ def interactive(process, flag, indent, connector):
                 current_pos += 1
             refresh_line(process[current_pos], flag, indent, 'cursor', lines[current_pos] - offset)
         # quit interactive mode
-        if k == ord(' '):
+        if k == ord(' ') or k == curses.KEY_RESIZE:
             PGTOP_VERBOSE_MODE = old_verbose_mode
             curses.flushinp()
             return 0
@@ -721,6 +753,10 @@ def poll_activities(interval, connector, flag, indent, process = None, pg_num_ve
     if k == ord('h'):
         help_window()
         known = True
+
+    if k == curses.KEY_RESIZE and PGTOP_BUFFER is not None and PGTOP_BUFFER.has_key('procs'):
+        check_window_size()
+        refresh_window(PGTOP_BUFFER['procs'], PGTOP_BUFFER['extras'], PGTOP_BUFFER['flag'], PGTOP_BUFFER['indent'], PGTOP_BUFFER['io'], PGTOP_BUFFER['tps'])
 
     curses.flushinp()
     t_end = time.time() 
@@ -868,6 +904,11 @@ def poll_locked_blocking(interval, connector, flag, indent, process = None, pg_n
     # Refresh
     if k == ord('R'):
         known = True
+    
+    if k == curses.KEY_RESIZE and PGTOP_BUFFER is not None and PGTOP_BUFFER.has_key('procs'):
+        check_window_size()
+        refresh_window(PGTOP_BUFFER['procs'], PGTOP_BUFFER['extras'], PGTOP_BUFFER['flag'], PGTOP_BUFFER['indent'], PGTOP_BUFFER['io'], PGTOP_BUFFER['tps'])
+
      
     curses.flushinp()
     t_end = time.time() 
@@ -892,12 +933,6 @@ def poll_locked_blocking(interval, connector, flag, indent, process = None, pg_n
         disp_procs = sorted(queries, key=lambda q: q['duration'], reverse=True)
     
     return (disp_procs, new_procs)
-
-"""
-Simple curses wrapper for word printing.
-"""
-def print_word(word, color = 0):
-    win.addstr(word, color)
 
 """
 Print a string at position (lineno, colno) and returns its length.
@@ -972,7 +1007,7 @@ def print_cols_header(flag):
             if val['name'] == 'Query':
                 disp += " " * (PGTOP_MAXX - (len(line) + len(disp)))
             line += disp
-            win.addstr(lineno, x, disp, color_highlight|curses.A_REVERSE)
+            print_string(lineno, x, disp, color_highlight|curses.A_REVERSE)
             x += len(disp)
     lineno += 1
 
@@ -1054,23 +1089,33 @@ def help_window():
     text = "Released under New BSD License."
     l = print_string(lineno, 0, text)
     lineno += 2
-    l = display_help_key(lineno, 00, 'Up/Down Arrows', 'scroll process list')
-    l = display_help_key(lineno, 45, '             C', 'activate/deactivate colors')
+    l = display_help_key(lineno, 00, 'Up/Down', 'scroll process list')
+    l = display_help_key(lineno, 45, '      C', 'activate/deactivate colors')
     lineno +=1
-    l = display_help_key(lineno, 00, '         Space', 'pause')
-    l = display_help_key(lineno, 45, '             r', 'sort by READ/s desc. (activites)')
+    l = display_help_key(lineno, 00, '  Space', 'pause')
+    l = display_help_key(lineno, 45, '      r', 'sort by READ/s desc. (activites)')
     lineno +=1
-    l = display_help_key(lineno, 00, '             v', 'change queries display mode')
-    l = display_help_key(lineno, 45, '             w', 'sort by WRITE/s desc. (activites)')
+    l = display_help_key(lineno, 00, '      v', 'change queries display mode')
+    l = display_help_key(lineno, 45, '      w', 'sort by WRITE/s desc. (activites)')
     lineno +=1
-    l = display_help_key(lineno, 00, '             q', 'quit')
-    l = display_help_key(lineno, 45, '             c', 'sort by CPU% desc. (activites)')
+    l = display_help_key(lineno, 00, '      q', 'quit')
+    l = display_help_key(lineno, 45, '      c', 'sort by CPU% desc. (activites)')
     lineno +=1
-    l = display_help_key(lineno, 00, '             +', 'increase refresh time (max:3)')
-    l = display_help_key(lineno, 45, '             m', 'sort by MEM% desc. (activites)')
+    l = display_help_key(lineno, 00, '      +', 'increase refresh time (max:3)')
+    l = display_help_key(lineno, 45, '      m', 'sort by MEM% desc. (activites)')
     lineno +=1
-    l = display_help_key(lineno, 00, '             -', 'decrease refresh time (min:1)')
-    l = display_help_key(lineno, 45, '             t', 'sort by TIME+ desc. (activites)')
+    l = display_help_key(lineno, 00, '      -', 'decrease refresh time (min:1)')
+    l = display_help_key(lineno, 45, '      t', 'sort by TIME+ desc. (activites)')
+    lineno +=1
+    l = display_help_key(lineno, 00, '      R', 'force refresh')
+    lineno +=1
+    l = print_string(lineno, 0, 'Mode')
+    lineno +=1
+    l = display_help_key(lineno, 00, '   F1/1', 'running queries')
+    lineno +=1
+    l = display_help_key(lineno, 00, '   F2/2', 'locked queries')
+    lineno +=1
+    l = display_help_key(lineno, 00, '   F3/3', 'blocking queries')
     
     lineno += 2
     l = print_string(lineno, 0, 'Press any key to exit.')    
@@ -1226,6 +1271,7 @@ def main():
     global PGTOP_START_LINE
     global PGTOP_MAXX
     global PGTOP_MAXY
+    global PGTOP_BUFFER
 
     try:
         parser = OptionParser(add_help_option=False, version="%prog "+PGTOP_VERSION, description="htop like application for local PostgreSQL server activity monitoring.")
@@ -1333,9 +1379,7 @@ def main():
         (tps_time, tps_nb_tx) = pg_get_txid_current(conn)
         
         while 1:
-            (PGTOP_MAXY, PGTOP_MAXX) = win.getmaxyx()
-            if len(indent) > (PGTOP_MAXX - 2):
-                raise Exception('Window\'s too small, %s chars are required.' % (len(indent),))
+            check_window_size()
             
             # poll process
             old_pgtop_mode = PGTOP_MODE
@@ -1361,7 +1405,7 @@ def main():
             tps = int((n_tps_nb_tx - tps_nb_tx) / (n_tps_time - tps_time))
             tps_time = n_tps_time
             tps_nb_tx = n_tps_nb_tx
-            
+            PGTOP_BUFFER = {'procs': disp_procs, 'extras': (pg_short_version, hostname, options.username, options.host, options.port), 'flag': flag, 'indent': indent, 'io': delta_disks_io, 'tps': tps}
             refresh_window(disp_procs, (pg_short_version, hostname, options.username, options.host, options.port), flag, indent, delta_disks_io, tps)
             interval = 1
 
@@ -1371,6 +1415,9 @@ def main():
         sys.exit("FATAL: Acces denied for user %s, can't acces system informations for process %s" % (getpass.getuser(), str(e),))
     except curses.error as e:
         at_exit_curses()
+        import traceback
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        traceback.print_exception(exc_type, exc_value, exc_traceback, file=sys.stdout)
         sys.exit("FATAL: %s" % (str(e),))
     except KeyboardInterrupt as e:
         at_exit_curses()
