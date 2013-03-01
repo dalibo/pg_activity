@@ -698,7 +698,8 @@ def poll_activities(interval, connector, flag, indent, process = None, pg_num_ve
     # PAUSE mode
     if k == ord(' '):
         pause()
-        known = True
+        check_window_size()
+        refresh_window(PGTOP_BUFFER['procs'], PGTOP_BUFFER['extras'], PGTOP_BUFFER['flag'], PGTOP_BUFFER['indent'], PGTOP_BUFFER['io'], PGTOP_BUFFER['tps'])
     # interactive mode
     if (k == curses.KEY_DOWN or k == curses.KEY_UP) and len(disp_proc) > 0:
         interactive(disp_proc, flag, indent, connector)
@@ -716,14 +717,16 @@ def poll_activities(interval, connector, flag, indent, process = None, pg_num_ve
         PGTOP_VERBOSE_MODE += 1
         if PGTOP_VERBOSE_MODE > 3:
             PGTOP_VERBOSE_MODE = 1
-        known = True
+        check_window_size()
+        refresh_window(PGTOP_BUFFER['procs'], PGTOP_BUFFER['extras'], PGTOP_BUFFER['flag'], PGTOP_BUFFER['indent'], PGTOP_BUFFER['io'], PGTOP_BUFFER['tps'])
     # turnoff/on colors
     if k == ord('C'):
         if PGTOP_COLOR is True:
             set_nocolor()
         else:
             set_color()
-        known = True
+        check_window_size()
+        refresh_window(PGTOP_BUFFER['procs'], PGTOP_BUFFER['extras'], PGTOP_BUFFER['flag'], PGTOP_BUFFER['indent'], PGTOP_BUFFER['io'], PGTOP_BUFFER['tps'])
     # sorts
     if k == ord('c') and (flag & PGTOP_FLAG_CPU) and PGTOP_SORT != 'c':
         PGTOP_SORT = 'c'
@@ -752,7 +755,8 @@ def poll_activities(interval, connector, flag, indent, process = None, pg_num_ve
      
     if k == ord('h'):
         help_window()
-        known = True
+        check_window_size()
+        refresh_window(PGTOP_BUFFER['procs'], PGTOP_BUFFER['extras'], PGTOP_BUFFER['flag'], PGTOP_BUFFER['indent'], PGTOP_BUFFER['io'], PGTOP_BUFFER['tps'])
 
     if k == curses.KEY_RESIZE and PGTOP_BUFFER is not None and PGTOP_BUFFER.has_key('procs'):
         check_window_size()
@@ -853,7 +857,8 @@ def poll_locked_blocking(interval, connector, flag, indent, process = None, pg_n
     # PAUSE mode
     if k == ord(' '):
         pause()
-        known = True
+        check_window_size()
+        refresh_window(PGTOP_BUFFER['procs'], PGTOP_BUFFER['extras'], PGTOP_BUFFER['flag'], PGTOP_BUFFER['indent'], PGTOP_BUFFER['io'], PGTOP_BUFFER['tps'])
     # interactive mode
     if (k == curses.KEY_DOWN or k == curses.KEY_UP) and len(disp_proc) > 0:
         interactive(disp_proc, flag, indent, connector)
@@ -880,14 +885,16 @@ def poll_locked_blocking(interval, connector, flag, indent, process = None, pg_n
         PGTOP_VERBOSE_MODE += 1
         if PGTOP_VERBOSE_MODE > 3:
             PGTOP_VERBOSE_MODE = 1
-        known = True
+        check_window_size()
+        refresh_window(PGTOP_BUFFER['procs'], PGTOP_BUFFER['extras'], PGTOP_BUFFER['flag'], PGTOP_BUFFER['indent'], PGTOP_BUFFER['io'], PGTOP_BUFFER['tps'])
     # turnoff/on colors
     if k == ord('C'):
         if PGTOP_COLOR is True:
             set_nocolor()
         else:
             set_color()
-        known = True
+        check_window_size()
+        refresh_window(PGTOP_BUFFER['procs'], PGTOP_BUFFER['extras'], PGTOP_BUFFER['flag'], PGTOP_BUFFER['indent'], PGTOP_BUFFER['io'], PGTOP_BUFFER['tps'])
     # sorts
     if k == ord('t') and PGTOP_SORT != 't':
         PGTOP_SORT = 't'
@@ -899,7 +906,8 @@ def poll_locked_blocking(interval, connector, flag, indent, process = None, pg_n
 
     if k == ord('h'):
         help_window()
-        known = True
+        check_window_size()
+        refresh_window(PGTOP_BUFFER['procs'], PGTOP_BUFFER['extras'], PGTOP_BUFFER['flag'], PGTOP_BUFFER['indent'], PGTOP_BUFFER['io'], PGTOP_BUFFER['tps'])
     
     # Refresh
     if k == ord('R'):
@@ -908,7 +916,6 @@ def poll_locked_blocking(interval, connector, flag, indent, process = None, pg_n
     if k == curses.KEY_RESIZE and PGTOP_BUFFER is not None and PGTOP_BUFFER.has_key('procs'):
         check_window_size()
         refresh_window(PGTOP_BUFFER['procs'], PGTOP_BUFFER['extras'], PGTOP_BUFFER['flag'], PGTOP_BUFFER['indent'], PGTOP_BUFFER['io'], PGTOP_BUFFER['tps'])
-
      
     curses.flushinp()
     t_end = time.time() 
