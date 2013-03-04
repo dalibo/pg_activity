@@ -51,34 +51,6 @@ from optparse import OptionParser, OptionGroup
 import optparse
 import socket
 
-"""
-Called at exit time.
-Rollback to default values.
-"""
-def at_exit_curses():
-    try:
-        win.keypad(0)
-        win.move(0,0)
-        win.erase()
-    except KeyboardInterrupt as e:
-        pass
-    curses.nocbreak()
-    curses.echo()
-    try:
-        curses.curs_set(1)
-    except Exception as e:
-        pass
-    curses.endwin()
-
-"""
-Function called on a kill.
-"""
-def signal_handler(signal, frame):
-    at_exit_curses()
-    print "FATAL: Killed."
-    sys.exit(0)
-
-
 # Curses initialization
 curses.setupterm()
 win = curses.initscr()
@@ -102,15 +74,6 @@ try:
 except Exception as e:
     # Terminal doesn't support curs_set() and colors
     PGTOP_SYS_COLOR = False
-
-"""
-Wrapper around curses.color_pair()
-"""
-def get_curses_color(color):
-    if PGTOP_SYS_COLOR:
-        return curses.color_pair(color)
-    else:
-        return 0
 
 lineno = 0
 curses.endwin()
@@ -141,6 +104,16 @@ PGTOP_FLAG_RELATION =   256
 PGTOP_FLAG_TYPE =       512
 PGTOP_FLAG_MODE =       1024
 PGTOP_FLAG_NONE =       None
+
+"""
+Wrapper around curses.color_pair()
+"""
+def get_curses_color(color):
+    if PGTOP_SYS_COLOR:
+        return curses.color_pair(color)
+    else:
+        return 0
+
 
 PGTOP_COLS = {
     'activities': {
@@ -219,6 +192,57 @@ PGTOP_START_LINE = 4
 PGTOP_BUFFER = None
 # refresh time
 PGTOP_REFRESH_TIME = 2
+
+"""
+Simple class used for process managing.
+"""
+class pgtop_proc:
+
+    def __init__(self,pid = None, database = None, client = None, cpu = None, mem = None, read = None, write = None, query = None, duration = None, wait = None, extras = None):
+        self.pid = pid
+        self.database = database
+        self.client = client
+        self.cpu = cpu
+        self.mem = mem
+        self.read = read
+        self.write = write 
+        self.query = query
+        self.duration = duration
+        self.wait = wait
+        self.extras = extras
+
+    def setExtra(self, key, value):
+        self.extras[key] = value
+    
+    def getExtra(self, key):
+        if self.extras is not None and self.extras.has_key(key):
+            return self.extras[key]
+"""
+Called at exit time.
+Rollback to default values.
+"""
+def at_exit_curses():
+    try:
+        win.keypad(0)
+        win.move(0,0)
+        win.erase()
+    except KeyboardInterrupt as e:
+        pass
+    curses.nocbreak()
+    curses.echo()
+    try:
+        curses.curs_set(1)
+    except Exception as e:
+        pass
+    curses.endwin()
+
+"""
+Function called on a kill.
+"""
+def signal_handler(signal, frame):
+    at_exit_curses()
+    print "FATAL: Killed."
+    sys.exit(0)
 
 """
 Replace colors by white.
@@ -450,22 +474,18 @@ def sys_get_proc(queries):
 
     for sq in queries:
         try:
-            p = psutil.Process(sq['pid'])
-            p._meminfo = p.get_memory_info()
-            p._io_counters = p.get_io_counters()
-            p._io_time = time.time()
-            p._mem_percent = p.get_memory_percent()
-            p._cpu_percent = p.get_cpu_percent(interval=0)
-            p._cpu_times = p.get_cpu_times()
-            p._pg_user = sq['user']
-            p._pg_database = sq['database']
-            p._pg_client = sq['client']
-            p._pg_duration = sq['duration']
-            p._pg_wait = sq['wait']
-            p._pg_query = clean_str(sq['query'])
-            p._io_read_delta = 0
-            p._io_write_delta = 0
-            process[sq['pid']] = p
+            proc = psutil.Process(sq['pid'])
+            p = pgtop_proc(pid = sq['pid'], database = sq['database'], client = sq['client'], duration = sq['duration'], wait = sq['wait'], query = clean_str(sq['query']), extras = {})
+            p.setExtra('meminfo', proc.get_memory_info())
+            p.setExtra('io_counters', proc.get_io_counters())
+            p.setExtra('io_time', time.time())
+            p.setExtra('mem_percent', proc.get_memory_percent())
+            p.setExtra('cpu_percent', proc.get_cpu_percent(interval=0))
+            p.setExtra('cpu_times', proc.get_cpu_times())
+            p.setExtra('read_delta', 0)
+            p.setExtra('write_delta', 0)
+            p.setExtra('psutil_proc', proc)
+            process[p.pid] = p
         except psutil.error.NoSuchProcess as e:
             pass
         except psutil.error.AccessDenied as e:
@@ -482,7 +502,6 @@ def check_window_size():
     if PGTOP_BUFFER and PGTOP_BUFFER.has_key('indent') and len(PGTOP_BUFFER['indent']) > (PGTOP_MAXX - 2):
         raise Exception("Window's too small, %s chars are required." % (len(PGTOP_BUFFER['indent']),))
 
-
 """
 Returns PAUSE message, depending of the line size
 """
@@ -498,8 +517,6 @@ def get_pause_msg():
 PAUSE mode
 """
 def pause():
-    global PGTOP_MAXY
-    global PGTOP_MAXX
     print_string(PGTOP_START_LINE, 0, get_pause_msg(), get_curses_color(C_RED_BLACK)|curses.A_REVERSE|curses.A_BOLD)
     current_pos = -1
     while 1:
@@ -539,14 +556,14 @@ def current_position():
 """
 Display interactive mode menu bar
 """
-def help_key_interactive(y):
-    colno = print_string((y - 1), 0, "<k>", get_curses_color(0))
-    colno += print_string((y - 1), colno, "Terminate the backend    ", get_curses_color(C_CYAN)|curses.A_REVERSE)
-    colno += print_string((y - 1), colno, "<Space>", get_curses_color(0))
-    colno += print_string((y - 1), colno, "Back to activity    ", get_curses_color(C_CYAN)|curses.A_REVERSE)
-    colno += print_string((y - 1), colno, "<q>", get_curses_color(0))
-    colno += print_string((y - 1), colno, "Quit    ", get_curses_color(C_CYAN)|curses.A_REVERSE)
-    colno += print_string((y - 1), colno, add_blank(" "), get_curses_color(C_CYAN)|curses.A_REVERSE)
+def help_key_interactive():
+    colno = print_string((PGTOP_MAXY - 1), 0, "<k>", get_curses_color(0))
+    colno += print_string((PGTOP_MAXY - 1), colno, "Terminate the backend    ", get_curses_color(C_CYAN)|curses.A_REVERSE)
+    colno += print_string((PGTOP_MAXY - 1), colno, "<Space>", get_curses_color(0))
+    colno += print_string((PGTOP_MAXY - 1), colno, "Back to activity    ", get_curses_color(C_CYAN)|curses.A_REVERSE)
+    colno += print_string((PGTOP_MAXY - 1), colno, "<q>", get_curses_color(0))
+    colno += print_string((PGTOP_MAXY - 1), colno, "Quit    ", get_curses_color(C_CYAN)|curses.A_REVERSE)
+    colno += print_string((PGTOP_MAXY - 1), colno, add_blank(" "), get_curses_color(C_CYAN)|curses.A_REVERSE)
 
 """
 Display change mode menu bar
@@ -569,9 +586,9 @@ def change_mode_interactive():
 """
 Ask for terminating a backend
 """
-def ask_terminate_backend(y, pid, connector):
-    colno = print_string((y - 1), 0, "Terminate backend with PID %s ? <Y/N>" % (str(pid),), get_curses_color(0))
-    colno += print_string((y - 1), colno, add_blank(" "), get_curses_color(C_CYAN)|curses.A_REVERSE)
+def ask_terminate_backend(pid, connector):
+    colno = print_string((PGTOP_MAXY - 1), 0, "Terminate backend with PID %s ? <Y/N>" % (str(pid),), get_curses_color(0))
+    colno += print_string((PGTOP_MAXY - 1), colno, add_blank(" "), get_curses_color(C_CYAN)|curses.A_REVERSE)
     while 1:
         try:
             k = win.getch()
@@ -606,7 +623,7 @@ def interactive(process, flag, indent, connector):
     # Refresh lines with this verbose mode    
     scroll_window(process, flag, indent, 0)
     
-    help_key_interactive(PGTOP_MAXY)
+    help_key_interactive()
 
     current_pos = 0
     offset = 0
@@ -623,7 +640,7 @@ def interactive(process, flag, indent, connector):
             exit()
         # terminate the backend attached to this PID
         if k == ord('k'):
-            res = ask_terminate_backend(PGTOP_MAXY, process[current_pos]['pid'], connector)
+            res = ask_terminate_backend(process[current_pos]['pid'], connector)
             PGTOP_VERBOSE_MODE = old_verbose_mode
             curses.flushinp()
             return 0
@@ -634,7 +651,7 @@ def interactive(process, flag, indent, connector):
                 if (lines[current_pos] - offset) < (PGTOP_START_LINE + 3):
                     offset -= 1
                     scroll_window(process, flag, indent, offset)
-                    help_key_interactive(PGTOP_MAXY)
+                    help_key_interactive()
 
                 if current_pos < len(process):
                     refresh_line(process[current_pos], flag, indent, 'default', lines[current_pos] - offset)
@@ -667,7 +684,7 @@ def poll(interval, connector, flag, indent, process = None, pg_num_version = Non
         return poll_activities(interval, connector, flag, indent, process, pg_num_version, disp_proc)
     elif PGTOP_MODE == 'waiting' or PGTOP_MODE == 'blocking':
         return poll_waiting_blocking(interval, connector, flag, indent, process, pg_num_version, disp_proc)
-    
+ 
 """
 Poll activities.
 """
@@ -681,6 +698,7 @@ def poll_activities(interval, connector, flag, indent, process = None, pg_num_ve
     win.timeout(int(1000 * PGTOP_REFRESH_TIME * interval))
     t_start = time.time()
     known = False
+    do_refresh = False
     try:
         k = win.getch()
     except KeyboardInterrupt as e:
@@ -691,16 +709,17 @@ def poll_activities(interval, connector, flag, indent, process = None, pg_num_ve
     # PAUSE mode
     if k == ord(' '):
         pause()
-        check_window_size()
-        refresh_window(PGTOP_BUFFER['procs'], PGTOP_BUFFER['extras'], PGTOP_BUFFER['flag'], PGTOP_BUFFER['indent'], PGTOP_BUFFER['io'], PGTOP_BUFFER['tps'])
+        do_refresh = True
     # interactive mode
     if (k == curses.KEY_DOWN or k == curses.KEY_UP) and len(disp_proc) > 0:
         interactive(disp_proc, flag, indent, connector)
         known = True
+    # show waiting queries
     if (k == curses.KEY_F2 or k == ord('2')):
         PGTOP_MODE = 'waiting'
         curses.flushinp()
         return poll_waiting_blocking(0, connector, flag, indent, None, pg_num_version, None)
+    # show blocking queries
     if (k == curses.KEY_F3 or k == ord('3')):
         PGTOP_MODE = 'blocking'
         curses.flushinp()
@@ -710,16 +729,14 @@ def poll_activities(interval, connector, flag, indent, process = None, pg_num_ve
         PGTOP_VERBOSE_MODE += 1
         if PGTOP_VERBOSE_MODE > 3:
             PGTOP_VERBOSE_MODE = 1
-        check_window_size()
-        refresh_window(PGTOP_BUFFER['procs'], PGTOP_BUFFER['extras'], PGTOP_BUFFER['flag'], PGTOP_BUFFER['indent'], PGTOP_BUFFER['io'], PGTOP_BUFFER['tps'])
-    # turnoff/on colors
+        do_refresh = True
+    # turn off/on colors
     if k == ord('C'):
         if PGTOP_COLOR is True:
             set_nocolor()
         else:
             set_color()
-        check_window_size()
-        refresh_window(PGTOP_BUFFER['procs'], PGTOP_BUFFER['extras'], PGTOP_BUFFER['flag'], PGTOP_BUFFER['indent'], PGTOP_BUFFER['io'], PGTOP_BUFFER['tps'])
+        do_refresh = True
     # sorts
     if k == ord('c') and (flag & PGTOP_FLAG_CPU) and PGTOP_SORT != 'c':
         PGTOP_SORT = 'c'
@@ -738,20 +755,24 @@ def poll_activities(interval, connector, flag, indent, process = None, pg_num_ve
         known = True
     if k == ord('+') and PGTOP_REFRESH_TIME < 3:
         PGTOP_REFRESH_TIME += 1
-        known = True
+        do_refresh = True
     if k == ord('-') and PGTOP_REFRESH_TIME > 1:
         PGTOP_REFRESH_TIME -= 1
-        known = True
+        do_refresh = True
+    
+        
     # Refresh
     if k == ord('R'):
         known = True
      
     if k == ord('h'):
         help_window()
-        check_window_size()
-        refresh_window(PGTOP_BUFFER['procs'], PGTOP_BUFFER['extras'], PGTOP_BUFFER['flag'], PGTOP_BUFFER['indent'], PGTOP_BUFFER['io'], PGTOP_BUFFER['tps'])
+        do_refresh = True
 
     if k == curses.KEY_RESIZE and PGTOP_BUFFER is not None and PGTOP_BUFFER.has_key('procs'):
+        do_refresh = True
+    
+    if do_refresh is True and PGTOP_BUFFER is not None and PGTOP_BUFFER.has_key('procs'):
         check_window_size()
         refresh_window(PGTOP_BUFFER['procs'], PGTOP_BUFFER['extras'], PGTOP_BUFFER['flag'], PGTOP_BUFFER['indent'], PGTOP_BUFFER['io'], PGTOP_BUFFER['tps'])
 
@@ -770,27 +791,26 @@ def poll_activities(interval, connector, flag, indent, process = None, pg_num_ve
         for pid,p in new_procs.items():
             try:
                 if process.has_key(pid):
-                    n_pg_duration = p._pg_duration
-                    n_pg_query = p._pg_query
-                    n_pg_client = p._pg_client
-                    n_io_counters = p.get_io_counters()
+                    n_pg_duration = p.duration
+                    n_pg_query = p.query
+                    n_pg_client = p.client
+                    n_io_counters = p.getExtra('io_counters')
                     n_io_time = time.time()
                     p = process[pid]
-                    p._pg_duration = n_pg_duration
-                    p._pg_query = n_pg_query
-                    p._pg_client = n_pg_client
-                    p._io_read_delta = (n_io_counters.read_bytes - p._io_counters.read_bytes)/(n_io_time - p._io_time)
-                    p._io_write_delta = (n_io_counters.write_bytes - p._io_counters.write_bytes)/(n_io_time - p._io_time)
-                    p._io_counters = n_io_counters
-                    p._io_time = n_io_time
+                    p.duration = n_pg_duration
+                    p.query = n_pg_query
+                    p.client = n_pg_client
+                    p.setExtra('read_delta', (n_io_counters.read_bytes - p.getExtra('io_counters').read_bytes)/(n_io_time - p.getExtra('io_time')))
+                    p.setExtra('write_delta', (n_io_counters.write_bytes - p.getExtra('io_counters').write_bytes)/(n_io_time - p.getExtra('io_time')))
+                    p.setExtra('io_counters', n_io_counters)
+                    p.setExtra('io_time', n_io_time)
                 else:
-                    p._io_counters = p.get_io_counters()
+                    p.setExtra('io_counters', p.getExtra('io_counters'))
             
-                p._mempercent = p.get_memory_percent()
-                p._cpu_percent = p.get_cpu_percent(interval=0)
-                p._name = p.name
+                p.setExtra('mem_percent', p.getExtra('psutil_proc').get_memory_percent())
+                p.setExtra('cpu_percent', p.getExtra('psutil_proc').get_cpu_percent(interval=0))
                 new_procs[pid] = p
-                procs.append({'pid':pid, 'database':p._pg_database, 'client': p._pg_client, 'cpu': p._cpu_percent, 'mem': p._mempercent, 'read': p._io_read_delta, 'write': p._io_write_delta, 'query': p._pg_query, 'duration': p._pg_duration, 'wait': p._pg_wait})
+                procs.append({'pid':pid, 'database':p.database, 'client': p.client, 'cpu': p.getExtra('cpu_percent'), 'mem': p.getExtra('mem_percent'), 'read': p.getExtra('read_delta'), 'write': p.getExtra('write_delta'), 'query': p.query, 'duration': p.duration, 'wait': p.wait})
 
             except psutil.NoSuchProcess:
                 pass
@@ -803,7 +823,6 @@ def poll_activities(interval, connector, flag, indent, process = None, pg_num_ve
         new_procs = None
         for q in queries:
             procs.append({'pid':q['pid'], 'database': q['database'], 'client': q['client'], 'query': q['query'], 'duration': q['duration'], 'wait': q['wait']})
-
 
     # return processes sorted by query duration
     if PGTOP_SORT == 't':
@@ -836,6 +855,7 @@ def poll_waiting_blocking(interval, connector, flag, indent, process = None, pg_
     global PGTOP_MODE
 
     t_start = time.time()
+    do_refresh = False
     known = False
     # Keyboard interactions
     win.timeout(int(1000 * PGTOP_REFRESH_TIME * interval))
@@ -850,8 +870,7 @@ def poll_waiting_blocking(interval, connector, flag, indent, process = None, pg_
     # PAUSE mode
     if k == ord(' '):
         pause()
-        check_window_size()
-        refresh_window(PGTOP_BUFFER['procs'], PGTOP_BUFFER['extras'], PGTOP_BUFFER['flag'], PGTOP_BUFFER['indent'], PGTOP_BUFFER['io'], PGTOP_BUFFER['tps'])
+        do_refresh = True
     # interactive mode
     if (k == curses.KEY_DOWN or k == curses.KEY_UP) and len(disp_proc) > 0:
         interactive(disp_proc, flag, indent, connector)
@@ -878,16 +897,14 @@ def poll_waiting_blocking(interval, connector, flag, indent, process = None, pg_
         PGTOP_VERBOSE_MODE += 1
         if PGTOP_VERBOSE_MODE > 3:
             PGTOP_VERBOSE_MODE = 1
-        check_window_size()
-        refresh_window(PGTOP_BUFFER['procs'], PGTOP_BUFFER['extras'], PGTOP_BUFFER['flag'], PGTOP_BUFFER['indent'], PGTOP_BUFFER['io'], PGTOP_BUFFER['tps'])
+        do_refresh = True
     # turnoff/on colors
     if k == ord('C'):
         if PGTOP_COLOR is True:
             set_nocolor()
         else:
             set_color()
-        check_window_size()
-        refresh_window(PGTOP_BUFFER['procs'], PGTOP_BUFFER['extras'], PGTOP_BUFFER['flag'], PGTOP_BUFFER['indent'], PGTOP_BUFFER['io'], PGTOP_BUFFER['tps'])
+        do_refresh = True
     # sorts
     if k == ord('t') and PGTOP_SORT != 't':
         PGTOP_SORT = 't'
@@ -899,14 +916,16 @@ def poll_waiting_blocking(interval, connector, flag, indent, process = None, pg_
 
     if k == ord('h'):
         help_window()
-        check_window_size()
-        refresh_window(PGTOP_BUFFER['procs'], PGTOP_BUFFER['extras'], PGTOP_BUFFER['flag'], PGTOP_BUFFER['indent'], PGTOP_BUFFER['io'], PGTOP_BUFFER['tps'])
+        do_refresh = True
     
     # Refresh
     if k == ord('R'):
         known = True
     
     if k == curses.KEY_RESIZE and PGTOP_BUFFER is not None and PGTOP_BUFFER.has_key('procs'):
+        do_refresh = True
+    
+    if do_refresh is True and PGTOP_BUFFER is not None and PGTOP_BUFFER.has_key('procs'):
         check_window_size()
         refresh_window(PGTOP_BUFFER['procs'], PGTOP_BUFFER['extras'], PGTOP_BUFFER['flag'], PGTOP_BUFFER['indent'], PGTOP_BUFFER['io'], PGTOP_BUFFER['tps'])
      
@@ -996,15 +1015,15 @@ def print_cols_header(flag):
         if val is not 0:
             disp = val['template_h'] % val['name']
             if (
-                (val['name'] == 'CPU%' and PGTOP_SORT == 'c') or
-                (val['name'] == 'MEM%' and PGTOP_SORT == 'm') or
-                (val['name'] == 'READ/s' and PGTOP_SORT == 'r') or
-                (val['name'] == 'WRITE/s' and PGTOP_SORT == 'w') or
-                (val['name'] == 'TIME+' and PGTOP_SORT == 't')):
+                (val['name'] == "CPU%" and PGTOP_SORT == 'c') or
+                (val['name'] == "MEM%" and PGTOP_SORT == 'm') or
+                (val['name'] == "READ/s" and PGTOP_SORT == 'r') or
+                (val['name'] == "WRITE/s" and PGTOP_SORT == 'w') or
+                (val['name'] == "TIME+" and PGTOP_SORT == 't')):
                 color_highlight = get_curses_color(C_CYAN)
             else:
                 color_highlight = get_curses_color(C_GREEN)
-            if val['name'] == 'Query':
+            if val['name'] == "Query":
                 disp += " " * (PGTOP_MAXX - (len(line) + len(disp)))
             line += disp
             print_string(lineno, x, disp, color_highlight|curses.A_REVERSE)
@@ -1274,7 +1293,7 @@ def main():
     global PGTOP_BUFFER
 
     try:
-        parser = OptionParser(add_help_option=False, version="%prog "+PGTOP_VERSION, description="htop like application for local PostgreSQL server activity monitoring.")
+        parser = OptionParser(add_help_option=False, version="%prog "+PGTOP_VERSION, description="htop like application for PostgreSQL server activity monitoring.")
         parser.add_option('-U', '--username', dest='username', default='postgres', help="Database user name (default: \"postgres\").", metavar='USERNAME')
         parser.add_option('-p', '--port', dest='port', default='5432', help="Database server port (default: \"5432\").", metavar='PORT')
         parser.add_option('-h', '--host', dest='host', help="Database server host or socket directory (default: \"local socket\").", metavar='HOSTNAME', default='localhost')
@@ -1290,6 +1309,7 @@ def main():
         group.add_option('--no-wait', dest='nowait', action='store_true', help="Disable W.", default='false')
         parser.add_option_group(group)
         parser.add_option('--help', dest='help', action='store_true', help="Show this help message and exit.", default='false')
+        parser.add_option('--debug', dest='debug', action='store_true', help="Enable debug mode for traceback tracking.", default='false')
     
         (options, args) = parser.parse_args()
         if options.help is True:
@@ -1306,6 +1326,7 @@ def main():
                     password = pgpass_password
             except Exception as e:
                 pass
+        debug = options.debug
         try:
             conn = pg_connect(host = options.host, port = options.port, user = options.username, password = password)
         except psycopg2.Error as e:
@@ -1415,9 +1436,10 @@ def main():
         sys.exit("FATAL: Acces denied for user %s, can't acces system informations for process %s" % (getpass.getuser(), str(e),))
     except curses.error as e:
         at_exit_curses()
-        import traceback
-        exc_type, exc_value, exc_traceback = sys.exc_info()
-        traceback.print_exception(exc_type, exc_value, exc_traceback, file=sys.stdout)
+        if debug is True:
+            import traceback
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            traceback.print_exception(exc_type, exc_value, exc_traceback, file=sys.stdout)
         sys.exit("FATAL: %s" % (str(e),))
     except KeyboardInterrupt as e:
         at_exit_curses()
@@ -1425,9 +1447,10 @@ def main():
     except Exception as e:
         at_exit_curses()
         # DEBUG
-        import traceback
-        exc_type, exc_value, exc_traceback = sys.exc_info()
-        traceback.print_exception(exc_type, exc_value, exc_traceback, file=sys.stdout)
+        if debug is True:
+            import traceback
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            traceback.print_exception(exc_type, exc_value, exc_traceback, file=sys.stdout)
         sys.exit("FATAL: %s" % (str(e),))
 
 """

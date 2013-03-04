@@ -1,7 +1,7 @@
 pg_activity
 ===========
 
-	htop like application for local PostgreSQL server activity monitoring.
+	htop like application for PostgreSQL server activity monitoring.
 
 Dependencies
 ------------
@@ -9,8 +9,12 @@ Dependencies
 	Python >= 2.6
 	psycopg2 >= 2.2.1
 	psutil >= 0.5.1
-	# for installation from sources :
 	setuptools >= 0.6.14
+
+Installation
+------------
+
+    sudo python setup.py install
 
 Usage
 -----
@@ -25,6 +29,7 @@ Usage
                         	  "local socket").
 		-C, --no-color        Disable color usage.
 		--help                Show this help message and exit.
+		--debug               Enable debug mode for traceback tracking.
 
 	Display options, you can exclude some columns by using them :
 		--no-database         Disable DATABASE.
@@ -52,7 +57,7 @@ Interactives commands
 	+			Increase refresh time. Maximum value : 3s
 	-			Decrease refesh time. Minimum Value : 1s
 	F1/1		Running queries monitoring
-	F2/2		Locked queries monitoring
+	F2/2		Waiting queries monitoring
 	F3/3		Blocking queries monitoring
 	h			Help page
     R           Refresh

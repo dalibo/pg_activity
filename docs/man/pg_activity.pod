@@ -116,7 +116,7 @@ pg_activity is a htop like application for PostgreSQL server activity monitoring
 
 =item B<F1/1>  Running queries monitoring.
 
-=item B<F2/2>  Locked queries monitoring.
+=item B<F2/2>  Waiting queries monitoring.
 
 =item B<F3/3>  Blocking queries monitoring.
 
