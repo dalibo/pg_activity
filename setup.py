@@ -1,4 +1,8 @@
+import sys
 from setuptools import setup
+
+if sys.version_info < (2, 6):
+    raise SystemExit('ERROR: pg_activity need at least python 2.6 to work.')
 
 setup(
     name = 'pg_activity',
