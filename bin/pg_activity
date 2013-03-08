@@ -629,11 +629,16 @@ def interactive(process, flag, indent, connector):
     offset = 0
     refresh_line(process[current_pos], flag, indent, 'cursor', lines[current_pos] - offset)
     t_active = time.time()
+    win.timeout(int(1000))
+    nb_nk = 0
+
     while 1:
         try:
             k = win.getch()
         except KeyboardInterrupt as e:
             raise e
+        if k == -1:
+            nb_nk += 1        
         # quit
         if k == ord('q'):
             curses.endwin()
@@ -646,7 +651,8 @@ def interactive(process, flag, indent, connector):
             return 0
         # Move cursor
         if k == curses.KEY_DOWN or k == curses.KEY_UP:
-            t_active = time.time()
+            nb_nk = 0        
+            # t_active = time.time()
             if k == curses.KEY_UP and current_pos > 0:
                 if (lines[current_pos] - offset) < (PGTOP_START_LINE + 3):
                     offset -= 1
@@ -666,13 +672,15 @@ def interactive(process, flag, indent, connector):
                     refresh_line(process[current_pos], flag, indent, 'default', lines[current_pos] - offset)
                 current_pos += 1
             refresh_line(process[current_pos], flag, indent, 'cursor', lines[current_pos] - offset)
+            curses.flushinp()
+            continue
         # quit interactive mode
         if k == ord(' ') or k == curses.KEY_RESIZE:
             PGTOP_VERBOSE_MODE = old_verbose_mode
             curses.flushinp()
             return 0
         curses.flushinp()
-        if time.time() - t_active > 3:
+        if nb_nk > 3:
             PGTOP_VERBOSE_MODE = old_verbose_mode
             return 0
 
@@ -1326,12 +1334,15 @@ def main():
                     password = pgpass_password
             except Exception as e:
                 pass
+        
         debug = options.debug
+        
         try:
             conn = pg_connect(host = options.host, port = options.port, user = options.username, password = password)
         except psycopg2.Error as e:
             at_exit_curses()
             sys.exit("FATAL: %s" % (clean_str(str(e),)))
+        
         pg_version = pg_get_version(conn)
         (pg_short_version, pg_num_version) = pg_get_num_version(pg_version)
         
