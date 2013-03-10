@@ -174,7 +174,7 @@ PGTOP_WRAP_NOINDENT = 2
 PGTOP_WRAP = 3
 # default
 PGTOP_VERBOSE_MODE = 2
-# max IOPs
+# max IOPS
 PGTOP_MAX_IOPS = 0
 # sort
 PGTOP_SORT = 't'
@@ -185,7 +185,7 @@ PGTOP_MODE = 'activities'
 # Does pg_activity is connected to a local PG server ?
 PGTOP_IS_LOCAL = True
 # Start line
-PGTOP_START_LINE = 4
+PGTOP_START_LINE = 5
 # Window's size
 (PGTOP_MAXY, PGTOP_MAXX) = win.getmaxyx()
 # init buffer
@@ -364,8 +364,11 @@ def pg_get_version(conn):
 """
 Terminate a backend
 """
-def pg_terminate_backend(conn, pid):
-    query = "SELECT pg_terminate_backend(%s) AS terminated"
+def pg_terminate_backend(conn, pid, pg_num_version):
+    if pg_num_version >= 80400:
+        query = "SELECT pg_terminate_backend(%s) AS terminated"
+    else:
+        query = "SELECT pg_cancel_backend(%s) AS terminated"
     cur = conn.cursor()
     res = cur.execute(query, (pid,))
     ret = cur.fetchone()
@@ -389,14 +392,14 @@ def pg_get_num_version(text_version):
     return None
 
 """
-Get current transaction ID and timestamp.
+Get current sum of transactions, total size and  timestamp.
 """
-def pg_get_txid_current(conn,):
-    query = "SELECT EXTRACT(EPOCH FROM NOW()) AS timestamp, txid_current() AS txid"
+def pg_get_current_xact_size(conn,):
+    query = "SELECT EXTRACT(EPOCH FROM NOW()) AS timestamp, SUM(pg_stat_get_db_xact_commit(oid)+pg_stat_get_db_xact_rollback(oid))::BIGINT AS no_xact, SUM(pg_database_size(datname)) AS total_size FROM pg_database"
     cur = conn.cursor()
     res = cur.execute(query,)
     ret = cur.fetchone()
-    return (ret['timestamp'], ret['txid'])
+    return (ret['timestamp'], ret['no_xact'], ret['total_size'])
 
 """
 Get activity from pg_stat_activity view.
@@ -493,14 +496,13 @@ def sys_get_proc(queries):
     return process
 
 """
-Verifiy if the window's size is enough
+Update window's size
 """
 def check_window_size():
     global PGTOP_MAXY
     global PGTOP_MAXX
     (PGTOP_MAXY, PGTOP_MAXX) = win.getmaxyx()
-    if PGTOP_BUFFER and PGTOP_BUFFER.has_key('indent') and len(PGTOP_BUFFER['indent']) > (PGTOP_MAXX - 2):
-        raise Exception("Window's too small, %s chars are required." % (len(PGTOP_BUFFER['indent']),))
+    return
 
 """
 Returns PAUSE message, depending of the line size
@@ -533,7 +535,7 @@ def pause():
         
         if k == curses.KEY_RESIZE and PGTOP_BUFFER is not None and PGTOP_BUFFER.has_key('procs'):
             check_window_size()
-            refresh_window(PGTOP_BUFFER['procs'], PGTOP_BUFFER['extras'], PGTOP_BUFFER['flag'], PGTOP_BUFFER['indent'], PGTOP_BUFFER['io'], PGTOP_BUFFER['tps'])
+            refresh_window(PGTOP_BUFFER['procs'], PGTOP_BUFFER['extras'], PGTOP_BUFFER['flag'], PGTOP_BUFFER['indent'], PGTOP_BUFFER['io'], PGTOP_BUFFER['tps'], PGTOP_BUFFER['size_ev'], PGTOP_BUFFER['total_size'])
             print_string(PGTOP_START_LINE, 0, get_pause_msg(), get_curses_color(C_RED_BLACK)|curses.A_REVERSE|curses.A_BOLD)
         curses.flushinp()
 
@@ -586,7 +588,7 @@ def change_mode_interactive():
 """
 Ask for terminating a backend
 """
-def ask_terminate_backend(pid, connector):
+def ask_terminate_backend(pid, connector, pg_num_version):
     colno = print_string((PGTOP_MAXY - 1), 0, "Terminate backend with PID %s ? <Y/N>" % (str(pid),), get_curses_color(0))
     colno += print_string((PGTOP_MAXY - 1), colno, add_blank(" "), get_curses_color(C_CYAN)|curses.A_REVERSE)
     while 1:
@@ -600,7 +602,7 @@ def ask_terminate_backend(pid, connector):
             exit()
         # yes
         if k == ord('y') or k == ord('Y'):
-            res = pg_terminate_backend(connector, str(pid))
+            res = pg_terminate_backend(connector, str(pid), pg_num_version)
             return 1
         # no
         if k == ord('n') or k == ord('N') or k == ord(' '):
@@ -613,7 +615,7 @@ def ask_terminate_backend(pid, connector):
 Interactive mode trigged on KEY_UP or KEY_DOWN key press
 If no key hit during 3 seconds, exit this mode
 """
-def interactive(process, flag, indent, connector):
+def interactive(process, flag, indent, connector, pg_num_version):
     global lines
     global PGTOP_VERBOSE_MODE
     # Force truncated display
@@ -645,7 +647,7 @@ def interactive(process, flag, indent, connector):
             exit()
         # terminate the backend attached to this PID
         if k == ord('k'):
-            res = ask_terminate_backend(process[current_pos]['pid'], connector)
+            res = ask_terminate_backend(process[current_pos]['pid'], connector, pg_num_version)
             PGTOP_VERBOSE_MODE = old_verbose_mode
             curses.flushinp()
             return 0
@@ -720,7 +722,7 @@ def poll_activities(interval, connector, flag, indent, process = None, pg_num_ve
         do_refresh = True
     # interactive mode
     if (k == curses.KEY_DOWN or k == curses.KEY_UP) and len(disp_proc) > 0:
-        interactive(disp_proc, flag, indent, connector)
+        interactive(disp_proc, flag, indent, connector, pg_num_version)
         known = True
     # show waiting queries
     if (k == curses.KEY_F2 or k == ord('2')):
@@ -782,7 +784,7 @@ def poll_activities(interval, connector, flag, indent, process = None, pg_num_ve
     
     if do_refresh is True and PGTOP_BUFFER is not None and PGTOP_BUFFER.has_key('procs'):
         check_window_size()
-        refresh_window(PGTOP_BUFFER['procs'], PGTOP_BUFFER['extras'], PGTOP_BUFFER['flag'], PGTOP_BUFFER['indent'], PGTOP_BUFFER['io'], PGTOP_BUFFER['tps'])
+        refresh_window(PGTOP_BUFFER['procs'], PGTOP_BUFFER['extras'], PGTOP_BUFFER['flag'], PGTOP_BUFFER['indent'], PGTOP_BUFFER['io'], PGTOP_BUFFER['tps'], PGTOP_BUFFER['size_ev'], PGTOP_BUFFER['total_size'])
 
     curses.flushinp()
     t_end = time.time() 
@@ -881,7 +883,7 @@ def poll_waiting_blocking(interval, connector, flag, indent, process = None, pg_
         do_refresh = True
     # interactive mode
     if (k == curses.KEY_DOWN or k == curses.KEY_UP) and len(disp_proc) > 0:
-        interactive(disp_proc, flag, indent, connector)
+        interactive(disp_proc, flag, indent, connector, pg_num_version)
         known = True
     # activities mode
     if (k == curses.KEY_F1 or k == ord('1')):
@@ -935,7 +937,7 @@ def poll_waiting_blocking(interval, connector, flag, indent, process = None, pg_
     
     if do_refresh is True and PGTOP_BUFFER is not None and PGTOP_BUFFER.has_key('procs'):
         check_window_size()
-        refresh_window(PGTOP_BUFFER['procs'], PGTOP_BUFFER['extras'], PGTOP_BUFFER['flag'], PGTOP_BUFFER['indent'], PGTOP_BUFFER['io'], PGTOP_BUFFER['tps'])
+        refresh_window(PGTOP_BUFFER['procs'], PGTOP_BUFFER['extras'], PGTOP_BUFFER['flag'], PGTOP_BUFFER['indent'], PGTOP_BUFFER['io'], PGTOP_BUFFER['tps'], PGTOP_BUFFER['size_ev'], PGTOP_BUFFER['total_size'])
      
     curses.flushinp()
     t_end = time.time() 
@@ -984,13 +986,17 @@ Convert a size into a human readable format.
 def bytes2human(n):
     symbols = ('K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y')
     prefix = {}
+    ne = ''
+    if n < 0:
+        n = n * -1
+        ne = '-'
     for i, s in enumerate(symbols):
         prefix[s] = 1 << (i+1)*10
     for s in reversed(symbols):
         if n >= prefix[s]:
             value = "%.2f" % float(float(n) / float(prefix[s]))
-            return "%s%s" % (value, s)
-    return "%.2fB" % n
+            return "%s%s%s" % (ne, value, s)
+    return "%s%.2fB" % (ne, n)
 
 """
 Returns identation for Query column.
@@ -1041,7 +1047,7 @@ def print_cols_header(flag):
 """
 Print window header
 """
-def print_header(pg_version, hostname, user, host, port, io, tps):
+def print_header(pg_version, hostname, user, host, port, io, tps, size_ev, total_size):
     global lineno
     global PGTOP_MAX_IOPS 
     lineno = 0
@@ -1056,10 +1062,15 @@ def print_header(pg_version, hostname, user, host, port, io, tps):
     colno += print_string(lineno, colno, host, get_curses_color(C_CYAN))
     colno += print_string(lineno, colno, ":")
     colno += print_string(lineno, colno, port, get_curses_color(C_CYAN))
+    colno += print_string(lineno, colno, " - Ref.: %ss" % (PGTOP_REFRESH_TIME,))
+    colno = 0
+    lineno += 1   
+    colno += print_string(lineno, colno, "  Size: ")
+    colno += print_string(lineno, colno, "%7s" % (bytes2human(total_size),),)
+    colno += print_string(lineno, colno, " - %9s/s" % (bytes2human(size_ev),),)
     colno += print_string(lineno, colno, " - TPS: ")
-    colno += print_string(lineno, colno, "%6s" % (tps,), get_curses_color(C_CYAN))
-    colno += print_string(lineno, colno, " - ref.: %ss" % (PGTOP_REFRESH_TIME,))
-    
+    colno += print_string(lineno, colno, "%6s" % (tps,), get_curses_color(C_GREEN)|curses.A_BOLD)
+ 
     # If not local connection, don't get and display system informations
     if not PGTOP_IS_LOCAL:
         return
@@ -1079,20 +1090,22 @@ def print_header(pg_version, hostname, user, host, port, io, tps):
 
     used = phymem.total - (phymem.free + buffers + cached)
     lineno += 1
-    line = "  Mem.: %5s%% %9s/%s " % (phymem.percent, str(int(used / 1024 / 1024)) + "M", str(int(phymem.total / 1024 / 1024)) + "M")
+    # line = "  Mem.: %5s0%% - %9s/%s" % (phymem.percent, str(int(used / 1024 / 1024)) + "M", str(int(phymem.total / 1024 / 1024)) + "M")
+    line = "  Mem.: %5s0%% - %9s/%s" % (phymem.percent, bytes2human(used), bytes2human(phymem.total))
     colno_io = print_string(lineno, 0, line)
     
     if (int(io['read_count'])+int(io['write_count'])) > PGTOP_MAX_IOPS:
         PGTOP_MAX_IOPS = (int(io['read_count'])+int(io['write_count']))
     
-    line_io = " | IO Disks Max : %s IOPs" % (PGTOP_MAX_IOPS,)
+    line_io = " | IO Disks Max: %s IOPS" % (PGTOP_MAX_IOPS,)
     colno = print_string(lineno, colno_io, line_io)
 
     # swap usage
-    line = "  Swap: %5s%% %9s/%s\n" % (vmem.percent, str(int(vmem.used / 1024 / 1024)) + "M", str(int(vmem.total / 1024 / 1024)) + "M")
+    # line = "  Swap: %5s0%% - %9s/%s" % (vmem.percent, str(int(vmem.used / 1024 / 1024)) + "M", str(int(vmem.total / 1024 / 1024)) + "M")
+    line = "  Swap: %5s0%% - %9s/%s" % (vmem.percent, bytes2human(vmem.used), bytes2human(vmem.total))
     lineno += 1
     colno = print_string(lineno, 0, line)
-    line_io = " | Read : %8s/s - %6s IOPs" % (bytes2human(io['read_bytes']), int(io['read_count']),)
+    line_io = " | Read : %8s/s - %6s IOPS" % (bytes2human(io['read_bytes']), int(io['read_count']),)
     colno = print_string(lineno, colno_io, line_io)
 
     # load average, uptime
@@ -1100,7 +1113,7 @@ def print_header(pg_version, hostname, user, host, port, io, tps):
     line = "  Load:   %.2f %.2f %.2f" % (av1, av2, av3)
     lineno += 1
     colno = print_string(lineno, 0, line)
-    line_io = " | Write: %8s/s - %6s IOPs" % (bytes2human(io['write_bytes']), int(io['write_count']),)
+    line_io = " | Write: %8s/s - %6s IOPS" % (bytes2human(io['write_bytes']), int(io['write_count']),)
     colno = print_string(lineno, colno_io, line_io)
 
 """
@@ -1163,14 +1176,14 @@ def display_help_key(lineno, colno, key, help):
 """
 Refresh the window
 """
-def refresh_window(procs, extras, flag, indent, io, tps):
+def refresh_window(procs, extras, flag, indent, io, tps, size_ev, total_size):
     global lineno
     global lines
 
     lines = []
     (pg_version, hostname, user, host, port) = extras
     win.erase()
-    print_header(pg_version, hostname, user, host, port, io, tps)
+    print_header(pg_version, hostname, user, host, port, io, tps, size_ev, total_size)
     lineno += 2
     line_trunc = lineno
     current_position()
@@ -1269,7 +1282,7 @@ def refresh_line(p, flag, indent, typecolor = 'default', line = None):
         query = p['query']
         query_wrote = ''
         offset = 0
-        if len(query) > dif:
+        if len(query) > dif and dif > 1:
             query_part = query[offset:dif]
             print_string(l_lineno, colno, " %s" % (add_blank(query_part,len(indent)+1),), PGTOP_LINE_COLORS['query'][typecolor])
             query_wrote += query_part
@@ -1345,18 +1358,17 @@ def main():
         
         pg_version = pg_get_version(conn)
         (pg_short_version, pg_num_version) = pg_get_num_version(pg_version)
-        
         hostname = socket.gethostname()
         
         # does pg_activity runing against local PG instance
         if not pg_is_local(conn):
             PGTOP_IS_LOCAL = False
-            PGTOP_START_LINE = 1
+            PGTOP_START_LINE = 2
             hostname = options.host
         # if not connected to a local pg server, then go to degraded mode
         elif not pg_is_local_access():
             PGTOP_IS_LOCAL = False
-            PGTOP_START_LINE = 1
+            PGTOP_START_LINE = 2
             hostname = options.host
 
         # top part
@@ -1408,7 +1420,7 @@ def main():
         disks_io = None
         disp_procs = None
         # init num. of TX
-        (tps_time, tps_nb_tx) = pg_get_txid_current(conn)
+        (tps_time, tps_nb_tx, tps_total_size) = pg_get_current_xact_size(conn)
         
         while 1:
             check_window_size()
@@ -1433,12 +1445,14 @@ def main():
     
             procs = new_procs
             # refresh the winodw
-            (n_tps_time, n_tps_nb_tx) = pg_get_txid_current(conn)
+            (n_tps_time, n_tps_nb_tx, n_tps_total_size) = pg_get_current_xact_size(conn)
             tps = int((n_tps_nb_tx - tps_nb_tx) / (n_tps_time - tps_time))
+            size_ev = float(float(n_tps_total_size - tps_total_size) / (n_tps_time - tps_time))
             tps_time = n_tps_time
             tps_nb_tx = n_tps_nb_tx
-            PGTOP_BUFFER = {'procs': disp_procs, 'extras': (pg_short_version, hostname, options.username, options.host, options.port), 'flag': flag, 'indent': indent, 'io': delta_disks_io, 'tps': tps}
-            refresh_window(disp_procs, (pg_short_version, hostname, options.username, options.host, options.port), flag, indent, delta_disks_io, tps)
+            tps_total_size = n_tps_total_size
+            PGTOP_BUFFER = {'procs': disp_procs, 'extras': (pg_short_version, hostname, options.username, options.host, options.port), 'flag': flag, 'indent': indent, 'io': delta_disks_io, 'tps': tps, 'size_ev': size_ev, 'total_size': tps_total_size}
+            refresh_window(disp_procs, (pg_short_version, hostname, options.username, options.host, options.port), flag, indent, delta_disks_io, tps, size_ev, tps_total_size)
             interval = 1
 
     except psutil.AccessDenied as e:
