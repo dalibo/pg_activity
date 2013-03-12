@@ -339,7 +339,7 @@ system informations for a postgres process.
 """
 def pg_is_local_access():
     for p in psutil.process_iter():
-        if p.name == 'postgres':
+        if p.name == 'postgres' or p.name == 'postmaster':
             try:
                 proc = psutil.Process(p.pid)
                 proc.get_io_counters()
