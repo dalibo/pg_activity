@@ -1,7 +1,7 @@
 pg_activity
 ===========
 
-	htop like application for PostgreSQL server activity monitoring.
+	top like application for PostgreSQL server activity monitoring.
 
 Dependencies
 ------------
