@@ -654,7 +654,6 @@ def interactive(process, flag, indent, connector, pg_num_version):
         # Move cursor
         if k == curses.KEY_DOWN or k == curses.KEY_UP:
             nb_nk = 0        
-            # t_active = time.time()
             if k == curses.KEY_UP and current_pos > 0:
                 if (lines[current_pos] - offset) < (PGTOP_START_LINE + 3):
                     offset -= 1
@@ -668,7 +667,7 @@ def interactive(process, flag, indent, connector, pg_num_version):
                 if (lines[current_pos] - offset) >= (PGTOP_MAXY - 2):
                     offset += 1
                     scroll_window(process, flag, indent, offset)
-                    help_key_interactive(PGTOP_MAXY)
+                    help_key_interactive()
 
                 if current_pos >= 0:
                     refresh_line(process[current_pos], flag, indent, 'default', lines[current_pos] - offset)
@@ -1090,7 +1089,6 @@ def print_header(pg_version, hostname, user, host, port, io, tps, size_ev, total
 
     used = phymem.total - (phymem.free + buffers + cached)
     lineno += 1
-    # line = "  Mem.: %5s0%% - %9s/%s" % (phymem.percent, str(int(used / 1024 / 1024)) + "M", str(int(phymem.total / 1024 / 1024)) + "M")
     line = "  Mem.: %5s0%% - %9s/%s" % (phymem.percent, bytes2human(used), bytes2human(phymem.total))
     colno_io = print_string(lineno, 0, line)
     
@@ -1101,7 +1099,6 @@ def print_header(pg_version, hostname, user, host, port, io, tps, size_ev, total
     colno = print_string(lineno, colno_io, line_io)
 
     # swap usage
-    # line = "  Swap: %5s0%% - %9s/%s" % (vmem.percent, str(int(vmem.used / 1024 / 1024)) + "M", str(int(vmem.total / 1024 / 1024)) + "M")
     line = "  Swap: %5s0%% - %9s/%s" % (vmem.percent, bytes2human(vmem.used), bytes2human(vmem.total))
     lineno += 1
     colno = print_string(lineno, 0, line)
