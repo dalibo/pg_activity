@@ -1225,8 +1225,6 @@ def refresh_line(p, flag, indent, typecolor = 'default', line = None):
         l_lineno = lineno
 
     colno = 0
-    if l_lineno > PGTOP_MAXY:
-        return
     colno += print_string(l_lineno, colno, "%-6s " % (p['pid'],), PGTOP_LINE_COLORS['pid'][typecolor])
     if flag & PGTOP_FLAG_DATABASE:
         colno += print_string(l_lineno, colno, "%-16s " % (p['database'][:16],), PGTOP_LINE_COLORS['database'][typecolor])
