@@ -194,7 +194,7 @@ PGTOP_BUFFER = None
 PGTOP_REFRESH_TIME = 2
 
 """
-Simple class used for process managing.
+Simple class used for process management.
 """
 class pgtop_proc:
 
