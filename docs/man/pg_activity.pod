@@ -20,7 +20,7 @@ pg_activity is a htop like application for PostgreSQL server activity monitoring
 
 =item B<-h HOSTNAME>, B<--host=HOSTNAME>
 
-	Database server host or socket directory (default: "local socket").
+	Database server host or socket directory (default: "localhost").
 
 =item B<-C>, B<--no-color>
 
