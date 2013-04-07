@@ -103,6 +103,7 @@ PGTOP_FLAG_WAIT =       128
 PGTOP_FLAG_RELATION =   256
 PGTOP_FLAG_TYPE =       512
 PGTOP_FLAG_MODE =       1024
+PGTOP_FLAG_IOWAIT =     2048
 PGTOP_FLAG_NONE =       None
 
 """
@@ -114,19 +115,22 @@ def get_curses_color(color):
     else:
         return 0
 
+# Maximum number of columns
+PGTOP_MAX_NCOL = 12
 
 PGTOP_COLS = {
     'activities': {
-        'pid'       : {'n': 1, 'name': 'PID', 'template_h': '%-6s ', 'flag': PGTOP_FLAG_NONE, 'mandatory': True},
-        'database'  : {'n': 2, 'name': 'DATABASE', 'template_h': '%-16s ', 'flag': PGTOP_FLAG_DATABASE, 'mandatory': False},
-        'client'    : {'n': 3, 'name': 'CLIENT', 'template_h': '%16s ', 'flag': PGTOP_FLAG_CLIENT, 'mandatory': False},
-        'cpu'       : {'n': 4, 'name': 'CPU%', 'template_h': '%6s ', 'flag': PGTOP_FLAG_CPU, 'mandatory': False},
-        'mem'       : {'n': 5, 'name': 'MEM%', 'template_h': '%4s ', 'flag': PGTOP_FLAG_MEM, 'mandatory': False},
-        'read'      : {'n': 6, 'name': 'READ/s', 'template_h': '%8s ', 'flag': PGTOP_FLAG_READ, 'mandatory': False},
-        'write'     : {'n': 7, 'name': 'WRITE/s', 'template_h': '%8s ', 'flag': PGTOP_FLAG_WRITE, 'mandatory': False},
-        'time'      : {'n': 8, 'name': 'TIME+', 'template_h': '%9s ', 'flag': PGTOP_FLAG_TIME, 'mandatory': False},
-        'wait'      : {'n': 9, 'name': 'W', 'template_h': '%2s ', 'flag': PGTOP_FLAG_WAIT, 'mandatory': False},
-        'query'     : {'n': 10, 'name': 'Query', 'template_h': ' %2s', 'flag': PGTOP_FLAG_NONE, 'mandatory': True},
+        'pid'       : {'n':  1, 'name': 'PID', 'template_h': '%-6s ', 'flag': PGTOP_FLAG_NONE, 'mandatory': True},
+        'database'  : {'n':  2, 'name': 'DATABASE', 'template_h': '%-16s ', 'flag': PGTOP_FLAG_DATABASE, 'mandatory': False},
+        'client'    : {'n':  3, 'name': 'CLIENT', 'template_h': '%16s ', 'flag': PGTOP_FLAG_CLIENT, 'mandatory': False},
+        'cpu'       : {'n':  4, 'name': 'CPU%', 'template_h': '%6s ', 'flag': PGTOP_FLAG_CPU, 'mandatory': False},
+        'mem'       : {'n':  5, 'name': 'MEM%', 'template_h': '%4s ', 'flag': PGTOP_FLAG_MEM, 'mandatory': False},
+        'read'      : {'n':  6, 'name': 'READ/s', 'template_h': '%8s ', 'flag': PGTOP_FLAG_READ, 'mandatory': False},
+        'write'     : {'n':  7, 'name': 'WRITE/s', 'template_h': '%8s ', 'flag': PGTOP_FLAG_WRITE, 'mandatory': False},
+        'time'      : {'n':  8, 'name': 'TIME+', 'template_h': '%9s ', 'flag': PGTOP_FLAG_TIME, 'mandatory': False},
+        'wait'      : {'n':  9, 'name': 'W', 'template_h': '%2s ', 'flag': PGTOP_FLAG_WAIT, 'mandatory': False},
+        'iowait'    : {'n': 10, 'name': 'IOW', 'template_h': '%4s ', 'flag': PGTOP_FLAG_IOWAIT, 'mandatory': False},
+        'query'     : {'n': 11, 'name': 'Query', 'template_h': ' %2s', 'flag': PGTOP_FLAG_NONE, 'mandatory': True},
     },
     'waiting': {
         'pid'       : {'n': 1, 'name': 'PID', 'template_h': '%-6s ', 'flag': PGTOP_FLAG_NONE, 'mandatory': True},
@@ -192,6 +196,24 @@ PGTOP_START_LINE = 5
 PGTOP_BUFFER = None
 # refresh time
 PGTOP_REFRESH_TIME = 2
+# Maximum DATABASE columns header length
+PGTOP_MAX_DB_LENGTH = 16
+
+"""
+Set new DATABASE column length
+"""
+def set_max_db_length(new_length):
+    global PGTOP_MAX_DB_LENGTH
+    global PGTOP_COLS
+    if new_length > 16:
+        new_length = 16
+    if new_length < 8:
+        new_length = 8
+
+    PGTOP_MAX_DB_LENGTH = new_length
+    PGTOP_COLS['activities']['database']['template_h'] = '%-'+str(new_length)+'s '
+    PGTOP_COLS['waiting']['database']['template_h'] = '%-'+str(new_length)+'s '
+    PGTOP_COLS['blocking']['database']['template_h'] = '%-'+str(new_length)+'s '
 
 """
 Simple class used for process management.
@@ -394,12 +416,12 @@ def pg_get_num_version(text_version):
 """
 Get current sum of transactions, total size and  timestamp.
 """
-def pg_get_current_xact_size(conn,):
-    query = "SELECT EXTRACT(EPOCH FROM NOW()) AS timestamp, SUM(pg_stat_get_db_xact_commit(oid)+pg_stat_get_db_xact_rollback(oid))::BIGINT AS no_xact, SUM(pg_database_size(datname)) AS total_size FROM pg_database"
+def pg_get_snapshot_infos(conn,):
+    query = "SELECT EXTRACT(EPOCH FROM NOW()) AS timestamp, SUM(pg_stat_get_db_xact_commit(oid)+pg_stat_get_db_xact_rollback(oid))::BIGINT AS no_xact, SUM(pg_database_size(datname)) AS total_size, MAX(LENGTH(datname)) AS max_length FROM pg_database"
     cur = conn.cursor()
     res = cur.execute(query,)
     ret = cur.fetchone()
-    return (ret['timestamp'], ret['no_xact'], ret['total_size'])
+    return (ret['timestamp'], ret['no_xact'], ret['total_size'], ret['max_length'])
 
 """
 Get activity from pg_stat_activity view.
@@ -466,6 +488,13 @@ def pg_is_local(conn):
         return True
     return False
 
+
+def sys_get_IOW_status(status):
+    if str(status) == 'disk sleep':
+        return 'Y'
+    else:
+        return 'N'
+
 """
 Get system informations (CPU, memory, IO read & write)
 for each process PID using psutil module.
@@ -487,6 +516,7 @@ def sys_get_proc(queries):
             p.setExtra('cpu_times', proc.get_cpu_times())
             p.setExtra('read_delta', 0)
             p.setExtra('write_delta', 0)
+            p.setExtra('io_wait', sys_get_IOW_status(str(proc.status)))
             p.setExtra('psutil_proc', proc)
             process[p.pid] = p
         except psutil.error.NoSuchProcess as e:
@@ -803,12 +833,16 @@ def poll_activities(interval, connector, flag, indent, process = None, pg_num_ve
                     n_pg_duration = p.duration
                     n_pg_query = p.query
                     n_pg_client = p.client
+                    n_wait = p.wait
                     n_io_counters = p.getExtra('io_counters')
                     n_io_time = time.time()
+                    n_io_wait = p.getExtra('io_wait')
                     p = process[pid]
                     p.duration = n_pg_duration
                     p.query = n_pg_query
                     p.client = n_pg_client
+                    p.wait = n_wait
+                    p.setExtra('io_wait', n_io_wait)
                     p.setExtra('read_delta', (n_io_counters.read_bytes - p.getExtra('io_counters').read_bytes)/(n_io_time - p.getExtra('io_time')))
                     p.setExtra('write_delta', (n_io_counters.write_bytes - p.getExtra('io_counters').write_bytes)/(n_io_time - p.getExtra('io_time')))
                     p.setExtra('io_counters', n_io_counters)
@@ -819,7 +853,7 @@ def poll_activities(interval, connector, flag, indent, process = None, pg_num_ve
                 p.setExtra('mem_percent', p.getExtra('psutil_proc').get_memory_percent())
                 p.setExtra('cpu_percent', p.getExtra('psutil_proc').get_cpu_percent(interval=0))
                 new_procs[pid] = p
-                procs.append({'pid':pid, 'database':p.database, 'client': p.client, 'cpu': p.getExtra('cpu_percent'), 'mem': p.getExtra('mem_percent'), 'read': p.getExtra('read_delta'), 'write': p.getExtra('write_delta'), 'query': p.query, 'duration': p.duration, 'wait': p.wait})
+                procs.append({'pid': pid, 'database': p.database, 'client': p.client, 'cpu': p.getExtra('cpu_percent'), 'mem': p.getExtra('mem_percent'), 'read': p.getExtra('read_delta'), 'write': p.getExtra('write_delta'), 'query': p.query, 'duration': p.duration, 'wait': p.wait, 'io_wait': p.getExtra('io_wait')})
 
             except psutil.NoSuchProcess:
                 pass
@@ -1002,7 +1036,7 @@ Returns identation for Query column.
 """
 def get_indent(flag):
     indent = ''
-    r = [0] * 11
+    r = [0] * PGTOP_MAX_NCOL
     for key, val in PGTOP_COLS[PGTOP_MODE].items():
         if val['mandatory'] or (not val['mandatory'] and val['flag'] & flag):
             r[int(val['n'])] = val
@@ -1020,7 +1054,7 @@ def print_cols_header(flag):
     line = ''
     disp = ''
     x = 0
-    r = [0] * 11
+    r = [0] * PGTOP_MAX_NCOL
     for key, val in PGTOP_COLS[PGTOP_MODE].items():
         if val['mandatory'] or (not val['mandatory'] and val['flag'] & flag):
             r[int(val['n'])] = val
@@ -1223,11 +1257,11 @@ def refresh_line(p, flag, indent, typecolor = 'default', line = None):
         l_lineno = line
     else:
         l_lineno = lineno
-
+    
     colno = 0
     colno += print_string(l_lineno, colno, "%-6s " % (p['pid'],), PGTOP_LINE_COLORS['pid'][typecolor])
     if flag & PGTOP_FLAG_DATABASE:
-        colno += print_string(l_lineno, colno, "%-16s " % (p['database'][:16],), PGTOP_LINE_COLORS['database'][typecolor])
+        colno += print_string(l_lineno, colno, PGTOP_COLS[PGTOP_MODE]['database']['template_h'] % (p['database'][:16],), PGTOP_LINE_COLORS['database'][typecolor])
     if PGTOP_MODE == 'activities':
         if flag & PGTOP_FLAG_CLIENT:
             colno += print_string(l_lineno, colno, "%16s " % (str(p['client'])[:16],), PGTOP_LINE_COLORS['client'][typecolor])
@@ -1268,6 +1302,13 @@ def refresh_line(p, flag, indent, typecolor = 'default', line = None):
             colno += print_string(l_lineno, colno, "%2s " % ('Y',), PGTOP_LINE_COLORS['wait_red'][typecolor])
         else:
             colno += print_string(l_lineno, colno, "%2s " % ('N',), PGTOP_LINE_COLORS['wait_green'][typecolor])
+    
+    if PGTOP_MODE == 'activities' and flag & PGTOP_FLAG_IOWAIT:
+        if p['io_wait'] == 'Y':
+            colno += print_string(l_lineno, colno, "%4s " % ('Y',), PGTOP_LINE_COLORS['wait_red'][typecolor])
+        else:
+            colno += print_string(l_lineno, colno, "%4s " % ('N',), PGTOP_LINE_COLORS['wait_green'][typecolor])
+
 
     dif = PGTOP_MAXX - len(indent) - 1
     if PGTOP_VERBOSE_MODE == PGTOP_TRUNCATE:
@@ -1354,6 +1395,9 @@ def main():
         pg_version = pg_get_version(conn)
         (pg_short_version, pg_num_version) = pg_get_num_version(pg_version)
         hostname = socket.gethostname()
+       
+        # reduce DATABASE column length 
+        set_max_db_length(16)
         
         # does pg_activity runing against local PG instance
         if not pg_is_local(conn):
@@ -1382,7 +1426,7 @@ def main():
         else:
             set_color()    
         # default flag
-        flag = PGTOP_FLAG_DATABASE | PGTOP_FLAG_CLIENT | PGTOP_FLAG_CPU | PGTOP_FLAG_MEM | PGTOP_FLAG_READ | PGTOP_FLAG_WRITE | PGTOP_FLAG_TIME | PGTOP_FLAG_WAIT | PGTOP_FLAG_RELATION | PGTOP_FLAG_TYPE | PGTOP_FLAG_MODE
+        flag = PGTOP_FLAG_DATABASE | PGTOP_FLAG_CLIENT | PGTOP_FLAG_CPU | PGTOP_FLAG_MEM | PGTOP_FLAG_READ | PGTOP_FLAG_WRITE | PGTOP_FLAG_TIME | PGTOP_FLAG_WAIT | PGTOP_FLAG_RELATION | PGTOP_FLAG_TYPE | PGTOP_FLAG_MODE | PGTOP_FLAG_IOWAIT
         if options.nodb is True:
             flag -= PGTOP_FLAG_DATABASE
         if options.nocpu is True:
@@ -1409,13 +1453,14 @@ def main():
         if not PGTOP_IS_LOCAL and (flag & PGTOP_FLAG_WRITE):
             flag -= PGTOP_FLAG_WRITE
          
-        # indentation
-        indent = get_indent(flag)
         # main loop
         disks_io = None
         disp_procs = None
         # init num. of TX
-        (tps_time, tps_nb_tx, tps_total_size) = pg_get_current_xact_size(conn)
+        (tps_time, tps_nb_tx, tps_total_size, max_db_length) = pg_get_snapshot_infos(conn)
+        set_max_db_length(max_db_length)
+        # indentation
+        indent = get_indent(flag)
         
         while 1:
             check_window_size()
@@ -1440,7 +1485,9 @@ def main():
     
             procs = new_procs
             # refresh the winodw
-            (n_tps_time, n_tps_nb_tx, n_tps_total_size) = pg_get_current_xact_size(conn)
+            (n_tps_time, n_tps_nb_tx, n_tps_total_size, max_db_length) = pg_get_snapshot_infos(conn)
+            set_max_db_length(max_db_length)
+            
             tps = int((n_tps_nb_tx - tps_nb_tx) / (n_tps_time - tps_time))
             size_ev = float(float(n_tps_total_size - tps_total_size) / (n_tps_time - tps_time))
             tps_time = n_tps_time
