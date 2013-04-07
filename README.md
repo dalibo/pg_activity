@@ -26,7 +26,7 @@ Usage
 		-p PORT, --port=PORT  Database server port (default: "5432").
 		-h HOSTNAME, --host=HOSTNAME
 							  Database server host or socket directory (default:
-                        	  "local socket").
+                        	  "localhost").
 		-C, --no-color        Disable color usage.
 		--help                Show this help message and exit.
 		--debug               Enable debug mode for traceback tracking.
