@@ -199,10 +199,10 @@ PGTOP_REFRESH_TIME = 2
 # Maximum DATABASE columns header length
 PGTOP_MAX_DB_LENGTH = 16
 
-"""
-Set new DATABASE column length
-"""
 def set_max_db_length(new_length):
+    """
+    Set new DATABASE column length
+    """
     global PGTOP_MAX_DB_LENGTH
     global PGTOP_COLS
     if new_length > 16:
@@ -215,11 +215,10 @@ def set_max_db_length(new_length):
     PGTOP_COLS['waiting']['database']['template_h'] = '%-'+str(new_length)+'s '
     PGTOP_COLS['blocking']['database']['template_h'] = '%-'+str(new_length)+'s '
 
-"""
-Simple class used for process management.
-"""
 class pgtop_proc:
-
+    """
+    Simple class used for process management.
+    """
     def __init__(self,pid = None, database = None, client = None, cpu = None, mem = None, read = None, write = None, query = None, duration = None, wait = None, extras = None):
         self.pid = pid
         self.database = database
@@ -239,11 +238,11 @@ class pgtop_proc:
     def getExtra(self, key):
         if self.extras is not None and self.extras.has_key(key):
             return self.extras[key]
-"""
-Called at exit time.
-Rollback to default values.
-"""
 def at_exit_curses():
+    """
+    Called at exit time.
+    Rollback to default values.
+    """
     try:
         win.keypad(0)
         win.move(0,0)
@@ -258,18 +257,18 @@ def at_exit_curses():
         pass
     curses.endwin()
 
-"""
-Function called on a kill.
-"""
 def signal_handler(signal, frame):
+    """
+    Function called on a process kill.
+    """
     at_exit_curses()
     print "FATAL: Killed."
     sys.exit(0)
 
-"""
-Replace colors by white.
-"""
 def set_nocolor():
+    """
+    Replace colors by white.
+    """
     if not PGTOP_SYS_COLOR:
         return
     global PGTOP_COLOR
@@ -285,10 +284,10 @@ def set_nocolor():
     curses.init_pair(C_BLACK_CYAN, curses.COLOR_WHITE, -1)
     curses.init_pair(C_GRAY, curses.COLOR_WHITE, -1)
 
-"""
-Set colors.
-"""
 def set_color():
+    """
+    Set colors.
+    """
     if not PGTOP_SYS_COLOR:
         return
     global PGTOP_COLOR
@@ -304,10 +303,10 @@ def set_color():
     curses.init_pair(C_BLACK_CYAN, curses.COLOR_BLACK, curses.COLOR_CYAN)
     curses.init_pair(C_GRAY, 0, -1)
 
-"""
-Strip and replace some special characters.
-"""
 def clean_str(string):
+    """
+    Strip and replace some special characters.
+    """
     msg = str(string)
     msg = msg.replace("\n", " ")
     msg = re.sub(r"\s+", r" ", msg)
@@ -316,13 +315,13 @@ def clean_str(string):
     msg = re.sub(r"\s$", r"", msg)
     return msg
 
-"""
-Get postgres' password using pgpass file.
-
-http://www.postgresql.org/docs/9.2/static/libpq-pgpass.html
-http://wiki.postgresql.org/wiki/Pgpass
-"""
 def get_pgpass(pgpass = None):
+    """
+    Get postgres' password using pgpass file.
+
+    http://www.postgresql.org/docs/9.2/static/libpq-pgpass.html
+    http://wiki.postgresql.org/wiki/Pgpass
+    """
     if pgpass is None:
         from os.path import expanduser
         home = expanduser("~")
@@ -334,11 +333,11 @@ def get_pgpass(pgpass = None):
             return res.group(1, 2, 3, 4, 5)
     raise Exception("pgpass file not found")
 
-"""
-Connect to a PostgreSQL server and return
-cursor & connector.
-"""
 def pg_connect(host = 'localhost', port = 5432, user = 'postgres', password = None):
+    """
+    Connect to a PostgreSQL server and return
+    cursor & connector.
+    """
     conn = psycopg2.connect(
             database = 'postgres',
             host = host,
@@ -355,11 +354,11 @@ def pg_connect(host = 'localhost', port = 5432, user = 'postgres', password = No
         raise Exception("Must be run with database superuser privileges.")
     return conn
 
-"""
-Verify if the user running pg_activity can acces 
-system informations for a postgres process.
-"""
 def pg_is_local_access():
+    """
+    Verify if the user running pg_activity can acces 
+    system informations for a postgres process.
+    """
     for p in psutil.process_iter():
         if p.name == 'postgres' or p.name == 'postmaster':
             try:
@@ -373,20 +372,20 @@ def pg_is_local_access():
                 return False
     return False
 
-"""
-Get PostgreSQL server version.
-"""
 def pg_get_version(conn):
+    """
+    Get PostgreSQL server version.
+    """
     query = "SELECT version() AS pg_version"
     cur = conn.cursor()
     res = cur.execute(query)
     ret = cur.fetchone()
     return ret['pg_version']
 
-"""
-Terminate a backend
-"""
 def pg_terminate_backend(conn, pid, pg_num_version):
+    """
+    Terminate a backend
+    """
     if pg_num_version >= 80400:
         query = "SELECT pg_terminate_backend(%s) AS terminated"
     else:
@@ -396,11 +395,11 @@ def pg_terminate_backend(conn, pid, pg_num_version):
     ret = cur.fetchone()
     return ret['terminated']
 
-"""
-Get PostgreSQL short & numeric version from
-a string (SELECT version()).
-"""
 def pg_get_num_version(text_version):
+    """
+    Get PostgreSQL short & numeric version from
+    a string (SELECT version()).
+    """
     res = re.match(r"^PostgreSQL ([0-9]+)\.([0-9]+)\.([0-9]+)", text_version)
     if res is not None:
         r = res.group(1)
@@ -413,20 +412,20 @@ def pg_get_num_version(text_version):
         return (res.group(0), int(r))
     return None
 
-"""
-Get current sum of transactions, total size and  timestamp.
-"""
 def pg_get_snapshot_infos(conn,):
+    """
+    Get current sum of transactions, total size and  timestamp.
+    """
     query = "SELECT EXTRACT(EPOCH FROM NOW()) AS timestamp, SUM(pg_stat_get_db_xact_commit(oid)+pg_stat_get_db_xact_rollback(oid))::BIGINT AS no_xact, SUM(pg_database_size(datname)) AS total_size, MAX(LENGTH(datname)) AS max_length FROM pg_database"
     cur = conn.cursor()
     res = cur.execute(query,)
     ret = cur.fetchone()
     return (ret['timestamp'], ret['no_xact'], ret['total_size'], ret['max_length'])
 
-"""
-Get activity from pg_stat_activity view.
-"""
 def pg_get_activities(conn, pg_num_version):
+    """
+    Get activity from pg_stat_activity view.
+    """
     if pg_num_version >= 90200:
         # PostgreSQL 9.2.0 and more
         query = """
@@ -442,10 +441,10 @@ SELECT pg_stat_activity.procpid AS pid, CASE WHEN LENGTH(pg_stat_activity.datnam
     ret = cur.fetchall()
     return ret
 
-"""
-Get waiting queries.
-"""
 def pg_get_waiting(conn, pg_num_version):
+    """
+    Get waiting queries.
+    """
     if pg_num_version >= 90200:
         query = """
 SELECT pg_locks.pid AS pid, CASE WHEN LENGTH(pg_stat_activity.datname) > 16 THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$') ELSE pg_stat_activity.datname END AS database, pg_locks.mode AS mode, pg_locks.locktype AS type, pg_locks.relation::regclass AS relation, EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration, pg_stat_activity.query AS query FROM pg_catalog.pg_locks JOIN pg_catalog.pg_stat_activity ON(pg_catalog.pg_locks.pid = pg_catalog.pg_stat_activity.pid) WHERE NOT pg_catalog.pg_locks.granted AND pg_catalog.pg_stat_activity.pid <> pg_backend_pid() ORDER BY EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
@@ -459,10 +458,10 @@ SELECT pg_locks.pid AS pid, CASE WHEN LENGTH(pg_stat_activity.datname) > 16 THEN
     ret = cur.fetchall()
     return ret
 
-"""
-Get blocking queries
-"""
 def pg_get_blocking(conn, pg_num_version):
+    """
+    Get blocking queries
+    """
     if pg_num_version >= 90200:
         query = """
 SELECT pid, CASE WHEN LENGTH(datname) > 16 THEN SUBSTRING(datname FROM 0 FOR 6)||'...'||SUBSTRING(datname FROM '........$') ELSE datname END AS database, relation, mode, locktype AS type, duration, query FROM (SELECT blocking.pid, pg_stat_activity.query, blocking.mode, pg_stat_activity.datname, blocking.locktype,EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration, blocking.relation::regclass AS relation FROM pg_locks AS blocking JOIN (SELECT transactionid FROM pg_locks WHERE NOT granted) AS blocked ON (blocking.transactionid = blocked.transactionid) JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.pid) WHERE blocking.granted UNION ALL SELECT blocking.pid, pg_stat_activity.query, blocking.mode, pg_stat_activity.datname, blocking.locktype,EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration, blocking.relation::regclass AS relation FROM pg_locks AS blocking JOIN (SELECT database, relation, mode FROM pg_locks WHERE NOT granted AND relation IS NOT NULL) AS blocked ON (blocking.database = blocked.database AND blocking.relation = blocked.relation) JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.pid) WHERE blocking.granted) AS sq GROUP BY pid, query, mode, locktype, duration, datname, relation ORDER BY duration DESC
@@ -476,10 +475,10 @@ SELECT pid, CASE WHEN LENGTH(datname) > 16 THEN SUBSTRING(datname FROM 0 FOR 6)|
     ret = cur.fetchall()
     return ret
 
-"""
-Does pg_activity is connected localy ?
-"""
 def pg_is_local(conn):
+    """
+    Does pg_activity is connected localy ?
+    """
     query = "SELECT inet_server_addr() AS inet_server_addr, inet_client_addr() AS inet_client_addr"
     cur = conn.cursor()
     res = cur.execute(query)
@@ -495,11 +494,11 @@ def sys_get_IOW_status(status):
     else:
         return 'N'
 
-"""
-Get system informations (CPU, memory, IO read & write)
-for each process PID using psutil module.
-"""
 def sys_get_proc(queries):
+    """
+    Get system informations (CPU, memory, IO read & write)
+    for each process PID using psutil module.
+    """
     process = {}
     if not PGTOP_IS_LOCAL:
         return process
@@ -525,19 +524,19 @@ def sys_get_proc(queries):
             pass
     return process
 
-"""
-Update window's size
-"""
 def check_window_size():
+    """
+    Update window's size
+    """
     global PGTOP_MAXY
     global PGTOP_MAXX
     (PGTOP_MAXY, PGTOP_MAXX) = win.getmaxyx()
     return
 
-"""
-Returns PAUSE message, depending of the line size
-"""
 def get_pause_msg():
+    """
+    Returns PAUSE message, depending of the line size
+    """
     msg = "PAUSE"
     line = ""
     line += " " * (int(PGTOP_MAXX/2) - len(msg))
@@ -545,10 +544,10 @@ def get_pause_msg():
     line += " " * (PGTOP_MAXX - len(line) - 0)
     return line
 
-"""
-PAUSE mode
-"""
 def pause():
+    """
+    PAUSE mode
+    """
     print_string(PGTOP_START_LINE, 0, get_pause_msg(), get_curses_color(C_RED_BLACK)|curses.A_REVERSE|curses.A_BOLD)
     current_pos = -1
     while 1:
@@ -569,10 +568,10 @@ def pause():
             print_string(PGTOP_START_LINE, 0, get_pause_msg(), get_curses_color(C_RED_BLACK)|curses.A_REVERSE|curses.A_BOLD)
         curses.flushinp()
 
-"""
-Display current mode
-"""
 def current_position():
+    """
+    Display current mode
+    """
     if PGTOP_MODE == 'activities':
         msg = "RUNNING QUERIES"
     if PGTOP_MODE == 'waiting':
@@ -585,10 +584,10 @@ def current_position():
     line += " " * (PGTOP_MAXX - len(line) - 0)
     print_string(PGTOP_START_LINE, 0, line, get_curses_color(C_GREEN))
 
-"""
-Display interactive mode menu bar
-"""
 def help_key_interactive():
+    """
+    Display interactive mode menu bar
+    """
     colno = print_string((PGTOP_MAXY - 1), 0, "<k>", get_curses_color(0))
     colno += print_string((PGTOP_MAXY - 1), colno, "Terminate the backend    ", get_curses_color(C_CYAN)|curses.A_REVERSE)
     colno += print_string((PGTOP_MAXY - 1), colno, "<Space>", get_curses_color(0))
@@ -597,10 +596,10 @@ def help_key_interactive():
     colno += print_string((PGTOP_MAXY - 1), colno, "Quit    ", get_curses_color(C_CYAN)|curses.A_REVERSE)
     colno += print_string((PGTOP_MAXY - 1), colno, add_blank(" "), get_curses_color(C_CYAN)|curses.A_REVERSE)
 
-"""
-Display change mode menu bar
-"""
 def change_mode_interactive():
+    """
+    Display change mode menu bar
+    """
     colno = print_string((PGTOP_MAXY - 1), 0, "<F1/1>", get_curses_color(0))
     colno += print_string((PGTOP_MAXY - 1), colno, "Running queries    ", get_curses_color(C_CYAN)|curses.A_REVERSE)
     colno += print_string((PGTOP_MAXY - 1), colno, "<F2/2>", get_curses_color(0))
@@ -615,10 +614,10 @@ def change_mode_interactive():
     colno += print_string((PGTOP_MAXY - 1), colno, "Help    ", get_curses_color(C_CYAN)|curses.A_REVERSE)
     colno += print_string((PGTOP_MAXY - 1), colno, add_blank(" "), get_curses_color(C_CYAN)|curses.A_REVERSE)
 
-"""
-Ask for terminating a backend
-"""
 def ask_terminate_backend(pid, connector, pg_num_version):
+    """
+    Ask for terminating a backend
+    """
     colno = print_string((PGTOP_MAXY - 1), 0, "Terminate backend with PID %s ? <Y/N>" % (str(pid),), get_curses_color(0))
     colno += print_string((PGTOP_MAXY - 1), colno, add_blank(" "), get_curses_color(C_CYAN)|curses.A_REVERSE)
     while 1:
@@ -641,11 +640,11 @@ def ask_terminate_backend(pid, connector, pg_num_version):
         if k == curses.KEY_RESIZE:
             return 0
 
-"""
-Interactive mode trigged on KEY_UP or KEY_DOWN key press
-If no key hit during 3 seconds, exit this mode
-"""
 def interactive(process, flag, indent, connector, pg_num_version):
+    """
+    Interactive mode trigged on KEY_UP or KEY_DOWN key press
+    If no key hit during 3 seconds, exit this mode
+    """
     global lines
     global PGTOP_VERBOSE_MODE
     # Force truncated display
@@ -715,19 +714,19 @@ def interactive(process, flag, indent, connector, pg_num_version):
             PGTOP_VERBOSE_MODE = old_verbose_mode
             return 0
 
-"""
-Wrapper around polling
-"""
 def poll(interval, connector, flag, indent, process = None, pg_num_version = None, disp_proc = None):
+    """
+    Wrapper around polling
+    """
     if PGTOP_MODE == 'activities':
         return poll_activities(interval, connector, flag, indent, process, pg_num_version, disp_proc)
     elif PGTOP_MODE == 'waiting' or PGTOP_MODE == 'blocking':
         return poll_waiting_blocking(interval, connector, flag, indent, process, pg_num_version, disp_proc)
  
-"""
-Poll activities.
-"""
 def poll_activities(interval, connector, flag, indent, process = None, pg_num_version = None, disp_proc = None):
+    """
+    Poll activities.
+    """
     global PGTOP_VERBOSE_MODE
     global PGTOP_SORT
     global PGTOP_REFRESH_TIME
@@ -798,8 +797,6 @@ def poll_activities(interval, connector, flag, indent, process = None, pg_num_ve
     if k == ord('-') and PGTOP_REFRESH_TIME > 1:
         PGTOP_REFRESH_TIME -= 1
         do_refresh = True
-    
-        
     # Refresh
     if k == ord('R'):
         known = True
@@ -888,10 +885,10 @@ def poll_activities(interval, connector, flag, indent, process = None, pg_num_ve
     
     return (disp_procs, new_procs)
 
-"""
-Poll waiting or blocking queries
-"""
 def poll_waiting_blocking(interval, connector, flag, indent, process = None, pg_num_version = None, disp_proc = None):
+    """
+    Poll waiting or blocking queries
+    """
     global PGTOP_VERBOSE_MODE
     global PGTOP_SORT
     global PGTOP_REFRESH_TIME
@@ -996,27 +993,27 @@ def poll_waiting_blocking(interval, connector, flag, indent, process = None, pg_
     
     return (disp_procs, new_procs)
 
-"""
-Print a string at position (lineno, colno) and returns its length.
-"""
 def print_string(lineno, colno, word, color = 0):
+    """
+    Print a string at position (lineno, colno) and returns its length.
+    """
     try:
         win.addstr(lineno, colno, word, color)
     except curses.error:
         pass
     return len(word)
 
-"""
-Complete string with white spaces from the end of string to the end of line.
-"""
 def add_blank(line, offset = 0): 
+    """
+    Complete string with white spaces from the end of string to the end of line.
+    """
     line += " " * (PGTOP_MAXX - (len(line) + offset))
     return line
 
-"""
-Convert a size into a human readable format.
-"""
 def bytes2human(n):
+    """
+    Convert a size into a human readable format.
+    """
     symbols = ('K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y')
     prefix = {}
     ne = ''
@@ -1031,10 +1028,10 @@ def bytes2human(n):
             return "%s%s%s" % (ne, value, s)
     return "%s%.2fB" % (ne, n)
 
-"""
-Returns identation for Query column.
-"""
 def get_indent(flag):
+    """
+    Returns identation for Query column.
+    """
     indent = ''
     r = [0] * PGTOP_MAX_NCOL
     for key, val in PGTOP_COLS[PGTOP_MODE].items():
@@ -1046,10 +1043,10 @@ def get_indent(flag):
                 indent += val['template_h'] % ' '
     return indent
 
-"""
-Print columns headers
-"""
 def print_cols_header(flag):
+    """
+    Print columns headers
+    """
     global lineno
     line = ''
     disp = ''
@@ -1077,10 +1074,10 @@ def print_cols_header(flag):
             x += len(disp)
     lineno += 1
 
-"""
-Print window header
-"""
 def print_header(pg_version, hostname, user, host, port, io, tps, size_ev, total_size):
+    """
+    Print window header
+    """
     global lineno
     global PGTOP_MAX_IOPS 
     lineno = 0
@@ -1147,10 +1144,10 @@ def print_header(pg_version, hostname, user, host, port, io, tps, size_ev, total
     line_io = " | Write: %8s/s - %6s IOPS" % (bytes2human(io['write_bytes']), int(io['write_count']),)
     colno = print_string(lineno, colno_io, line_io)
 
-"""
-Display help window
-"""
 def help_window():
+    """
+    Display help window
+    """
     win.erase()
     lineno = 0
     colno = 0
@@ -1196,18 +1193,18 @@ def help_window():
     except KeyboardInterrupt as e:
         raise e
 
-"""
-Display help key
-"""
 def display_help_key(lineno, colno, key, help):
+    """
+    Display help key
+    """
     l = print_string(lineno, colno, key, get_curses_color(C_CYAN)|curses.A_BOLD)
     l2 = print_string(lineno, colno + l, ": %s" % (help,))
     return (colno + l + l2)
 
-"""
-Refresh the window
-"""
 def refresh_window(procs, extras, flag, indent, io, tps, size_ev, total_size):
+    """
+    Refresh the window
+    """
     global lineno
     global lines
 
@@ -1231,10 +1228,10 @@ def refresh_window(procs, extras, flag, indent, io, tps, size_ev, total_size):
             print_string(l, 0, add_blank(" "))
     change_mode_interactive()
 
-"""
-Scroll the window
-"""
 def scroll_window(procs, flag, indent, offset = 0):
+    """
+    Scroll the window
+    """
     global lineno
     lineno = (PGTOP_START_LINE + 2)
     pos = 0
@@ -1248,10 +1245,10 @@ def scroll_window(procs, flag, indent, offset = 0):
                 print_string(l, 0, add_blank(" "))
         pos += 1
 
-"""
-Refresh a line for activities mode
-"""
 def refresh_line(p, flag, indent, typecolor = 'default', line = None):
+    """
+    Refresh a line for activities mode
+    """
     global lineno
     if line is not None:
         l_lineno = line
@@ -1339,9 +1336,7 @@ def refresh_line(p, flag, indent, typecolor = 'default', line = None):
             colno += print_string(l_lineno, colno, " %s" % (add_blank(query, len(indent)),), PGTOP_LINE_COLORS['query'][typecolor])
     lineno += 1
 
-"""
-main
-"""
+# Main function
 def main():
     global PGTOP_IS_LOCAL
     global PGTOP_START_LINE
@@ -1520,9 +1515,7 @@ def main():
             traceback.print_exception(exc_type, exc_value, exc_traceback, file=sys.stdout)
         sys.exit("FATAL: %s" % (str(e),))
 
-"""
-Call the main function
-"""
+# Call the main function
 if __name__ == '__main__':
     signal.signal(signal.SIGTERM, signal_handler)
     main()
