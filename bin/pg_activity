@@ -32,7 +32,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-PGTOP_VERSION="1.0.0"
+PGTOP_VERSION = "1.0.0"
 
 import os
 import sys
@@ -236,6 +236,7 @@ class pgtop_proc:
     def getExtra(self, key):
         if self.extras is not None and self.extras.has_key(key):
             return self.extras[key]
+
 def at_exit_curses():
     """
     Called at exit time.
@@ -243,7 +244,7 @@ def at_exit_curses():
     """
     try:
         win.keypad(0)
-        win.move(0,0)
+        win.move(0, 0)
         win.erase()
     except KeyboardInterrupt as e:
         pass
@@ -822,7 +823,7 @@ def poll_activities(interval, connector, flag, indent, process = None, pg_num_ve
         new_procs = sys_get_proc(queries)
 
         procs = []
-        for pid,p in new_procs.items():
+        for pid, p in new_procs.items():
             try:
                 if process.has_key(pid):
                     n_pg_duration = p.duration
@@ -1157,30 +1158,30 @@ def help_window():
     lineno += 2
     l = display_help_key(lineno, 00, "Up/Down", "scroll process list")
     l = display_help_key(lineno, 45, "      C", "activate/deactivate colors")
-    lineno +=1
+    lineno += 1
     l = display_help_key(lineno, 00, "  Space", "pause")
     l = display_help_key(lineno, 45, "      r", "sort by READ/s desc. (activities)")
-    lineno +=1
+    lineno += 1
     l = display_help_key(lineno, 00, "      v", "change queries display mode")
     l = display_help_key(lineno, 45, "      w", "sort by WRITE/s desc. (activities)")
-    lineno +=1
+    lineno += 1
     l = display_help_key(lineno, 00, "      q", "quit")
     l = display_help_key(lineno, 45, "      c", "sort by CPU% desc. (activities)")
-    lineno +=1
+    lineno += 1
     l = display_help_key(lineno, 00, "      +", "increase refresh time (max:3)")
     l = display_help_key(lineno, 45, "      m", "sort by MEM% desc. (activities)")
-    lineno +=1
+    lineno += 1
     l = display_help_key(lineno, 00, "      -", "decrease refresh time (min:1)")
     l = display_help_key(lineno, 45, "      t", "sort by TIME+ desc. (activities)")
-    lineno +=1
+    lineno += 1
     l = display_help_key(lineno, 00, "      R", "force refresh")
-    lineno +=1
+    lineno += 1
     l = print_string(lineno, 0, "Mode")
-    lineno +=1
+    lineno += 1
     l = display_help_key(lineno, 00, "   F1/1", "running queries")
-    lineno +=1
+    lineno += 1
     l = display_help_key(lineno, 00, "   F2/2", "waiting queries")
-    lineno +=1
+    lineno += 1
     l = display_help_key(lineno, 00, "   F3/3", "blocking queries")
     
     lineno += 2
@@ -1308,14 +1309,14 @@ def refresh_line(p, flag, indent, typecolor = 'default', line = None):
     dif = PGTOP_MAXX - len(indent) - 1
     if PGTOP_VERBOSE_MODE == PGTOP_TRUNCATE:
         query = p['query'][:dif]
-        colno += print_string(l_lineno, colno, " %s" % (add_blank(query,len(indent)+1),), PGTOP_LINE_COLORS['query'][typecolor])
+        colno += print_string(l_lineno, colno, " %s" % (add_blank(query, len(indent)+1),), PGTOP_LINE_COLORS['query'][typecolor])
     elif PGTOP_VERBOSE_MODE == PGTOP_WRAP or  PGTOP_VERBOSE_MODE == PGTOP_WRAP_NOINDENT:
         query = p['query']
         query_wrote = ''
         offset = 0
         if len(query) > dif and dif > 1:
             query_part = query[offset:dif]
-            print_string(l_lineno, colno, " %s" % (add_blank(query_part,len(indent)+1),), PGTOP_LINE_COLORS['query'][typecolor])
+            print_string(l_lineno, colno, " %s" % (add_blank(query_part, len(indent)+1),), PGTOP_LINE_COLORS['query'][typecolor])
             query_wrote += query_part
             offset = len(query_wrote)
             if PGTOP_VERBOSE_MODE == PGTOP_WRAP_NOINDENT:
