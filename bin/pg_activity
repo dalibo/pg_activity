@@ -57,9 +57,9 @@ curses.noecho()
 curses.cbreak()
 
 
-#Some terms like vt100 do not support colors,
-#in that case, curses.curs_set() and all curses functions
-#related to colors (and probably others) raise an ERROR.
+# Some terms like vt100 do not support colors,
+# in that case, curses.curs_set() and all curses functions
+# related to colors (and probably others) raise an ERROR.
 PGTOP_SYS_COLOR = True
 
 try:
@@ -325,11 +325,15 @@ def get_pgpass(pgpass = None):
         from os.path import expanduser
         home = expanduser("~")
         pgpass = "%s/.pgpass" % (str(home),)
+    ret = []
     with open(pgpass, 'r') as fp:
-        content = fp.read()
-        res = re.match(r"^([^:]+):([^:]+):([^:]+):([^:]+):(.*)$", content)
-        if res is not None:
-            return res.group(1, 2, 3, 4, 5)
+        content = fp.readlines()
+        for line in content:
+            res = None
+            res = re.match(r"^([^:]+):([^:]+):([^:]+):([^:]+):(.*)$", line)
+            if res is not None:
+                ret.append(res.group(1, 2, 3, 4, 5))
+        return ret
     raise Exception("pgpass file not found")
 
 def pg_connect(host = 'localhost', port = 5432, user = 'postgres', password = None):
@@ -1368,9 +1372,10 @@ def main():
         if password is None:
             # pgpass file handling
             try:
-                (pgpass_host, pgpass_port, pgpass_database, pgpass_user, pgpass_password) = get_pgpass(os.environ.get('PGPASSFILE'))
-                if pgpass_host == options.host and pgpass_port == options.port and pgpass_user == options.username and pgpass_database == 'postgres':
-                    password = pgpass_password
+                for (pgpass_host, pgpass_port, pgpass_database, pgpass_user, pgpass_password) in get_pgpass(os.environ.get('PGPASSFILE')):
+                    if (pgpass_host == options.host or pgpass_host == '*') and (pgpass_port == options.port or pgpass_port == '*') and (pgpass_user == options.username or pgpass_user == '*') and (pgpass_database == 'postgres' or pgpass_database == '*'):
+                        password = pgpass_password
+                        continue
             except Exception as e:
                 pass
         
