@@ -41,14 +41,12 @@ if os.name != 'posix':
 import signal
 import time
 import curses
-import atexit
-from datetime import datetime, timedelta
+from datetime import timedelta
 import psutil
 import psycopg2
 import psycopg2.extras
 import re
 from optparse import OptionParser, OptionGroup
-import optparse
 import socket
 
 # Curses initialization
