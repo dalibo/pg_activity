@@ -18,6 +18,6 @@ setup(
         "psycopg2 >= 2.2.1",
     ],
     data_files = [
-        ('/usr/share/man/man1', ['docs/man/pg_activity.1.gz'])
-    ]
+        ('/usr/share/man/man1', ['docs/man/pg_activity.1'])
+    ],
 )

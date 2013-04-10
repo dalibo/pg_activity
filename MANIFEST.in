@@ -1,0 +1,2 @@
+recursive-include *.py
+include docs/man/pg_activity.1
