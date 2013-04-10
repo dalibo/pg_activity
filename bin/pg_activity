@@ -826,33 +826,30 @@ def poll_activities(interval, connector, flag, indent, process = None, pg_num_ve
         new_procs = sys_get_proc(queries)
 
         procs = []
-        for pid, p in new_procs.items():
+        for pid, new_proc in new_procs.items():
             try:
                 if process.has_key(pid):
-                    n_pg_duration = p.duration
-                    n_pg_query = p.query
-                    n_pg_client = p.client
-                    n_wait = p.wait
-                    n_io_counters = p.getExtra('io_counters')
                     n_io_time = time.time()
-                    n_io_wait = p.getExtra('io_wait')
-                    p = process[pid]
-                    p.duration = n_pg_duration
-                    p.query = n_pg_query
-                    p.client = n_pg_client
-                    p.wait = n_wait
-                    p.setExtra('io_wait', n_io_wait)
-                    p.setExtra('read_delta', (n_io_counters.read_bytes - p.getExtra('io_counters').read_bytes)/(n_io_time - p.getExtra('io_time')))
-                    p.setExtra('write_delta', (n_io_counters.write_bytes - p.getExtra('io_counters').write_bytes)/(n_io_time - p.getExtra('io_time')))
-                    p.setExtra('io_counters', n_io_counters)
-                    p.setExtra('io_time', n_io_time)
+                    # Getting informations from the previous loop
+                    proc = process[pid]
+                    # Update old process with new informations
+                    proc.duration = new_proc.duration
+                    proc.query = new_proc.query
+                    proc.client = new_proc.client
+                    proc.wait = new_proc.wait
+                    proc.setExtra('io_wait', new_proc.getExtra('io_wait'))
+                    proc.setExtra('read_delta', (new_proc.getExtra('io_counters').read_bytes - proc.getExtra('io_counters').read_bytes)/(n_io_time - proc.getExtra('io_time')))
+                    proc.setExtra('write_delta', (new_proc.getExtra('io_counters').write_bytes - proc.getExtra('io_counters').write_bytes)/(n_io_time - proc.getExtra('io_time')))
+                    proc.setExtra('io_counters', new_proc.getExtra('io_counters'))
+                    proc.setExtra('io_time', n_io_time)
                 else:
-                    p.setExtra('io_counters', p.getExtra('io_counters'))
+                    # No previous information about this process
+                    proc = new_proc
             
-                p.setExtra('mem_percent', p.getExtra('psutil_proc').get_memory_percent())
-                p.setExtra('cpu_percent', p.getExtra('psutil_proc').get_cpu_percent(interval=0))
-                new_procs[pid] = p
-                procs.append({'pid': pid, 'database': p.database, 'client': p.client, 'cpu': p.getExtra('cpu_percent'), 'mem': p.getExtra('mem_percent'), 'read': p.getExtra('read_delta'), 'write': p.getExtra('write_delta'), 'query': p.query, 'duration': p.duration, 'wait': p.wait, 'io_wait': p.getExtra('io_wait')})
+                proc.setExtra('mem_percent', proc.getExtra('psutil_proc').get_memory_percent())
+                proc.setExtra('cpu_percent', proc.getExtra('psutil_proc').get_cpu_percent(interval=0))
+                new_procs[pid] = proc
+                procs.append({'pid': pid, 'database': proc.database, 'client': proc.client, 'cpu': proc.getExtra('cpu_percent'), 'mem': proc.getExtra('mem_percent'), 'read': proc.getExtra('read_delta'), 'write': proc.getExtra('write_delta'), 'query': proc.query, 'duration': proc.duration, 'wait': proc.wait, 'io_wait': proc.getExtra('io_wait')})
 
             except psutil.NoSuchProcess:
                 pass
