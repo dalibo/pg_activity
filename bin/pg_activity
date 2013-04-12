@@ -337,13 +337,13 @@ def get_pgpass(pgpass = None):
         return ret
     raise Exception("pgpass file not found")
 
-def pg_connect(host = 'localhost', port = 5432, user = 'postgres', password = None):
+def pg_connect(host = 'localhost', port = 5432, user = 'postgres', password = None, database = 'postgres'):
     """
     Connect to a PostgreSQL server and return
     cursor & connector.
     """
     conn = psycopg2.connect(
-            database = 'postgres',
+            database = database,
             host = host,
             port = port,
             user = user,
@@ -1378,9 +1378,13 @@ def main():
                 pass
         
         debug = options.debug
-        
+
+        database = os.environ.get('PGDATABASE')
+        if database is None:
+            database = 'postgres'
+
         try:
-            conn = pg_connect(host = options.host, port = options.port, user = options.username, password = password)
+            conn = pg_connect(host = options.host, port = options.port, user = options.username, password = password, database = database)
         except psycopg2.Error as e:
             at_exit_curses()
             sys.exit("FATAL: %s" % (clean_str(str(e),)))
