@@ -12,7 +12,7 @@ pg_activity is a htop like application for PostgreSQL server activity monitoring
 
 =item B<-U USERNAME>, B<--username=USERNAME>
 
-	Database user name (default: "postgres").
+	Database user name (default: $USER).
 
 =item B<-p PORT>, B<--port=PORT>
 
@@ -21,6 +21,10 @@ pg_activity is a htop like application for PostgreSQL server activity monitoring
 =item B<-h HOSTNAME>, B<--host=HOSTNAME>
 
 	Database server host or socket directory (default: "localhost").
+
+=item B<-d DBNAME>, B<--dbname=DBNAME>
+
+    Database name to connect to (default: "postgres").
 
 =item B<-C>, B<--no-color>
 

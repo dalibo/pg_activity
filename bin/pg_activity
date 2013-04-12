@@ -57,7 +57,6 @@ PGTOP_WIN.keypad(1)
 curses.noecho()
 curses.cbreak()
 
-
 # Some terms like vt100 do not support colors,
 # in that case, curses.curs_set() and all curses functions
 # related to colors (and probably others) raise an ERROR.
@@ -69,7 +68,7 @@ try:
     # use colors
     curses.start_color()
     curses.use_default_colors()
-except Exception as e:
+except Exception:
     # Terminal doesn't support curs_set() and colors
     PGTOP_SYS_COLOR = False
 
@@ -337,13 +336,13 @@ def get_pgpass(pgpass = None):
         return ret
     raise Exception("pgpass file not found")
 
-def pg_connect(host = 'localhost', port = 5432, user = 'postgres', password = None):
+def pg_connect(host = 'localhost', port = 5432, user = 'postgres', password = None, database = 'postgres'):
     """
     Connect to a PostgreSQL server and return
     cursor & connector.
     """
     conn = psycopg2.connect(
-            database = 'postgres',
+            database = database,
             host = host,
             port = port,
             user = user,
@@ -648,7 +647,6 @@ def interactive(process, flag, indent, connector, pg_num_version):
     Interactive mode trigged on KEY_UP or KEY_DOWN key press
     If no key hit during 3 seconds, exit this mode
     """
-    global PGTOP_LINES
     global PGTOP_VERBOSE_MODE
     # Force truncated display
     old_verbose_mode = PGTOP_VERBOSE_MODE
@@ -1033,7 +1031,7 @@ def get_indent(flag):
     """
     indent = ''
     r = [0] * PGTOP_MAX_NCOL
-    for key, val in PGTOP_COLS[PGTOP_MODE].items():
+    for _, val in PGTOP_COLS[PGTOP_MODE].items():
         if val['mandatory'] or (not val['mandatory'] and val['flag'] & flag):
             r[int(val['n'])] = val
     for val in r:
@@ -1051,7 +1049,7 @@ def print_cols_header(flag):
     disp = ''
     x = 0
     r = [0] * PGTOP_MAX_NCOL
-    for key, val in PGTOP_COLS[PGTOP_MODE].items():
+    for _, val in PGTOP_COLS[PGTOP_MODE].items():
         if val['mandatory'] or (not val['mandatory'] and val['flag'] & flag):
             r[int(val['n'])] = val
     for val in r:
@@ -1148,6 +1146,7 @@ def help_window():
     Display help window
     """
     PGTOP_WIN.erase()
+    global PGTOP_LINENO
     PGTOP_LINENO = 0
     text = "pg_activity %s - (c) 2012-2013 Julien Tachoires" % (PGTOP_VERSION)
     print_string(PGTOP_LINENO, 0, text, get_curses_color(C_GREEN)|curses.A_BOLD)
@@ -1337,8 +1336,6 @@ def refresh_line(p, flag, indent, typecolor = 'default', line = None):
 def main():
     global PGTOP_IS_LOCAL
     global PGTOP_START_LINE
-    global PGTOP_MAXX
-    global PGTOP_MAXY
     global PGTOP_BUFFER
 
     try:
@@ -1346,6 +1343,7 @@ def main():
         parser.add_option('-U', '--username', dest = 'username', default = getpass.getuser(), help = "Database user name (default: \"%s\")." % (getpass.getuser(),), metavar = 'USERNAME')
         parser.add_option('-p', '--port', dest = 'port', default = '5432', help = "Database server port (default: \"5432\").", metavar = 'PORT')
         parser.add_option('-h', '--host', dest = 'host', help = "Database server host or socket directory (default: \"localhost\").", metavar = 'HOSTNAME', default = 'localhost')
+        parser.add_option('-d', '--dbname', dest = 'dbname', help = "Database name to connect to (default: \"postgres\").", metavar = 'DBNAME', default = 'postgres')
         parser.add_option('-C', '--no-color', dest = 'nocolor', action = 'store_true', help = "Disable color usage.", default = 'false')
         group = OptionGroup(parser, "Display Options, you can exclude some columns by using them ")
         group.add_option('--no-database', dest = 'nodb', action = 'store_true', help = "Disable DATABASE.", default = 'false')
@@ -1371,7 +1369,7 @@ def main():
             # pgpass file handling
             try:
                 for (pgpass_host, pgpass_port, pgpass_database, pgpass_user, pgpass_password) in get_pgpass(os.environ.get('PGPASSFILE')):
-                    if (pgpass_host == options.host or pgpass_host == '*') and (pgpass_port == options.port or pgpass_port == '*') and (pgpass_user == options.username or pgpass_user == '*') and (pgpass_database == 'postgres' or pgpass_database == '*'):
+                    if (pgpass_host == options.host or pgpass_host == '*') and (pgpass_port == options.port or pgpass_port == '*') and (pgpass_user == options.username or pgpass_user == '*') and (pgpass_database == options.dbname or pgpass_database == '*'):
                         password = pgpass_password
                         continue
             except Exception as e:
@@ -1380,7 +1378,7 @@ def main():
         debug = options.debug
         
         try:
-            conn = pg_connect(host = options.host, port = options.port, user = options.username, password = password)
+            conn = pg_connect(host = options.host, port = options.port, user = options.username, password = password, database = options.dbname)
         except psycopg2.Error as e:
             at_exit_curses()
             sys.exit("FATAL: %s" % (clean_str(str(e),)))
@@ -1467,7 +1465,7 @@ def main():
                 indent = get_indent(flag)
             
             if PGTOP_IS_LOCAL:
-                new_disks_io = {'io':psutil.disk_io_counters(), 'time':time.time()}
+                new_disks_io = {'io': psutil.disk_io_counters(), 'time': time.time()}
                 delta_disks_io = {'read_count': 0, 'write_count': 0, 'read_bytes': 0.0, 'write_bytes': 0.0}
                 if disks_io is not None:
                     delta_disks_io['read_count'] = (new_disks_io['io'].read_count - disks_io['io'].read_count)/(new_disks_io['time'] - disks_io['time'])

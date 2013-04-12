@@ -19,6 +19,8 @@ Installation
 Usage
 -----
 
+    pg_activity [options]
+
 	Options:
 		--version            Show program's version number and exit 
 		-U USERNAME, --username=USERNAME
@@ -27,6 +29,8 @@ Usage
 		-h HOSTNAME, --host=HOSTNAME
 							  Database server host or socket directory (default:
                         	  "localhost").
+        -d DBNAME, --dbname=DBNAME
+                              Database name to connect to (default: "postgres").
 		-C, --no-color        Disable color usage.
 		--help                Show this help message and exit.
 		--debug               Enable debug mode for traceback tracking.
