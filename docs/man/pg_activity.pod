@@ -1,6 +1,10 @@
+=head1 NAME
+
+pg_activity - Realtime PostgreSQL database server monitoring tool
+
 =head1 SYNOPSIS
 
-B<pg_activity> [-UphC]
+B<pg_activity> [-UphdC]
 
 =head1 DESCRIPTION
 
