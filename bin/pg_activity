@@ -403,15 +403,15 @@ def pg_get_num_version(text_version):
     Get PostgreSQL short & numeric version from
     a string (SELECT version()).
     """
-    res = re.match(r"^PostgreSQL ([0-9]+)\.([0-9]+)\.([0-9]+)", text_version)
+    res = re.match(r"^(PostgreSQL|EnterpriseDB) ([0-9]+)\.([0-9]+)\.([0-9]+)", text_version)
     if res is not None:
-        r = res.group(1)
-        if int(res.group(2)) < 10:
-            r += '0'
-        r += res.group(2)
+        r = res.group(2)
         if int(res.group(3)) < 10:
             r += '0'
         r += res.group(3)
+        if int(res.group(4)) < 10:
+            r += '0'
+        r += res.group(4)
         return (res.group(0), int(r))
     return None
 
