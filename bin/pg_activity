@@ -413,7 +413,23 @@ def pg_get_num_version(text_version):
             r += '0'
         r += res.group(4)
         return (res.group(0), int(r))
+    return pg_get_num_dev_version(text_version)
+
+def pg_get_num_dev_version(text_version):
+    """
+    Get PostgreSQL short & numeric devel. version
+    from a string (SELECT version()). 
+    """
+    res = re.match(r"^(PostgreSQL|EnterpriseDB) ([0-9]+)\.([0-9]+)devel", text_version)
+    if res is not None:
+        r = res.group(2)
+        if int(res.group(3)) < 10:
+            r += '0'
+        r += res.group(3)
+        r += '00'
+        return (res.group(0), int(r))
     return None
+
 
 def pg_get_snapshot_infos(conn,):
     """
