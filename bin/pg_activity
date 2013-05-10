@@ -545,9 +545,9 @@ def sys_get_proc(queries):
             p.setExtra('io_wait', sys_get_IOW_status(str(proc.status)))
             p.setExtra('psutil_proc', proc)
             process[p.pid] = p
-        except psutil.error.NoSuchProcess:
+        except psutil.NoSuchProcess:
             pass
-        except psutil.error.AccessDenied:
+        except psutil.AccessDenied:
             pass
     return process
 
