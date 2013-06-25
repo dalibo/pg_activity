@@ -2,7 +2,7 @@
 
 """
 pg_activity utility
-version: 1.0.1
+version: 1.0.2
 author: Julien Tachoires <julmon@gmail.com>
 license: New BSD License
 
@@ -32,7 +32,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-PGTOP_VERSION = "1.0.1"
+PGTOP_VERSION = "1.0.2"
 
 import os
 import sys

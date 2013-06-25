@@ -1,4 +1,13 @@
 import sys
+
+# Dirty work around destinated to deactivate
+# manual page install when option --no-man is given
+data_files = [ ('/usr/share/man/man1', ['docs/man/pg_activity.1']) ]
+for opt in sys.argv:
+    if opt == '--no-man':
+        data_files = None
+        sys.argv.remove(opt)
+
 from setuptools import setup
 
 if sys.version_info < (2, 6):
@@ -6,7 +15,7 @@ if sys.version_info < (2, 6):
 
 setup(
     name = 'pg_activity',
-    version = '1.0.1',
+    version = '1.0.2',
     author = 'Julien Tachoires',
     author_email = 'julmon@gmail.com',
     scripts = ['bin/pg_activity'],
@@ -17,7 +26,5 @@ setup(
         "psutil >= 0.4.1",
         "psycopg2 >= 2.2.1",
     ],
-    data_files = [
-        ('/usr/share/man/man1', ['docs/man/pg_activity.1'])
-    ],
+    data_files = data_files,
 )
