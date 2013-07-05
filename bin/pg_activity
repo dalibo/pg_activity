@@ -511,7 +511,7 @@ def get_duration(duration):
     Returns 0 if the given duration is negative
     else, returns the duration
     """
-    if float(duration) < 0:
+    if duration is None or float(duration) < 0:
         return 0
     return float(duration)
 
