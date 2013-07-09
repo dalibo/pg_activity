@@ -16,7 +16,7 @@ Installation
 
     sudo python setup.py install
 
-### If you don't want to install man pages :
+### If you don't want to install man pages
 
     sudo python setup.py install --no-man
 
