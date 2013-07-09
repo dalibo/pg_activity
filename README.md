@@ -16,6 +16,12 @@ Installation
 
     sudo python setup.py install
 
+Use::
+
+    python setup.py install --no-man
+
+if you don't want to install man pages.
+
 Usage
 -----
 
