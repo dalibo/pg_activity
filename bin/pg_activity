@@ -336,12 +336,28 @@ def get_pgpass(pgpass = None):
         return ret
     raise Exception("pgpass file not found")
 
-def pg_connect(host = 'localhost', port = 5432, user = 'postgres', password = None, database = 'postgres'):
+def pg_connect(host = None, port = 5432, user = 'postgres', password = None, database = 'postgres'):
     """
     Connect to a PostgreSQL server and return
     cursor & connector.
     """
-    conn = psycopg2.connect(
+    conn = None
+    if host is None or host == 'localhost':
+        # try to connect using a UNIX Socket by passing host=None
+        try:
+            conn = psycopg2.connect(
+                database = database,
+                user = user,
+                host = None,
+                port = port,
+                password = password,
+                connection_factory=psycopg2.extras.DictConnection
+                )
+        except:
+            if host is None:
+                raise
+    if conn is None: # fallback on TCP/IP connection
+        conn = psycopg2.connect(
             database = database,
             host = host,
             port = port,
