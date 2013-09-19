@@ -66,6 +66,10 @@ pg_activity is a htop like application for PostgreSQL server activity monitoring
 
 	Disable DATABASE.
 
+=item B<--no-user>
+
+	Disable USER.
+
 =item B<--no-client>
 
 	Disable CLIENT.

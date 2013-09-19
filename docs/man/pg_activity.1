@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "PG_ACTIVITY 1"
-.TH PG_ACTIVITY 1 "2013-07-17" "pg_activity 1.0.3 dev" "PostgreSQL server activity monitoring tool"
+.TH PG_ACTIVITY 1 "2013-09-19" "pg_activity 1.0.3 dev" "PostgreSQL server activity monitoring tool"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -192,6 +192,11 @@ pg_activity is a htop like application for PostgreSQL server activity monitoring
 .IX Item "--no-database"
 .Vb 1
 \&        Disable DATABASE.
+.Ve
+.IP "\fB\-\-no\-user\fR" 2
+.IX Item "--no-user"
+.Vb 1
+\&        Disable USER.
 .Ve
 .IP "\fB\-\-no\-client\fR" 2
 .IX Item "--no-client"
