@@ -42,6 +42,7 @@ Usage
 
 	Display options, you can exclude some columns by using them :
 		--no-database         Disable DATABASE.
+    	--no-user             Disable USER.
     	--no-client           Disable CLIENT.
     	--no-cpu              Disable CPU%.
     	--no-mem              Disable MEM%.
