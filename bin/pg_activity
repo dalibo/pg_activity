@@ -1267,8 +1267,8 @@ def refresh_window(procs, extras, flag, indent, io, tps, size_ev, total_size):
             PGTOP_LINES.append(line_trunc)
         except curses.error:
             break
-        for l in range(PGTOP_LINENO, (PGTOP_MAXX-1)):
-            print_string(l, 0, add_blank(" "))
+    for l in range(PGTOP_LINENO, (PGTOP_MAXY-1)):
+        print_string(l, 0, add_blank(" "))
     change_mode_interactive()
 
 def scroll_window(procs, flag, indent, offset = 0):
@@ -1279,14 +1279,11 @@ def scroll_window(procs, flag, indent, offset = 0):
     PGTOP_LINENO = (PGTOP_START_LINE + 2)
     pos = 0
     for p in procs:
-        if pos >= offset:
-            try:
-                refresh_line(p, flag, indent, 'default')
-            except curses.error:
-                break
-            for l in range(PGTOP_LINENO, (PGTOP_MAXX-1)):
-                print_string(l, 0, add_blank(" "))
+        if pos >= offset and PGTOP_LINENO < (PGTOP_MAXY - 1):
+            refresh_line(p, flag, indent, 'default')
         pos += 1
+    for l in range(PGTOP_LINENO, (PGTOP_MAXX-1)):
+        print_string(l, 0, add_blank(" "))
 
 def refresh_line(p, flag, indent, typecolor = 'default', line = None):
     """
