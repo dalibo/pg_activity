@@ -229,7 +229,7 @@ class pgtop_proc:
         self.cpu = cpu
         self.mem = mem
         self.read = read
-        self.write = write 
+        self.write = write
         self.query = query
         self.duration = duration
         self.wait = wait
@@ -237,7 +237,7 @@ class pgtop_proc:
 
     def setExtra(self, key, value):
         self.extras[key] = value
-    
+
     def getExtra(self, key):
         if self.extras is not None and self.extras.has_key(key):
             return self.extras[key]
@@ -452,7 +452,6 @@ def pg_get_num_dev_version(text_version):
         return (res.group(0), int(r))
     return None
 
-
 def pg_get_snapshot_infos(conn,):
     """
     Get current sum of transactions, total size and  timestamp.
@@ -609,7 +608,7 @@ def pause():
         if k == ord(' '):
             curses.flushinp()
             return 0
-        
+
         if k == curses.KEY_RESIZE and PGTOP_BUFFER is not None and PGTOP_BUFFER.has_key('procs'):
             check_window_size()
             refresh_window(PGTOP_BUFFER['procs'], PGTOP_BUFFER['extras'], PGTOP_BUFFER['flag'], PGTOP_BUFFER['indent'], PGTOP_BUFFER['io'], PGTOP_BUFFER['tps'], PGTOP_BUFFER['size_ev'], PGTOP_BUFFER['total_size'])
@@ -700,7 +699,7 @@ def interactive(process, flag, indent, connector, pg_num_version):
 
     # Refresh lines with this verbose mode    
     scroll_window(process, flag, indent, 0)
-    
+
     help_key_interactive()
 
     current_pos = 0
@@ -768,7 +767,7 @@ def poll(interval, connector, flag, indent, process = None, pg_num_version = Non
         return poll_activities(interval, connector, flag, indent, process, pg_num_version, disp_proc)
     elif PGTOP_MODE == 'waiting' or PGTOP_MODE == 'blocking':
         return poll_waiting_blocking(interval, connector, flag, indent, process, pg_num_version, disp_proc)
- 
+
 def poll_activities(interval, connector, flag, indent, process = None, pg_num_version = None, disp_proc = None):
     """
     Poll activities.
@@ -846,14 +845,14 @@ def poll_activities(interval, connector, flag, indent, process = None, pg_num_ve
     # Refresh
     if k == ord('R'):
         known = True
-     
+
     if k == ord('h'):
         help_window()
         do_refresh = True
 
     if k == curses.KEY_RESIZE and PGTOP_BUFFER is not None and PGTOP_BUFFER.has_key('procs'):
         do_refresh = True
-    
+
     if do_refresh is True and PGTOP_BUFFER is not None and PGTOP_BUFFER.has_key('procs'):
         check_window_size()
         refresh_window(PGTOP_BUFFER['procs'], PGTOP_BUFFER['extras'], PGTOP_BUFFER['flag'], PGTOP_BUFFER['indent'], PGTOP_BUFFER['io'], PGTOP_BUFFER['tps'], PGTOP_BUFFER['size_ev'], PGTOP_BUFFER['total_size'])
@@ -889,7 +888,7 @@ def poll_activities(interval, connector, flag, indent, process = None, pg_num_ve
                 else:
                     # No previous information about this process
                     proc = new_proc
-            
+
                 proc.setExtra('mem_percent', proc.getExtra('psutil_proc').get_memory_percent())
                 proc.setExtra('cpu_percent', proc.getExtra('psutil_proc').get_cpu_percent(interval=0))
                 new_procs[pid] = proc
@@ -925,7 +924,7 @@ def poll_activities(interval, connector, flag, indent, process = None, pg_num_ve
         disp_procs = sorted(procs, key=lambda p: p['write'], reverse=True)
     else:
         disp_procs = sorted(procs, key=lambda p: p['duration'], reverse=True)
-    
+
     return (disp_procs, new_procs)
 
 def poll_waiting_blocking(interval, connector, flag, indent, process = None, pg_num_version = None, disp_proc = None):
@@ -942,7 +941,7 @@ def poll_waiting_blocking(interval, connector, flag, indent, process = None, pg_
     known = False
     # Keyboard interactions
     PGTOP_WIN.timeout(int(1000 * PGTOP_REFRESH_TIME * interval))
-    
+
     try:
         k = PGTOP_WIN.getch()
     except KeyboardInterrupt as e:
@@ -1000,41 +999,41 @@ def poll_waiting_blocking(interval, connector, flag, indent, process = None, pg_
     if k == ord('h'):
         help_window()
         do_refresh = True
-    
+
     # Refresh
     if k == ord('R'):
         known = True
-    
+
     if k == curses.KEY_RESIZE and PGTOP_BUFFER is not None and PGTOP_BUFFER.has_key('procs'):
         do_refresh = True
-    
+
     if do_refresh is True and PGTOP_BUFFER is not None and PGTOP_BUFFER.has_key('procs'):
         check_window_size()
         refresh_window(PGTOP_BUFFER['procs'], PGTOP_BUFFER['extras'], PGTOP_BUFFER['flag'], PGTOP_BUFFER['indent'], PGTOP_BUFFER['io'], PGTOP_BUFFER['tps'], PGTOP_BUFFER['size_ev'], PGTOP_BUFFER['total_size'])
-     
+
     curses.flushinp()
-    t_end = time.time() 
+    t_end = time.time()
     if k > -1 and not known and (t_end - t_start) < (PGTOP_REFRESH_TIME * interval):
         return poll_waiting_blocking(((PGTOP_REFRESH_TIME * interval) - (t_end - t_start))/PGTOP_REFRESH_TIME, connector, flag, indent, process, pg_num_version, disp_proc)
- 
+
     # poll postgresql activity
     if PGTOP_MODE == 'waiting':
         queries =  pg_get_waiting(connector, pg_num_version)
     else:
         queries =  pg_get_blocking(connector, pg_num_version)
-    
+
     new_procs = {}
     for q in queries:
         new_procs[q['pid']] = q
         new_procs[q['pid']]['duration'] = get_duration(q['duration'])
-    
+
     # return processes sorted by query duration
     if PGTOP_SORT == 't':
         # TIME
         disp_procs = sorted(queries, key=lambda q: q['duration'], reverse=True)
     else:
         disp_procs = sorted(queries, key=lambda q: q['duration'], reverse=True)
-    
+
     return (disp_procs, new_procs)
 
 def print_string(lineno, colno, word, color = 0):
@@ -1047,7 +1046,7 @@ def print_string(lineno, colno, word, color = 0):
         pass
     return len(word)
 
-def add_blank(line, offset = 0): 
+def add_blank(line, offset = 0):
     """
     Complete string with white spaces from the end of string to the end of line.
     """
@@ -1123,7 +1122,7 @@ def print_header(pg_version, hostname, user, host, port, io, tps, size_ev, total
     Print window header
     """
     global PGTOP_LINENO
-    global PGTOP_MAX_IOPS 
+    global PGTOP_MAX_IOPS
     PGTOP_LINENO = 0
     colno = 0
     version = " %s" % (pg_version)
@@ -1138,17 +1137,17 @@ def print_header(pg_version, hostname, user, host, port, io, tps, size_ev, total
     colno += print_string(PGTOP_LINENO, colno, port, get_curses_color(C_CYAN))
     colno += print_string(PGTOP_LINENO, colno, " - Ref.: %ss" % (PGTOP_REFRESH_TIME,))
     colno = 0
-    PGTOP_LINENO += 1   
+    PGTOP_LINENO += 1
     colno += print_string(PGTOP_LINENO, colno, "  Size: ")
     colno += print_string(PGTOP_LINENO, colno, "%7s" % (bytes2human(total_size),),)
     colno += print_string(PGTOP_LINENO, colno, " - %9s/s" % (bytes2human(size_ev),),)
     colno += print_string(PGTOP_LINENO, colno, " - TPS: ")
     colno += print_string(PGTOP_LINENO, colno, "%6s" % (tps,), get_curses_color(C_GREEN)|curses.A_BOLD)
- 
+
     # If not local connection, don't get and display system informations
     if not PGTOP_IS_LOCAL:
         return
-    
+
     try:
         # psutil >= 0.6.0
         phymem = psutil.virtual_memory()
@@ -1166,10 +1165,10 @@ def print_header(pg_version, hostname, user, host, port, io, tps, size_ev, total
     PGTOP_LINENO += 1
     line = "  Mem.: %5s0%% - %9s/%s" % (phymem.percent, bytes2human(used), bytes2human(phymem.total))
     colno_io = print_string(PGTOP_LINENO, 0, line)
-    
+
     if (int(io['read_count'])+int(io['write_count'])) > PGTOP_MAX_IOPS:
         PGTOP_MAX_IOPS = (int(io['read_count'])+int(io['write_count']))
-    
+
     line_io = " | IO Disks Max: %s IOPS" % (PGTOP_MAX_IOPS,)
     colno = print_string(PGTOP_LINENO, colno_io, line_io)
 
@@ -1228,9 +1227,9 @@ def help_window():
     display_help_key(PGTOP_LINENO, 00, "   F2/2", "waiting queries")
     PGTOP_LINENO += 1
     display_help_key(PGTOP_LINENO, 00, "   F3/3", "blocking queries")
-    
+
     PGTOP_LINENO += 2
-    print_string(PGTOP_LINENO, 0, "Press any key to exit.")    
+    print_string(PGTOP_LINENO, 0, "Press any key to exit.")
     PGTOP_WIN.timeout(-1)
     try:
         PGTOP_WIN.getch()
@@ -1294,7 +1293,7 @@ def refresh_line(p, flag, indent, typecolor = 'default', line = None):
         l_lineno = line
     else:
         l_lineno = PGTOP_LINENO
-    
+
     colno = 0
     colno += print_string(l_lineno, colno, "%-6s " % (p['pid'],), PGTOP_LINE_COLORS['pid'][typecolor])
     if flag & PGTOP_FLAG_DATABASE:
@@ -1339,13 +1338,12 @@ def refresh_line(p, flag, indent, typecolor = 'default', line = None):
             colno += print_string(l_lineno, colno, "%2s " % ('Y',), PGTOP_LINE_COLORS['wait_red'][typecolor])
         else:
             colno += print_string(l_lineno, colno, "%2s " % ('N',), PGTOP_LINE_COLORS['wait_green'][typecolor])
-    
+
     if PGTOP_MODE == 'activities' and flag & PGTOP_FLAG_IOWAIT:
         if p['io_wait'] == 'Y':
             colno += print_string(l_lineno, colno, "%4s " % ('Y',), PGTOP_LINE_COLORS['wait_red'][typecolor])
         else:
             colno += print_string(l_lineno, colno, "%4s " % ('N',), PGTOP_LINE_COLORS['wait_green'][typecolor])
-
 
     dif = PGTOP_MAXX - len(indent) - 1
     if PGTOP_VERBOSE_MODE == PGTOP_TRUNCATE:
@@ -1365,7 +1363,7 @@ def refresh_line(p, flag, indent, typecolor = 'default', line = None):
                 p_indent = ""
             else:
                 p_indent = indent
-            while (len(query) - offset > 0):    
+            while (len(query) - offset > 0):
                 query_part = query[offset:(dif+offset)]
                 l_lineno += 1
                 PGTOP_LINENO += 1
@@ -1423,7 +1421,7 @@ def main():
             at_exit_curses()
             print(parser.format_help().strip())
             sys.exit(1)
-        
+
         password = os.environ.get('PGPASSWORD')
         if password is None:
             # pgpass file handling
@@ -1434,22 +1432,22 @@ def main():
                         continue
             except Exception as e:
                 pass
-        
+
         debug = options.debug
-        
+
         try:
             conn = pg_connect(host = options.host, port = options.port, user = options.username, password = password, database = options.dbname)
         except psycopg2.Error as e:
             at_exit_curses()
             sys.exit("FATAL: %s" % (clean_str(str(e),)))
-        
+
         pg_version = pg_get_version(conn)
         (pg_short_version, pg_num_version) = pg_get_num_version(pg_version)
         hostname = socket.gethostname()
-       
+
         # reduce DATABASE column length 
         set_max_db_length(16)
-        
+
         # does pg_activity runing against local PG instance
         if not pg_is_local(conn):
             PGTOP_IS_LOCAL = False
@@ -1475,7 +1473,7 @@ def main():
         if options.nocolor == True:
             set_nocolor()
         else:
-            set_color()    
+            set_color()
         # default flag
         flag = PGTOP_FLAG_DATABASE | PGTOP_FLAG_USER | PGTOP_FLAG_CLIENT | PGTOP_FLAG_CPU | PGTOP_FLAG_MEM | PGTOP_FLAG_READ | PGTOP_FLAG_WRITE | PGTOP_FLAG_TIME | PGTOP_FLAG_WAIT | PGTOP_FLAG_RELATION | PGTOP_FLAG_TYPE | PGTOP_FLAG_MODE | PGTOP_FLAG_IOWAIT
         if options.nodb is True:
@@ -1496,7 +1494,7 @@ def main():
             flag -= PGTOP_FLAG_TIME
         if options.nowait is True:
             flag -= PGTOP_FLAG_WAIT
-        
+
         if not PGTOP_IS_LOCAL and (flag & PGTOP_FLAG_CPU):
             flag -= PGTOP_FLAG_CPU
         if not PGTOP_IS_LOCAL and (flag & PGTOP_FLAG_MEM):
@@ -1507,7 +1505,7 @@ def main():
             flag -= PGTOP_FLAG_WRITE
         if not PGTOP_IS_LOCAL and (flag & PGTOP_FLAG_IOWAIT):
             flag -= PGTOP_FLAG_IOWAIT
-          
+
         # main loop
         disks_io = None
         disp_procs = None
@@ -1516,16 +1514,16 @@ def main():
         set_max_db_length(max_db_length)
         # indentation
         indent = get_indent(flag)
-        
+
         while 1:
             check_window_size()
-            
+
             # poll process
             old_pgtop_mode = PGTOP_MODE
             (disp_procs, new_procs) = poll(interval, conn, flag, indent, procs, pg_num_version, disp_procs)
             if PGTOP_MODE != old_pgtop_mode:
                 indent = get_indent(flag)
-            
+
             if PGTOP_IS_LOCAL:
                 new_disks_io = {'io': psutil.disk_io_counters(), 'time': time.time()}
                 delta_disks_io = {'read_count': 0, 'write_count': 0, 'read_bytes': 0.0, 'write_bytes': 0.0}
@@ -1537,12 +1535,12 @@ def main():
                 disks_io = new_disks_io
             else:
                 delta_disks_io = None
-    
+
             procs = new_procs
             # refresh the winodw
             (n_tps_time, n_tps_nb_tx, n_tps_total_size, max_db_length) = pg_get_snapshot_infos(conn)
             set_max_db_length(max_db_length)
-            
+
             tps = int((n_tps_nb_tx - tps_nb_tx) / (n_tps_time - tps_time))
             size_ev = float(float(n_tps_total_size - tps_total_size) / (n_tps_time - tps_time))
             tps_time = n_tps_time
