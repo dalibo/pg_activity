@@ -1281,7 +1281,7 @@ def scroll_window(procs, flag, indent, offset = 0):
         if pos >= offset and PGTOP_LINENO < (PGTOP_MAXY - 1):
             refresh_line(p, flag, indent, 'default')
         pos += 1
-    for l in range(PGTOP_LINENO, (PGTOP_MAXX-1)):
+    for l in range(PGTOP_LINENO, (PGTOP_MAXY-1)):
         print_string(l, 0, add_blank(" "))
 
 def refresh_line(p, flag, indent, typecolor = 'default', line = None):
