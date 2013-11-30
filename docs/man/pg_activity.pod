@@ -34,6 +34,10 @@ pg_activity is a htop like application for PostgreSQL server activity monitoring
 
 	Disable color usage.
 
+=item B<--blocksize=BLOCKSIZE>
+
+	Filesystem blocksize (default: 4096).
+
 =item B<--help>
 
 	Show this help message and exit.
@@ -144,15 +148,17 @@ pg_activity is a htop like application for PostgreSQL server activity monitoring
 
 =over 2
 	
-=item B<UP>    Move up the cursor
+=item B<UP>    Move up the cursor.
 
-=item B<DOWN>  Move down the cursor
+=item B<DOWN>  Move down the cursor.
 
-=item B<k>     Cancel the backend
+=item B<k>     Terminate the current backend/tagged backends.
 
-=item B<Space> Back to activity
+=item B<Space> Tag or untag the process.
 
-=item B<q>     Quit
+=item B<q>     Quit.
+
+=item B<Other> Back to activity.
 
 =back
 

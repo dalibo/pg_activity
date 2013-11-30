@@ -15,10 +15,11 @@ if sys.version_info < (2, 6):
 
 setup(
     name = 'pg_activity',
-    version = '1.0.3 dev',
+    version = '1.1.0',
     author = 'Julien Tachoires',
     author_email = 'julmon@gmail.com',
     scripts = ['bin/pg_activity'],
+    packages = ['pgactivity'],
     url = 'https://github.com/julmon/pg_activity',
     license = 'LICENSE.txt',
     description = 'htop like utility for PostgreSQL activity monitoring.',

@@ -16,7 +16,7 @@ Installation
 
     sudo python setup.py install
 
-### If you don't want to install man pages
+### Installation without man pages
 
     sudo python setup.py install --no-man
 
@@ -39,6 +39,7 @@ Usage
 		-C, --no-color        Disable color usage.
 		--help                Show this help message and exit.
 		--debug               Enable debug mode for traceback tracking.
+        --blocksize=BLOCKSIZE Filesystem blocksize (default: 4096).
 
 	Display options, you can exclude some columns by using them :
 		--no-database         Disable DATABASE.
@@ -77,9 +78,10 @@ Navigation mode
 
 	UP			Move up the cursor
 	DOWN		Move down the cursor
-	k			Cancel the backend
-	Space		Back to activity
+	k			Terminate the current backend/tagged backends
+	Space		Tag or untag the process
 	q			Quit
+	Other		Back to activity
 			
 Screenshot
 ----------

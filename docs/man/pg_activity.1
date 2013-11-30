@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "PG_ACTIVITY 1"
-.TH PG_ACTIVITY 1 "2013-09-19" "pg_activity 1.0.3 dev" "PostgreSQL server activity monitoring tool"
+.TH PG_ACTIVITY 1 "2013-11-30" "pg_activity 1.1.0" "PostgreSQL server activity monitoring tool"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -163,6 +163,11 @@ pg_activity is a htop like application for PostgreSQL server activity monitoring
 .IX Item "-C, --no-color"
 .Vb 1
 \&        Disable color usage.
+.Ve
+.IP "\fB\-\-blocksize=BLOCKSIZE\fR" 2
+.IX Item "--blocksize=BLOCKSIZE"
+.Vb 1
+\&        Filesystem blocksize (default: 4096).
 .Ve
 .IP "\fB\-\-help\fR" 2
 .IX Item "--help"
@@ -273,17 +278,19 @@ pg_activity is a htop like application for PostgreSQL server activity monitoring
 .PD
 .SH "NAVIGATION MODE"
 .IX Header "NAVIGATION MODE"
-.IP "\fB\s-1UP\s0\fR    Move up the cursor" 2
-.IX Item "UP    Move up the cursor"
+.IP "\fB\s-1UP\s0\fR    Move up the cursor." 2
+.IX Item "UP    Move up the cursor."
 .PD 0
-.IP "\fB\s-1DOWN\s0\fR  Move down the cursor" 2
-.IX Item "DOWN  Move down the cursor"
-.IP "\fBk\fR     Cancel the backend" 2
-.IX Item "k     Cancel the backend"
-.IP "\fBSpace\fR Back to activity" 2
-.IX Item "Space Back to activity"
-.IP "\fBq\fR     Quit" 2
-.IX Item "q     Quit"
+.IP "\fB\s-1DOWN\s0\fR  Move down the cursor." 2
+.IX Item "DOWN  Move down the cursor."
+.IP "\fBk\fR     Terminate the current backend/tagged backends." 2
+.IX Item "k     Terminate the current backend/tagged backends."
+.IP "\fBSpace\fR Tag or untag the process." 2
+.IX Item "Space Tag or untag the process."
+.IP "\fBq\fR     Quit." 2
+.IX Item "q     Quit."
+.IP "\fBOther\fR Back to activity." 2
+.IX Item "Other Back to activity."
 .PD
 .SH "EXAMPLES"
 .IX Header "EXAMPLES"
