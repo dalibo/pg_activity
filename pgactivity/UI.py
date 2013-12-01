@@ -819,7 +819,20 @@ class UI:
                     proc.setExtra('mem_percent', proc.getExtra('psutil_proc').get_memory_percent())
                     proc.setExtra('cpu_percent', proc.getExtra('psutil_proc').get_cpu_percent(interval=0))
                     new_procs[pid] = proc
-                    procs.append({'pid': pid, 'database': proc.database, 'user':proc.user, 'client': proc.client, 'cpu': proc.getExtra('cpu_percent'), 'mem': proc.getExtra('mem_percent'), 'read': proc.getExtra('read_delta'), 'write': proc.getExtra('write_delta'), 'query': proc.query, 'duration': self.dc.get_duration(proc.duration), 'wait': proc.wait, 'io_wait': proc.getExtra('io_wait')})
+                    procs.append({
+                        'pid': pid,
+                        'database': proc.database,
+                        'user':proc.user,
+                        'client': proc.client,
+                        'cpu': proc.getExtra('cpu_percent'),
+                        'mem': proc.getExtra('mem_percent'),
+                        'read': proc.getExtra('read_delta'),
+                        'write': proc.getExtra('write_delta'),
+                        'query': proc.query,
+                        'duration': self.dc.get_duration(proc.duration),
+                        'wait': proc.wait,
+                        'io_wait': proc.getExtra('io_wait')
+                    })
 
                 except psutil.NoSuchProcess:
                     pass
@@ -839,7 +852,15 @@ class UI:
             for q in queries:
                 if not this.pid.count(q['pid']):
                     this.pid.append(q['pid'])
-                procs.append({'pid': q['pid'], 'database': q['database'], 'user': q['user'], 'client': q['client'], 'query': q['query'], 'duration': self.dc.get_duration(q['duration']), 'wait': q['wait']})
+                procs.append({
+                    'pid': q['pid'],
+                    'database': q['database'],
+                    'user': q['user'],
+                    'client': q['client'],
+                    'query': q['query'],
+                    'duration': self.dc.get_duration(q['duration']),
+                    'wait': q['wait']
+                })
 
         # return processes sorted by query duration
         if self.sort == 't':
@@ -1068,9 +1089,9 @@ class UI:
         colno = 0
         self.lineno += 1
         colno += self.print_string(self.lineno, colno, "  Size: ")
-        colno += self.print_string(self.lineno, colno, "%7s" % (self.bytes2human(total_size),),)
+        colno += self.print_string(self.lineno, colno, "%8s" % (self.bytes2human(total_size),),)
         colno += self.print_string(self.lineno, colno, " - %9s/s" % (self.bytes2human(size_ev),),)
-        colno += self.print_string(self.lineno, colno, "     | TPS: ")
+        colno += self.print_string(self.lineno, colno, "        | TPS: ")
         colno += self.print_string(self.lineno, colno, "%11s" % (tps,), self.get_curses_color(C_GREEN)|curses.A_BOLD)
 
         # If not local connection, don't get and display system informations
@@ -1083,7 +1104,7 @@ class UI:
         (av1, av2, av3) = self.dc.get_load_average()
 
         self.lineno += 1
-        line = "  Mem.: %5s0%% - %9s/%s" % (mem_used_per, self.bytes2human(mem_used), self.bytes2human(mem_total))
+        line = "  Mem.: %6s0%% - %9s/%-8s" % (mem_used_per, self.bytes2human(mem_used), self.bytes2human(mem_total))
         colno_io = self.print_string(self.lineno, 0, line)
 
         if (int(io['read_count'])+int(io['write_count'])) > self.max_iops:
@@ -1093,14 +1114,14 @@ class UI:
         colno = self.print_string(self.lineno, colno_io, line_io)
 
         # swap usage
-        line = "  Swap: %5s0%% - %9s/%s" % (swap_used_per, self.bytes2human(swap_used), self.bytes2human(swap_total))
+        line = "  Swap: %6s0%% - %9s/%-8s" % (swap_used_per, self.bytes2human(swap_used), self.bytes2human(swap_total))
         self.lineno += 1
         colno = self.print_string(self.lineno, 0, line)
         line_io = " | Read : %10s/s - %6s/s" % (self.bytes2human(io['read_bytes']), int(io['read_count']),)
         colno = self.print_string(self.lineno, colno_io, line_io)
 
         # load average, uptime
-        line = "  Load:   %.2f %.2f %.2f" % (av1, av2, av3)
+        line = "  Load:    %.2f %.2f %.2f" % (av1, av2, av3)
         self.lineno += 1
         colno = self.print_string(self.lineno, 0, line)
         line_io = " | Write: %10s/s - %6s/s" % (self.bytes2human(io['write_bytes']), int(io['write_count']),)
