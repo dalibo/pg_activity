@@ -711,11 +711,13 @@ class UI:
         # show waiting queries
         if (k == curses.KEY_F2 or k == ord('2')):
             self.mode = 'waiting'
+            self.sort = 't'
             curses.flushinp()
             return self.poll_waiting_blocking(0, flag, indent)
         # show blocking queries
         if (k == curses.KEY_F3 or k == ord('3')):
             self.mode = 'blocking'
+            self.sort = 't'
             curses.flushinp()
             return self.poll_waiting_blocking(0, flag, indent)
         # change verbosity
@@ -978,14 +980,10 @@ class UI:
         new_procs = {}
         for q in queries:
             new_procs[q['pid']] = q
-            new_procs[q['pid']]['duration'] = self.dc.get_duration(q['duration'])
+            new_procs[q['pid']][6] = self.dc.get_duration(q['duration'])
 
         # return processes sorted by query duration
-        if self.sort == 't':
-            # TIME
-            disp_procs = sorted(queries, key=lambda q: q['duration'], reverse=True)
-        else:
-            disp_procs = sorted(queries, key=lambda q: q['duration'], reverse=True)
+        disp_procs = sorted(queries, key=lambda q: q['duration'], reverse=True)
 
         return (disp_procs, new_procs)
 
