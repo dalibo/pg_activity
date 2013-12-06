@@ -852,8 +852,8 @@ class UI:
             procs = []
             new_procs = None
             for q in queries:
-                if not this.pid.count(q['pid']):
-                    this.pid.append(q['pid'])
+                if not self.pid.count(q['pid']):
+                    self.pid.append(q['pid'])
                 procs.append({
                     'pid': q['pid'],
                     'database': q['database'],
