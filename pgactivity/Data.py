@@ -114,7 +114,7 @@ class Data:
         system informations for a postgres process.
         """
         for p in psutil.process_iter():
-            if p.name == 'postgres' or p.name == 'postmaster':
+            if p.name == 'postgres' or p.name == 'postmaster' or p.name == 'edb-postgres':
                 try:
                     proc = psutil.Process(p.pid)
                     proc.get_io_counters()
