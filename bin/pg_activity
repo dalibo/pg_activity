@@ -2,17 +2,27 @@
 
 """
 pg_activity
-version: 1.1.0
+version: 1.1.1
 author: Julien Tachoires <julmon@gmail.com>
 license: PostgreSQL License
 
-Copyright (c) 2012 - 2013, Julien Tachoires
+Copyright (c) 2012 - 2014, Julien Tachoires
 
-Permission to use, copy, modify, and distribute this software and its documentation for any purpose, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and this paragraph and the following two paragraphs appear in all copies.
+Permission to use, copy, modify, and distribute this software and its
+documentation for any purpose, without fee, and without a written
+agreement is hereby granted, provided that the above copyright notice
+and this paragraph and the following two paragraphs appear in all copies.
 
-IN NO EVENT SHALL JULIEN TACHOIRES BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF JULIEN TACHOIRES HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+IN NO EVENT SHALL JULIEN TACHOIRES BE LIABLE TO ANY PARTY FOR DIRECT,
+INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST
+PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION,
+EVEN IF JULIEN TACHOIRES HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-JULIEN TACHOIRES SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, AND JULIEN TACHOIRES HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+JULIEN TACHOIRES SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT
+NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+FOR A PARTICULAR PURPOSE. THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS"
+BASIS, AND JULIEN TACHOIRES HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE,
+SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 """
 
 PGTOP_VERSION = "1.1.1"
@@ -33,125 +43,268 @@ from pgactivity import UI
 
 # Customized OptionParser
 class ModifiedOptionParser(OptionParser):
+    """
+    ModifiedOptionParser
+    """
     def error(self, msg):
         raise OptionParsingError(msg)
 
 class OptionParsingError(RuntimeError):
+    """
+    OptionParsingError
+    """
     def __init__(self, msg):
         self.msg = msg
 
 # Create the UI
-ui = UI.UI(PGTOP_VERSION)
+PGAUI = UI.UI(PGTOP_VERSION)
 
-# Main function
 def main():
+    """
+    Main function
+    """
     try:
         try:
-            parser = ModifiedOptionParser(add_help_option = False, version = "%prog "+PGTOP_VERSION, description = "htop like application for PostgreSQL server activity monitoring.")
-            parser.add_option('-U', '--username', dest = 'username', default = getpass.getuser(), help = "Database user name (default: \"%s\")." % (getpass.getuser(),), metavar = 'USERNAME')
-            parser.add_option('-p', '--port', dest = 'port', default = '5432', help = "Database server port (default: \"5432\").", metavar = 'PORT')
-            parser.add_option('-h', '--host', dest = 'host', help = "Database server host or socket directory (default: \"localhost\").", metavar = 'HOSTNAME', default = 'localhost')
-            parser.add_option('-d', '--dbname', dest = 'dbname', help = "Database name to connect to (default: \"postgres\").", metavar = 'DBNAME', default = 'postgres')
-            parser.add_option('-C', '--no-color', dest = 'nocolor', action = 'store_true', help = "Disable color usage.", default = 'false')
-            parser.add_option('--blocksize', dest = 'blocksize',  help = "Filesystem blocksize (default: 4096)", metavar = 'BLOCKSIZE', default = 4096)
-            group = OptionGroup(parser, "Display Options, you can exclude some columns by using them ")
-            group.add_option('--no-database', dest = 'nodb', action = 'store_true', help = "Disable DATABASE.", default = 'false')
-            group.add_option('--no-user', dest = 'nouser', action = 'store_true', help = "Disable USER.", default = 'false')
-            group.add_option('--no-client', dest = 'noclient', action = 'store_true', help = "Disable CLIENT.", default = 'false')
-            group.add_option('--no-cpu', dest = 'nocpu', action = 'store_true', help = "Disable CPU%.", default = 'false')
-            group.add_option('--no-mem', dest = 'nomem', action = 'store_true', help = "Disable MEM%.", default = 'false')
-            group.add_option('--no-read', dest = 'noread', action = 'store_true', help = "Disable READ/s.", default = 'false')
-            group.add_option('--no-write', dest = 'nowrite', action = 'store_true', help = "Disable WRITE/s.", default = 'false')
-            group.add_option('--no-time', dest = 'notime', action = 'store_true', help = "Disable TIME+.", default = 'false')
-            group.add_option('--no-wait', dest = 'nowait', action = 'store_true', help = "Disable W.", default = 'false')
+            parser = ModifiedOptionParser(
+                add_help_option = False,
+                version = "%prog "+PGTOP_VERSION,
+                description = "htop like application for PostgreSQL \
+server activity monitoring.")
+            # -U / --username
+            parser.add_option(
+                '-U',
+                '--username',
+                dest = 'username',
+                default = getpass.getuser(),
+                help = "Database user name (default: \"%s\")."
+                    % (getpass.getuser(),),
+                metavar = 'USERNAME')
+            # -p / --port
+            parser.add_option(
+                '-p',
+                '--port',
+                dest = 'port',
+                default = '5432',
+                help = "Database server port (default: \"5432\").",
+                metavar = 'PORT')
+            # -h / --host
+            parser.add_option(
+                '-h',
+                '--host',
+                dest = 'host',
+                help = "Database server host or socket directory \
+                            (default: \"localhost\").",
+                metavar = 'HOSTNAME',
+                default = 'localhost')
+            # -d / --dbname
+            parser.add_option(
+                '-d',
+                '--dbname',
+                dest = 'dbname',
+                help = "Database name to connect to (default: \"postgres\").",
+                metavar = 'DBNAME',
+                default = 'postgres')
+            # -C / --no-color
+            parser.add_option(
+                '-C',
+                '--no-color',
+                dest = 'nocolor',
+                action = 'store_true',
+                help = "Disable color usage.",
+                default = 'false')
+            # --blocksize
+            parser.add_option(
+                '--blocksize',
+                dest = 'blocksize',
+                help = "Filesystem blocksize (default: 4096)",
+                metavar = 'BLOCKSIZE',
+                default = 4096)
+            group = OptionGroup(
+                parser,
+                "Display Options, you can exclude some columns by using them ")
+            # --no-database
+            group.add_option(
+                '--no-database',
+                dest = 'nodb',
+                action = 'store_true',
+                help = "Disable DATABASE.",
+                default = 'false')
+            # --no-user
+            group.add_option(
+                '--no-user',
+                dest = 'nouser',
+                action = 'store_true',
+                help = "Disable USER.",
+                default = 'false')
+            # --no-client
+            group.add_option(
+                '--no-client',
+                dest = 'noclient',
+                action = 'store_true',
+                help = "Disable CLIENT.",
+                default = 'false')
+            # --no-cpu
+            group.add_option(
+                '--no-cpu',
+                dest = 'nocpu',
+                action = 'store_true',
+                help = "Disable CPU%.",
+                default = 'false')
+            # --no-mem
+            group.add_option(
+                '--no-mem',
+                dest = 'nomem',
+                action = 'store_true',
+                help = "Disable MEM%.",
+                default = 'false')
+            # --no-read
+            group.add_option(
+                '--no-read',
+                dest = 'noread',
+                action = 'store_true',
+                help = "Disable READ/s.",
+                default = 'false')
+            # --no-write
+            group.add_option(
+                '--no-write',
+                dest = 'nowrite',
+                action = 'store_true',
+                help = "Disable WRITE/s.",
+                default = 'false')
+            # --no-time
+            group.add_option(
+                '--no-time',
+                dest = 'notime',
+                action = 'store_true',
+                help = "Disable TIME+.",
+                default = 'false')
+            # --no-wait
+            group.add_option(
+                '--no-wait',
+                dest = 'nowait',
+                action = 'store_true',
+                help = "Disable W.",
+                default = 'false')
             parser.add_option_group(group)
-            parser.add_option('--help', dest = 'help', action = 'store_true', help = "Show this help message and exit.", default = 'false')
-            parser.add_option('--debug', dest = 'debug', action = 'store_true', help = "Enable debug mode for traceback tracking.", default = 'false')
-            (options, args) = parser.parse_args()
-        except OptionParsingError, e:
-            ui.at_exit_curses()
-            print 'pg_activity: error: %s' % e.msg
+            # --help
+            parser.add_option(
+                '--help',
+                dest = 'help',
+                action = 'store_true',
+                help = "Show this help message and exit.",
+                default = 'false')
+            # --debug
+            parser.add_option(
+                '--debug',
+                dest = 'debug',
+                action = 'store_true',
+                help = "Enable debug mode for traceback tracking.",
+                default = 'false')
+            (options, _) = parser.parse_args()
+        except OptionParsingError, err:
+            PGAUI.at_exit_curses()
+            print 'pg_activity: error: %s' % err.msg
             print 'Try "pg_activity --help" for more information.'
             sys.exit(1)
         if options.help is True:
-            ui.at_exit_curses()
+            PGAUI.at_exit_curses()
             print(parser.format_help().strip())
             sys.exit(1)
         password = os.environ.get('PGPASSWORD')
         if password is None:
             # pgpass file handling
             try:
-                for (pgpass_host, pgpass_port, pgpass_database, pgpass_user, pgpass_password) in ui.dc.get_pgpass(os.environ.get('PGPASSFILE')):
-                    if (pgpass_host == options.host or pgpass_host == '*') and (pgpass_port == options.port or pgpass_port == '*') and (pgpass_user == options.username or pgpass_user == '*') and (pgpass_database == options.dbname or pgpass_database == '*'):
-                        password = pgpass_password
+                pgpa_file = os.environ.get('PGPASSFILE')
+                for (pgpa_h, pgpa_p, pgpa_d, pgpa_u, pgpa_pwd) in \
+                    PGAUI.data.get_pgpass(pgpa_file):
+                    if (pgpa_h == options.host or pgpa_h == '*') and \
+                        (pgpa_p == options.port or pgpa_p == '*') and \
+                        (pgpa_u == options.username or pgpa_u == '*') and \
+                        (pgpa_d == options.dbname or pgpa_d == '*'):
+                        password = pgpa_pwd
                         continue
-            except Exception as e:
+            except Exception, err:
                 pass
         debug = options.debug
         try:
-            ui.dc.pg_connect(host = options.host, port = options.port, user = options.username, password = password, database = options.dbname)
-        except psycopg2.Error as e:
-            ui.at_exit_curses()
-            sys.exit("FATAL: %s" % (ui.clean_str(str(e),)))
-        pg_version = ui.dc.pg_get_version()
-        ui.dc.pg_get_num_version(pg_version)
+            PGAUI.data.pg_connect(
+                host = options.host,
+                port = options.port,
+                user = options.username,
+                password = password,
+                database = options.dbname)
+        except psycopg2.Error, err:
+            PGAUI.at_exit_curses()
+            sys.exit("FATAL: %s" % (PGAUI.clean_str(str(err),)))
+        pg_version = PGAUI.data.pg_get_version()
+        PGAUI.data.pg_get_num_version(pg_version)
         hostname = socket.gethostname()
         # reduce DATABASE column length 
-        ui.set_max_db_length(16)
+        PGAUI.set_max_db_length(16)
         # blocksize
-        ui.set_blocksize(int(options.blocksize))
+        PGAUI.set_blocksize(int(options.blocksize))
         # does pg_activity runing against local PG instance
-        if not ui.dc.pg_is_local():
-            ui.set_is_local(False)
-            ui.set_start_line(2)
+        if not PGAUI.data.pg_is_local():
+            PGAUI.set_is_local(False)
+            PGAUI.set_start_line(2)
             hostname = options.host
         # if not connected to a local pg server, then go to degraded mode
-        elif not ui.dc.pg_is_local_access():
-            ui.set_is_local(False)
-            ui.set_start_line(2)
+        elif not PGAUI.data.pg_is_local_access():
+            PGAUI.set_is_local(False)
+            PGAUI.set_start_line(2)
             hostname = options.host
         # top part
         interval = 0
-        if ui.get_mode() == 'activities':
-            queries =  ui.dc.pg_get_activities()
-            procs = ui.dc.sys_get_proc(queries, ui.get_is_local())
-        elif ui.get_mode() == 'waiting':
-            procs = ui.dc.pg_get_waiting()
-        elif ui.get_mode() == 'blocking':
-            procs = ui.dc.pg_get_blocking()
+        if PGAUI.get_mode() == 'activities':
+            queries =  PGAUI.data.pg_get_activities()
+            procs = PGAUI.data.sys_get_proc(queries, PGAUI.get_is_local())
+        elif PGAUI.get_mode() == 'waiting':
+            procs = PGAUI.data.pg_get_waiting()
+        elif PGAUI.get_mode() == 'blocking':
+            procs = PGAUI.data.pg_get_blocking()
         # color ?
         if options.nocolor == True:
-            ui.set_nocolor()
+            PGAUI.set_nocolor()
         else:
-            ui.set_color()
+            PGAUI.set_color()
         # draw the flag
-        flag = ui.get_flag_from_options(options)
+        flag = PGAUI.get_flag_from_options(options)
         # main loop
         disp_procs = None
         delta_disk_io = None
         # get DB informations
-        db_info = ui.dc.pg_get_db_info(None)
-        ui.set_max_db_length(db_info['max_length'])
+        db_info = PGAUI.data.pg_get_db_info(None)
+        PGAUI.set_max_db_length(db_info['max_length'])
         # indentation
-        indent = ui.get_indent(flag)
+        indent = PGAUI.get_indent(flag)
 
         while 1:
-            ui.check_window_size()
-            old_pgtop_mode = ui.get_mode()
+            PGAUI.check_window_size()
+            old_pgtop_mode = PGAUI.get_mode()
             # poll process
-            (disp_procs, new_procs) = ui.poll(interval, flag, indent, procs, disp_procs)
-            if ui.get_mode() != old_pgtop_mode:
-                indent = ui.get_indent(flag)
-            if ui.get_is_local():
-                delta_disk_io = ui.dc.get_global_io_counters()
+            (disp_procs, new_procs) = PGAUI.poll(
+                                        interval,
+                                        flag,
+                                        indent,
+                                        procs,
+                                        disp_procs)
+            if PGAUI.get_mode() != old_pgtop_mode:
+                indent = PGAUI.get_indent(flag)
+            if PGAUI.get_is_local():
+                delta_disk_io = PGAUI.data.get_global_io_counters()
             procs = new_procs
             # refresh the winodw
-            db_info = ui.dc.pg_get_db_info(db_info)
-            ui.set_max_db_length(db_info['max_length'])
+            db_info = PGAUI.data.pg_get_db_info(db_info)
+            PGAUI.set_max_db_length(db_info['max_length'])
             # bufferize
-            ui.set_buffer({
+            PGAUI.set_buffer({
                 'procs': disp_procs,
-                'extras': (ui.dc.get_pg_version(), hostname, options.username, options.host, options.port),
+                'extras': (
+                    PGAUI.data.get_pg_version(),
+                    hostname,
+                    options.username,
+                    options.host,
+                    options.port),
                 'flag': flag,
                 'indent': indent,
                 'io': delta_disk_io,
@@ -160,9 +313,14 @@ def main():
                 'total_size': db_info['total_size']
             })
             # refresh
-            ui.refresh_window(
+            PGAUI.refresh_window(
                 disp_procs, 
-                (ui.dc.get_pg_version(), hostname, options.username, options.host, options.port),
+                (
+                    PGAUI.data.get_pg_version(),
+                    hostname,
+                    options.username,
+                    options.host,
+                    options.port),
                 flag,
                 indent,
                 delta_disk_io,
@@ -172,11 +330,13 @@ def main():
             )
             interval = 1
 
-    except psutil.AccessDenied as e:
-        ui.at_exit_curses()
-        sys.exit("FATAL: Acces denied for user %s, can't acces system informations for process %s" % (getpass.getuser(), str(e),))
-    except curses.error as e:
-        ui.at_exit_curses()
+    except psutil.AccessDenied, err:
+        PGAUI.at_exit_curses()
+        sys.exit(
+            "FATAL: Acces denied, can't acces system informations for PID %s"
+            % (str(err),))
+    except curses.error, err:
+        PGAUI.at_exit_curses()
         if debug is True:
             import traceback
             exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -185,12 +345,12 @@ def main():
                 exc_value,
                 exc_traceback,
                 file=sys.stdout)
-        sys.exit("FATAL: %s" % (str(e),))
-    except KeyboardInterrupt as e:
-        ui.at_exit_curses()
+        sys.exit("FATAL: %s" % (str(err),))
+    except KeyboardInterrupt, err:
+        PGAUI.at_exit_curses()
         sys.exit(1)
-    except Exception as e:
-        ui.at_exit_curses()
+    except Exception, err:
+        PGAUI.at_exit_curses()
         # DEBUG
         if debug is True:
             import traceback
@@ -200,9 +360,9 @@ def main():
                 exc_value,
                 exc_traceback,
                 file=sys.stdout)
-        sys.exit("FATAL: %s" % (str(e),))
+        sys.exit("FATAL: %s" % (str(err),))
 
 # Call the main function
 if __name__ == '__main__':
-    signal.signal(signal.SIGTERM, ui.signal_handler)
+    signal.signal(signal.SIGTERM, PGAUI.signal_handler)
     main()

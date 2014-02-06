@@ -1,16 +1,26 @@
 """
 pg_activity
-version: 1.1.0
+version: 1.1.1
 author: Julien Tachoires <julmon@gmail.com>
 license: PostgreSQL License
 
-Copyright (c) 2012 - 2013, Julien Tachoires
+Copyright (c) 2012 - 2014, Julien Tachoires
 
-Permission to use, copy, modify, and distribute this software and its documentation for any purpose, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and this paragraph and the following two paragraphs appear in all copies.
+Permission to use, copy, modify, and distribute this software and its
+documentation for any purpose, without fee, and without a written
+agreement is hereby granted, provided that the above copyright notice
+and this paragraph and the following two paragraphs appear in all copies.
 
-IN NO EVENT SHALL JULIEN TACHOIRES BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF JULIEN TACHOIRES HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+IN NO EVENT SHALL JULIEN TACHOIRES BE LIABLE TO ANY PARTY FOR DIRECT,
+INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST
+PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION,
+EVEN IF JULIEN TACHOIRES HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-JULIEN TACHOIRES SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, AND JULIEN TACHOIRES HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+JULIEN TACHOIRES SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT
+NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+FOR A PARTICULAR PURPOSE. THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS"
+BASIS, AND JULIEN TACHOIRES HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE,
+SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 """
 
 import psycopg2
@@ -18,10 +28,33 @@ import psycopg2.extras
 import re
 import psutil
 import time
-from Process import *
+from pgactivity.Process import Process
 import os
 
+def clean_str(string):
+    """
+    Strip and replace some special characters.
+    """
+    msg = str(string)
+    msg = msg.replace("\n", " ")
+    msg = re.sub(r"\s+", r" ", msg)
+    msg = re.sub(r"^\s", r"", msg)
+    msg = re.sub(r"\s$", r"", msg)
+    return msg
+
 class Data:
+    """
+    Data class
+    """
+    pg_conn = None
+    pg_version = None
+    pg_num_version = None
+    io_counters = None
+    prev_io_counters = None
+    read_bytes_delta = 0
+    write_bytes_delta = 0
+    read_count_delta = 0
+    write_count_delta = 0
 
     def __init__(self,):
         """
@@ -32,6 +65,10 @@ class Data:
         self.pg_num_version = None
         self.io_counters = None
         self.prev_io_counters = None
+        self.read_bytes_delta = 0
+        self.write_bytes_delta = 0
+        self.read_count_delta = 0
+        self.write_count_delta = 0
 
     def get_pg_version(self,):
         """
@@ -39,16 +76,6 @@ class Data:
         """
         return self.pg_version
 
-    def clean_str(self, string):
-        """
-        Strip and replace some special characters.
-        """
-        msg = str(string)
-        msg = msg.replace("\n", " ")
-        msg = re.sub(r"\s+", r" ", msg)
-        msg = re.sub(r"^\s", r"", msg)
-        msg = re.sub(r"\s$", r"", msg)
-        return msg
 
     def get_pgpass(self, pgpass = None):
         """
@@ -62,8 +89,8 @@ class Data:
             home = expanduser("~")
             pgpass = "%s/.pgpass" % (str(home),)
         ret = []
-        with open(pgpass, 'r') as fp:
-            content = fp.readlines()
+        with open(pgpass, 'r') as filep:
+            content = filep.readlines()
             for line in content:
                 res = None
                 res = re.match(r"^([^:]+):([^:]+):([^:]+):([^:]+):(.*)$", line)
@@ -72,7 +99,12 @@ class Data:
             return ret
         raise Exception("pgpass file not found")
 
-    def pg_connect(self, host = None, port = 5432, user = 'postgres', password = None, database = 'postgres'):
+    def pg_connect(self,
+        host = None,
+        port = 5432,
+        user = 'postgres',
+        password = None,
+        database = 'postgres'):
         """
         Connect to a PostgreSQL server and return
         cursor & connector.
@@ -89,9 +121,9 @@ class Data:
                     password = password,
                     connection_factory=psycopg2.extras.DictConnection
                     )
-            except:
+            except psycopg2.Error, psy_err:
                 if host is None:
-                    raise
+                    raise psy_err
         if self.pg_conn is None: # fallback on TCP/IP connection
             self.pg_conn = psycopg2.connect(
                 database = database,
@@ -113,10 +145,10 @@ class Data:
         Verify if the user running pg_activity can acces 
         system informations for a postgres process.
         """
-        for p in psutil.process_iter():
-            if p.name == 'postgres' or p.name == 'postmaster' or p.name == 'edb-postgres':
+        for psproc in psutil.process_iter():
+            if psproc.name in ('postgres', 'postmaster', 'edb-postgres'):
                 try:
-                    proc = psutil.Process(p.pid)
+                    proc = psutil.Process(psproc.pid)
                     proc.get_io_counters()
                     proc.get_cpu_times()
                     return True
@@ -154,17 +186,19 @@ class Data:
         Get PostgreSQL short & numeric version from
         a string (SELECT version()).
         """
-        res = re.match(r"^(PostgreSQL|EnterpriseDB) ([0-9]+)\.([0-9]+)\.([0-9]+)", text_version)
+        res = re.match(
+                r"^(PostgreSQL|EnterpriseDB) ([0-9]+)\.([0-9]+)\.([0-9]+)",
+                text_version)
         if res is not None:
-            r = res.group(2)
+            rmatch = res.group(2)
             if int(res.group(3)) < 10:
-                r += '0'
-            r += res.group(3)
+                rmatch += '0'
+            rmatch += res.group(3)
             if int(res.group(4)) < 10:
-                r += '0'
-            r += res.group(4)
+                rmatch += '0'
+            rmatch += res.group(4)
             self.pg_version = str(res.group(0))
-            self.pg_num_version = int(r)
+            self.pg_num_version = int(rmatch)
             return
         self.pg_get_num_dev_version(text_version)
 
@@ -173,15 +207,17 @@ class Data:
         Get PostgreSQL short & numeric devel. or beta version
         from a string (SELECT version()). 
         """
-        res = re.match(r"^(PostgreSQL|EnterpriseDB) ([0-9]+)\.([0-9]+)(devel|beta[0-9]+)", text_version)
+        res = re.match(
+            r"^(PostgreSQL|EnterpriseDB) ([0-9]+)\.([0-9]+)(devel|beta[0-9]+)",
+            text_version)
         if res is not None:
-            r = res.group(2)
+            rmatch = res.group(2)
             if int(res.group(3)) < 10:
-                r += '0'
-            r += res.group(3)
-            r += '00'
+                rmatch += '0'
+            rmatch += res.group(3)
+            rmatch += '00'
             self.pg_version = str(res.group(0))
-            self.pg_num_version = int(r)
+            self.pg_num_version = int(rmatch)
             return
         raise Exception('Undefined PostgreSQL version.')
 
@@ -204,9 +240,18 @@ class Data:
         tps = 0
         size_ev = 0
         if prev_db_infos is not None:
-            tps = int((ret['no_xact'] - prev_db_infos['no_xact']) / (ret['timestamp'] - prev_db_infos['timestamp']))
-            size_ev = float(float(ret['total_size'] - prev_db_infos['total_size']) / (ret['timestamp'] - prev_db_infos['timestamp']))
-        return {'timestamp':ret['timestamp'], 'no_xact': ret['no_xact'], 'total_size': ret['total_size'], 'max_length': ret['max_length'], 'tps': tps, 'size_ev': size_ev}
+            tps = int((ret['no_xact'] - prev_db_infos['no_xact'])
+                    / (ret['timestamp'] - prev_db_infos['timestamp']))
+            size_ev = float(float(ret['total_size']
+                        - prev_db_infos['total_size'])
+                    / (ret['timestamp'] - prev_db_infos['timestamp']))
+        return {
+            'timestamp': ret['timestamp'],
+            'no_xact': ret['no_xact'],
+            'total_size': ret['total_size'],
+            'max_length': ret['max_length'],
+            'tps': tps,
+            'size_ev': size_ev}
 
     def pg_get_activities(self,):
         """
@@ -488,11 +533,15 @@ class Data:
         """
         Is pg_activity connected localy ?
         """
-        query = "SELECT inet_server_addr() AS inet_server_addr, inet_client_addr() AS inet_client_addr"
+        query = """
+        SELECT inet_server_addr() AS inet_server_addr, inet_client_addr() AS inet_client_addr
+        """
         cur = self.pg_conn.cursor()
         cur.execute(query)
         ret = cur.fetchone()
-        if len(str(ret['inet_server_addr'])) == 0 or ret['inet_server_addr'] == ret['inet_client_addr']:
+        if len(str(ret['inet_server_addr'])) == 0:
+            return True
+        if ret['inet_server_addr'] == ret['inet_client_addr']:
             return True
         return False
 
@@ -505,7 +554,7 @@ class Data:
             return 0
         return float(duration)
 
-    def sys_get_IOW_status(self, status):
+    def __sys_get_iow_status(self, status):
         """
         Returns 'Y' if status == 'disk sleep', else 'N'
         """
@@ -519,42 +568,53 @@ class Data:
         Get system informations (CPU, memory, IO read & write)
         for each process PID using psutil module.
         """
-        process = {}
+        processes = {}
         if not is_local:
-            return process
-        for sq in queries:
+            return processes
+        for query in queries:
             try:
-                proc = psutil.Process(sq['pid'])
-                p = Process(
-                    pid = sq['pid'],
-                    database = sq['database'],
-                    user = sq['user'],
-                    client = sq['client'],
-                    duration = sq['duration'],
-                    wait = sq['wait'],
-                    query = self.clean_str(sq['query']),
+                psproc = psutil.Process(query['pid'])
+                process = Process(
+                    pid = query['pid'],
+                    database = query['database'],
+                    user = query['user'],
+                    client = query['client'],
+                    duration = query['duration'],
+                    wait = query['wait'],
+                    query = clean_str(query['query']),
                     extras = {}
                     )
 
-                p.setExtra('meminfo',       proc.get_memory_info())
-                p.setExtra('io_counters',   proc.get_io_counters())
-                p.setExtra('io_time',       time.time())
-                p.setExtra('mem_percent',   proc.get_memory_percent())
-                p.setExtra('cpu_percent',   proc.get_cpu_percent(interval=0))
-                p.setExtra('cpu_times',     proc.get_cpu_times())
-                p.setExtra('read_delta',    0)
-                p.setExtra('write_delta',   0)
-                p.setExtra('io_wait',       self.sys_get_IOW_status(str(proc.status)))
-                p.setExtra('psutil_proc',   proc)
-                process[p.pid] = p
+                process.set_extra('meminfo',
+                    psproc.get_memory_info())
+                process.set_extra('io_counters',
+                    psproc.get_io_counters())
+                process.set_extra('io_time',
+                    time.time())
+                process.set_extra('mem_percent',
+                    psproc.get_memory_percent())
+                process.set_extra('cpu_percent',
+                    psproc.get_cpu_percent(interval=0))
+                process.set_extra('cpu_times',
+                    psproc.get_cpu_times())
+                process.set_extra('read_delta', 0)
+                process.set_extra('write_delta', 0)
+                process.set_extra('io_wait',
+                    self.__sys_get_iow_status(str(psproc.status)))
+                process.set_extra('psutil_proc', psproc)
+                processes[process.pid] = process
 
             except psutil.NoSuchProcess:
                 pass
             except psutil.AccessDenied:
                 pass
-        return process
+        return processes
  
-    def set_global_io_counters(self, read_bytes_delta, write_bytes_delta, read_count_delta, write_count_delta):
+    def set_global_io_counters(self,
+        read_bytes_delta,
+        write_bytes_delta,
+        read_count_delta,
+        write_count_delta):
         """
         Set IO counters.
         """
@@ -567,7 +627,11 @@ class Data:
         """
         Get IO counters.
         """
-        return {'read_bytes': self.read_bytes_delta, 'write_bytes': self.write_bytes_delta, 'read_count': self.read_count_delta, 'write_count': self.write_count_delta}
+        return {
+            'read_bytes': self.read_bytes_delta,
+            'write_bytes': self.write_bytes_delta,
+            'read_count': self.read_count_delta,
+            'write_count': self.write_count_delta}
 
     def get_mem_swap(self,):
         """
@@ -587,7 +651,13 @@ class Data:
             vmem = psutil.virtmem_usage()
 
         mem_used = phymem.total - (phymem.free + buffers + cached)
-        return (phymem.percent, mem_used, phymem.total, vmem.percent, vmem.used, vmem.total)
+        return (
+            phymem.percent,
+            mem_used,
+            phymem.total,
+            vmem.percent,
+            vmem.used,
+            vmem.total)
 
     def get_load_average(self,):
         """
