@@ -111,12 +111,11 @@ class Data:
         """
         self.pg_conn = None
         if host is None or host == 'localhost':
-            # try to connect using a UNIX Socket by passing host=None
+            # try to connect using UNIX socket
             try:
                 self.pg_conn = psycopg2.connect(
                     database = database,
                     user = user,
-                    host = None,
                     port = port,
                     password = password,
                     connection_factory=psycopg2.extras.DictConnection
