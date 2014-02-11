@@ -117,8 +117,8 @@ class Data:
                     database = database,
                     user = user,
                     port = port,
-                    password = password,
-                    connection_factory=psycopg2.extras.DictConnection
+                    password = str(password),
+                    connection_factory = psycopg2.extras.DictConnection
                     )
             except psycopg2.Error, psy_err:
                 if host is None:
@@ -130,7 +130,7 @@ class Data:
                 port = port,
                 user = user,
                 password = str(password),
-                connection_factory=psycopg2.extras.DictConnection
+                connection_factory = psycopg2.extras.DictConnection
                 )
         self.pg_conn.set_isolation_level(0)
         cur = self.pg_conn.cursor()
