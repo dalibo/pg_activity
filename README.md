@@ -71,25 +71,25 @@ Interactives commands
 `t`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sort by TIME+, descending  
 `Space`		Pause on/off  
 `v`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Change queries display mode: full, truncated, indented  
-`UP/DOWN`	Scroll process list  
+`UP/DOWN`	Scroll processes list  
 `q`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Quit  
 `+`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Increase refresh time. Maximum value : 3s  
 `-`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Decrease refesh time. Minimum Value : 1s  
-`F1/1`&nbsp;&nbsp;Running queries monitoring  
-`F2/2`&nbsp;&nbsp;Waiting queries monitoring  
-`F3/3`&nbsp;&nbsp;Blocking queries monitoring  
+`F1/1`&nbsp;&nbsp;Running queries list  
+`F2/2`&nbsp;&nbsp;Waiting queries list  
+`F3/3`&nbsp;&nbsp;Blocking queries list  
 `h`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Help page  
 `R`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Refresh  
 
 Navigation mode
 ---------------
 
-`UP`		Move up the cursor
-`DOWN`		Move down the cursor
-`k`			Terminate the current backend/tagged backends
-`Space`		Tag or untag the process
-`q`			Quit
-`Other`		Back to activity
+`UP`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Move up the cursor  
+`DOWN`&nbsp;&nbsp;&nbsp;Move down the cursor  
+`k`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Terminate the current backend/tagged backends  
+`Space`&nbsp;Tag or untag the process  
+`q`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Quit  
+`Other`&nbsp;&nbsp;Back to activity  
 			
 Screenshot
 ----------
