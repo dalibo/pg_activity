@@ -1,15 +1,15 @@
 pg_activity
 ===========
 
-`top` like application for PostgreSQL server activity monitoring.
+`htop` like application for **PostgreSQL** server activity monitoring.
 
 Dependencies
 ------------
 
-Python >= 2.6
-psycopg2 >= 2.2.1
-psutil >= 0.5.1
-setuptools >= 0.6.14
+`python`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>= **2.6**  
+`psycopg2`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>= **2.2.1**  
+`psutil`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>= **0.5.1**  
+`setuptools` >= **0.6.14**  
 
 Installation
 ------------
@@ -24,10 +24,14 @@ Installation
 Usage
 -----
 
-`pg_activity` can works *localy* or *remotely*. In a local excecution context, to obtain sufficient rights to display system informations, the system user running `pg_activity` must be the same user running postgresql server (`postgres` by default), or have more rights like `root`. Otherwise, `pg_activity` can fallback to a degraded mode without displaying system informations. On the same way, the postgres' user used to connect to the database must have administration rights.
-ex:
-    sudo -u postgres pg\_activity -U postgres
- 
+`pg_activity` can works **localy** or **remotely**. In a local execution context, to obtain sufficient rights to display system informations, the system user running `pg_activity` must be the same user running postgresql server (`postgres` by default), or have more rights like `root`. Otherwise, `pg_activity` can fallback to a degraded mode without displaying system informations. On the same way, the postgres' user used to connect to the database must have administration rights.  
+ex:  
+    
+    sudo -u postgres pg_activity -U postgres
+
+Options
+-------
+
     pg_activity [options]
 
 	Options:
@@ -59,23 +63,23 @@ ex:
 Interactives commands
 ---------------------
 
-`C`			Activate/deactivate colors
-`r`			Sort by READ/s, descending
-`w`			Sort by WRITE/s, descending
-`c`			Sort by CPU%, descending
-`m`			Sort by MEM%, descending
-`t`			Sort by TIME+, descending
-`Space`		Pause on/off
-`v`			Change queries display mode: full, truncated, indented
-`UP / DOWN`	Scroll process list
-`q`			Quit
-`+`			Increase refresh time. Maximum value : 3s
-`-`			Decrease refesh time. Minimum Value : 1s
-`F1/1`		Running queries monitoring
-`F2/2`		Waiting queries monitoring
-`F3/3`		Blocking queries monitoring
-`h`			Help page
-`R`         Refresh
+`C`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Activate/deactivate colors  
+`r`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sort by READ/s, descending  
+`w`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sort by WRITE/s, descending  
+`c`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sort by CPU%, descending  
+`m`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sort by MEM%, descending  
+`t`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sort by TIME+, descending  
+`Space`		Pause on/off  
+`v`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Change queries display mode: full, truncated, indented  
+`UP/DOWN`	Scroll process list  
+`q`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Quit  
+`+`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Increase refresh time. Maximum value : 3s  
+`-`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Decrease refesh time. Minimum Value : 1s  
+`F1/1`&nbsp;&nbsp;Running queries monitoring  
+`F2/2`&nbsp;&nbsp;Waiting queries monitoring  
+`F3/3`&nbsp;&nbsp;Blocking queries monitoring  
+`h`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Help page  
+`R`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Refresh  
 
 Navigation mode
 ---------------
