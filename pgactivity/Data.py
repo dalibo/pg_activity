@@ -31,6 +31,40 @@ import time
 from pgactivity.Process import Process
 import os
 
+if psutil.version_info < (2, 0, 0):
+    class PSProcess(psutil.Process):
+        """
+        Due to the new psutil 2 API we need to create a new class inherited
+        from psutil.Process and wrap old methods.
+        """
+        def name(self,):
+            return self.name
+
+        def status(self,):
+            return self.status
+
+        def io_counters(self,):
+            return self.get_io_counters()
+
+        def cpu_time(self,):
+            return self.get_cpu_times()
+
+        def memory_info(self,):
+            return self.get_memory_info()
+
+        def memory_percent(self,):
+            return self.get_memory_percent()
+
+        def cpu_percent(self, interval = 0):
+            return self.get_cpu_percent(interval = interval)
+
+        def cpu_times(self,):
+            return self.get_cpu_times()
+else:
+    class PSProcess(psutil.Process):
+        pass
+
+
 def clean_str(string):
     """
     Strip and replace some special characters.
@@ -145,11 +179,15 @@ class Data:
         system informations for a postgres process.
         """
         for psproc in psutil.process_iter():
-            if psproc.name in ('postgres', 'postmaster', 'edb-postgres'):
+            try:
+                name = psproc.name()
+            except NameError:
+                name = psproc.name
+            if name in ('postgres', 'postmaster', 'edb-postgres'):
                 try:
-                    proc = psutil.Process(psproc.pid)
-                    proc.get_io_counters()
-                    proc.get_cpu_times()
+                    proc = PSProcess(psproc.pid)
+                    proc.io_counters()
+                    proc.cpu_times()
                     return True
                 except psutil.AccessDenied:
                     return False
@@ -538,8 +576,6 @@ class Data:
         cur = self.pg_conn.cursor()
         cur.execute(query)
         ret = cur.fetchone()
-        if len(str(ret['inet_server_addr'])) == 0:
-            return True
         if ret['inet_server_addr'] == ret['inet_client_addr']:
             return True
         return False
@@ -572,7 +608,7 @@ class Data:
             return processes
         for query in queries:
             try:
-                psproc = psutil.Process(query['pid'])
+                psproc = PSProcess(query['pid'])
                 process = Process(
                     pid = query['pid'],
                     database = query['database'],
@@ -585,21 +621,21 @@ class Data:
                     )
 
                 process.set_extra('meminfo',
-                    psproc.get_memory_info())
+                    psproc.memory_info())
                 process.set_extra('io_counters',
-                    psproc.get_io_counters())
+                    psproc.io_counters())
                 process.set_extra('io_time',
                     time.time())
                 process.set_extra('mem_percent',
-                    psproc.get_memory_percent())
+                    psproc.memory_percent())
                 process.set_extra('cpu_percent',
-                    psproc.get_cpu_percent(interval=0))
+                    psproc.cpu_percent(interval=0))
                 process.set_extra('cpu_times',
-                    psproc.get_cpu_times())
+                    psproc.cpu_times())
                 process.set_extra('read_delta', 0)
                 process.set_extra('write_delta', 0)
                 process.set_extra('io_wait',
-                    self.__sys_get_iow_status(str(psproc.status)))
+                    self.__sys_get_iow_status(str(psproc.status())))
                 process.set_extra('psutil_proc', psproc)
                 processes[process.pid] = process
 
