@@ -183,6 +183,8 @@ class Data:
                 name = psproc.name()
             except NameError:
                 name = psproc.name
+            except TypeError:
+                name = psproc.name
             if name in ('postgres', 'postmaster', 'edb-postgres'):
                 try:
                     proc = PSProcess(psproc.pid)
