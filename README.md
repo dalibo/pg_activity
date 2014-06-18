@@ -16,15 +16,15 @@ Installation
 
     sudo python setup.py install
 
-### Installation without man pages
+### Installation with man page
 
-    sudo python setup.py install --no-man
+    sudo python setup.py install --with-man
 
 
 Usage
 -----
 
-`pg_activity` can works **localy** or **remotely**. In a local execution context, to obtain sufficient rights to display system informations, the system user running `pg_activity` must be the same user running postgresql server (`postgres` by default), or have more rights like `root`. Otherwise, `pg_activity` can fallback to a degraded mode without displaying system informations. On the same way, the postgres' user used to connect to the database must have administration rights.  
+`pg_activity` works **localy** or **remotely**. In a local execution context, to obtain sufficient rights to display system informations, the system user running `pg_activity` must be the same user running postgresql server (`postgres` by default), or have more rights like `root`. Otherwise, `pg_activity` can fallback to a degraded mode without displaying system informations. On the same way, postgres role used to connect to the database must be super user.  
 ex:  
     
     sudo -u postgres pg_activity -U postgres

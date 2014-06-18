@@ -1,6 +1,5 @@
 """
 pg_activity
-version: 1.1.1
 author: Julien Tachoires <julmon@gmail.com>
 license: PostgreSQL License
 

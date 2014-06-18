@@ -1,11 +1,9 @@
 import sys
 
-# Dirty work around destinated to deactivate
-# manual page install when option --no-man is given
-data_files = [ ('/usr/share/man/man1', ['docs/man/pg_activity.1']) ]
+data_files = None
 for opt in sys.argv:
-    if opt == '--no-man':
-        data_files = None
+    if opt == '--with-man':
+        data_files = [ ('/usr/share/man/man1', ['docs/man/pg_activity.1']) ]
         sys.argv.remove(opt)
 
 from setuptools import setup
@@ -15,7 +13,7 @@ if sys.version_info < (2, 6):
 
 setup(
     name = 'pg_activity',
-    version = '1.1.1',
+    version = '1.2.0',
     author = 'Julien Tachoires',
     author_email = 'julmon@gmail.com',
     scripts = ['bin/pg_activity'],

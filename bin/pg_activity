@@ -2,7 +2,6 @@
 
 """
 pg_activity
-version: 1.1.1
 author: Julien Tachoires <julmon@gmail.com>
 license: PostgreSQL License
 
@@ -25,7 +24,7 @@ BASIS, AND JULIEN TACHOIRES HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE,
 SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 """
 
-PGTOP_VERSION = "1.1.1"
+PGTOP_VERSION = "1.2.0"
 
 import os
 import sys
