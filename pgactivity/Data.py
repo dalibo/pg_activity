@@ -36,11 +36,8 @@ if psutil.version_info < (2, 0, 0):
         Due to the new psutil 2 API we need to create a new class inherited
         from psutil.Process and wrap old methods.
         """
-        def name(self,):
-            return self.name
-
-        def status(self,):
-            return self.status
+        def status_iow(self,):
+            return str(self.status)
 
         def io_counters(self,):
             return self.get_io_counters()
@@ -61,8 +58,8 @@ if psutil.version_info < (2, 0, 0):
             return self.get_cpu_times()
 else:
     class PSProcess(psutil.Process):
-        pass
-
+        def status_iow(self,):
+            return str(self.status())
 
 def clean_str(string):
     """
@@ -594,7 +591,7 @@ class Data:
         """
         Returns 'Y' if status == 'disk sleep', else 'N'
         """
-        if str(status) == 'disk sleep':
+        if status == 'disk sleep':
             return 'Y'
         else:
             return 'N'
@@ -636,7 +633,7 @@ class Data:
                 process.set_extra('read_delta', 0)
                 process.set_extra('write_delta', 0)
                 process.set_extra('io_wait',
-                    self.__sys_get_iow_status(str(psproc.status())))
+                    self.__sys_get_iow_status(psproc.status_iow()))
                 process.set_extra('psutil_proc', psproc)
                 processes[process.pid] = process
 
