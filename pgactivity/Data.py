@@ -243,7 +243,7 @@ class Data:
         from a string (SELECT version()). 
         """
         res = re.match(
-            r"^(PostgreSQL|EnterpriseDB) ([0-9]+)\.([0-9]+)(devel|beta[0-9]+)",
+            r"^(PostgreSQL|EnterpriseDB) ([0-9]+)\.([0-9]+)(devel|beta[0-9]+|rc[0-9]+)",
             text_version)
         if res is not None:
             rmatch = res.group(2)
