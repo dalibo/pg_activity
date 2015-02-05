@@ -1207,11 +1207,11 @@ class UI:
 
                     proc.set_extra(
                         'mem_percent',
-                        proc.get_extra('psutil_proc').get_memory_percent())
+                        proc.get_extra('psutil_proc').memory_percent())
                     proc.set_extra(
                         'cpu_percent',
                         proc.get_extra('psutil_proc').\
-                            get_cpu_percent(interval=0))
+                            cpu_percent(interval=0))
                     new_procs[pid] = proc
                     procs.append({
                         'pid': pid,
