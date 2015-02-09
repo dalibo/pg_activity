@@ -16,7 +16,7 @@ setup(
     version = '1.2.0',
     author = 'Julien Tachoires',
     author_email = 'julmon@gmail.com',
-    scripts = ['bin/pg_activity'],
+    scripts = ['pg_activity'],
     packages = ['pgactivity'],
     url = 'https://github.com/julmon/pg_activity',
     license = 'LICENSE.txt',
