@@ -201,12 +201,10 @@ server activity monitoring.")
                 default = 'false')
             (options, _) = parser.parse_args()
         except OptionParsingError, err:
-            PGAUI.at_exit_curses()
             print 'pg_activity: error: %s' % err.msg
             print 'Try "pg_activity --help" for more information.'
             sys.exit(1)
         if options.help is True:
-            PGAUI.at_exit_curses()
             print(parser.format_help().strip())
             sys.exit(1)
         password = os.environ.get('PGPASSWORD')
@@ -233,7 +231,6 @@ server activity monitoring.")
                 password = password,
                 database = options.dbname)
         except psycopg2.Error, err:
-            PGAUI.at_exit_curses()
             sys.exit("FATAL: %s" % (PGAUI.clean_str(str(err),)))
         pg_version = PGAUI.data.pg_get_version()
         PGAUI.data.pg_get_num_version(pg_version)
@@ -261,11 +258,6 @@ server activity monitoring.")
             procs = PGAUI.data.pg_get_waiting()
         elif PGAUI.get_mode() == 'blocking':
             procs = PGAUI.data.pg_get_blocking()
-        # color ?
-        if options.nocolor == True:
-            PGAUI.set_nocolor()
-        else:
-            PGAUI.set_color()
         # draw the flag
         flag = PGAUI.get_flag_from_options(options)
         # main loop
@@ -276,7 +268,13 @@ server activity monitoring.")
         PGAUI.set_max_db_length(db_info['max_length'])
         # indentation
         indent = PGAUI.get_indent(flag)
-
+        # Init curses
+        PGAUI.init_curses()
+        # color ?
+        if options.nocolor == True:
+            PGAUI.set_nocolor()
+        else:
+            PGAUI.set_color()
         while 1:
             PGAUI.check_window_size()
             old_pgtop_mode = PGAUI.get_mode()

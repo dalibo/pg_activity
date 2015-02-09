@@ -323,6 +323,54 @@ class UI:
         # Default filesystem blocksize
         self.fs_blocksize = 4096
         # Init curses
+        # self.__init_curses()
+
+    def set_is_local(self, is_local):
+        """
+        Set self.is_local
+        """
+        self.is_local = is_local
+
+    def get_is_local(self,):
+        """
+        Get self.is_local
+        """
+        return self.is_local
+
+    def get_mode(self,):
+        """
+        Get self.mode
+        """
+        return self.mode
+
+    def set_start_line(self, start_line):
+        """
+        Set self.start_line
+        """
+        self.start_line = start_line
+
+    def set_buffer(self, uibuffer):
+        """
+        Set self.uibuffer
+        """
+        self.uibuffer = uibuffer
+
+    def set_blocksize(self, blocksize):
+        """
+        Set blocksize
+        """
+        if not isinstance(blocksize, int):
+            raise Exception('Unvalid blocksize value.')
+        if blocksize != 0 and not ((blocksize & (blocksize - 1)) == 0):
+            raise Exception('Unvalid blocksize value.')
+        if not blocksize > 0:
+            raise Exception('Unvalid blocksize value.')
+        self.fs_blocksize = int(blocksize)
+
+    def init_curses(self,):
+        """
+        Initialize curses environment and colors.
+        """
         self.__init_curses()
         # Columns colors definition
         self.line_colors = {
@@ -417,48 +465,6 @@ class UI:
                 'yellow':  self.__get_color(C_YELLOW)|curses.A_BOLD
             }
         }
-
-    def set_is_local(self, is_local):
-        """
-        Set self.is_local
-        """
-        self.is_local = is_local
-
-    def get_is_local(self,):
-        """
-        Get self.is_local
-        """
-        return self.is_local
-
-    def get_mode(self,):
-        """
-        Get self.mode
-        """
-        return self.mode
-
-    def set_start_line(self, start_line):
-        """
-        Set self.start_line
-        """
-        self.start_line = start_line
-
-    def set_buffer(self, uibuffer):
-        """
-        Set self.uibuffer
-        """
-        self.uibuffer = uibuffer
-
-    def set_blocksize(self, blocksize):
-        """
-        Set blocksize
-        """
-        if not isinstance(blocksize, int):
-            raise Exception('Unvalid blocksize value.')
-        if blocksize != 0 and not ((blocksize & (blocksize - 1)) == 0):
-            raise Exception('Unvalid blocksize value.')
-        if not blocksize > 0:
-            raise Exception('Unvalid blocksize value.')
-        self.fs_blocksize = int(blocksize)
 
     def __init_curses(self,):
         """
@@ -559,6 +565,9 @@ class UI:
             self.win.erase()
         except KeyboardInterrupt:
             pass
+        except AttributeError:
+            # Curses not initialized yet
+            return
         curses.nocbreak()
         curses.echo()
         try:
