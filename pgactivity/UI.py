@@ -1909,11 +1909,14 @@ class UI:
                                 self.line_colors['mode_yellow'][typecolor])
 
         if flag & PGTOP_FLAG_TIME:
-            if process['duration'] >= 1:
+            if process['duration'] >= 1 and process['duration'] < 60000:
                 ctime = timedelta(seconds=float(process['duration']))
                 mic = '%.6d' % (ctime.microseconds)
                 ctime = "%s:%s.%s" % (str((ctime.seconds // 60)).zfill(2), \
                             str((ctime.seconds % 60)).zfill(2), str(mic)[:2])
+            elif process['duration'] >= 60000:
+                ctime = "%s h" % str(int(process['duration'] / 3600))
+
             if process['duration'] < 1:
                 colno += self.__print_string(
                             l_lineno,
