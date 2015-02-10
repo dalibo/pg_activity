@@ -37,6 +37,7 @@ import getpass
 import psutil
 import curses
 import psycopg2
+from psycopg2 import errorcodes
 
 from pgactivity import UI
 
@@ -223,15 +224,28 @@ server activity monitoring.")
             except Exception, err:
                 pass
         debug = options.debug
-        try:
-            PGAUI.data.pg_connect(
-                host = options.host,
-                port = options.port,
-                user = options.username,
-                password = password,
-                database = options.dbname)
-        except psycopg2.Error, err:
-            sys.exit("FATAL: %s" % (PGAUI.clean_str(str(err),)))
+        nb_try = 0
+        while nb_try < 2:
+            try:
+                PGAUI.data.pg_connect(
+                    host = options.host,
+                    port = options.port,
+                    user = options.username,
+                    password = password,
+                    database = options.dbname)
+                break
+            except psycopg2.OperationalError as err:
+                if nb_try < 1 and (err.pgcode == errorcodes.INVALID_PASSWORD or
+                    str(err).strip().startswith(
+                        "FATAL:  password authentication failed for user")):
+                    nb_try += 1
+                    password = PGAUI.ask_password()
+                elif nb_try < 1 and str(err).strip() == "fe_sendauth: no password supplied":
+                    nb_try += 1
+                    password = PGAUI.ask_password()
+                else:
+                    sys.exit("pg_activity: FATAL: %s" % (PGAUI.clean_str(str(err),)))
+
         pg_version = PGAUI.data.pg_get_version()
         PGAUI.data.pg_get_num_version(pg_version)
         hostname = socket.gethostname()

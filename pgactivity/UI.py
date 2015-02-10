@@ -29,6 +29,7 @@ import sys
 from datetime import timedelta
 from pgactivity.Data import Data
 import psutil
+from getpass import getpass
 
 # Define some color pairs
 C_BLACK_GREEN = 1
@@ -632,6 +633,13 @@ class UI:
         msg = re.sub(r"^\s", r"", msg)
         msg = re.sub(r"\s$", r"", msg)
         return msg
+
+    def ask_password(self, ):
+        """
+        Ask for PostgreSQL user password
+        """
+        password = getpass()
+        return password
 
     def check_window_size(self,):
         """
