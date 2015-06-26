@@ -84,7 +84,7 @@ server activity monitoring.")
                 '-p',
                 '--port',
                 dest = 'port',
-                default = os.environ.get('PGPORT') or 5432,
+                default = os.environ.get('PGPORT') or '5432',
                 help = "Database server port (default: \"5432\").",
                 metavar = 'PORT')
             # -h / --host
