@@ -841,7 +841,7 @@ class UI:
         """
         Ask for terminating some backends
         """
-        if len(pids) == 1: 
+        if len(pids) == 1:
             colno = self.__print_string(
                         (self.maxy - 1),
                         0,
@@ -917,7 +917,7 @@ class UI:
         old_verbose_mode = self.verbose_mode
         self.verbose_mode = PGTOP_TRUNCATE
 
-        # Refresh lines with this verbose mode 
+        # Refresh lines with this verbose mode
         self.__scroll_window(process, flag, indent, 0)
 
         self.__help_key_interactive()
@@ -1129,7 +1129,7 @@ class UI:
         # Refresh
         if key == ord('R'):
             known = True
-        
+
         if key == ord('u'):
             self.__empty_pid_yank()
             known = True
@@ -1211,7 +1211,7 @@ class UI:
                         proc.set_extra(
                             'io_time',
                             n_io_time)
- 
+
                         # Global io counters
                         read_bytes_delta  += proc.get_extra('read_delta')
                         write_bytes_delta += proc.get_extra('write_delta')
@@ -1513,7 +1513,7 @@ class UI:
         self.lineno += 1
 
     def __print_header(self, pg_version, hostname, user, host, \
-        port, ios, tps, size_ev, total_size):
+        port, database, ios, tps, size_ev, total_size):
         """
         Print window header
         """
@@ -1559,6 +1559,15 @@ class UI:
                     self.lineno,
                     colno,
                     port,
+                    self.__get_color(C_CYAN))
+        colno += self.__print_string(
+                    self.lineno,
+                    colno,
+                    "/")
+        colno += self.__print_string(
+                    self.lineno,
+                    colno,
+                    database,
                     self.__get_color(C_CYAN))
         colno += self.__print_string(
                     self.lineno,
@@ -1776,7 +1785,7 @@ class UI:
         """
 
         self.lines = []
-        (pg_version, hostname, user, host, port) = extras
+        (pg_version, hostname, user, host, port, dbname) = extras
         self.win.erase()
         self.__print_header(
             pg_version,
@@ -1784,6 +1793,7 @@ class UI:
             user,
             host,
             port,
+            dbname,
             ios,
             tps,
             size_ev,

@@ -75,7 +75,7 @@ server activity monitoring.")
                 '-U',
                 '--username',
                 dest = 'username',
-                default = getpass.getuser(),
+                default = os.environ.get('PGUSER') or getpass.getuser(),
                 help = "Database user name (default: \"%s\")."
                     % (getpass.getuser(),),
                 metavar = 'USERNAME')
@@ -84,7 +84,7 @@ server activity monitoring.")
                 '-p',
                 '--port',
                 dest = 'port',
-                default = '5432',
+                default = os.environ.get('PGPORT') or '5432',
                 help = "Database server port (default: \"5432\").",
                 metavar = 'PORT')
             # -h / --host
@@ -95,7 +95,7 @@ server activity monitoring.")
                 help = "Database server host or socket directory \
                             (default: \"localhost\").",
                 metavar = 'HOSTNAME',
-                default = 'localhost')
+                default = os.environ.get('PGHOST') or 'localhost')
             # -d / --dbname
             parser.add_option(
                 '-d',
@@ -249,7 +249,7 @@ server activity monitoring.")
         pg_version = PGAUI.data.pg_get_version()
         PGAUI.data.pg_get_num_version(pg_version)
         hostname = socket.gethostname()
-        # reduce DATABASE column length 
+        # reduce DATABASE column length
         PGAUI.set_max_db_length(16)
         # blocksize
         PGAUI.set_blocksize(int(options.blocksize))
@@ -315,7 +315,8 @@ server activity monitoring.")
                     hostname,
                     options.username,
                     options.host,
-                    options.port),
+                    options.port,
+                    options.dbname),
                 'flag': flag,
                 'indent': indent,
                 'io': delta_disk_io,
@@ -325,13 +326,14 @@ server activity monitoring.")
             })
             # refresh
             PGAUI.refresh_window(
-                disp_procs, 
+                disp_procs,
                 (
                     PGAUI.data.get_pg_version(),
                     hostname,
                     options.username,
                     options.host,
-                    options.port),
+                    options.port,
+                    options.dbname),
                 flag,
                 indent,
                 delta_disk_io,
