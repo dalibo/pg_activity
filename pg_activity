@@ -240,7 +240,7 @@ server activity monitoring.")
                     user = options.username,
                     password = password,
                     database = options.dbname,
-                    rds = options.rds)
+                    rds_mode = options.rds)
                 break
             except psycopg2.OperationalError as err:
                 if nb_try < 1 and (err.pgcode == errorcodes.INVALID_PASSWORD or
