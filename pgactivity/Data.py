@@ -134,7 +134,8 @@ class Data:
         port = 5432,
         user = 'postgres',
         password = None,
-        database = 'postgres'):
+        database = 'postgres',
+        rds_mode = False):
         """
         Connect to a PostgreSQL server and return
         cursor & connector.
@@ -163,11 +164,12 @@ class Data:
                 connection_factory = psycopg2.extras.DictConnection
                 )
         self.pg_conn.set_isolation_level(0)
-        cur = self.pg_conn.cursor()
-        cur.execute("SELECT current_setting('is_superuser')")
-        ret = cur.fetchone()
-        if ret[0] != "on":
-            raise Exception("Must be run with database superuser privileges.")
+        if rds_mode != True: # Make sure we are using superuser if not on RDS
+          cur = self.pg_conn.cursor()
+          cur.execute("SELECT current_setting('is_superuser')")
+          ret = cur.fetchone()
+          if ret[0] != "on":
+              raise Exception("Must be run with database superuser privileges.")
 
     def pg_is_local_access(self,):
         """
@@ -256,7 +258,7 @@ class Data:
             return
         raise Exception('Undefined PostgreSQL version.')
 
-    def pg_get_db_info(self, prev_db_infos):
+    def pg_get_db_info(self, prev_db_infos, using_rds = False):
         """
         Get current sum of transactions, total size and  timestamp.
         """
@@ -269,6 +271,7 @@ class Data:
     FROM
         pg_database
         """
+        query += "\nWHERE datname <> 'rdsadmin'" if using_rds else ''
         cur = self.pg_conn.cursor()
         cur.execute(query,)
         ret = cur.fetchone()

@@ -119,6 +119,13 @@ server activity monitoring.")
                 help = "Filesystem blocksize (default: 4096)",
                 metavar = 'BLOCKSIZE',
                 default = 4096)
+            # --rds
+            parser.add_option(
+                '--rds',
+                dest = 'rds',
+                action = 'store_true',
+                help = "Enable support for AWS RDS",
+                default = 'false')
             group = OptionGroup(
                 parser,
                 "Display Options, you can exclude some columns by using them ")
@@ -232,7 +239,8 @@ server activity monitoring.")
                     port = options.port,
                     user = options.username,
                     password = password,
-                    database = options.dbname)
+                    database = options.dbname,
+                    rds = options.rds)
                 break
             except psycopg2.OperationalError as err:
                 if nb_try < 1 and (err.pgcode == errorcodes.INVALID_PASSWORD or
@@ -278,7 +286,7 @@ server activity monitoring.")
         disp_procs = None
         delta_disk_io = None
         # get DB informations
-        db_info = PGAUI.data.pg_get_db_info(None)
+        db_info = PGAUI.data.pg_get_db_info(None, using_rds = options.rds)
         PGAUI.set_max_db_length(db_info['max_length'])
         # indentation
         indent = PGAUI.get_indent(flag)
@@ -305,7 +313,7 @@ server activity monitoring.")
                 delta_disk_io = PGAUI.data.get_global_io_counters()
             procs = new_procs
             # refresh the winodw
-            db_info = PGAUI.data.pg_get_db_info(db_info)
+            db_info = PGAUI.data.pg_get_db_info(db_info, using_rds = options.rds)
             PGAUI.set_max_db_length(db_info['max_length'])
             # bufferize
             PGAUI.set_buffer({
