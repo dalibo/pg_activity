@@ -174,18 +174,18 @@ class Data:
     def pg_is_local_access(self,):
         """
         Verify if the user running pg_activity can acces 
-        system informations for a postgres process.
+        system informations for the postmaster process.
         """
-        for psproc in psutil.process_iter():
-            try:
-                name = psproc.name()
-            except NameError:
-                name = psproc.name
-            except TypeError:
-                name = psproc.name
-            if name in ('postgres', 'postmaster', 'edb-postgres'):
+        try:
+            query = "SELECT setting AS pid_file FROM pg_settings WHERE name = 'external_pid_file'"
+            cur = self.pg_conn.cursor()
+            cur.execute(query)
+            ret = cur.fetchone()
+            pid_file = ret['pid_file']
+            with open(pid_file, 'r') as fd:
+                pid = fd.read().strip()
                 try:
-                    proc = PSProcess(psproc.pid)
+                    proc = PSProcess(int(pid))
                     proc.io_counters()
                     proc.cpu_times()
                     return True
@@ -193,7 +193,8 @@ class Data:
                     return False
                 except Exception:
                     return False
-        return False
+        except Exception:
+            return False
 
     def pg_get_version(self,):
         """
