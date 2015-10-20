@@ -177,13 +177,13 @@ class Data:
         system informations for the postmaster process.
         """
         try:
-            query = "SELECT setting AS pid_file FROM pg_settings WHERE name = 'external_pid_file'"
+            query = "SELECT setting||'/postmaster.pid' AS pid_file FROM pg_settings WHERE name = 'data_directory'"
             cur = self.pg_conn.cursor()
             cur.execute(query)
             ret = cur.fetchone()
             pid_file = ret['pid_file']
             with open(pid_file, 'r') as fd:
-                pid = fd.read().strip()
+                pid = fd.readlines()[0].strip()
                 try:
                     proc = PSProcess(int(pid))
                     proc.io_counters()
