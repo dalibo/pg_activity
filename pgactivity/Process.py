@@ -52,5 +52,5 @@ class Process():
         """
         Get a value from extras dict
         """
-        if self.extras is not None and self.extras.has_key(key):
+        if self.extras is not None and key in self.extras:
             return self.extras[key]

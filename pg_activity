@@ -24,6 +24,8 @@ BASIS, AND JULIEN TACHOIRES HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE,
 SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 """
 
+from __future__ import print_function
+
 PGTOP_VERSION = "1.3.0 dev"
 
 import os
@@ -208,9 +210,9 @@ server activity monitoring.")
                 help = "Enable debug mode for traceback tracking.",
                 default = 'false')
             (options, _) = parser.parse_args()
-        except OptionParsingError, err:
-            print 'pg_activity: error: %s' % err.msg
-            print 'Try "pg_activity --help" for more information.'
+        except OptionParsingError as err:
+            print('pg_activity: error: %s' % err.msg)
+            print('Try "pg_activity --help" for more information.')
             sys.exit(1)
         if options.help is True:
             print(parser.format_help().strip())
@@ -228,7 +230,7 @@ server activity monitoring.")
                         (pgpa_d == options.dbname or pgpa_d == '*'):
                         password = pgpa_pwd
                         continue
-            except Exception, err:
+            except Exception as err:
                 pass
         debug = options.debug
         nb_try = 0
@@ -351,12 +353,12 @@ server activity monitoring.")
             )
             interval = 1
 
-    except psutil.AccessDenied, err:
+    except psutil.AccessDenied as err:
         PGAUI.at_exit_curses()
         sys.exit(
             "FATAL: Acces denied, can't acces system informations for PID %s"
             % (str(err),))
-    except curses.error, err:
+    except curses.error as err:
         PGAUI.at_exit_curses()
         if debug is True:
             import traceback
@@ -367,10 +369,10 @@ server activity monitoring.")
                 exc_traceback,
                 file=sys.stdout)
         sys.exit("FATAL: %s" % (str(err),))
-    except KeyboardInterrupt, err:
+    except KeyboardInterrupt as err:
         PGAUI.at_exit_curses()
         sys.exit(1)
-    except Exception, err:
+    except Exception as err:
         PGAUI.at_exit_curses()
         # DEBUG
         if debug is True:

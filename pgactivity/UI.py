@@ -22,6 +22,8 @@ BASIS, AND JULIEN TACHOIRES HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE,
 SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 """
 
+from __future__ import print_function
+
 import curses
 import re
 import time
@@ -582,8 +584,8 @@ class UI:
         Function called on a process kill.
         """
         self.at_exit_curses()
-        print "FATAL: Killed with signal %s ." % (str(signal),)
-        print "%s" % (str(frame),)
+        print("FATAL: Killed with signal %s ." % (str(signal),))
+        print("%s" % (str(frame),))
         sys.exit(1)
 
     def set_nocolor(self,):
@@ -671,7 +673,7 @@ class UI:
         while 1:
             try:
                 k = self.win.getch()
-            except KeyboardInterrupt, err:
+            except KeyboardInterrupt as err:
                 raise err
             if k == ord('q'):
                 curses.endwin()
@@ -681,7 +683,7 @@ class UI:
                 return 0
 
             if k == curses.KEY_RESIZE:
-                if self.uibuffer is not None and self.uibuffer.has_key('procs'):
+                if self.uibuffer is not None and 'procs' in self.uibuffer:
                     self.check_window_size()
                     self.refresh_window(
                         self.uibuffer['procs'],
@@ -873,7 +875,7 @@ class UI:
         while 1:
             try:
                 key = self.win.getch()
-            except KeyboardInterrupt, err:
+            except KeyboardInterrupt as err:
                 raise err
             # quit
             if key == ord('q'):
@@ -937,7 +939,7 @@ class UI:
             known = False
             try:
                 k = self.win.getch()
-            except KeyboardInterrupt, err:
+            except KeyboardInterrupt as err:
                 raise err
             if k == -1:
                 nb_nk += 1
@@ -1064,7 +1066,7 @@ class UI:
         do_refresh = False
         try:
             key = self.win.getch()
-        except KeyboardInterrupt, err:
+        except KeyboardInterrupt as err:
             raise err
         if key == ord('q'):
             curses.endwin()
@@ -1140,22 +1142,23 @@ class UI:
 
         if key == curses.KEY_RESIZE and \
             self.uibuffer is not None and \
-            self.uibuffer.has_key('procs'):
+            'procs' in self.uibuffer:
             do_refresh = True
 
         if do_refresh is True and \
             self.uibuffer is not None and \
-            self.uibuffer.has_key('procs'):
-            self.check_window_size()
-            self.refresh_window(
-                self.uibuffer['procs'],
-                self.uibuffer['extras'],
-                self.uibuffer['flag'],
-                self.uibuffer['indent'],
-                self.uibuffer['io'],
-                self.uibuffer['tps'],
-                self.uibuffer['size_ev'],
-                self.uibuffer['total_size'])
+            type(self.uibuffer) is dict and \
+            'procs' in self.uibuffer:
+                self.check_window_size()
+                self.refresh_window(
+                    self.uibuffer['procs'],
+                    self.uibuffer['extras'],
+                    self.uibuffer['flag'],
+                    self.uibuffer['indent'],
+                    self.uibuffer['io'],
+                    self.uibuffer['tps'],
+                    self.uibuffer['size_ev'],
+                    self.uibuffer['total_size'])
 
         curses.flushinp()
         t_end = time.time()
@@ -1183,7 +1186,7 @@ class UI:
             write_count_delta = 0
             for pid, new_proc in new_procs.items():
                 try:
-                    if process.has_key(pid):
+                    if pid in process:
                         n_io_time = time.time()
                         # Getting informations from the previous loop
                         proc = process[pid]
@@ -1249,7 +1252,7 @@ class UI:
                     pass
                 except psutil.AccessDenied:
                     pass
-                except Exception, err:
+                except Exception as err:
                     raise err
             # store io counters
             if read_bytes_delta > 0:
@@ -1331,7 +1334,7 @@ class UI:
 
         try:
             k = self.win.getch()
-        except KeyboardInterrupt, err:
+        except KeyboardInterrupt as err:
             raise err
         if k == ord('q'):
             curses.endwin()
@@ -1395,11 +1398,11 @@ class UI:
             known = True
 
         if k == curses.KEY_RESIZE and self.uibuffer is not None and \
-            self.uibuffer.has_key('procs'):
+            'procs' in self.uibuffer:
             do_refresh = True
 
         if do_refresh is True and self.uibuffer is not None and \
-            self.uibuffer.has_key('procs'):
+            'procs' in self.uibuffer:
             self.check_window_size()
             self.refresh_window(
                 self.uibuffer['procs'],
@@ -1760,7 +1763,7 @@ class UI:
         self.win.timeout(-1)
         try:
             self.win.getch()
-        except KeyboardInterrupt, err:
+        except KeyboardInterrupt as err:
             raise err
 
     def __display_help_key(self, lineno, colno, key, help_msg):

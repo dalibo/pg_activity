@@ -151,7 +151,7 @@ class Data:
                     password = str(password),
                     connection_factory = psycopg2.extras.DictConnection
                     )
-            except psycopg2.Error, psy_err:
+            except psycopg2.Error as psy_err:
                 if host is None:
                     raise psy_err
         if self.pg_conn is None: # fallback on TCP/IP connection
