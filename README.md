@@ -1,15 +1,17 @@
 pg_activity
 ===========
 
-`htop` like application for **PostgreSQL** server activity monitoring.
+Command line tool for PostgreSQL server activity monitoring.
 
 Dependencies
 ------------
 
-`python`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>= **2.6**  
-`psycopg2`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>= **2.2.1**  
-`psutil`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>= **0.5.1**  
-`setuptools` >= **0.6.14**  
+  - `python` &ge; **2.6**
+  - `psycopg2` &ge; **2.2.1**
+  - `psutil` &ge;  **0.5.1**
+
+Installation from sources:
+`setuptools` &ge; **0.6.14** 
 
 Installation
 ------------
@@ -24,7 +26,7 @@ Installation
 Usage
 -----
 
-`pg_activity` works **localy** or **remotely**. In a local execution context, to obtain sufficient rights to display system informations, the system user running `pg_activity` must be the same user running postgresql server (`postgres` by default), or have more rights like `root`. Otherwise, `pg_activity` can fallback to a degraded mode without displaying system informations. On the same way, postgres role used to connect to the database must be super user.  
+`pg_activity` works localy or remotely. In local execution context, to obtain sufficient rights to display system informations, the system user running `pg_activity` must be the same user running postgresql server (`postgres` by default), or have more rights like `root`. Otherwise, `pg_activity` can fallback to a degraded mode without displaying system informations. On the same way, PostgreSQL user used to connect to the database must be super-user.  
 ex:  
     
     sudo -u postgres pg_activity -U postgres
@@ -45,12 +47,14 @@ Options
         -d DBNAME, --dbname=DBNAME
                               Database name to connect to (default: "postgres").
 		-C, --no-color        Disable color usage.
+		--blocksize=BLOCKSIZE Filesystem blocksize (default: 4096).
+		--rds                 Enable support for AWS RDS.
 		--help                Show this help message and exit.
 		--debug               Enable debug mode for traceback tracking.
-        --blocksize=BLOCKSIZE Filesystem blocksize (default: 4096).
+        
 
 	Display options, you can exclude some columns by using them :
-		--no-database         Disable DATABASE.
+	--no-database         Disable DATABASE.
     	--no-user             Disable USER.
     	--no-client           Disable CLIENT.
     	--no-cpu              Disable CPU%.
@@ -63,33 +67,37 @@ Options
 Interactives commands
 ---------------------
 
-`C`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Activate/deactivate colors  
-`r`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sort by READ/s, descending  
-`w`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sort by WRITE/s, descending  
-`c`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sort by CPU%, descending  
-`m`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sort by MEM%, descending  
-`t`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sort by TIME+, descending  
-`Space`		Pause on/off  
-`v`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Change queries display mode: full, truncated, indented  
-`UP/DOWN`	Scroll processes list  
-`q`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Quit  
-`+`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Increase refresh time. Maximum value : 3s  
-`-`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Decrease refesh time. Minimum Value : 1s  
-`F1/1`&nbsp;&nbsp;Running queries list  
-`F2/2`&nbsp;&nbsp;Waiting queries list  
-`F3/3`&nbsp;&nbsp;Blocking queries list  
-`h`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Help page  
-`R`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Refresh  
+| Key       | Action                                                 |
+|-----------|--------------------------------------------------------|
+| `C`       | Activate/deactivate colors                             |
+| `r`       | Sort by READ/s, descending                             |
+| `w`       | Sort by WRITE/s, descending                            |
+| `c`       | Sort by CPU%, descending                               |
+| `m`       | Sort by MEM%, descending                               |
+| `t`       | Sort by TIME+, descending                              |
+| `Space`   | Pause on/off                                           |  
+| `v`       | Change queries display mode: full, truncated, indented |
+| `UP/DOWN` | Scroll processes list                                  |
+| `q`       | Quit                                                   |  
+| `+`       | Increase refresh time. Maximum value : 3s              |
+| `-`       | Decrease refesh time. Minimum Value : 1s               |
+| `F1/1`    | Running queries list                                   |  
+| `F2/2`    | Waiting queries list                                   | 
+| `F3/3`    | Blocking queries list                                  |
+| `h`       | Help page                                              |  
+| `R`       | Refresh                                                | 
 
 Navigation mode
 ---------------
 
-`UP`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Move up the cursor  
-`DOWN`&nbsp;&nbsp;&nbsp;Move down the cursor  
-`k`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Terminate the current backend/tagged backends  
-`Space`&nbsp;Tag or untag the process  
-`q`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Quit  
-`Other`&nbsp;&nbsp;Back to activity  
+| Key     | Action                                        |
+|---------|-----------------------------------------------|
+| `UP`    | Move up the cursor                            |
+| `DOWN`  | Move down the cursor                          |
+| `k`     | Terminate the current backend/tagged backends |
+| `Space` | Tag or untag the process                      |
+| `q`     | Quit                                          |  
+| `Other` | Back to activity                              |  
 			
 Screenshot
 ----------
