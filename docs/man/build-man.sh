@@ -1,3 +1,3 @@
 #!/bin/bash
 
-pod2man -r "pg_activity 1.3.0 dev" -d `date +%Y-%m-%d` -c "PostgreSQL server activity monitoring tool" pg_activity.pod > pg_activity.1;
+pod2man -r "pg_activity 1.3.0" -d `date +%Y-%m-%d` -c "Command line tool for PostgreSQL server activity monitoring." pg_activity.pod > pg_activity.1;

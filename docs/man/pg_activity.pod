@@ -1,14 +1,14 @@
 =head1 NAME
 
-pg_activity - Realtime PostgreSQL database server monitoring tool
+pg_activity
 
 =head1 SYNOPSIS
 
-B<pg_activity> [-UphdC]
+B<pg_activity> [option..]
 
 =head1 DESCRIPTION
 
-pg_activity is a htop like application for PostgreSQL server activity monitoring.
+Command line tool for PostgreSQL server activity monitoring.
 
 =head1 COMMAND-LINE OPTIONS
 
@@ -38,6 +38,10 @@ pg_activity is a htop like application for PostgreSQL server activity monitoring
 
 	Filesystem blocksize (default: 4096).
 
+=item B<--rds>
+
+	Enable support for AWS RDS.
+
 =item B<--help>
 
 	Show this help message and exit.
@@ -54,7 +58,19 @@ pg_activity is a htop like application for PostgreSQL server activity monitoring
 
 =item B<PGPASSWORD>
 
-    PostgreSQL password
+    PostgreSQL password.
+
+=item B<PGPORT>
+
+	Database server port.
+
+=item B<PGUSER>
+
+	Database user name.
+
+=item B<PGHOST>
+
+	Database server host or socket directory.
 
 =item B<PGPASSFILE>
 
@@ -164,7 +180,7 @@ pg_activity is a htop like application for PostgreSQL server activity monitoring
 
 =head1 EXAMPLES
 
-PGPASSWORD='mypassword' pg_activity -U pgadmin -h 127.0.0.1 --no-client -C
+PGPASSWORD='mypassword' pg_activity -U pgadmin -h 127.0.0.1 --no-client
 
 pg_activity -h /tmp
 
