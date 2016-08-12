@@ -148,7 +148,7 @@ class Data:
                     database = database,
                     user = user,
                     port = port,
-                    password = str(password),
+                    password = password,
                     connection_factory = psycopg2.extras.DictConnection
                     )
             except psycopg2.Error as psy_err:
@@ -160,7 +160,7 @@ class Data:
                 host = host,
                 port = port,
                 user = user,
-                password = str(password),
+                password = password,
                 connection_factory = psycopg2.extras.DictConnection
                 )
         self.pg_conn.set_isolation_level(0)
