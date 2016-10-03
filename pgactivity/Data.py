@@ -296,8 +296,32 @@ class Data:
         """
         Get activity from pg_stat_activity view.
         """
-        if self.pg_num_version >= 90200:
-            # PostgreSQL 9.2.0 and more
+        if self.pg_num_version >= 90600:
+            # PostgreSQL 9.6.0 and more
+            query = """
+    SELECT
+        pg_stat_activity.pid AS pid,
+        CASE WHEN LENGTH(pg_stat_activity.datname) > 16
+            THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
+            ELSE pg_stat_activity.datname
+            END
+        AS database,
+        pg_stat_activity.client_addr AS client,
+        EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
+        pg_stat_activity.wait_event IS NOT NULL AS wait,
+        pg_stat_activity.usename AS user,
+        pg_stat_activity.query AS query
+    FROM
+        pg_stat_activity
+    WHERE
+        state <> 'idle'
+        AND pid <> pg_backend_pid()
+    ORDER BY
+        EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
+            """
+            
+        elif self.pg_num_version < 90600 and self.pg_num_version >= 90200:
+            # PostgreSQL prior to 9.6.0 and >= 9.2.0
             query = """
     SELECT
         pg_stat_activity.pid AS pid,
