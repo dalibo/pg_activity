@@ -218,20 +218,6 @@ server activity monitoring.")
             print(parser.format_help().strip())
             sys.exit(1)
         password = os.environ.get('PGPASSWORD')
-        if password is None:
-            # pgpass file handling
-            try:
-                pgpa_file = os.environ.get('PGPASSFILE')
-                for (pgpa_h, pgpa_p, pgpa_d, pgpa_u, pgpa_pwd) in \
-                    PGAUI.data.get_pgpass(pgpa_file):
-                    if (pgpa_h == options.host or pgpa_h == '*') and \
-                        (pgpa_p == options.port or pgpa_p == '*') and \
-                        (pgpa_u == options.username or pgpa_u == '*') and \
-                        (pgpa_d == options.dbname or pgpa_d == '*'):
-                        password = pgpa_pwd
-                        continue
-            except Exception as err:
-                pass
         debug = options.debug
         nb_try = 0
         while nb_try < 2:
