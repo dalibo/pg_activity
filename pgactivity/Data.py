@@ -106,29 +106,6 @@ class Data:
         """
         return self.pg_version
 
-
-    def get_pgpass(self, pgpass = None):
-        """
-        Get postgres' password using pgpass file.
-
-        http://www.postgresql.org/docs/9.2/static/libpq-pgpass.html
-        http://wiki.postgresql.org/wiki/Pgpass
-        """
-        if pgpass is None:
-            from os.path import expanduser
-            home = expanduser("~")
-            pgpass = "%s/.pgpass" % (str(home),)
-        ret = []
-        with open(pgpass, 'r') as filep:
-            content = filep.readlines()
-            for line in content:
-                res = None
-                res = re.match(r"^([^:]+):([^:]+):([^:]+):([^:]+):(.*)$", line)
-                if res is not None:
-                    ret.append(res.group(1, 2, 3, 4, 5))
-            return ret
-        raise Exception("pgpass file not found")
-
     def pg_connect(self,
         host = None,
         port = 5432,
