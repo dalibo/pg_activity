@@ -13,7 +13,7 @@ if sys.version_info < (2, 6):
 
 setup(
     name = 'pg_activity',
-    version = '1.3.0',
+    version = '1.3.1',
     author = 'Julien Tachoires',
     author_email = 'julmon@gmail.com',
     scripts = ['pg_activity'],

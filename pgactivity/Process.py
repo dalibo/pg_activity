@@ -3,7 +3,7 @@ pg_activity
 author: Julien Tachoires <julmon@gmail.com>
 license: PostgreSQL License
 
-Copyright (c) 2012 - 2015, Julien Tachoires
+Copyright (c) 2012 - 2016, Julien Tachoires
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose, without fee, and without a written
