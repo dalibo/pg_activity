@@ -146,7 +146,7 @@ Command line tool for PostgreSQL server activity monitoring.
 
 =item B<+>     Increase refresh time. Maximum value : 3s
 
-=item B<->     Decrease refesh time. Minimum Value : 1s
+=item B<->     Decrease refresh time. Minimum Value : 1s
 
 =item B<F1/1>  Running queries monitoring.
 
