@@ -82,7 +82,7 @@ Interactives commands
 | `UP/DOWN` | Scroll processes list                                  |
 | `q`       | Quit                                                   |  
 | `+`       | Increase refresh time. Maximum value : 3s              |
-| `-`       | Decrease refesh time. Minimum Value : 1s               |
+| `-`       | Decrease refresh time. Minimum Value : 1s               |
 | `F1/1`    | Running queries list                                   |  
 | `F2/2`    | Waiting queries list                                   | 
 | `F3/3`    | Blocking queries list                                  |
