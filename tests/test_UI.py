@@ -20,15 +20,14 @@ def test_bytes2human():
     for case, expected_result in samples:
         assert bytes2human(case) == expected_result, 'bytes2human fail'
 
-ui = UI(PGTOP_VERSION)
-def test_get_flag_from_options():
-    """Test get_flag_from_options method of UI class against every
-    possible combination of options (options.nodb, options.nouser etc.)
-    both in cases when we work with remote and local database.
-    We are testing against hardcoded results of using same method
-    as of current date.
-    """
 
+def test_get_flag_from_options():
+    """tests get_flag_from_options method against every
+    possible combination of options it can receive
+    (options.nodb, options.nouser etc.), both in cases when
+    we work with remote and local database.
+    """
+    variants = itertools.product([True, False], repeat=9)
     class Options:
         def __init__(self, args):
             (self.nodb,
@@ -40,24 +39,18 @@ def test_get_flag_from_options():
              self.nowrite,
              self.notime,
              self.nowait) = args
-
-    variants = itertools.product([True, False], repeat=9)
+    
     option_cases = [Options(i) for i in variants]
 
-    initial_state = ui.is_local  # remember initial state
+    ui = UI(PGTOP_VERSION)
 
-    # test for remote db
-    ui.is_local = False
-    remote_result = [ui.get_flag_from_options(case) for case in option_cases]
+    ui.is_local = False  # test for remote db
+    result_remote = [ui.get_flag_from_options(case) for case in option_cases]
 
-    # test for local db
-    ui.is_local = True
-    local_result = [ui.get_flag_from_options(case) for case in option_cases]
+    ui.is_local = True  # test for local db
+    result_local = [ui.get_flag_from_options(case) for case in option_cases]
 
-    ui.is_local = initial_state  # restore initial state
-
-
-    remote = [
+    expected_remote = [
             3584, 3840, 3712, 3968, 3584, 3840, 3712, 3968, 3584, 3840, 3712,
             3968, 3584, 3840, 3712, 3968, 3584, 3840, 3712, 3968, 3584, 3840,
             3712, 3968, 3584, 3840, 3712, 3968, 3584, 3840, 3712, 3968, 3586,
@@ -106,7 +99,7 @@ def test_get_flag_from_options():
             3975, 3591, 3847, 3719, 3975, 3591, 3847, 3719, 3975, 3591, 3847,
             3719, 3975, 3591, 3847, 3719, 3975
             ]
-    local = [
+    expected_local = [
           7680, 7936, 7808, 8064, 7744, 8000, 7872, 8128, 7712, 7968, 7840,
           8096, 7776, 8032, 7904, 8160, 7696, 7952, 7824, 8080, 7760, 8016,
           7888, 8144, 7728, 7984, 7856, 8112, 7792, 8048, 7920, 8176, 7682,
@@ -156,9 +149,46 @@ def test_get_flag_from_options():
           7871, 8127, 7807, 8063, 7935, 8191
           ]
 
-    assert remote_result == remote, 'get_flag_from_options fail'
-    assert local_result == local, 'get_flag_from_options fail'
+    assert result_remote == expected_remote, 'get_flag_from_options fail'
+    assert result_local == expected_local, 'get_flag_from_options fail'
+
+def test_init_curses():
+    """init_curses method calls __init_curses method,
+    which sets up terminal for us to use
+    (keyboard input, colors etc.)
+    We don`t test it here.
+    It also sets up several terminal window-related attributes,
+    line_colors among others.
+    Only line_colors attribute is tested.
+    """
+    ui = UI(PGTOP_VERSION)
+    ui.init_curses()
+
+    expected_result = {
+      'client': {'cursor': 262656, 'default': 512, 'yellow': 2098432},
+      'cpu': {'cursor': 262656, 'default': 0, 'yellow': 2098432},
+      'database': {'cursor': 262656, 'default': 2099712, 'yellow': 2098432},
+      'mem': {'cursor': 262656, 'default': 0, 'yellow': 2098432},
+      'mode_red': {'cursor': 262656, 'default': 2097920, 'yellow': 2098432},
+      'mode_yellow': {'cursor': 262656, 'default': 2098432, 'yellow': 2098432},
+      'pid': {'cursor': 262656, 'default': 512, 'yellow': 2098432},
+      'query': {'cursor': 262656, 'default': 0, 'yellow': 2098432},
+      'read': {'cursor': 262656, 'default': 0, 'yellow': 2098432},
+      'relation': {'cursor': 262656, 'default': 512, 'yellow': 2098432},
+      'time_green': {'cursor': 262656, 'default': 1024, 'yellow': 2098432},
+      'time_red': {'cursor': 262656, 'default': 768, 'yellow': 2098432},
+      'time_yellow': {'cursor': 262656, 'default': 1280, 'yellow': 2098432},
+      'type': {'cursor': 262656, 'default': 0, 'yellow': 2098432},
+      'user': {'cursor': 262656, 'default': 2099712, 'yellow': 2098432},
+      'wait_green': {'cursor': 262656, 'default': 2098176, 'yellow': 2098432},
+      'wait_red': {'cursor': 262656, 'default': 2097920, 'yellow': 2098432},
+      'write': {'cursor': 262656, 'default': 0, 'yellow': 2098432}
+    }
+
+    assert ui.line_colors == expected_result, 'init_curses fail'
 
 
-test_bytes2human()
-test_get_flag_from_options()
+if __name__ == '__main__':
+    test_bytes2human()
+    test_get_flag_from_options()
+    test_init_curses()
