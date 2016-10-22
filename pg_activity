@@ -31,9 +31,7 @@ import sys
 if os.name != 'posix':
     sys.exit("FATAL: Platform not supported.")
 import signal
-from optparse import OptionParser, OptionGroup
 import socket
-import getpass
 import psutil
 import curses
 import psycopg2
