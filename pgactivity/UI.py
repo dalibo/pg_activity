@@ -33,7 +33,7 @@ from pgactivity.Data import Data
 import psutil
 from getpass import getpass
 import operator
-from functools import reduce
+from functools import reduce, partial
 if sys.version_info[0] == 2:
     from itertools import imap as map, ifilter as filter
 
@@ -582,7 +582,7 @@ class UI:
         return start + text + end
 
     def __print_pause_msg(self):
-        self.__print_string(
+        self.__putstrLn(
             self.start_line,
             0,
             self.__get_msg("PAUSE"),
@@ -628,57 +628,27 @@ class UI:
         color = self.__get_color(C_GREEN)
         line = self.__get_msg(msg)
 
-        self.__print_string(self.start_line, 0, line, color|curses.A_BOLD)
+        self.__putstrLn(self.start_line, 0, line, color|curses.A_BOLD)
 
     def __help_key_interactive(self,):
         """
         Display interactive mode menu bar
         """
-        colno = self.__print_string(
-            (self.maxy - 1),
-            0,
-            "k",
-            self.__get_color(0))
-        colno += self.__print_string(
-            (self.maxy - 1),
-            colno,
-            "Terminate the backend    ",
-            self.__get_color(C_CYAN)|curses.A_REVERSE)
-        colno += self.__print_string(
-            (self.maxy - 1),
-            colno,
-            "Space",
-            self.__get_color(0))
-        colno += self.__print_string(
-            (self.maxy - 1),
-            colno,
-            "Tag/untag the process    ",
-            self.__get_color(C_CYAN)|curses.A_REVERSE)
-        colno += self.__print_string(
-            (self.maxy - 1),
-            colno,
-            "Other",
-            self.__get_color(0))
-        colno += self.__print_string(
-            (self.maxy - 1),
-            colno,
-            "Back to activity    ",
-            self.__get_color(C_CYAN)|curses.A_REVERSE)
-        colno += self.__print_string(
-            (self.maxy - 1),
-            colno,
-            "q",
-            self.__get_color(0))
-        colno += self.__print_string(
-            (self.maxy - 1),
-            colno,
-            "Quit    ",
-            self.__get_color(C_CYAN)|curses.A_REVERSE)
-        colno += self.__print_string(
-            (self.maxy - 1),
-            colno,
-            self.__add_blank(" "),
-            self.__get_color(C_CYAN)|curses.A_REVERSE)
+
+        cyan = self.__get_color(C_CYAN)
+        params = (
+            ("k", self.__get_color(0)),
+            ("Terminate the backend    ", cyan|curses.A_REVERSE),
+            ("Space", self.__get_color(0)),
+            ("Tag/untag the process    ", cyan|curses.A_REVERSE),
+            ("Other", self.__get_color(0)),
+            ("Back to activity    ", cyan|curses.A_REVERSE),
+            ("q", self.__get_color(0)),
+            ("Quit    ", cyan|curses.A_REVERSE),
+            (self.__add_blank(" "), cyan|curses.A_REVERSE),
+        )
+
+        self.__print_line(self.maxy-1, 0, params)
 
     def __change_mode_interactive(self,):
         """
@@ -1357,7 +1327,7 @@ class UI:
 
         return (disp_procs, new_procs)
 
-    def __print_string(self, lineno, colno, word, color = 0):
+    def __print_string(self, lineno, colno, word, color=0):
         """
         Print a string at position (lineno, colno) and returns its length.
         """
@@ -1366,6 +1336,21 @@ class UI:
         except curses.error:
             pass
         return len(word)
+
+    def __putstrLn(self, lineno, colno, word, color=0):
+        try:
+            self.win.addstr(lineno, colno, word, color)
+        except curses.error:
+            pass
+
+    def __print_line(self, lineno, start_colno, params):
+        print_fn = partial(self.__putstrLn, lineno)
+
+        colno = start_colno
+        for p in params:
+            print_fn(colno, *p)
+            word = p[0]
+            colno += len(word)
 
     def __add_blank(self, line, offset = 0):
         """
@@ -1417,7 +1402,7 @@ class UI:
                 if val['name'] == "Query":
                     disp += " " * (self.maxx - (len(line) + len(disp)))
                 line += disp
-                self.__print_string(
+                self.__putstrLn(
                     self.lineno,
                     xpos,
                     disp,
@@ -1430,85 +1415,38 @@ class UI:
         """
         Print window header
         """
-        self.lineno = 0
-        colno = 0
         version = " %s" % (pg_version)
-        colno = self.__print_string(
-                    self.lineno,
-                    colno,
-                    version)
-        colno += self.__print_string(
-                    self.lineno,
-                    colno,
-                    " - ")
-        colno += self.__print_string(
-                    self.lineno,
-                    colno,
-                    hostname,
-                    curses.A_BOLD)
-        colno += self.__print_string(
-                    self.lineno,
-                    colno,
-                    " - ")
-        colno += self.__print_string(
-                    self.lineno,
-                    colno,
-                    user,
-                    self.__get_color(C_CYAN))
-        colno += self.__print_string(
-                    self.lineno,
-                    colno,
-                    "@")
-        colno += self.__print_string(
-                    self.lineno,
-                    colno,
-                    host,
-                    self.__get_color(C_CYAN))
-        colno += self.__print_string(
-                    self.lineno,
-                    colno,
-                    ":")
-        colno += self.__print_string(
-                    self.lineno,
-                    colno,
-                    port,
-                    self.__get_color(C_CYAN))
-        colno += self.__print_string(
-                    self.lineno,
-                    colno,
-                    "/")
-        colno += self.__print_string(
-                    self.lineno,
-                    colno,
-                    database,
-                    self.__get_color(C_CYAN))
-        colno += self.__print_string(
-                    self.lineno,
-                    colno,
-                    " - Ref.: %ss" % (self.refresh_time,))
-        colno = 0
+
+        self.lineno = 0
+        cyan = self.__get_color(C_CYAN)
+        params = (
+            (" - ",),
+            (hostname,curses.A_BOLD,),
+            (" - ",),
+            (user, cyan),
+            ("@",),
+            (host, cyan),
+            (":",),
+            (port, cyan),
+            ("/",),
+            (database, cyan),
+            (" - Ref.: {}s".format(self.refresh_time),),
+        )
+        self.__print_line(self.lineno, 0, params)
+
         self.lineno += 1
-        colno += self.__print_string(
-                    self.lineno,
-                    colno,
-                    "  Size: ")
-        colno += self.__print_string(
-                    self.lineno,
-                    colno,
-                    "%8s" % (bytes2human(total_size),),)
-        colno += self.__print_string(
-                    self.lineno,
-                    colno,
-                    " - %9s/s" % (bytes2human(size_ev),),)
-        colno += self.__print_string(
-                    self.lineno,
-                    colno,
-                    "        | TPS: ")
-        colno += self.__print_string(
-                    self.lineno,
-                    colno,
-                    "%11s" % (tps,),
-                    self.__get_color(C_GREEN)|curses.A_BOLD)
+        s_total_size = "%8s" % bytes2human(total_size)
+        s_size_ev = " - %9s/s" % bytes2human(size_ev)
+        s_tps = "%11s" % (tps,)
+        green_bold = self.__get_color(C_GREEN)|curses.A_BOLD
+        params = (
+            ("  Size: ",),
+            (s_total_size,),
+            (s_size_ev,),
+            ("        | TPS: ",),
+            (s_tps, green_bold),
+            )
+        self.__print_line(self.lineno, 0, params)
 
         # If not local connection, don't get and display system informations
         if not self.is_local:
@@ -1556,16 +1494,16 @@ class UI:
         """
         self.win.erase()
         self.lineno = 0
-        text = "pg_activity %s - (c) 2012-2015 Julien Tachoires" % \
-            (self.version)
-        self.__print_string(
+        version = self.version
+        text = "pg_activity %s - (c) 2012-2015 Julien Tachoires" % version
+        self.__putstrLn(
                 self.lineno,
                 0,
                 text,
                 self.__get_color(C_GREEN)|curses.A_BOLD)
         self.lineno += 1
         text = "Released under PostgreSQL License."
-        self.__print_string(
+        self.__putstrLn(
                 self.lineno,
                 0,
                 text)
@@ -1642,7 +1580,7 @@ class UI:
                 "      R",
                 "force refresh")
         self.lineno += 1
-        self.__print_string(
+        self.__putstrLn(
                 self.lineno,
                 0,
                 "Mode")
@@ -1666,7 +1604,7 @@ class UI:
                 "blocking queries")
 
         self.lineno += 2
-        self.__print_string(
+        self.__putstrLn(
                 self.lineno,
                 0,
                 "Press any key to exit.")
@@ -1680,26 +1618,31 @@ class UI:
         """
         Display help key
         """
-        pos1 = self.__print_string(
-                lineno,
-                colno,
-                key,
-                self.__get_color(C_CYAN)|curses.A_BOLD)
-        pos2 = self.__print_string(
-                lineno,
-                colno + pos1,
-                ": %s" % (help_msg,))
-        return (colno + pos1 + pos2)
+        cyan_b = self.__get_color(C_CYAN)|curses.A_BOLD
+        word = ": %s" % (help_msg,)
+        self.__putstrLn(lineno, colno, key, cyan_b)
+        self.__putstrLn(lineno, colno + len(key), word)
+        return (colno + len(key) + len(word))
 
     def refresh_window(self, procs, extras, flag, indent, ios, \
         tps, size_ev, total_size):
         """
         Refresh the window
         """
-
         self.lines = []
         self.win.erase()
-        self.__print_header(*extras, ios, tps, size_ev, total_size)
+        (pg_version, hostname, user, host, port, dbname) = extras
+        self.__print_header(
+            pg_version,
+            hostname,
+            user,
+            host,
+            port,
+            dbname,
+            ios,
+            tps,
+            size_ev,
+            total_size)
         self.lineno += 2
         line_trunc = self.lineno
         self.__current_position()
@@ -1712,7 +1655,7 @@ class UI:
             except curses.error:
                 break
         for line in range(self.lineno, (self.maxy-1)):
-            self.__print_string(line, 0, self.__add_blank(" "))
+            self.__putstrLn(line, 0, self.__add_blank(" "))
         self.__change_mode_interactive()
 
     def __scroll_window(self, procs, flag, indent, offset = 0):
@@ -1726,7 +1669,7 @@ class UI:
                 self.__refresh_line(proc, flag, indent, 'default')
             pos += 1
         for line in range(self.lineno, (self.maxy-1)):
-            self.__print_string(line, 0, self.__add_blank(" "))
+            self.__putstrLn(line, 0, self.__add_blank(" "))
 
     def __refresh_line(self, process, flag, indent, \
         typecolor = 'default', line = None):
@@ -1802,20 +1745,15 @@ class UI:
                             "%16s " % (str(process['type'])[:16],),
                             self.line_colors['type'][typecolor])
             if flag & PGTOP_FLAG_MODE:
-                if process['mode'] == 'ExclusiveLock' or \
-                    process['mode'] == 'RowExclusiveLock' or \
-                    process['mode'] == 'AccessExclusiveLock':
-                    colno += self.__print_string(
-                                l_lineno,
-                                colno,
-                                "%16s " % (str(process['mode'])[:16],),
-                                self.line_colors['mode_red'][typecolor])
-                else:
-                    colno += self.__print_string(
-                                l_lineno,
-                                colno,
-                                "%16s " % (str(process['mode'])[:16],),
-                                self.line_colors['mode_yellow'][typecolor])
+                pr_locks = {'ExclusiveLock',
+                            'RowExclusiveLock',
+                            'AccessExclusiveLock'}
+                word = "%16s " % (mode[:16],)
+                fn = lambda k: self.line_colors[k][typecolor]
+                color = fn('mode_red') if (process['mode'] in pr_locks) else \
+                                                        fn('mode_yellow')
+                self.__putstrLn(l_lineno, colno, word, color)
+                colno += len(word)
 
         if flag & PGTOP_FLAG_TIME:
             if process['duration'] >= 1 and process['duration'] < 60000:
