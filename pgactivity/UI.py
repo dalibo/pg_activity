@@ -29,6 +29,7 @@ import re
 import time
 import sys
 from datetime import timedelta
+import pgactivity
 from pgactivity.Data import Data
 import psutil
 from getpass import getpass
@@ -285,7 +286,7 @@ class UI:
         """
         Constructor.
         """
-        self.version = version
+        self.version = pgactivity.__version__
         self.win = None
         self.sys_color = True
         self.lineno = 0
@@ -403,7 +404,7 @@ class UI:
             'relation':     {'default': cyan},
             'type':         {'default': zero},
             'mode_yellow':  {'default': bold_yellow},
-            'mode_red':     {'default': bold_red}
+            'mode_red':     {'default': bold_red},
         }
 
         for col in line_colors:
@@ -654,105 +655,42 @@ class UI:
         """
         Display change mode menu bar
         """
-        colno = self.__print_string(
-            (self.maxy - 1),
-            0,
-            "F1/1",
-            self.__get_color(0))
-        colno += self.__print_string(
-            (self.maxy - 1),
-            colno,
-            "Running queries    ",
-            self.__get_color(C_CYAN)|curses.A_REVERSE)
-        colno += self.__print_string(
-            (self.maxy - 1),
-            colno,
-            "F2/2",
-            self.__get_color(0))
-        colno += self.__print_string(
-            (self.maxy - 1),
-            colno,
-            "Waiting queries    ",
-            self.__get_color(C_CYAN)|curses.A_REVERSE)
-        colno += self.__print_string(
-            (self.maxy - 1),
-            colno,
-            "F3/3",
-            self.__get_color(0))
-        colno += self.__print_string(
-            (self.maxy - 1),
-            colno,
-            "Blocking queries ",
-            self.__get_color(C_CYAN)|curses.A_REVERSE)
-        colno += self.__print_string(
-            (self.maxy - 1),
-            colno,
-            "Space",
-            self.__get_color(0))
-        colno += self.__print_string(
-            (self.maxy - 1),
-            colno,
-            "Pause    ",
-            self.__get_color(C_CYAN)|curses.A_REVERSE)
-        colno += self.__print_string(
-            (self.maxy - 1),
-            colno,
-            "q",
-            self.__get_color(0))
-        colno += self.__print_string(
-            (self.maxy - 1),
-            colno,
-            "Quit    ",
-            self.__get_color(C_CYAN)|curses.A_REVERSE)
-        colno += self.__print_string(
-            (self.maxy - 1),
-            colno,
-            "h",
-            self.__get_color(0))
-        colno += self.__print_string(
-            (self.maxy - 1),
-            colno,
-            "Help    ",
-            self.__get_color(C_CYAN)|curses.A_REVERSE)
-        colno += self.__print_string(
-            (self.maxy - 1),
-            colno,
-            self.__add_blank(" "),
-            self.__get_color(C_CYAN)|curses.A_REVERSE)
+
+        
+        cyan_reverse = self.__get_color(C_CYAN)|curses.A_REVERSE
+        zero = self.__get_color(0)
+        params = (
+            ("F1/1", zero),
+            ("Running queries    ", cyan_reverse),
+            ("F2/2", zero),
+            ("Waiting queries    ", cyan_reverse),
+            ("F3/3", zero),
+            ("Blocking queries ", cyan_reverse),
+            ("Space", zero),
+            ("Pause    ", cyan_reverse),
+            ("q", zero),
+            ("Quit    ", cyan_reverse),
+            ("h", zero),
+            ("Help    ", cyan_reverse),
+            (self.__add_blank(" "), cyan_reverse),
+            )
+
+        self.__print_line(self.maxy-1, 0, params)
 
     def __ask_terminate_backends(self, pids,):
         """
         Ask for terminating some backends
         """
-        if len(pids) == 1:
-            colno = self.__print_string(
-                        (self.maxy - 1),
-                        0,
-                        "Terminate backend with PID %s ? <Y/N>" \
-                             % (str(pids[0]),),
-                        self.__get_color(0))
-        else:
-            pos = 0
-            disp = ""
-            for pid in pids:
-                if pos > 5:
-                    disp += "..."
-                    break
-                if pos > 0:
-                    disp += ", "
-                disp += "%s" % (pid,)
-                pos += 1
-            colno = self.__print_string(
-                        (self.maxy - 1),
-                        0,
-                        "Terminate backends with PID %s ? <Y/N>" % (str(disp),),
-                        self.__get_color(0))
+        xs = ('%s' % pid for pid in pids)
+        (xs, endln) = (xs[-1], '...') if len(xs)>5 else (xs, '')
+        disp = ', '.join(xs) + endln
+        word = "Terminate backend with PID %s ? <Y/N>" % disp
+        blank = self.__add_blank(" ")
 
-        colno += self.__print_string(
-                    (self.maxy - 1),
-                    colno,
-                    self.__add_blank(" "),
-                    self.__get_color(C_CYAN)|curses.A_REVERSE)
+        params = ((word, self.__get_color(0)),
+                  (blank, self.__get_color(C_CYAN)|curses.A_REVERSE),)
+        self.__print_line(self.maxy-1, 0, params)
+
         while 1:
             try:
                 key = self.win.getch()
@@ -769,7 +707,7 @@ class UI:
                 self.__empty_pid_yank()
                 return 1
             # no
-            if key == ord('n') or key == ord('N') or key == ord(' '):
+            if key in map(ord, 'nN '):
                 return 0
             # resize => exit
             if key == curses.KEY_RESIZE:

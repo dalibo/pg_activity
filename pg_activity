@@ -37,11 +37,11 @@ import curses
 import psycopg2
 from psycopg2 import errorcodes
 
-from pgactivity import UI, __version__
+from pgactivity import UI
 from pgactivity.parser import parser, OptionParsingError
 
 # Create the UI
-PGAUI = UI.UI(__version__)
+PGAUI = UI.UI()
 
 def main():
     """
