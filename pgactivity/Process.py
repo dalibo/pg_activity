@@ -28,7 +28,7 @@ class Process():
     """
     def __init__(self, pid = None, database = None, user = None, \
         client = None, cpu = None, mem = None, read = None, write = None, \
-        query = None, duration = None, wait = None, extras = None):
+        state = None, query = None, duration = None, wait = None, extras = None):
         self.pid = pid
         self.database = database
         self.user = user
@@ -37,6 +37,7 @@ class Process():
         self.mem = mem
         self.read = read
         self.write = write
+        self.state = state
         self.query = query
         self.duration = duration
         self.wait = wait
