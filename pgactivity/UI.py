@@ -67,7 +67,7 @@ PGTOP_WRAP_NOINDENT =   2
 PGTOP_WRAP =            3
 
 # Maximum number of column
-PGTOP_MAX_NCOL = 13
+PGTOP_MAX_NCOL = 14
 
 PGTOP_COLS = {
     'activities': {
@@ -148,8 +148,15 @@ PGTOP_COLS = {
             'flag': PGTOP_FLAG_IOWAIT,
             'mandatory': False
         },
-        'query': {
+        'state': {
             'n': 12,
+            'name': 'state',
+            'template_h': ' %17s  ',
+            'flag': PGTOP_FLAG_NONE,
+            'mandatory': True
+        },
+        'query': {
+            'n': 13,
             'name': 'Query',
             'template_h': ' %2s',
             'flag': PGTOP_FLAG_NONE,
@@ -199,8 +206,15 @@ PGTOP_COLS = {
             'flag': PGTOP_FLAG_TIME,
             'mandatory': False
         },
-        'query': {
+        'state': {
             'n': 7,
+            'name': 'state',
+            'template_h': ' %17s  ',
+            'flag': PGTOP_FLAG_NONE,
+            'mandatory': True
+        },
+        'query': {
+            'n': 8,
             'name': 'Query',
             'template_h': ' %2s',
             'flag': PGTOP_FLAG_NONE,
@@ -250,8 +264,15 @@ PGTOP_COLS = {
             'flag': PGTOP_FLAG_TIME,
             'mandatory': False
         },
-        'query': {
+        'state': {
             'n': 7,
+            'name': 'state',
+            'template_h': ' %17s  ',
+            'flag': PGTOP_FLAG_NONE,
+            'mandatory': True
+        },
+        'query': {
+            'n': 8,
             'name': 'Query',
             'template_h': ' %2s',
             'flag': PGTOP_FLAG_NONE,
@@ -259,6 +280,11 @@ PGTOP_COLS = {
         },
     }
 }
+
+MAP_STATES = {
+    'idle in transaction': 'idle in trans',
+    'idle in transaction (aborted)': 'idle in trans (a)',
+    }
 
 def bytes2human(num):
     """
@@ -439,6 +465,26 @@ class UI:
             },
             'wait_red': {
                 'default': self.__get_color(C_RED)|curses.A_BOLD,
+                'cursor':  self.__get_color(C_CYAN)|curses.A_REVERSE,
+                'yellow':  self.__get_color(C_YELLOW)|curses.A_BOLD
+            },
+            'state_default': {
+                'default': self.__get_color(0),
+                'cursor':  self.__get_color(C_CYAN)|curses.A_REVERSE,
+                'yellow':  self.__get_color(C_YELLOW)|curses.A_BOLD
+            },
+            'state_yellow': {
+                'default': self.__get_color(C_YELLOW),
+                'cursor':  self.__get_color(C_CYAN)|curses.A_REVERSE,
+                'yellow':  self.__get_color(C_YELLOW)|curses.A_BOLD
+            },
+            'state_green': {
+                'default': self.__get_color(C_GREEN),
+                'cursor':  self.__get_color(C_CYAN)|curses.A_REVERSE,
+                'yellow':  self.__get_color(C_YELLOW)|curses.A_BOLD
+            },
+            'state_red': {
+                'default': self.__get_color(C_RED),
                 'cursor':  self.__get_color(C_CYAN)|curses.A_REVERSE,
                 'yellow':  self.__get_color(C_YELLOW)|curses.A_BOLD
             },
@@ -1192,6 +1238,7 @@ class UI:
                         proc = process[pid]
                         # Update old process with new informations
                         proc.duration = new_proc.duration
+                        proc.state = new_proc.state
                         proc.query = new_proc.query
                         proc.client = new_proc.client
                         proc.wait = new_proc.wait
@@ -1242,6 +1289,7 @@ class UI:
                         'mem': proc.get_extra('mem_percent'),
                         'read': proc.get_extra('read_delta'),
                         'write': proc.get_extra('write_delta'),
+                        'state': proc.state,
                         'query': proc.query,
                         'duration': self.data.get_duration(proc.duration),
                         'wait': proc.wait,
@@ -1275,6 +1323,7 @@ class UI:
                     'database': query['database'],
                     'user': query['user'],
                     'client': query['client'],
+                    'state': query['state'],
                     'query': query['query'],
                     'duration': self.data.get_duration(query['duration']),
                     'wait': query['wait']
@@ -1446,6 +1495,9 @@ class UI:
                         reverse=True)
 
         return (disp_procs, new_procs)
+
+    def print_string(self, lineno, colno, word, color = 0):
+        return self.__print_string(lineno, colno, word, color)
 
     def __print_string(self, lineno, colno, word, color = 0):
         """
@@ -1975,6 +2027,22 @@ class UI:
                             colno,
                             "%4s " % ('N',),
                             self.line_colors['wait_green'][typecolor])
+
+        state = MAP_STATES.get(process['state']) or process['state']
+        if state == 'active':
+            color_state = 'state_green'
+        elif state == 'idle in trans':
+            color_state = 'state_yellow'
+        elif state == 'idle in trans (a)':
+            color_state = 'state_red'
+        else:
+            color_state = 'state_default'
+
+        colno += self.__print_string(
+                    l_lineno,
+                    colno,
+                    " %17s  " % state,
+                    self.line_colors[color_state][typecolor])
 
         dif = self.maxx - len(indent) - 1
         if self.verbose_mode == PGTOP_TRUNCATE:
