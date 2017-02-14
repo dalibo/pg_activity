@@ -66,6 +66,21 @@ PGTOP_TRUNCATE =        1
 PGTOP_WRAP_NOINDENT =   2
 PGTOP_WRAP =            3
 
+# Cancel/Terminate backend
+PGTOP_SIGNAL_CANCEL_BACKEND =    ord('c')
+PGTOP_SIGNAL_TERMINATE_BACKEND = ord('k')
+
+PGTOP_SIGNAL_MESSAGE = {
+    PGTOP_SIGNAL_CANCEL_BACKEND: {
+        's': "Cancel query at backend with PID %s ? <Y/N>",
+        'p': "Cancel query at backends with PID %s ? <Y/N>"
+    },
+    PGTOP_SIGNAL_TERMINATE_BACKEND: {
+        's': "Terminate backend with PID %s ? <Y/N>",
+        'p': "Terminate backends with PID %s ? <Y/N>"
+    },
+}
+
 # Maximum number of column
 PGTOP_MAX_NCOL = 14
 
@@ -772,6 +787,16 @@ class UI:
         colno = self.__print_string(
             (self.maxy - 1),
             0,
+            "c",
+            self.__get_color(0))
+        colno += self.__print_string(
+            (self.maxy - 1),
+            colno,
+            "Cancel current query     ",
+            self.__get_color(C_CYAN)|curses.A_REVERSE)
+        colno += self.__print_string(
+            (self.maxy - 1),
+            colno,
             "k",
             self.__get_color(0))
         colno += self.__print_string(
@@ -885,16 +910,15 @@ class UI:
             self.__add_blank(" "),
             self.__get_color(C_CYAN)|curses.A_REVERSE)
 
-    def __ask_terminate_backends(self, pids,):
+    def __ask_terminate_or_cancel_backends(self, action, pids,):
         """
-        Ask for terminating some backends
+        Ask for cancelling or terminating some backends
         """
         if len(pids) == 1:
             colno = self.__print_string(
                         (self.maxy - 1),
                         0,
-                        "Terminate backend with PID %s ? <Y/N>" \
-                             % (str(pids[0]),),
+                        PGTOP_SIGNAL_MESSAGE[action]['s'] % (str(pids[0]),),
                         self.__get_color(0))
         else:
             pos = 0
@@ -910,7 +934,7 @@ class UI:
             colno = self.__print_string(
                         (self.maxy - 1),
                         0,
-                        "Terminate backends with PID %s ? <Y/N>" % (str(disp),),
+                        PGTOP_SIGNAL_MESSAGE[action]['p'] % (str(disp),),
                         self.__get_color(0))
 
         colno += self.__print_string(
@@ -930,7 +954,10 @@ class UI:
             # yes
             if key == ord('y') or key == ord('Y'):
                 for pid in pids:
-                    self.data.pg_terminate_backend(str(pid),)
+                    if action == PGTOP_SIGNAL_TERMINATE_BACKEND:
+                        self.data.pg_terminate_backend(str(pid),)
+                    else:
+                        self.data.pg_cancel_backend(str(pid),)
                 self.__empty_pid_yank()
                 return 1
             # no
@@ -993,13 +1020,13 @@ class UI:
             if k == ord('q'):
                 curses.endwin()
                 exit()
-            # terminate the backend attached to this PID
-            if k == ord('k'):
+            # terminate/cancel the backend attached to this PID
+            if k == PGTOP_SIGNAL_TERMINATE_BACKEND or k == PGTOP_SIGNAL_CANCEL_BACKEND:
                 if len(self.pid_yank) == 0:
-                    self.__ask_terminate_backends( \
-                        [process[current_pos]['pid']],)
+                    self.__ask_terminate_or_cancel_backends( \
+                        k, [process[current_pos]['pid']],)
                 else:
-                    self.__ask_terminate_backends(self.pid_yank,)
+                    self.__ask_terminate_or_cancel_backends(k, self.pid_yank,)
                 self.verbose_mode = old_verbose_mode
                 curses.flushinp()
                 return 0

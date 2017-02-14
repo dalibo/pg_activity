@@ -183,6 +183,16 @@ class Data:
         ret = cur.fetchone()
         return ret['pg_version']
 
+    def pg_cancel_backend(self, pid,):
+        """
+        Cancel a backend
+        """
+        query = "SELECT pg_cancel_backend(%s) AS cancelled"
+        cur = self.pg_conn.cursor()
+        cur.execute(query, (pid,))
+        ret = cur.fetchone()
+        return ret['cancelled']
+
     def pg_terminate_backend(self, pid,):
         """
         Terminate a backend
