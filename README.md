@@ -15,6 +15,11 @@ Dependencies
 Installation from sources:
 `setuptools` &ge; **0.6.14** 
 
+Your system also needs to have the postgres-devel package installed
+
+    sudo aptitude install postgresql-server-dev-8.4
+
+
 Installation
 ------------
 
