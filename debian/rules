@@ -1,0 +1,7 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+DESTDIR=$(CURDIR)/debian/tmp
+
+%:
+	dh $@ --with python2

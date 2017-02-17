@@ -1,0 +1,19 @@
+Source: pg-activity
+Section: misc
+Priority: extra
+Maintainer: Aurelien Rougemont <beorn@gandi.net>
+Homepage: https://github.com/julmon/pg_activity/
+Vcs-Git: git://github.com/julmon/pg_activity.git/
+Vcs-Browser: https://github.com/julmon/pg_activity/
+Build-Depends: debhelper (>= 8), python (>= 2.6)
+Build-Depends-Indep: python-setuptools
+Standards-Version: 3.9.1
+X-Python-Version: >= 2.6
+
+Package: pg-activity
+Architecture: all
+Depends: python (>= 2.6),
+ python-psycopg2, 
+ python-psutil,
+Description: pg_activity
+ top like application for PostgreSQL server activity monitoring.
