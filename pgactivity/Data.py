@@ -212,16 +212,19 @@ class Data:
         a string (SELECT version()).
         """
         res = re.match(
-                r"^(PostgreSQL|EnterpriseDB) ([0-9]+)\.([0-9]+)\.([0-9]+)",
+                r"^(PostgreSQL|EnterpriseDB) ([0-9]+)\.([0-9]+)(?:\.([0-9]+))?",
                 text_version)
         if res is not None:
             rmatch = res.group(2)
             if int(res.group(3)) < 10:
                 rmatch += '0'
             rmatch += res.group(3)
-            if int(res.group(4)) < 10:
-                rmatch += '0'
-            rmatch += res.group(4)
+            if res.group(4) is not None:
+                if int(res.group(4)) < 10:
+                    rmatch += '0'
+                rmatch += res.group(4)
+            else:
+                rmatch += '00'
             self.pg_version = str(res.group(0))
             self.pg_num_version = int(rmatch)
             return
@@ -233,13 +236,16 @@ class Data:
         from a string (SELECT version()). 
         """
         res = re.match(
-            r"^(PostgreSQL|EnterpriseDB) ([0-9]+)\.([0-9]+)(devel|beta[0-9]+|rc[0-9]+)",
+            r"^(PostgreSQL|EnterpriseDB) ([0-9]+)(?:\.([0-9]+))?(devel|beta[0-9]+|rc[0-9]+)",
             text_version)
         if res is not None:
             rmatch = res.group(2)
-            if int(res.group(3)) < 10:
-                rmatch += '0'
-            rmatch += res.group(3)
+            if res.group(3) is not None:
+                if int(res.group(3)) < 10:
+                    rmatch += '0'
+                rmatch += res.group(3)
+            else:
+                rmatch += '00'
             rmatch += '00'
             self.pg_version = str(res.group(0))
             self.pg_num_version = int(rmatch)
