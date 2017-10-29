@@ -1320,7 +1320,8 @@ class UI:
                         'query': proc.query,
                         'duration': self.data.get_duration(proc.duration),
                         'wait': proc.wait,
-                        'io_wait': proc.get_extra('io_wait')
+                        'io_wait': proc.get_extra('io_wait'),
+                        'backend_type': proc.get_extra('backend_type')
                     })
 
                 except psutil.NoSuchProcess:
@@ -2072,8 +2073,14 @@ class UI:
                     self.line_colors[color_state][typecolor])
 
         dif = self.maxx - len(indent) - 1
+
+        query = ''
+        if 'backend_type' in process and \
+                process['backend_type'] == 'background worker':
+
+            query += '\_ '
         if self.verbose_mode == PGTOP_TRUNCATE:
-            query = process['query'][:dif]
+            query += process['query'][:dif]
             colno += self.__print_string(
                         l_lineno,
                         colno,
@@ -2081,7 +2088,7 @@ class UI:
                         self.line_colors['query'][typecolor])
         elif self.verbose_mode == PGTOP_WRAP or \
             self.verbose_mode == PGTOP_WRAP_NOINDENT:
-            query = process['query']
+            query += process['query']
             query_wrote = ''
             offset = 0
             if len(query) > dif and dif > 1:

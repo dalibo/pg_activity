@@ -289,7 +289,32 @@ class Data:
         """
         Get activity from pg_stat_activity view.
         """
-        if self.pg_num_version >= 90600:
+        if self.pg_num_version >= 100000:
+            # PostgreSQL 10 and more
+            query = """
+    SELECT
+        pg_stat_activity.pid AS pid,
+        CASE WHEN LENGTH(pg_stat_activity.datname) > 16
+            THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
+            ELSE pg_stat_activity.datname
+            END
+        AS database,
+        pg_stat_activity.client_addr AS client,
+        EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
+        pg_stat_activity.wait_event IS NOT NULL AS wait,
+        pg_stat_activity.usename AS user,
+        pg_stat_activity.state AS state,
+        pg_stat_activity.query AS query,
+        pg_stat_activity.backend_type AS backend_type
+    FROM
+        pg_stat_activity
+    WHERE
+        state <> 'idle'
+        AND pid <> pg_backend_pid()
+    ORDER BY
+        EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
+            """
+        elif self.pg_num_version >= 90600:
             # PostgreSQL 9.6.0 and more
             query = """
     SELECT
@@ -304,7 +329,8 @@ class Data:
         pg_stat_activity.wait_event IS NOT NULL AS wait,
         pg_stat_activity.usename AS user,
         pg_stat_activity.state AS state,
-        pg_stat_activity.query AS query
+        pg_stat_activity.query AS query,
+        null AS backend_type
     FROM
         pg_stat_activity
     WHERE
@@ -313,7 +339,6 @@ class Data:
     ORDER BY
         EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
             """
-            
         elif self.pg_num_version < 90600 and self.pg_num_version >= 90200:
             # PostgreSQL prior to 9.6.0 and >= 9.2.0
             query = """
@@ -329,7 +354,8 @@ class Data:
         pg_stat_activity.waiting AS wait,
         pg_stat_activity.usename AS user,
         pg_stat_activity.state AS state,
-        pg_stat_activity.query AS query
+        pg_stat_activity.query AS query,
+        null AS backend_type
     FROM
         pg_stat_activity
     WHERE
@@ -353,7 +379,8 @@ class Data:
         EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
         pg_stat_activity.waiting AS wait,
         pg_stat_activity.usename AS user,
-        pg_stat_activity.current_query AS query
+        pg_stat_activity.current_query AS query,
+        null AS backend_type
     FROM
         pg_stat_activity
     WHERE
@@ -669,6 +696,7 @@ class Data:
                 process.set_extra('io_wait',
                     self.__sys_get_iow_status(psproc.status_iow()))
                 process.set_extra('psutil_proc', psproc)
+                process.set_extra('backend_type', query['backend_type'])
                 processes[process.pid] = process
 
             except psutil.NoSuchProcess:
@@ -676,7 +704,7 @@ class Data:
             except psutil.AccessDenied:
                 pass
         return processes
- 
+
     def set_global_io_counters(self,
         read_bytes_delta,
         write_bytes_delta,
