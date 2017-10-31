@@ -1932,7 +1932,7 @@ class UI:
                         l_lineno,
                         colno,
                         PGTOP_COLS[self.mode]['database']['template_h'] % \
-                            (process['database'][:16],),
+                            (str(process['database'])[:16],),
                         self.line_colors['database'][typecolor])
         if self.mode == 'activities':
             if flag & PGTOP_FLAG_USER:
