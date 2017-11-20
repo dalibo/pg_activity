@@ -753,6 +753,7 @@ class UI:
                         self.uibuffer['indent'],
                         self.uibuffer['io'],
                         self.uibuffer['tps'],
+						self.uibuffer['active_connections'],
                         self.uibuffer['size_ev'],
                         self.uibuffer['total_size'])
                     self.__print_string(
@@ -1230,6 +1231,7 @@ class UI:
                     self.uibuffer['indent'],
                     self.uibuffer['io'],
                     self.uibuffer['tps'],
+					self.uibuffer['active_connections'],
                     self.uibuffer['size_ev'],
                     self.uibuffer['total_size'])
 
@@ -1488,6 +1490,7 @@ class UI:
                 self.uibuffer['indent'],
                 self.uibuffer['io'],
                 self.uibuffer['tps'],
+				self.uibuffer['active_connections'],
                 self.uibuffer['size_ev'],
                 self.uibuffer['total_size'])
 
@@ -1596,7 +1599,7 @@ class UI:
         self.lineno += 1
 
     def __print_header(self, pg_version, hostname, user, host, \
-        port, database, ios, tps, size_ev, total_size):
+        port, database, ios, tps, active_connections, size_ev, total_size):
         """
         Print window header
         """
@@ -1678,6 +1681,15 @@ class UI:
                     self.lineno,
                     colno,
                     "%11s" % (tps,),
+                    self.__get_color(C_GREEN)|curses.A_BOLD)
+        colno += self.__print_string(
+					self.lineno,
+					colno,
+					"        | Active Connections: ")
+        colno += self.__print_string(
+                    self.lineno,
+                    colno,
+                    "%11s" % (active_connections,),
                     self.__get_color(C_GREEN)|curses.A_BOLD)
 
         # If not local connection, don't get and display system informations
@@ -1862,7 +1874,7 @@ class UI:
         return (colno + pos1 + pos2)
 
     def refresh_window(self, procs, extras, flag, indent, ios, \
-        tps, size_ev, total_size):
+        tps, active_connections, size_ev, total_size):
         """
         Refresh the window
         """
@@ -1879,6 +1891,7 @@ class UI:
             dbname,
             ios,
             tps,
+			active_connections,
             size_ev,
             total_size)
         self.lineno += 2

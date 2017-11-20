@@ -251,6 +251,7 @@ class Data:
             self.pg_num_version = int(rmatch)
             return
         raise Exception('Undefined PostgreSQL version.')
+	
 
     def pg_get_db_info(self, prev_db_infos, using_rds = False):
         """
@@ -284,6 +285,23 @@ class Data:
             'max_length': ret['max_length'],
             'tps': tps,
             'size_ev': size_ev}
+	
+    def pg_get_active_connections(self,):
+        """
+        Get total of active connections.
+        """
+        query = """
+        SELECT
+            COUNT(*) as active_connections
+        FROM pg_stat_activity 
+        WHERE state = 'active'
+        """
+
+        cur = self.pg_conn.cursor()
+        cur.execute(query,)
+        ret = cur.fetchone()
+        active_connections = int(ret['active_connections'])
+        return active_connections
 
     def pg_get_activities(self,):
         """

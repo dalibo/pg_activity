@@ -275,6 +275,8 @@ server activity monitoring.")
         delta_disk_io = None
         # get DB informations
         db_info = PGAUI.data.pg_get_db_info(None, using_rds = options.rds)
+        # get active connections
+        active_connections = PGAUI.data.pg_get_active_connections()    
         PGAUI.set_max_db_length(db_info['max_length'])
         # indentation
         indent = PGAUI.get_indent(flag)
@@ -303,6 +305,8 @@ server activity monitoring.")
             # refresh the winodw
             db_info = PGAUI.data.pg_get_db_info(db_info, using_rds = options.rds)
             PGAUI.set_max_db_length(db_info['max_length'])
+            # get active connections
+            active_connections = PGAUI.data.pg_get_active_connections()    
             # bufferize
             PGAUI.set_buffer({
                 'procs': disp_procs,
@@ -317,6 +321,7 @@ server activity monitoring.")
                 'indent': indent,
                 'io': delta_disk_io,
                 'tps': db_info['tps'],
+				'active_connections': active_connections,
                 'size_ev': db_info['size_ev'],
                 'total_size': db_info['total_size']
             })
@@ -334,6 +339,7 @@ server activity monitoring.")
                 indent,
                 delta_disk_io,
                 db_info['tps'],
+				active_connections,
                 db_info['size_ev'],
                 db_info['total_size']
             )
