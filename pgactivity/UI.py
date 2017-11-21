@@ -1490,7 +1490,7 @@ class UI:
                 self.uibuffer['indent'],
                 self.uibuffer['io'],
                 self.uibuffer['tps'],
-				self.uibuffer['active_connections'],
+                self.uibuffer['active_connections'],
                 self.uibuffer['size_ev'],
                 self.uibuffer['total_size'])
 
