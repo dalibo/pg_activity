@@ -753,7 +753,7 @@ class UI:
                         self.uibuffer['indent'],
                         self.uibuffer['io'],
                         self.uibuffer['tps'],
-						self.uibuffer['active_connections'],
+                        self.uibuffer['active_connections'],
                         self.uibuffer['size_ev'],
                         self.uibuffer['total_size'])
                     self.__print_string(
@@ -1231,7 +1231,7 @@ class UI:
                     self.uibuffer['indent'],
                     self.uibuffer['io'],
                     self.uibuffer['tps'],
-					self.uibuffer['active_connections'],
+                    self.uibuffer['active_connections'],
                     self.uibuffer['size_ev'],
                     self.uibuffer['total_size'])
 
@@ -1891,7 +1891,7 @@ class UI:
             dbname,
             ios,
             tps,
-			active_connections,
+            active_connections,
             size_ev,
             total_size)
         self.lineno += 2

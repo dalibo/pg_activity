@@ -321,7 +321,7 @@ server activity monitoring.")
                 'indent': indent,
                 'io': delta_disk_io,
                 'tps': db_info['tps'],
-				'active_connections': active_connections,
+                'active_connections': active_connections,
                 'size_ev': db_info['size_ev'],
                 'total_size': db_info['total_size']
             })
@@ -339,7 +339,7 @@ server activity monitoring.")
                 indent,
                 delta_disk_io,
                 db_info['tps'],
-				active_connections,
+                active_connections,
                 db_info['size_ev'],
                 db_info['total_size']
             )
