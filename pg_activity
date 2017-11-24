@@ -275,8 +275,6 @@ server activity monitoring.")
         delta_disk_io = None
         # get DB informations
         db_info = PGAUI.data.pg_get_db_info(None, using_rds = options.rds)
-        # get active connections
-        active_connections = PGAUI.data.pg_get_active_connections()    
         PGAUI.set_max_db_length(db_info['max_length'])
         # indentation
         indent = PGAUI.get_indent(flag)
