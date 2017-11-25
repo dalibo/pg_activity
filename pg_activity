@@ -304,7 +304,7 @@ server activity monitoring.")
             db_info = PGAUI.data.pg_get_db_info(db_info, using_rds = options.rds)
             PGAUI.set_max_db_length(db_info['max_length'])
             # get active connections
-            active_connections = PGAUI.data.pg_get_active_connections()    
+            active_connections = PGAUI.data.pg_get_active_connections()
             # bufferize
             PGAUI.set_buffer({
                 'procs': disp_procs,
