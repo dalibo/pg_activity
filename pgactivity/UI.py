@@ -93,14 +93,27 @@ PGTOP_COLS = {
             'template_h': '%-6s ',
             'flag': PGTOP_FLAG_NONE,
             'mandatory': True
+<<<<<<< HEAD
         },      
         'database': {
+=======
+        },
+        'appname': {
+>>>>>>> 1f3879666426c7906bc727c23d32ff68a8160a4f
             'n':  2,
+            'name': 'APP',
+            'template_h': '%-16s ',
+            'flag': PGTOP_FLAG_APPNAME,
+            'mandatory': False
+        },        
+        'database': {
+            'n':  3,
             'name': 'DATABASE',
             'template_h': '%-16s ',
             'flag': PGTOP_FLAG_DATABASE,
             'mandatory': False
         },
+<<<<<<< HEAD
         'appname': {
             'n':  3,
             'name': 'APP',
@@ -108,6 +121,8 @@ PGTOP_COLS = {
             'flag': PGTOP_FLAG_APPNAME,
             'mandatory': False
         },          
+=======
+>>>>>>> 1f3879666426c7906bc727c23d32ff68a8160a4f
         'user': {
             'n':  4,
             'name': 'USER',
