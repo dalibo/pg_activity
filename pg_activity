@@ -194,6 +194,13 @@ server activity monitoring.")
                 action = 'store_true',
                 help = "Disable W.",
                 default = 'false')
+            # --no-app-name
+            group.add_option(
+                '--no-app-name',
+                dest = 'noappname',
+                action = 'store_true',
+                help = "Disable App.",
+                default = 'false')                
             parser.add_option_group(group)
             # --help
             parser.add_option(

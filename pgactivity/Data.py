@@ -312,6 +312,7 @@ class Data:
             query = """
     SELECT
         pg_stat_activity.pid AS pid,
+        pg_stat_activity.application_name AS application_name,
         CASE WHEN LENGTH(pg_stat_activity.datname) > 16
             THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
             ELSE pg_stat_activity.datname
@@ -337,6 +338,7 @@ class Data:
             query = """
     SELECT
         pg_stat_activity.pid AS pid,
+        pg_stat_activity.application_name AS application_name,        
         CASE WHEN LENGTH(pg_stat_activity.datname) > 16
             THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
             ELSE pg_stat_activity.datname
@@ -362,6 +364,7 @@ class Data:
             query = """
     SELECT
         pg_stat_activity.pid AS pid,
+        pg_stat_activity.application_name AS application_name,        
         CASE WHEN LENGTH(pg_stat_activity.datname) > 16
             THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
             ELSE pg_stat_activity.datname
@@ -387,6 +390,7 @@ class Data:
             query = """
     SELECT
         pg_stat_activity.procpid AS pid,
+        '<unknown>' AS application_name,        
         CASE
             WHEN LENGTH(pg_stat_activity.datname) > 16
             THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
@@ -420,6 +424,7 @@ class Data:
             query = """
     SELECT
         pg_locks.pid AS pid,
+        pg_stat_activity.application_name AS application_name,          
         CASE WHEN LENGTH(pg_stat_activity.datname) > 16
             THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
             ELSE pg_stat_activity.datname
@@ -445,6 +450,7 @@ class Data:
             query = """
     SELECT
         pg_locks.pid AS pid,
+        '<unknown>' AS application_name,        
         CASE
             WHEN LENGTH(pg_stat_activity.datname) > 16
             THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
@@ -694,7 +700,8 @@ class Data:
                     wait = query['wait'],
                     state = query['state'],
                     query = clean_str(query['query']),
-                    extras = {}
+                    extras = {},
+                    appname = query['application_name'] 
                     )
 
                 process.set_extra('meminfo',
