@@ -29,6 +29,7 @@ import psutil
 import time
 from pgactivity.Process import Process
 import os
+from warnings import catch_warnings, simplefilter
 
 if psutil.version_info < (2, 0, 0):
     class PSProcess(psutil.Process):
@@ -750,18 +751,20 @@ class Data:
         """
         Get memory and swap usage
         """
-        try:
-            # psutil >= 0.6.0
-            phymem = psutil.virtual_memory()
-            buffers = psutil.virtual_memory().buffers
-            cached = psutil.virtual_memory().cached
-            vmem = psutil.swap_memory()
-        except AttributeError:
-            # psutil > 0.4.0 and < 0.6.0
-            phymem = psutil.phymem_usage()
-            buffers = getattr(psutil, 'phymem_buffers', lambda: 0)()
-            cached = getattr(psutil, 'cached_phymem', lambda: 0)()
-            vmem = psutil.virtmem_usage()
+        with catch_warnings():
+            simplefilter("ignore", RuntimeWarning)
+            try:
+                # psutil >= 0.6.0
+                phymem = psutil.virtual_memory()
+                buffers = psutil.virtual_memory().buffers
+                cached = psutil.virtual_memory().cached
+                vmem = psutil.swap_memory()
+            except AttributeError:
+                # psutil > 0.4.0 and < 0.6.0
+                phymem = psutil.phymem_usage()
+                buffers = getattr(psutil, 'phymem_buffers', lambda: 0)()
+                cached = getattr(psutil, 'cached_phymem', lambda: 0)()
+                vmem = psutil.virtmem_usage()
 
         mem_used = phymem.total - (phymem.free + buffers + cached)
         return (
