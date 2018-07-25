@@ -456,7 +456,7 @@ class Data:
         pg_locks.locktype AS type,
         pg_locks.relation::regclass AS relation,
         EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
-        pg_stat_activity.state as state,
+        NULL AS state,
         pg_stat_activity.current_query AS query
     FROM
         pg_catalog.pg_locks
@@ -583,7 +583,7 @@ class Data:
             pg_stat_activity.datname,
             pg_stat_activity.usename,
             blocking.locktype,EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
-            pg_stat_activity.state as state,
+            NULL AS state,
             blocking.relation::regclass AS relation
         FROM
             pg_locks AS blocking
@@ -606,7 +606,7 @@ class Data:
             pg_stat_activity.usename,
             blocking.locktype,
             EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
-            pg_stat_activity.state as state,
+            NULL AS state,
             blocking.relation::regclass AS relation
         FROM
             pg_locks AS blocking
