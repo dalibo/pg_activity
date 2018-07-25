@@ -29,7 +29,7 @@ import re
 import time
 import sys
 from datetime import timedelta
-from pgactivity.Data import Data
+from pgactivity.Data import Data, clean_str
 import psutil
 from getpass import getpass
 
@@ -1941,6 +1941,7 @@ class UI:
                     colno,
                     "%-6s " % (process['pid'],),
                     self.line_colors['pid'][typecolor])
+        process['query'] = clean_str(process['query'])
         if flag & PGTOP_FLAG_DATABASE:
             colno += self.__print_string(
                         l_lineno,
