@@ -675,7 +675,7 @@ class Data:
                     duration = query['duration'],
                     wait = query['wait'],
                     state = query['state'],
-                    query = clean_str(query['query']),
+                    query = query['query'],
                     extras = {}
                     )
 
