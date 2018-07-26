@@ -908,7 +908,7 @@ class UI:
         colno += self.__print_string(
             (self.maxy - 1),
             colno,
-            self.__add_blank(" "),
+            self.__add_blank(" ", colno + 1),
             self.__get_color(C_CYAN)|curses.A_REVERSE)
 
     def __ask_terminate_or_cancel_backends(self, action, pids,):
@@ -1536,8 +1536,8 @@ class UI:
         """
         try:
             self.win.addstr(lineno, colno, word, color)
-        except curses.error:
-            pass
+        except curses.error as e:
+            raise e
         return len(word)
 
     def __add_blank(self, line, offset = 0):
@@ -1590,6 +1590,7 @@ class UI:
                 if val['name'] == "Query":
                     disp += " " * (self.maxx - (len(line) + len(disp)))
                 line += disp
+
                 self.__print_string(
                     self.lineno,
                     xpos,
