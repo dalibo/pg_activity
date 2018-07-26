@@ -1684,9 +1684,9 @@ class UI:
                     "%11s" % (tps,),
                     self.__get_color(C_GREEN)|curses.A_BOLD)
         colno += self.__print_string(
-					self.lineno,
-					colno,
-					"        | Active Connections: ")
+                    self.lineno,
+                    colno,
+                    "        | Active Connections: ")
         colno += self.__print_string(
                     self.lineno,
                     colno,
