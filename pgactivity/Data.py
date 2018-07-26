@@ -251,7 +251,6 @@ class Data:
             self.pg_num_version = int(rmatch)
             return
         raise Exception('Undefined PostgreSQL version.')
-	
 
     def pg_get_db_info(self, prev_db_infos, using_rds = False):
         """
@@ -285,7 +284,7 @@ class Data:
             'max_length': ret['max_length'],
             'tps': tps,
             'size_ev': size_ev}
-	
+
     def pg_get_active_connections(self,):
         """
         Get total of active connections.
@@ -317,7 +316,11 @@ class Data:
             ELSE pg_stat_activity.datname
             END
         AS database,
-        pg_stat_activity.client_addr AS client,
+        CASE WHEN pg_stat_activity.client_addr IS NULL
+            THEN 'local'
+            ELSE pg_stat_activity.client_addr::TEXT
+            END
+        AS client,
         EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
         pg_stat_activity.wait_event IS NOT NULL AS wait,
         pg_stat_activity.usename AS user,
@@ -342,7 +345,11 @@ class Data:
             ELSE pg_stat_activity.datname
             END
         AS database,
-        pg_stat_activity.client_addr AS client,
+        CASE WHEN pg_stat_activity.client_addr IS NULL
+            THEN 'local'
+            ELSE pg_stat_activity.client_addr::TEXT
+            END
+        AS client,
         EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
         pg_stat_activity.wait_event IS NOT NULL AS wait,
         pg_stat_activity.usename AS user,
@@ -367,7 +374,11 @@ class Data:
             ELSE pg_stat_activity.datname
             END
         AS database,
-        pg_stat_activity.client_addr AS client,
+        CASE WHEN pg_stat_activity.client_addr IS NULL
+            THEN 'local'
+            ELSE pg_stat_activity.client_addr::TEXT
+            END
+        AS client,
         EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
         pg_stat_activity.waiting AS wait,
         pg_stat_activity.usename AS user,
@@ -393,7 +404,11 @@ class Data:
             ELSE pg_stat_activity.datname
             END
         AS database,
-        pg_stat_activity.client_addr AS client,
+        CASE WHEN pg_stat_activity.client_addr IS NULL
+            THEN 'local'
+            ELSE pg_stat_activity.client_addr::TEXT
+            END
+        AS client,
         EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
         pg_stat_activity.waiting AS wait,
         pg_stat_activity.usename AS user,
