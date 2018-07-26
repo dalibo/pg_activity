@@ -1536,8 +1536,8 @@ class UI:
         """
         try:
             self.win.addstr(lineno, colno, word, color)
-        except curses.error as e:
-            raise e
+        except curses.error:
+            pass
         return len(word)
 
     def __add_blank(self, line, offset = 0):
@@ -1684,9 +1684,9 @@ class UI:
                     "%11s" % (tps,),
                     self.__get_color(C_GREEN)|curses.A_BOLD)
         colno += self.__print_string(
-					self.lineno,
-					colno,
-					"        | Active Connections: ")
+                    self.lineno,
+                    colno,
+                    "        | Active Connections: ")
         colno += self.__print_string(
                     self.lineno,
                     colno,
