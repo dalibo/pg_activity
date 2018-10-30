@@ -716,7 +716,7 @@ class Data:
                     wait = query['wait'],
                     state = query['state'],
                     query = query['query'],
-                    extras = {}
+                    extras = {},
                     appname = query['application_name'] 
                     )
 
@@ -738,6 +738,8 @@ class Data:
                     self.__sys_get_iow_status(psproc.status_iow()))
                 process.set_extra('psutil_proc', psproc)
                 process.set_extra('backend_type', query['backend_type'])
+                process.set_extra('appname', query['application_name'])
+                
                 processes[process.pid] = process
 
             except psutil.NoSuchProcess:

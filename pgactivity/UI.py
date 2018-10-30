@@ -1284,6 +1284,7 @@ class UI:
                         proc.duration = new_proc.duration
                         proc.state = new_proc.state
                         proc.query = new_proc.query
+                        proc.appname = new_proc.appname
                         proc.client = new_proc.client
                         proc.wait = new_proc.wait
                         proc.set_extra(
