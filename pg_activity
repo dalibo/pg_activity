@@ -353,7 +353,7 @@ server activity monitoring.")
     except psutil.AccessDenied as err:
         PGAUI.at_exit_curses()
         sys.exit(
-            "FATAL: Acces denied, can't acces system informations for PID %s"
+            "FATAL: Access denied, can't access system informations for PID %s"
             % (str(err),))
     except curses.error as err:
         PGAUI.at_exit_curses()
