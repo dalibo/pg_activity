@@ -29,6 +29,7 @@ import psutil
 import time
 from pgactivity.Process import Process
 import os
+from warnings import catch_warnings, simplefilter
 
 if psutil.version_info < (2, 0, 0):
     class PSProcess(psutil.Process):
@@ -251,7 +252,6 @@ class Data:
             self.pg_num_version = int(rmatch)
             return
         raise Exception('Undefined PostgreSQL version.')
-	
 
     def pg_get_db_info(self, prev_db_infos, using_rds = False):
         """
@@ -285,7 +285,7 @@ class Data:
             'max_length': ret['max_length'],
             'tps': tps,
             'size_ev': size_ev}
-	
+
     def pg_get_active_connections(self,):
         """
         Get total of active connections.
@@ -318,7 +318,11 @@ class Data:
             ELSE pg_stat_activity.datname
             END
         AS database,
-        pg_stat_activity.client_addr AS client,
+        CASE WHEN pg_stat_activity.client_addr IS NULL
+            THEN 'local'
+            ELSE pg_stat_activity.client_addr::TEXT
+            END
+        AS client,
         EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
         pg_stat_activity.wait_event IS NOT NULL AS wait,
         pg_stat_activity.usename AS user,
@@ -344,7 +348,11 @@ class Data:
             ELSE pg_stat_activity.datname
             END
         AS database,
-        pg_stat_activity.client_addr AS client,
+        CASE WHEN pg_stat_activity.client_addr IS NULL
+            THEN 'local'
+            ELSE pg_stat_activity.client_addr::TEXT
+            END
+        AS client,
         EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
         pg_stat_activity.wait_event IS NOT NULL AS wait,
         pg_stat_activity.usename AS user,
@@ -370,7 +378,11 @@ class Data:
             ELSE pg_stat_activity.datname
             END
         AS database,
-        pg_stat_activity.client_addr AS client,
+        CASE WHEN pg_stat_activity.client_addr IS NULL
+            THEN 'local'
+            ELSE pg_stat_activity.client_addr::TEXT
+            END
+        AS client,
         EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
         pg_stat_activity.waiting AS wait,
         pg_stat_activity.usename AS user,
@@ -397,7 +409,11 @@ class Data:
             ELSE pg_stat_activity.datname
             END
         AS database,
-        pg_stat_activity.client_addr AS client,
+        CASE WHEN pg_stat_activity.client_addr IS NULL
+            THEN 'local'
+            ELSE pg_stat_activity.client_addr::TEXT
+            END
+        AS client,
         EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
         pg_stat_activity.waiting AS wait,
         pg_stat_activity.usename AS user,
@@ -462,7 +478,7 @@ class Data:
         pg_locks.locktype AS type,
         pg_locks.relation::regclass AS relation,
         EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
-        pg_stat_activity.state as state,
+        NULL AS state,
         pg_stat_activity.current_query AS query
     FROM
         pg_catalog.pg_locks
@@ -589,7 +605,7 @@ class Data:
             pg_stat_activity.datname,
             pg_stat_activity.usename,
             blocking.locktype,EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
-            pg_stat_activity.state as state,
+            NULL AS state,
             blocking.relation::regclass AS relation
         FROM
             pg_locks AS blocking
@@ -612,7 +628,7 @@ class Data:
             pg_stat_activity.usename,
             blocking.locktype,
             EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
-            pg_stat_activity.state as state,
+            NULL AS state,
             blocking.relation::regclass AS relation
         FROM
             pg_locks AS blocking
@@ -699,8 +715,8 @@ class Data:
                     duration = query['duration'],
                     wait = query['wait'],
                     state = query['state'],
-                    query = clean_str(query['query']),
-                    extras = {},
+                    query = query['query'],
+                    extras = {}
                     appname = query['application_name'] 
                     )
 
@@ -757,18 +773,20 @@ class Data:
         """
         Get memory and swap usage
         """
-        try:
-            # psutil >= 0.6.0
-            phymem = psutil.virtual_memory()
-            buffers = psutil.virtual_memory().buffers
-            cached = psutil.virtual_memory().cached
-            vmem = psutil.swap_memory()
-        except AttributeError:
-            # psutil > 0.4.0 and < 0.6.0
-            phymem = psutil.phymem_usage()
-            buffers = getattr(psutil, 'phymem_buffers', lambda: 0)()
-            cached = getattr(psutil, 'cached_phymem', lambda: 0)()
-            vmem = psutil.virtmem_usage()
+        with catch_warnings():
+            simplefilter("ignore", RuntimeWarning)
+            try:
+                # psutil >= 0.6.0
+                phymem = psutil.virtual_memory()
+                buffers = psutil.virtual_memory().buffers
+                cached = psutil.virtual_memory().cached
+                vmem = psutil.swap_memory()
+            except AttributeError:
+                # psutil > 0.4.0 and < 0.6.0
+                phymem = psutil.phymem_usage()
+                buffers = getattr(psutil, 'phymem_buffers', lambda: 0)()
+                cached = getattr(psutil, 'cached_phymem', lambda: 0)()
+                vmem = psutil.virtmem_usage()
 
         mem_used = phymem.total - (phymem.free + buffers + cached)
         return (

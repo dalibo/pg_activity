@@ -29,7 +29,7 @@ import re
 import time
 import sys
 from datetime import timedelta
-from pgactivity.Data import Data
+from pgactivity.Data import Data, clean_str
 import psutil
 from getpass import getpass
 
@@ -923,7 +923,7 @@ class UI:
         colno += self.__print_string(
             (self.maxy - 1),
             colno,
-            self.__add_blank(" "),
+            self.__add_blank(" ", colno + 1),
             self.__get_color(C_CYAN)|curses.A_REVERSE)
 
     def __ask_terminate_or_cancel_backends(self, action, pids,):
@@ -1607,6 +1607,7 @@ class UI:
                 if val['name'] == "Query":
                     disp += " " * (self.maxx - (len(line) + len(disp)))
                 line += disp
+
                 self.__print_string(
                     self.lineno,
                     xpos,
@@ -1700,9 +1701,9 @@ class UI:
                     "%11s" % (tps,),
                     self.__get_color(C_GREEN)|curses.A_BOLD)
         colno += self.__print_string(
-					self.lineno,
-					colno,
-					"        | Active Connections: ")
+                    self.lineno,
+                    colno,
+                    "        | Active Connections: ")
         colno += self.__print_string(
                     self.lineno,
                     colno,
@@ -1958,6 +1959,7 @@ class UI:
                     colno,
                     "%-6s " % (process['pid'],),
                     self.line_colors['pid'][typecolor])
+        process['query'] = clean_str(process['query'])
         if flag & PGTOP_FLAG_DATABASE:
             colno += self.__print_string(
                         l_lineno,
