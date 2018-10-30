@@ -23,7 +23,7 @@ SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 """
 
 from __future__ import print_function
-
+from pprint import pprint
 import curses
 import re
 import time
@@ -201,43 +201,50 @@ PGTOP_COLS = {
             'flag': PGTOP_FLAG_DATABASE,
             'mandatory': False
         },
+        'appname': {
+            'n':  3,
+            'name': 'APP',
+            'template_h': '%16s ',
+            'flag': PGTOP_FLAG_APPNAME,
+            'mandatory': False
+        },          
         'relation': {
-            'n': 3,
+            'n': 4,
             'name': 'RELATION',
             'template_h': '%9s ',
             'flag': PGTOP_FLAG_RELATION,
             'mandatory': False
         },
         'type': {
-            'n': 4,
+            'n': 5,
             'name': 'TYPE',
             'template_h': '%16s ',
             'flag': PGTOP_FLAG_TYPE,
             'mandatory': False
         },
         'mode': {
-            'n': 5,
+            'n': 6,
             'name': 'MODE',
             'template_h': '%16s ',
             'flag': PGTOP_FLAG_MODE,
             'mandatory': False
         },
         'time': {
-            'n': 6,
+            'n': 7,
             'name': 'TIME+',
             'template_h': '%9s ',
             'flag': PGTOP_FLAG_TIME,
             'mandatory': False
         },
         'state': {
-            'n': 7,
+            'n': 8,
             'name': 'state',
             'template_h': ' %17s  ',
             'flag': PGTOP_FLAG_NONE,
             'mandatory': True
         },
         'query': {
-            'n': 8,
+            'n': 9,
             'name': 'Query',
             'template_h': ' %2s',
             'flag': PGTOP_FLAG_NONE,
@@ -259,43 +266,50 @@ PGTOP_COLS = {
             'flag': PGTOP_FLAG_DATABASE,
             'mandatory': False
         },
+        'appname': {
+            'n':  3,
+            'name': 'APP',
+            'template_h': '%16s ',
+            'flag': PGTOP_FLAG_APPNAME,
+            'mandatory': False
+        },          
         'relation': {
-            'n': 3,
+            'n': 4,
             'name': 'RELATION',
             'template_h': '%9s ',
             'flag': PGTOP_FLAG_RELATION,
             'mandatory': False
         },
         'type': {
-            'n': 4,
+            'n': 5,
             'name': 'TYPE',
             'template_h': '%16s ',
             'flag': PGTOP_FLAG_TYPE,
             'mandatory': False
         },
         'mode': {
-            'n': 5,
+            'n': 6,
             'name': 'MODE',
             'template_h': '%16s ',
             'flag': PGTOP_FLAG_MODE,
             'mandatory': False
         },
         'time': {
-            'n': 6,
+            'n': 7,
             'name': 'TIME+',
             'template_h': '%9s ',
             'flag': PGTOP_FLAG_TIME,
             'mandatory': False
         },
         'state': {
-            'n': 7,
+            'n': 8,
             'name': 'state',
             'template_h': ' %17s  ',
             'flag': PGTOP_FLAG_NONE,
             'mandatory': True
         },
         'query': {
-            'n': 8,
+            'n': 9,
             'name': 'Query',
             'template_h': ' %2s',
             'flag': PGTOP_FLAG_NONE,
@@ -2012,6 +2026,12 @@ class UI:
                             "%8s " % (bytes2human(process['write']),),
                             self.line_colors['write'][typecolor])
         elif self.mode == 'waiting' or self.mode == 'blocking':
+            if flag & PGTOP_FLAG_APPNAME:
+                colno += self.__print_string(
+                            l_lineno,
+                            colno,
+                            "%16s " % (str(process['appname'])[:16],),
+                            self.line_colors['appname'][typecolor])               
             if flag & PGTOP_FLAG_RELATION:
                 colno += self.__print_string(
                             l_lineno,

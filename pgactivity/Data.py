@@ -440,7 +440,7 @@ class Data:
             query = """
     SELECT
         pg_locks.pid AS pid,
-        pg_stat_activity.application_name AS application_name,          
+        pg_stat_activity.application_name AS appname,          
         CASE WHEN LENGTH(pg_stat_activity.datname) > 16
             THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
             ELSE pg_stat_activity.datname
@@ -466,7 +466,7 @@ class Data:
             query = """
     SELECT
         pg_locks.pid AS pid,
-        '<unknown>' AS application_name,        
+        '<unknown>' AS appname,        
         CASE
             WHEN LENGTH(pg_stat_activity.datname) > 16
             THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
@@ -502,6 +502,7 @@ class Data:
             query = """
     SELECT
         pid,
+        application_name AS appname,          
         CASE
             WHEN LENGTH(datname) > 16
             THEN SUBSTRING(datname FROM 0 FOR 6)||'...'||SUBSTRING(datname FROM '........$')
@@ -519,6 +520,7 @@ class Data:
         (
         SELECT
             blocking.pid,
+            pg_stat_activity.application_name,
             pg_stat_activity.query,
             blocking.mode,
             pg_stat_activity.datname,
@@ -542,6 +544,7 @@ class Data:
         UNION ALL
         SELECT
             blocking.pid,
+            pg_stat_activity.application_name,
             pg_stat_activity.query,
             blocking.mode,
             pg_stat_activity.datname,
@@ -568,6 +571,7 @@ class Data:
         ) AS sq
     GROUP BY
         pid,
+        application_name,
         query,
         mode,
         locktype,
@@ -600,6 +604,7 @@ class Data:
         (
         SELECT
             blocking.pid,
+            '<unknown>' AS appname,
             pg_stat_activity.current_query AS query,
             blocking.mode,
             pg_stat_activity.datname,
@@ -622,6 +627,7 @@ class Data:
         UNION ALL
         SELECT
             blocking.pid,
+            '<unknown>' AS appname,        
             pg_stat_activity.current_query AS query,
             blocking.mode,
             pg_stat_activity.datname,
@@ -648,6 +654,7 @@ class Data:
         ) AS sq
     GROUP BY
         pid,
+        appname,
         query,
         mode,
         locktype,
