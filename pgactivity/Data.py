@@ -337,7 +337,7 @@ class Data:
         EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
             """
         elif self.pg_num_version >= 90600:
-            # PostgreSQL 9.6.0 and more
+            # PostgreSQL prior to 10.0 and >= 9.6.0
             query = """
     SELECT
         pg_stat_activity.pid AS pid,
@@ -365,7 +365,7 @@ class Data:
     ORDER BY
         EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
             """
-        elif self.pg_num_version < 90600 and self.pg_num_version >= 90200:
+        elif self.pg_num_version >= 90200:
             # PostgreSQL prior to 9.6.0 and >= 9.2.0
             query = """
     SELECT
