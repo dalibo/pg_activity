@@ -194,6 +194,13 @@ server activity monitoring.")
                 action = 'store_true',
                 help = "Disable W.",
                 default = 'false')
+            # --no-app-name
+            group.add_option(
+                '--no-app-name',
+                dest = 'noappname',
+                action = 'store_true',
+                help = "Disable App.",
+                default = 'false')                
             parser.add_option_group(group)
             # --help
             parser.add_option(
@@ -346,7 +353,7 @@ server activity monitoring.")
     except psutil.AccessDenied as err:
         PGAUI.at_exit_curses()
         sys.exit(
-            "FATAL: Acces denied, can't acces system informations for PID %s"
+            "FATAL: Access denied, can't access system informations for PID %s"
             % (str(err),))
     except curses.error as err:
         PGAUI.at_exit_curses()

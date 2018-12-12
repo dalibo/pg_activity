@@ -28,7 +28,8 @@ class Process():
     """
     def __init__(self, pid = None, database = None, user = None, \
         client = None, cpu = None, mem = None, read = None, write = None, \
-        state = None, query = None, duration = None, wait = None, extras = None):
+        state = None, query = None, duration = None, wait = None, extras = None, \
+        appname = None):
         self.pid = pid
         self.database = database
         self.user = user
@@ -42,6 +43,7 @@ class Process():
         self.duration = duration
         self.wait = wait
         self.extras = extras
+        self.appname = appname
 
     def set_extra(self, key, value):
         """

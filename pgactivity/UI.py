@@ -23,7 +23,7 @@ SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 """
 
 from __future__ import print_function
-
+from pprint import pprint
 import curses
 import re
 import time
@@ -47,18 +47,19 @@ C_GRAY =        10
 
 # Columns
 PGTOP_FLAG_DATABASE =   1
-PGTOP_FLAG_CLIENT =     2
-PGTOP_FLAG_USER =       4
-PGTOP_FLAG_CPU =        8
-PGTOP_FLAG_MEM =        16
-PGTOP_FLAG_READ =       32
-PGTOP_FLAG_WRITE =      64
-PGTOP_FLAG_TIME =       128
-PGTOP_FLAG_WAIT =       256
-PGTOP_FLAG_RELATION =   512
-PGTOP_FLAG_TYPE =       1024
-PGTOP_FLAG_MODE =       2048
-PGTOP_FLAG_IOWAIT =     4096
+PGTOP_FLAG_APPNAME =    2
+PGTOP_FLAG_CLIENT =     4
+PGTOP_FLAG_USER =       8
+PGTOP_FLAG_CPU =        16
+PGTOP_FLAG_MEM =        32
+PGTOP_FLAG_READ =       64
+PGTOP_FLAG_WRITE =      128
+PGTOP_FLAG_TIME =       256
+PGTOP_FLAG_WAIT =       512
+PGTOP_FLAG_RELATION =   1024
+PGTOP_FLAG_TYPE =       2048
+PGTOP_FLAG_MODE =       4096
+PGTOP_FLAG_IOWAIT =     8192
 PGTOP_FLAG_NONE =       None
 
 # Display query mode
@@ -82,7 +83,7 @@ PGTOP_SIGNAL_MESSAGE = {
 }
 
 # Maximum number of column
-PGTOP_MAX_NCOL = 14
+PGTOP_MAX_NCOL = 15
 
 PGTOP_COLS = {
     'activities': {
@@ -92,86 +93,93 @@ PGTOP_COLS = {
             'template_h': '%-6s ',
             'flag': PGTOP_FLAG_NONE,
             'mandatory': True
-        },
+        },      
         'database': {
             'n':  2,
             'name': 'DATABASE',
             'template_h': '%-16s ',
             'flag': PGTOP_FLAG_DATABASE,
             'mandatory': False
-        },
-        'user': {
+        },        
+        'appname': {
             'n':  3,
+            'name': 'APP',
+            'template_h': '%16s ',
+            'flag': PGTOP_FLAG_APPNAME,
+            'mandatory': False
+        },          
+        'user': {
+            'n':  4,
             'name': 'USER',
             'template_h': '%16s ',
             'flag': PGTOP_FLAG_USER,
             'mandatory': False
         },
         'client': {
-            'n':  4,
+            'n':  5,
             'name': 'CLIENT',
             'template_h': '%16s ',
             'flag': PGTOP_FLAG_CLIENT,
             'mandatory': False
         },
         'cpu': {
-            'n':  5,
+            'n':  6,
             'name': 'CPU%',
             'template_h': '%6s ',
             'flag': PGTOP_FLAG_CPU,
             'mandatory': False
         },
         'mem': {
-            'n':  6,
+            'n':  7,
             'name': 'MEM%',
             'template_h': '%4s ',
             'flag': PGTOP_FLAG_MEM,
             'mandatory': False
         },
         'read': {
-            'n':  7,
+            'n':  8,
             'name': 'READ/s',
             'template_h': '%8s ',
             'flag': PGTOP_FLAG_READ,
             'mandatory': False
         },
         'write': {
-            'n':  8,
+            'n':  9,
             'name': 'WRITE/s',
             'template_h': '%8s ',
             'flag': PGTOP_FLAG_WRITE,
             'mandatory': False
         },
         'time': {
-            'n':  9,
+            'n':  10,
             'name': 'TIME+',
             'template_h': '%9s ',
             'flag': PGTOP_FLAG_TIME,
             'mandatory': False
         },
         'wait': {
-            'n': 10,
+            'n': 11,
             'name': 'W',
             'template_h': '%2s ',
             'flag': PGTOP_FLAG_WAIT,
             'mandatory': False
         },
         'iowait': {
-            'n': 11,
+            'n': 12,
             'name': 'IOW',
             'template_h': '%4s ',
             'flag': PGTOP_FLAG_IOWAIT,
             'mandatory': False
         },
         'state': {
-            'n': 12,
+            'n': 13,
             'name': 'state',
             'template_h': ' %17s  ',
             'flag': PGTOP_FLAG_NONE,
             'mandatory': True
         },
         'query': {
-            'n': 13,
+            'n': 14,
             'name': 'Query',
             'template_h': ' %2s',
             'flag': PGTOP_FLAG_NONE,
@@ -193,43 +201,50 @@ PGTOP_COLS = {
             'flag': PGTOP_FLAG_DATABASE,
             'mandatory': False
         },
+        'appname': {
+            'n':  3,
+            'name': 'APP',
+            'template_h': '%16s ',
+            'flag': PGTOP_FLAG_APPNAME,
+            'mandatory': False
+        },          
         'relation': {
-            'n': 3,
+            'n': 4,
             'name': 'RELATION',
             'template_h': '%9s ',
             'flag': PGTOP_FLAG_RELATION,
             'mandatory': False
         },
         'type': {
-            'n': 4,
+            'n': 5,
             'name': 'TYPE',
             'template_h': '%16s ',
             'flag': PGTOP_FLAG_TYPE,
             'mandatory': False
         },
         'mode': {
-            'n': 5,
+            'n': 6,
             'name': 'MODE',
             'template_h': '%16s ',
             'flag': PGTOP_FLAG_MODE,
             'mandatory': False
         },
         'time': {
-            'n': 6,
+            'n': 7,
             'name': 'TIME+',
             'template_h': '%9s ',
             'flag': PGTOP_FLAG_TIME,
             'mandatory': False
         },
         'state': {
-            'n': 7,
+            'n': 8,
             'name': 'state',
             'template_h': ' %17s  ',
             'flag': PGTOP_FLAG_NONE,
             'mandatory': True
         },
         'query': {
-            'n': 8,
+            'n': 9,
             'name': 'Query',
             'template_h': ' %2s',
             'flag': PGTOP_FLAG_NONE,
@@ -251,43 +266,50 @@ PGTOP_COLS = {
             'flag': PGTOP_FLAG_DATABASE,
             'mandatory': False
         },
+        'appname': {
+            'n':  3,
+            'name': 'APP',
+            'template_h': '%16s ',
+            'flag': PGTOP_FLAG_APPNAME,
+            'mandatory': False
+        },          
         'relation': {
-            'n': 3,
+            'n': 4,
             'name': 'RELATION',
             'template_h': '%9s ',
             'flag': PGTOP_FLAG_RELATION,
             'mandatory': False
         },
         'type': {
-            'n': 4,
+            'n': 5,
             'name': 'TYPE',
             'template_h': '%16s ',
             'flag': PGTOP_FLAG_TYPE,
             'mandatory': False
         },
         'mode': {
-            'n': 5,
+            'n': 6,
             'name': 'MODE',
             'template_h': '%16s ',
             'flag': PGTOP_FLAG_MODE,
             'mandatory': False
         },
         'time': {
-            'n': 6,
+            'n': 7,
             'name': 'TIME+',
             'template_h': '%9s ',
             'flag': PGTOP_FLAG_TIME,
             'mandatory': False
         },
         'state': {
-            'n': 7,
+            'n': 8,
             'name': 'state',
             'template_h': ' %17s  ',
             'flag': PGTOP_FLAG_NONE,
             'mandatory': True
         },
         'query': {
-            'n': 8,
+            'n': 9,
             'name': 'Query',
             'template_h': ' %2s',
             'flag': PGTOP_FLAG_NONE,
@@ -428,7 +450,12 @@ class UI:
                 'cursor':  self.__get_color(C_CYAN)|curses.A_REVERSE,
                 'yellow':  self.__get_color(C_YELLOW)|curses.A_BOLD
             },
-            'user': {
+            'appname': {
+                'default': curses.A_BOLD|self.__get_color(C_GRAY),
+                'cursor':  self.__get_color(C_CYAN)|curses.A_REVERSE,
+                'yellow':  self.__get_color(C_YELLOW)|curses.A_BOLD
+            },
+           'user': {
                 'default': curses.A_BOLD|self.__get_color(C_GRAY),
                 'cursor':  self.__get_color(C_CYAN)|curses.A_REVERSE,
                 'yellow':  self.__get_color(C_YELLOW)|curses.A_BOLD
@@ -560,7 +587,7 @@ class UI:
         flag = flag | PGTOP_FLAG_CPU | PGTOP_FLAG_MEM | PGTOP_FLAG_READ
         flag = flag | PGTOP_FLAG_WRITE | PGTOP_FLAG_TIME | PGTOP_FLAG_WAIT
         flag = flag | PGTOP_FLAG_RELATION | PGTOP_FLAG_TYPE | PGTOP_FLAG_MODE
-        flag = flag | PGTOP_FLAG_IOWAIT
+        flag = flag | PGTOP_FLAG_IOWAIT | PGTOP_FLAG_APPNAME
         if options.nodb is True:
             flag -= PGTOP_FLAG_DATABASE
         if options.nouser is True:
@@ -579,6 +606,8 @@ class UI:
             flag -= PGTOP_FLAG_TIME
         if options.nowait is True:
             flag -= PGTOP_FLAG_WAIT
+        if options.noappname is True:
+            flag -= PGTOP_FLAG_APPNAME    
 
         # Remove some if no running against local pg server.
         if not self.get_is_local() and (flag & PGTOP_FLAG_CPU):
@@ -1269,6 +1298,7 @@ class UI:
                         proc.duration = new_proc.duration
                         proc.state = new_proc.state
                         proc.query = new_proc.query
+                        proc.appname = new_proc.appname
                         proc.client = new_proc.client
                         proc.wait = new_proc.wait
                         proc.set_extra(
@@ -1311,6 +1341,7 @@ class UI:
                     new_procs[pid] = proc
                     procs.append({
                         'pid': pid,
+                        'appname': proc.appname,                        
                         'database': proc.database,
                         'user':proc.user,
                         'client': proc.client,
@@ -1350,6 +1381,7 @@ class UI:
                     self.pid.append(query['pid'])
                 procs.append({
                     'pid': query['pid'],
+                    'appname': query['application_name'],                                           
                     'database': query['database'],
                     'user': query['user'],
                     'client': query['client'],
@@ -1951,12 +1983,18 @@ class UI:
                             (str(process['database'])[:16],),
                         self.line_colors['database'][typecolor])
         if self.mode == 'activities':
+            if flag & PGTOP_FLAG_APPNAME:
+                colno += self.__print_string(
+                            l_lineno,
+                            colno,
+                            "%16s " % (str(process['appname'])[:16],),
+                            self.line_colors['appname'][typecolor])               
             if flag & PGTOP_FLAG_USER:
                 colno += self.__print_string(
                             l_lineno,
                             colno,
                             "%16s " % (str(process['user'])[:16],),
-                            self.line_colors['user'][typecolor])
+                            self.line_colors['user'][typecolor])                            
             if flag & PGTOP_FLAG_CLIENT:
                 colno += self.__print_string(
                             l_lineno,
@@ -1988,6 +2026,12 @@ class UI:
                             "%8s " % (bytes2human(process['write']),),
                             self.line_colors['write'][typecolor])
         elif self.mode == 'waiting' or self.mode == 'blocking':
+            if flag & PGTOP_FLAG_APPNAME:
+                colno += self.__print_string(
+                            l_lineno,
+                            colno,
+                            "%16s " % (str(process['appname'])[:16],),
+                            self.line_colors['appname'][typecolor])               
             if flag & PGTOP_FLAG_RELATION:
                 colno += self.__print_string(
                             l_lineno,
