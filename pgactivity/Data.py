@@ -151,7 +151,7 @@ class Data:
 
     def pg_is_local_access(self,):
         """
-        Verify if the user running pg_activity can acces 
+        Verify if the user running pg_activity can acces
         system informations for the postmaster process.
         """
         try:
@@ -234,7 +234,7 @@ class Data:
     def pg_get_num_dev_version(self, text_version):
         """
         Get PostgreSQL short & numeric devel. or beta version
-        from a string (SELECT version()). 
+        from a string (SELECT version()).
         """
         res = re.match(
             r"^(PostgreSQL|EnterpriseDB) ([0-9]+)(?:\.([0-9]+))?(devel|beta[0-9]+|rc[0-9]+)",
@@ -296,7 +296,7 @@ class Data:
         query = """
         SELECT
             COUNT(*) as active_connections
-        FROM pg_stat_activity 
+        FROM pg_stat_activity
         WHERE state = 'active'
         """
 
@@ -345,7 +345,7 @@ class Data:
             query = """
     SELECT
         pg_stat_activity.pid AS pid,
-        pg_stat_activity.application_name AS application_name,        
+        pg_stat_activity.application_name AS application_name,
         CASE WHEN LENGTH(pg_stat_activity.datname) > 16
             THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
             ELSE pg_stat_activity.datname
@@ -375,7 +375,7 @@ class Data:
             query = """
     SELECT
         pg_stat_activity.pid AS pid,
-        pg_stat_activity.application_name AS application_name,        
+        pg_stat_activity.application_name AS application_name,
         CASE WHEN LENGTH(pg_stat_activity.datname) > 16
             THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
             ELSE pg_stat_activity.datname
@@ -405,7 +405,7 @@ class Data:
             query = """
     SELECT
         pg_stat_activity.procpid AS pid,
-        '<unknown>' AS application_name,        
+        '<unknown>' AS application_name,
         CASE
             WHEN LENGTH(pg_stat_activity.datname) > 16
             THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
@@ -443,7 +443,7 @@ class Data:
             query = """
     SELECT
         pg_locks.pid AS pid,
-        pg_stat_activity.application_name AS appname,          
+        pg_stat_activity.application_name AS appname,
         CASE WHEN LENGTH(pg_stat_activity.datname) > 16
             THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
             ELSE pg_stat_activity.datname
@@ -469,7 +469,7 @@ class Data:
             query = """
     SELECT
         pg_locks.pid AS pid,
-        '<unknown>' AS appname,        
+        '<unknown>' AS appname,
         CASE
             WHEN LENGTH(pg_stat_activity.datname) > 16
             THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
@@ -505,7 +505,7 @@ class Data:
             query = """
     SELECT
         pid,
-        application_name AS appname,          
+        application_name AS appname,
         CASE
             WHEN LENGTH(datname) > 16
             THEN SUBSTRING(datname FROM 0 FOR 6)||'...'||SUBSTRING(datname FROM '........$')
@@ -603,7 +603,7 @@ class Data:
         duration,
         state,
         query
-    FROM 
+    FROM
         (
         SELECT
             blocking.pid,
@@ -630,7 +630,7 @@ class Data:
         UNION ALL
         SELECT
             blocking.pid,
-            '<unknown>' AS appname,        
+            '<unknown>' AS appname,
             pg_stat_activity.current_query AS query,
             blocking.mode,
             pg_stat_activity.datname,
@@ -727,7 +727,7 @@ class Data:
                     state = query['state'],
                     query = query['query'],
                     extras = {},
-                    appname = query['application_name'] 
+                    appname = query['application_name']
                     )
 
                 process.set_extra('meminfo',
@@ -749,7 +749,7 @@ class Data:
                 process.set_extra('psutil_proc', psproc)
                 process.set_extra('backend_type', query['backend_type'])
                 process.set_extra('appname', query['application_name'])
-                
+
                 processes[process.pid] = process
 
             except psutil.NoSuchProcess:

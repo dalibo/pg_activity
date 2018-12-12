@@ -207,7 +207,7 @@ server activity monitoring.")
                 dest = 'noappname',
                 action = 'store_true',
                 help = "Disable App.",
-                default = 'false')                
+                default = 'false')
             parser.add_option_group(group)
             # --help
             parser.add_option(

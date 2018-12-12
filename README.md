@@ -13,7 +13,7 @@ Dependencies
   - `psutil` &ge;  **0.5.1**
 
 Installation from sources:
-`setuptools` &ge; **0.6.14** 
+`setuptools` &ge; **0.6.14**
 
 Installation
 ------------
@@ -28,9 +28,9 @@ Installation
 Usage
 -----
 
-`pg_activity` works localy or remotely. In local execution context, to obtain sufficient rights to display system informations, the system user running `pg_activity` must be the same user running postgresql server (`postgres` by default), or have more rights like `root`. Otherwise, `pg_activity` can fallback to a degraded mode without displaying system informations. On the same way, PostgreSQL user used to connect to the database must be super-user.  
-ex:  
-    
+`pg_activity` works localy or remotely. In local execution context, to obtain sufficient rights to display system informations, the system user running `pg_activity` must be the same user running postgresql server (`postgres` by default), or have more rights like `root`. Otherwise, `pg_activity` can fallback to a degraded mode without displaying system informations. On the same way, PostgreSQL user used to connect to the database must be super-user.
+ex:
+
     sudo -u postgres pg_activity -U postgres
 
 Options
@@ -39,7 +39,7 @@ Options
     pg_activity [options]
 
 	Options:
-		--version            Show program's version number and exit 
+		--version            Show program's version number and exit
 		-U USERNAME, --username=USERNAME
                         	  Database user name (default: "postgres").
 		-p PORT, --port=PORT  Database server port (default: "5432").
@@ -54,7 +54,7 @@ Options
 		--help                Show this help message and exit.
 		--debug               Enable debug mode for traceback tracking.
         --no-db-size          Skip total size of DB.
-        
+
 
 	Display options, you can exclude some columns by using them :
 		--no-database         Disable DATABASE.
@@ -78,17 +78,17 @@ Interactives commands
 | `c`       | Sort by CPU%, descending                               |
 | `m`       | Sort by MEM%, descending                               |
 | `t`       | Sort by TIME+, descending                              |
-| `Space`   | Pause on/off                                           |  
+| `Space`   | Pause on/off                                           |
 | `v`       | Change queries display mode: full, truncated, indented |
 | `UP/DOWN` | Scroll processes list                                  |
-| `q`       | Quit                                                   |  
+| `q`       | Quit                                                   |
 | `+`       | Increase refresh time. Maximum value : 3s              |
-| `-`       | Decrease refresh time. Minimum Value : 1s               |
-| `F1/1`    | Running queries list                                   |  
-| `F2/2`    | Waiting queries list                                   | 
+| `-`       | Decrease refresh time. Minimum Value : 1s              |
+| `F1/1`    | Running queries list                                   |
+| `F2/2`    | Waiting queries list                                   |
 | `F3/3`    | Blocking queries list                                  |
-| `h`       | Help page                                              |  
-| `R`       | Refresh                                                | 
+| `h`       | Help page                                              |
+| `R`       | Refresh                                                |
 
 Navigation mode
 ---------------
@@ -99,8 +99,8 @@ Navigation mode
 | `DOWN`  | Move down the cursor                          |
 | `k`     | Terminate the current backend/tagged backends |
 | `Space` | Tag or untag the process                      |
-| `q`     | Quit                                          |  
-| `Other` | Back to activity                              |  
+| `q`     | Quit                                          |
+| `Other` | Back to activity                              |
 			
 Screenshot
 ----------
