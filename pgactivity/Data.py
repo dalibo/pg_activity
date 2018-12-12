@@ -324,7 +324,7 @@ class Data:
             END
         AS client,
         EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
-        pg_stat_activity.wait_event IS NOT NULL AS wait,
+        CASE WHEN pg_stat_activity.wait_event_type IN ('LWLock', 'Lock', 'BufferPin') THEN true ELSE false END AS wait,
         pg_stat_activity.usename AS user,
         pg_stat_activity.state AS state,
         pg_stat_activity.query AS query,
