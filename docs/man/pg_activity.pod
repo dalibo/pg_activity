@@ -46,6 +46,10 @@ CPU, MEM, READ or WRITE columns and other system informations.
 
 	Enable support for AWS RDS.
 
+=item B<--output=FILEPATH>
+
+	Store running queries as CSV.
+
 =item B<--help>
 
 	Show this help message and exit.

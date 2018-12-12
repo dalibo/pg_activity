@@ -51,6 +51,7 @@ Options
 		-C, --no-color        Disable color usage.
 		--blocksize=BLOCKSIZE Filesystem blocksize (default: 4096).
 		--rds                 Enable support for AWS RDS.
+		--output=FILEPATH     Store running queries as CSV.
 		--help                Show this help message and exit.
 		--debug               Enable debug mode for traceback tracking.
 		--no-db-size          Skip total size of DB.
