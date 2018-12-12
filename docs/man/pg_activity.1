@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "PG_ACTIVITY 1"
-.TH PG_ACTIVITY 1 "2017-11-14" "pg_activity 1.4.0" "Command line tool for PostgreSQL server activity monitoring."
+.TH PG_ACTIVITY 1 "2018-10-02" "pg_activity 1.4.0" "Command line tool for PostgreSQL server activity monitoring."
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -142,6 +142,10 @@ pg_activity \- Realtime PostgreSQL database server monitoring tool
 .SH "DESCRIPTION"
 .IX Header "DESCRIPTION"
 Command line tool for PostgreSQL server activity monitoring.
+.PP
+pg_activity must run on the same server than the instance and
+as the user running the instance (or root) to show
+\&\s-1CPU, MEM, READ\s0 or \s-1WRITE\s0 columns and other system informations.
 .SH "COMMAND-LINE OPTIONS"
 .IX Header "COMMAND-LINE OPTIONS"
 .IP "\fB\-U \s-1USERNAME\s0\fR, \fB\-\-username=USERNAME\fR" 2
@@ -321,4 +325,6 @@ Command line tool for PostgreSQL server activity monitoring.
 .IX Header "EXAMPLES"
 PGPASSWORD='mypassword' pg_activity \-U pgadmin \-h 127.0.0.1 \-\-no\-client
 .PP
-pg_activity \-h /tmp
+pg_activity \-h /var/run/postgresql
+.PP
+pg_activity \-h myserver \-p 5433 \-d nagios \-U nagios
