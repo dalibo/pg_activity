@@ -113,7 +113,8 @@ class Data:
         user = 'postgres',
         password = None,
         database = 'postgres',
-        rds_mode = False):
+        rds_mode = False,
+        service = None):
         """
         Connect to a PostgreSQL server and return
         cursor & connector.
@@ -122,24 +123,36 @@ class Data:
         if host is None or host == 'localhost':
             # try to connect using UNIX socket
             try:
-                self.pg_conn = psycopg2.connect(
-                    database = database,
-                    user = user,
-                    port = port,
-                    password = password,
-                    connection_factory = psycopg2.extras.DictConnection
+                if service is not None:
+                    self.pg_conn = psycopg2.connect(
+                        service = service,
+                        connection_factory = psycopg2.extras.DictConnection
+                    )
+                else:
+                    self.pg_conn = psycopg2.connect(
+                        database = database,
+                        user = user,
+                        port = port,
+                        password = password,
+                        connection_factory = psycopg2.extras.DictConnection
                     )
             except psycopg2.Error as psy_err:
                 if host is None:
                     raise psy_err
         if self.pg_conn is None: # fallback on TCP/IP connection
-            self.pg_conn = psycopg2.connect(
-                database = database,
-                host = host,
-                port = port,
-                user = user,
-                password = password,
-                connection_factory = psycopg2.extras.DictConnection
+            if service is not None:
+                self.pg_conn = psycopg2.connect(
+                    service = service,
+                    connection_factory = psycopg2.extras.DictConnection
+                )
+            else:
+                self.pg_conn = psycopg2.connect(
+                    database = database,
+                    host = host,
+                    port = port,
+                    user = user,
+                    password = password,
+                    connection_factory = psycopg2.extras.DictConnection
                 )
         self.pg_conn.set_isolation_level(0)
         if rds_mode != True: # Make sure we are using superuser if not on RDS

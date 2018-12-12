@@ -232,6 +232,7 @@ server activity monitoring.")
             print(parser.format_help().strip())
             sys.exit(1)
         password = os.environ.get('PGPASSWORD')
+        service = os.environ.get('PGSERVICE')
         debug = options.debug
         nb_try = 0
         while nb_try < 2:
@@ -242,7 +243,9 @@ server activity monitoring.")
                     user = options.username,
                     password = password,
                     database = options.dbname,
-                    rds_mode = options.rds)
+                    rds_mode = options.rds,
+                    service = service,
+                )
                 break
             except psycopg2.OperationalError as err:
                 if nb_try < 1 and (err.pgcode == errorcodes.INVALID_PASSWORD or
