@@ -53,6 +53,7 @@ Options
 		--rds                 Enable support for AWS RDS.
 		--help                Show this help message and exit.
 		--debug               Enable debug mode for traceback tracking.
+        --no-db-size          Skip total size of DB.
         
 
 	Display options, you can exclude some columns by using them :
