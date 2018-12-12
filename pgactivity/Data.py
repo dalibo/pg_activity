@@ -253,7 +253,7 @@ class Data:
             return
         raise Exception('Undefined PostgreSQL version.')
 
-    def pg_get_db_info(self, prev_db_infos, using_rds = False):
+    def pg_get_db_info(self, prev_db_infos, using_rds=False, skip_sizes=False):
         """
         Get current sum of transactions, total size and  timestamp.
         """
@@ -261,12 +261,15 @@ class Data:
     SELECT
         EXTRACT(EPOCH FROM NOW()) AS timestamp,
         SUM(pg_stat_get_db_xact_commit(oid)+pg_stat_get_db_xact_rollback(oid))::BIGINT AS no_xact,
-        SUM(pg_database_size(datname)) AS total_size,
+        {db_size} AS total_size,
         MAX(LENGTH(datname)) AS max_length
     FROM
         pg_database
-        """
-        query += "\nWHERE datname <> 'rdsadmin'" if using_rds else ''
+        {no_rds}
+        """.format(
+            db_size="0" if skip_sizes else "SUM(pg_database_size(datname))",
+            no_rds="WHERE datname <> 'rdsadmin'" if using_rds else ''
+        )
         cur = self.pg_conn.cursor()
         cur.execute(query,)
         ret = cur.fetchone()
