@@ -93,21 +93,21 @@ PGTOP_COLS = {
             'template_h': '%-6s ',
             'flag': PGTOP_FLAG_NONE,
             'mandatory': True
-        },      
+        },
         'database': {
             'n':  2,
             'name': 'DATABASE',
             'template_h': '%-16s ',
             'flag': PGTOP_FLAG_DATABASE,
             'mandatory': False
-        },        
+        },
         'appname': {
             'n':  3,
             'name': 'APP',
             'template_h': '%16s ',
             'flag': PGTOP_FLAG_APPNAME,
             'mandatory': False
-        },          
+        },
         'user': {
             'n':  4,
             'name': 'USER',
@@ -207,7 +207,7 @@ PGTOP_COLS = {
             'template_h': '%16s ',
             'flag': PGTOP_FLAG_APPNAME,
             'mandatory': False
-        },          
+        },
         'relation': {
             'n': 4,
             'name': 'RELATION',
@@ -272,7 +272,7 @@ PGTOP_COLS = {
             'template_h': '%16s ',
             'flag': PGTOP_FLAG_APPNAME,
             'mandatory': False
-        },          
+        },
         'relation': {
             'n': 4,
             'name': 'RELATION',
@@ -607,7 +607,7 @@ class UI:
         if options.nowait is True:
             flag -= PGTOP_FLAG_WAIT
         if options.noappname is True:
-            flag -= PGTOP_FLAG_APPNAME    
+            flag -= PGTOP_FLAG_APPNAME
 
         # Remove some if no running against local pg server.
         if not self.get_is_local() and (flag & PGTOP_FLAG_CPU):
@@ -1341,7 +1341,7 @@ class UI:
                     new_procs[pid] = proc
                     procs.append({
                         'pid': pid,
-                        'appname': proc.appname,                        
+                        'appname': proc.appname,
                         'database': proc.database,
                         'user':proc.user,
                         'client': proc.client,
@@ -1381,7 +1381,7 @@ class UI:
                     self.pid.append(query['pid'])
                 procs.append({
                     'pid': query['pid'],
-                    'appname': query['application_name'],                                           
+                    'appname': query['application_name'],
                     'database': query['database'],
                     'user': query['user'],
                     'client': query['client'],
@@ -1988,13 +1988,13 @@ class UI:
                             l_lineno,
                             colno,
                             "%16s " % (str(process['appname'])[:16],),
-                            self.line_colors['appname'][typecolor])               
+                            self.line_colors['appname'][typecolor])
             if flag & PGTOP_FLAG_USER:
                 colno += self.__print_string(
                             l_lineno,
                             colno,
                             "%16s " % (str(process['user'])[:16],),
-                            self.line_colors['user'][typecolor])                            
+                            self.line_colors['user'][typecolor])
             if flag & PGTOP_FLAG_CLIENT:
                 colno += self.__print_string(
                             l_lineno,
@@ -2031,7 +2031,7 @@ class UI:
                             l_lineno,
                             colno,
                             "%16s " % (str(process['appname'])[:16],),
-                            self.line_colors['appname'][typecolor])               
+                            self.line_colors['appname'][typecolor])
             if flag & PGTOP_FLAG_RELATION:
                 colno += self.__print_string(
                             l_lineno,
