@@ -90,6 +90,10 @@ CPU, MEM, READ or WRITE columns and other system informations.
 
 	Disable DATABASE.
 
+=item B<--no-db-size>
+
+	Disable DATABASE size.
+
 =item B<--no-user>
 
 	Disable USER.
@@ -121,6 +125,10 @@ CPU, MEM, READ or WRITE columns and other system informations.
 =item B<--no-wait>
 
 	Disable W.
+
+=item B<--no-app-name>
+
+	Disable App.
 
 =back
 
