@@ -66,6 +66,7 @@ Options
     	--no-write            Disable WRITE/s.
     	--no-time             Disable TIME+.
     	--no-wait             Disable W.
+    	--no-app-name         Disable App.
 
 Interactives commands
 ---------------------
