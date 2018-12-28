@@ -391,6 +391,18 @@ class UI:
         # Init curses
         # self.__init_curses()
 
+    def set_verbose_mode(self, verbose_mode):
+        """
+        Set self.verbose_mode
+        """
+        self.verbose_mode = verbose_mode
+
+    def get_verbose_mode(self,):
+        """
+        Get self.verbose_mode
+        """
+        return self.verbose_mode
+
     def set_is_local(self, is_local):
         """
         Set self.is_local

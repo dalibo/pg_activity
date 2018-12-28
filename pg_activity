@@ -128,6 +128,14 @@ server activity monitoring.")
                 action = 'store_true',
                 help = "Enable support for AWS RDS",
                 default = False)
+            # --verbose-mode
+            parser.add_option(
+                '--verbose-mode',
+                dest = 'verbosemode',
+                help = "Queries display mode. Values: 1-TRUNCATED, 2-FULL(default), 3-INDENTED",
+                metavar = 'VERBOSE_MODE',
+                choices = ['1', '2', '3'],
+                default = '2')
             group = OptionGroup(
                 parser,
                 "Display Options, you can exclude some columns by using them ")
@@ -266,6 +274,8 @@ server activity monitoring.")
         PGAUI.set_max_db_length(16)
         # blocksize
         PGAUI.set_blocksize(int(options.blocksize))
+        # verbose mode
+        PGAUI.set_verbose_mode(int(options.verbosemode))
         # does pg_activity runing against local PG instance
         if not PGAUI.data.pg_is_local():
             PGAUI.set_is_local(False)
