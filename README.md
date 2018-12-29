@@ -53,11 +53,13 @@ Options
 		--rds                 Enable support for AWS RDS.
 		--help                Show this help message and exit.
 		--debug               Enable debug mode for traceback tracking.
-        --no-db-size          Skip total size of DB.
+		--no-db-size          Skip total size of DB.
+		--verbose-mode=VERBOSE_MODE
+                               Queries display mode. Values: 1-TRUNCATED, 2-FULL(default), 3-INDENTED
 
 
 	Display options, you can exclude some columns by using them :
-		--no-database         Disable DATABASE.
+    	--no-database         Disable DATABASE.
     	--no-user             Disable USER.
     	--no-client           Disable CLIENT.
     	--no-cpu              Disable CPU%.
