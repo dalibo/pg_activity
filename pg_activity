@@ -26,7 +26,7 @@ SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 from __future__ import print_function
 
-PGTOP_VERSION = "1.4.0"
+PGTOP_VERSION = "1.5.0"
 
 import os
 import sys
