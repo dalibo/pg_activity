@@ -217,6 +217,13 @@ server activity monitoring.")
                 help = "Disable App.",
                 default = 'false')
             parser.add_option_group(group)
+            # --output
+            parser.add_option(
+                '--output',
+                dest = 'output',
+                help = "Store running queries as CSV.",
+                metavar = "FILEPATH",
+                default = None)
             # --help
             parser.add_option(
                 '--help',
@@ -276,6 +283,8 @@ server activity monitoring.")
         PGAUI.set_blocksize(int(options.blocksize))
         # verbose mode
         PGAUI.set_verbose_mode(int(options.verbosemode))
+        # output
+        PGAUI.set_output(options.output)
         # does pg_activity runing against local PG instance
         if not PGAUI.data.pg_is_local():
             PGAUI.set_is_local(False)

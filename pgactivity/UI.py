@@ -28,7 +28,7 @@ import curses
 import re
 import time
 import sys
-from datetime import timedelta
+from datetime import timedelta, datetime as dt
 from pgactivity.Data import Data, clean_str
 import psutil
 from getpass import getpass
@@ -388,8 +388,8 @@ class UI:
         self.max_ncol = PGTOP_MAX_NCOL
         # Default filesystem blocksize
         self.fs_blocksize = 4096
-        # Init curses
-        # self.__init_curses()
+        # Output file
+        self.output = None
 
     def set_verbose_mode(self, verbose_mode):
         """
@@ -725,6 +725,9 @@ class UI:
         curses.init_pair(C_WHITE, curses.COLOR_WHITE, -1)
         curses.init_pair(C_BLACK_CYAN, curses.COLOR_BLACK, curses.COLOR_CYAN)
         curses.init_pair(C_GRAY, 0, -1)
+
+    def set_output(self, output):
+        self.output = output
 
     def clean_str(self, string):
         """
@@ -1440,8 +1443,11 @@ class UI:
                             key=lambda p: p['duration'],
                             reverse=True)
 
-        self.__check_pid_yank()
+        # Store querie list
+        if self.output is not None:
+            self.__store_procs(procs)
 
+        self.__check_pid_yank()
         return (disp_procs, new_procs)
 
     def __poll_waiting_blocking(self, interval, flag, indent, \
@@ -2195,3 +2201,41 @@ class UI:
                             " %s" % (self.__add_blank(query, len(indent)),),
                             self.line_colors['query'][typecolor])
         self.lineno += 1
+
+    def __clean_str_csv(self, string):
+        # clean string for CSV format
+        s = clean_str(string)
+        s = s.replace('"', '\\"')
+        return s
+
+    def __store_procs(self, procs):
+        # Store process list into CSV file
+        with open(self.output, 'a') as f:
+            if f.tell() == 0:
+                # First line then write CSV header
+                f.write("datetimeutc;pid;database;appname;user;client;cpu;"
+                        "memory;read;write;duration;wait;io_wait;state;"
+                        "query\n")
+
+            for p in procs:
+                f.write("\"{dt}\";\"{pid}\";\"{database}\";\"{appname}\";"
+                        "\"{user}\";\"{client}\";\"{cpu}\";\"{mem}\";"
+                        "\"{read}\";\"{write}\";\"{duration}\";\"{wait}\";"
+                        "\"{io_wait}\";\"{state}\";\"{query}\"\n".format(
+                            dt=dt.utcnow().strftime("%Y-%m-%dT%H:%m:%SZ"),
+                            pid=p.get('pid', 'N/A'),
+                            database=p.get('database', 'N/A'),
+                            appname=p.get('appname', 'N/A'),
+                            user=p.get('user', 'N/A'),
+                            client=p.get('client', 'N/A'),
+                            cpu=p.get('cpu', 'N/A'),
+                            mem=p.get('mem', 'N/A'),
+                            read=p.get('read', 'N/A'),
+                            write=p.get('write', 'N/A'),
+                            duration=p.get('duration', 'N/A'),
+                            wait=p.get('wait', 'N/A'),
+                            io_wait=p.get('io_wait', 'N/A'),
+                            state=p.get('state', 'N/A'),
+                            query=self.__clean_str_csv(p.get('query', 'N/A'))
+                        )
+                )

@@ -51,6 +51,7 @@ Options
 		-C, --no-color        Disable color usage.
 		--blocksize=BLOCKSIZE Filesystem blocksize (default: 4096).
 		--rds                 Enable support for AWS RDS.
+		--output=FILEPATH     Store running queries as CSV.
 		--help                Show this help message and exit.
 		--debug               Enable debug mode for traceback tracking.
 		--no-db-size          Skip total size of DB.
@@ -69,6 +70,13 @@ Options
     	--no-time             Disable TIME+.
     	--no-wait             Disable W.
     	--no-app-name         Disable App.
+
+
+Notes
+-----
+
+Length of SQL query text that pg_activity reports relies on PostgreSQL parameter `track_activity_query_size`. Default value is `1024` (expressed in bytes). If your SQL query text look truncated, you should increase `track_activity_query_size`.
+
 
 Interactives commands
 ---------------------
