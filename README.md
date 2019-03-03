@@ -71,6 +71,13 @@ Options
     	--no-wait             Disable W.
     	--no-app-name         Disable App.
 
+
+Notes
+-----
+
+Length of SQL query text that pg_activity reports relies on PostgreSQL parameter `track_activity_query_size`. Default value is `1024` (expressed in bytes). If your SQL query text look truncated, you should increase `track_activity_query_size`.
+
+
 Interactives commands
 ---------------------
 
