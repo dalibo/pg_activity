@@ -3,7 +3,7 @@ pg_activity
 author: Julien Tachoires <julmon@gmail.com>
 license: PostgreSQL License
 
-Copyright (c) 2012 - 2016, Julien Tachoires
+Copyright (c) 2012 - 2019, Julien Tachoires
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose, without fee, and without a written
@@ -1789,7 +1789,7 @@ class UI:
         """
         self.win.erase()
         self.lineno = 0
-        text = "pg_activity %s - (c) 2012-2015 Julien Tachoires" % \
+        text = "pg_activity %s - (c) 2012-2019 Julien Tachoires" % \
             (self.version)
         self.__print_string(
                 self.lineno,
