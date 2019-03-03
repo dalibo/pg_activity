@@ -183,15 +183,20 @@ as the user running the instance (or root) to show
 .Vb 1
 \&        Enable support for AWS RDS.
 .Ve
-.IP "\fB\-\-verbose\-mode=VERBOSE_MODE\fR" 2
-.IX Item "--verbose-mode=VERBOSE_MODE"
-.Vb 1
-\&        Queries display mode. Values: 1\-TRUNCATED, 2\-FULL(default), 3\-INDENTED
-.Ve
 .IP "\fB\-\-output=FILEPATH\fR" 2
 .IX Item "--output=FILEPATH"
 .Vb 1
 \&        Store running queries as CSV.
+.Ve
+.IP "\fB\-\-no\-db\-size\fR" 2
+.IX Item "--no-db-size"
+.Vb 1
+\&        Skip total size of DB.
+.Ve
+.IP "\fB\-\-verbose\-mode=VERBOSE_MODE\fR" 2
+.IX Item "--verbose-mode=VERBOSE_MODE"
+.Vb 1
+\&        Queries display mode. Values: 1\-TRUNCATED, 2\-FULL(default), 3\-INDENTED
 .Ve
 .IP "\fB\-\-help\fR" 2
 .IX Item "--help"
@@ -236,11 +241,6 @@ as the user running the instance (or root) to show
 .IX Item "--no-database"
 .Vb 1
 \&        Disable DATABASE.
-.Ve
-.IP "\fB\-\-no\-db\-size\fR" 2
-.IX Item "--no-db-size"
-.Vb 1
-\&        Disable DATABASE size.
 .Ve
 .IP "\fB\-\-no\-user\fR" 2
 .IX Item "--no-user"
