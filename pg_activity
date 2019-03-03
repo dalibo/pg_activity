@@ -39,6 +39,7 @@ import getpass
 import psutil
 import curses
 import psycopg2
+import time
 from psycopg2 import errorcodes
 
 from pgactivity import UI
@@ -246,34 +247,11 @@ server activity monitoring.")
         if options.help is True:
             print(parser.format_help().strip())
             sys.exit(1)
-        password = os.environ.get('PGPASSWORD')
-        service = os.environ.get('PGSERVICE')
-        debug = options.debug
-        nb_try = 0
-        while nb_try < 2:
-            try:
-                PGAUI.data.pg_connect(
-                    host = options.host,
-                    port = options.port,
-                    user = options.username,
-                    password = password,
-                    database = options.dbname,
-                    rds_mode = options.rds,
-                    service = service,
-                )
-                break
-            except psycopg2.OperationalError as err:
-                if nb_try < 1 and (err.pgcode == errorcodes.INVALID_PASSWORD or
-                    str(err).strip().startswith(
-                        "FATAL:  password authentication failed for user")):
-                    nb_try += 1
-                    password = PGAUI.ask_password()
-                elif nb_try < 1 and str(err).strip() == "fe_sendauth: no password supplied":
-                    nb_try += 1
-                    password = PGAUI.ask_password()
-                else:
-                    sys.exit("pg_activity: FATAL: %s" % (PGAUI.clean_str(str(err),)))
 
+        password = pg_connect(options, password=os.environ.get('PGPASSWORD'),
+                              service=os.environ.get('PGSERVICE'))
+
+        debug = options.debug
         pg_version = PGAUI.data.pg_get_version()
         PGAUI.data.pg_get_num_version(pg_version)
         hostname = socket.gethostname()
@@ -322,62 +300,72 @@ server activity monitoring.")
         else:
             PGAUI.set_color()
         while 1:
-            PGAUI.check_window_size()
-            old_pgtop_mode = PGAUI.get_mode()
-            # poll process
-            (disp_procs, new_procs) = PGAUI.poll(
-                                        interval,
-                                        flag,
-                                        indent,
-                                        procs,
-                                        disp_procs)
-            if PGAUI.get_mode() != old_pgtop_mode:
-                indent = PGAUI.get_indent(flag)
-            if PGAUI.get_is_local():
-                delta_disk_io = PGAUI.data.get_global_io_counters()
-            procs = new_procs
-            # refresh the winodw
-            db_info = PGAUI.data.pg_get_db_info(db_info, using_rds=options.rds, skip_sizes=options.nodbsize)
-            PGAUI.set_max_db_length(db_info['max_length'])
-            # get active connections
-            active_connections = PGAUI.data.pg_get_active_connections()
-            # bufferize
-            PGAUI.set_buffer({
-                'procs': disp_procs,
-                'extras': (
-                    PGAUI.data.get_pg_version(),
-                    hostname,
-                    options.username,
-                    options.host,
-                    options.port,
-                    options.dbname),
-                'flag': flag,
-                'indent': indent,
-                'io': delta_disk_io,
-                'tps': db_info['tps'],
-                'active_connections': active_connections,
-                'size_ev': db_info['size_ev'],
-                'total_size': db_info['total_size']
-            })
-            # refresh
-            PGAUI.refresh_window(
-                disp_procs,
-                (
-                    PGAUI.data.get_pg_version(),
-                    hostname,
-                    options.username,
-                    options.host,
-                    options.port,
-                    options.dbname),
-                flag,
-                indent,
-                delta_disk_io,
-                db_info['tps'],
-                active_connections,
-                db_info['size_ev'],
-                db_info['total_size']
-            )
-            interval = 1
+            try:
+                PGAUI.check_window_size()
+                old_pgtop_mode = PGAUI.get_mode()
+                # poll process
+                (disp_procs, new_procs) = PGAUI.poll(interval, flag, indent,
+                                                     procs, disp_procs)
+                if PGAUI.get_mode() != old_pgtop_mode:
+                    indent = PGAUI.get_indent(flag)
+                if PGAUI.get_is_local():
+                    delta_disk_io = PGAUI.data.get_global_io_counters()
+                procs = new_procs
+                # refresh the winodw
+                db_info = PGAUI.data.pg_get_db_info(
+                    db_info,
+                    using_rds=options.rds,
+                    skip_sizes=options.nodbsize
+                )
+                PGAUI.set_max_db_length(db_info['max_length'])
+                # get active connections
+                active_connections = PGAUI.data.pg_get_active_connections()
+                # bufferize
+                PGAUI.set_buffer({
+                    'procs': disp_procs,
+                    'extras': (PGAUI.data.get_pg_version(), hostname,
+                               options.username, options.host,
+                               options.port, options.dbname),
+                    'flag': flag,
+                    'indent': indent,
+                    'io': delta_disk_io,
+                    'tps': db_info['tps'],
+                    'active_connections': active_connections,
+                    'size_ev': db_info['size_ev'],
+                    'total_size': db_info['total_size']
+                })
+                # refresh
+                PGAUI.refresh_window(
+                    disp_procs,
+                    (PGAUI.data.get_pg_version(), hostname, options.username,
+                     options.host, options.port, options.dbname),
+                    flag,
+                    indent,
+                    delta_disk_io,
+                    db_info['tps'],
+                    active_connections,
+                    db_info['size_ev'],
+                    db_info['total_size']
+                )
+                interval = 1
+
+            except psycopg2.OperationalError:
+                # PostgreSQL connection has been lost, trying to reconnect
+                # Clean curses
+                PGAUI.at_exit_curses()
+                not_connected = True
+                while not_connected:
+                    print("ERROR: Not connected to PostgreSQL, trying to open "
+                          "a new connection")
+                    try:
+                        pg_connect(options, password, os.environ.get('PGSERVICE'),
+                                   exit_on_failed=False)
+                        not_connected = False
+                    except Exception:
+                        print("ERROR: Connecton failed, retrying in 1 second...")
+                        time.sleep(1)
+                # Reinit curses env. when the connection is back
+                PGAUI.init_curses()
 
     except psutil.AccessDenied as err:
         PGAUI.at_exit_curses()
@@ -410,6 +398,38 @@ server activity monitoring.")
                 exc_traceback,
                 file=sys.stdout)
         sys.exit("FATAL: %s" % (str(err),))
+
+
+def pg_connect(options, password=None, service=None, exit_on_failed=True):
+    nb_try = 0
+    while nb_try < 2:
+        try:
+            PGAUI.data.pg_connect(
+                host=options.host,
+                port=options.port,
+                user=options.username,
+                password=password,
+                database=options.dbname,
+                rds_mode=options.rds,
+                service=service,
+            )
+            break
+        except psycopg2.OperationalError as err:
+            if nb_try < 1 and (err.pgcode == errorcodes.INVALID_PASSWORD or
+                str(err).strip().startswith(
+                    "FATAL:  password authentication failed for user")):
+                nb_try += 1
+                password = PGAUI.ask_password()
+            elif nb_try < 1 and str(err).strip() == "fe_sendauth: no password supplied":
+                nb_try += 1
+                password = PGAUI.ask_password()
+            elif exit_on_failed:
+                sys.exit("pg_activity: FATAL: %s" % (PGAUI.clean_str(str(err),)))
+            else:
+                raise Exception("Could not connect to PostgreSQL")
+    # Return the password in case of reconnection
+    return password
+
 
 # Call the main function
 if __name__ == '__main__':
