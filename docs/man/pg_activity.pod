@@ -46,6 +46,10 @@ CPU, MEM, READ or WRITE columns and other system informations.
 
 	Enable support for AWS RDS.
 
+=item B<--verbose-mode=VERBOSE_MODE>
+
+	Queries display mode. Values: 1-TRUNCATED, 2-FULL(default), 3-INDENTED
+
 =item B<--output=FILEPATH>
 
 	Store running queries as CSV.
