@@ -38,38 +38,39 @@ Options
 
     pg_activity [options]
 
-	Options:
-		--version            Show program's version number and exit
-		-U USERNAME, --username=USERNAME
-                        	  Database user name (default: "postgres").
-		-p PORT, --port=PORT  Database server port (default: "5432").
-		-h HOSTNAME, --host=HOSTNAME
-							  Database server host or socket directory (default:
-                        	  "localhost").
+    Options:
+        --version             Show program's version number and exit
+        -U USERNAME, --username=USERNAME
+                              Database user name (default: "postgres").
+        -p PORT, --port=PORT  Database server port (default: "5432").
+        -h HOSTNAME, --host=HOSTNAME
+                              Database server host or socket directory (default:
+                              "localhost").
         -d DBNAME, --dbname=DBNAME
                               Database name to connect to (default: "postgres").
-		-C, --no-color        Disable color usage.
-		--blocksize=BLOCKSIZE Filesystem blocksize (default: 4096).
-		--rds                 Enable support for AWS RDS.
-		--output=FILEPATH     Store running queries as CSV.
-		--help                Show this help message and exit.
-		--debug               Enable debug mode for traceback tracking.
-		--no-db-size          Skip total size of DB.
-		--verbose-mode=VERBOSE_MODE
-                               Queries display mode. Values: 1-TRUNCATED, 2-FULL(default), 3-INDENTED
+        -C, --no-color        Disable color usage.
+        --blocksize=BLOCKSIZE Filesystem blocksize (default: 4096).
+        --rds                 Enable support for AWS RDS.
+        --output=FILEPATH     Store running queries as CSV.
+        --help                Show this help message and exit.
+        --debug               Enable debug mode for traceback tracking.
+        --no-db-size          Skip total size of DB.
+        --verbose-mode=VERBOSE_MODE
+                              Queries display mode. Values: 1-TRUNCATED,
+                              2-FULL(default), 3-INDENTED
 
 
-	Display options, you can exclude some columns by using them :
-    	--no-database         Disable DATABASE.
-    	--no-user             Disable USER.
-    	--no-client           Disable CLIENT.
-    	--no-cpu              Disable CPU%.
-    	--no-mem              Disable MEM%.
-    	--no-read             Disable READ/s.
-    	--no-write            Disable WRITE/s.
-    	--no-time             Disable TIME+.
-    	--no-wait             Disable W.
-    	--no-app-name         Disable App.
+    Display options, you can exclude some columns by using them :
+        --no-database         Disable DATABASE.
+        --no-user             Disable USER.
+        --no-client           Disable CLIENT.
+        --no-cpu              Disable CPU%.
+        --no-mem              Disable MEM%.
+        --no-read             Disable READ/s.
+        --no-write            Disable WRITE/s.
+        --no-time             Disable TIME+.
+        --no-wait             Disable W.
+        --no-app-name         Disable App.
 
 
 Notes
