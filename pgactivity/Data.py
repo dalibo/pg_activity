@@ -86,6 +86,7 @@ class Data:
     write_bytes_delta = 0
     read_count_delta = 0
     write_count_delta = 0
+    refresh_dbsize = False
 
     def __init__(self,):
         """
@@ -100,6 +101,7 @@ class Data:
         self.write_bytes_delta = 0
         self.read_count_delta = 0
         self.write_count_delta = 0
+        self.refresh_dbsize = False
 
     def get_pg_version(self,):
         """
@@ -270,6 +272,12 @@ class Data:
         """
         Get current sum of transactions, total size and  timestamp.
         """
+        prev_total_size = "0"
+        if prev_db_infos is not None:
+            prev_total_size = prev_db_infos['total_size']
+
+        skip_dbsize = skip_sizes and (not self.refresh_dbsize)    
+        
         query = """
     SELECT
         EXTRACT(EPOCH FROM NOW()) AS timestamp,
@@ -280,8 +288,8 @@ class Data:
         pg_database
         {no_rds}
         """.format(
-            db_size="0" if skip_sizes else "SUM(pg_database_size(datname))",
-            no_rds="WHERE datname <> 'rdsadmin'" if using_rds else ''
+            db_size = prev_total_size if skip_dbsize else "SUM(pg_database_size(datname))",
+            no_rds = "WHERE datname <> 'rdsadmin'" if using_rds else ''
         )
         cur = self.pg_conn.cursor()
         cur.execute(query,)
@@ -827,3 +835,9 @@ class Data:
         Get load average
         """
         return os.getloadavg()
+
+    def set_refresh_dbsize(self, refresh_dbsize):
+        """
+        Set self.refresh_dbsize
+        """
+        self.refresh_dbsize = refresh_dbsize

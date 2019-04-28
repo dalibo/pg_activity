@@ -313,12 +313,13 @@ server activity monitoring.")
                 if PGAUI.get_is_local():
                     delta_disk_io = PGAUI.data.get_global_io_counters()
                 procs = new_procs
-                # refresh the winodw
+                # refresh the window
                 db_info = PGAUI.data.pg_get_db_info(
                     db_info,
                     using_rds=options.rds,
                     skip_sizes=options.nodbsize
-                )
+                ) 
+                PGAUI.data.set_refresh_dbsize(False)
                 PGAUI.set_max_db_length(db_info['max_length'])
                 # get active connections
                 active_connections = PGAUI.data.pg_get_active_connections()

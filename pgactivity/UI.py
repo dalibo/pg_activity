@@ -1250,6 +1250,11 @@ class UI:
         if key == ord('R'):
             known = True
 
+        # Refresh db size
+        if key == ord('D'):
+            self.data.set_refresh_dbsize(True)
+            do_refresh = True
+
         if key == ord('u'):
             self.__empty_pid_yank()
             known = True
@@ -1874,6 +1879,12 @@ class UI:
                 00,
                 "      R",
                 "force refresh")
+        self.lineno += 1
+        self.__display_help_key(
+                self.lineno,
+                00,
+                "      D",
+                "force refresh database size")
         self.lineno += 1
         self.__print_string(
                 self.lineno,

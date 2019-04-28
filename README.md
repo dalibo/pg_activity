@@ -82,25 +82,26 @@ Length of SQL query text that pg_activity reports relies on PostgreSQL parameter
 Interactives commands
 ---------------------
 
-| Key       | Action                                                 |
-|-----------|--------------------------------------------------------|
-| `C`       | Activate/deactivate colors                             |
-| `r`       | Sort by READ/s, descending                             |
-| `w`       | Sort by WRITE/s, descending                            |
-| `c`       | Sort by CPU%, descending                               |
-| `m`       | Sort by MEM%, descending                               |
-| `t`       | Sort by TIME+, descending                              |
-| `Space`   | Pause on/off                                           |
-| `v`       | Change queries display mode: full, truncated, indented |
-| `UP/DOWN` | Scroll processes list                                  |
-| `q`       | Quit                                                   |
-| `+`       | Increase refresh time. Maximum value : 3s              |
-| `-`       | Decrease refresh time. Minimum Value : 1s              |
-| `F1/1`    | Running queries list                                   |
-| `F2/2`    | Waiting queries list                                   |
-| `F3/3`    | Blocking queries list                                  |
-| `h`       | Help page                                              |
-| `R`       | Refresh                                                |
+| Key       | Action                                                           |
+|-----------|------------------------------------------------------------------|
+| `C`       | Activate/deactivate colors                                       |
+| `r`       | Sort by READ/s, descending                                       |
+| `w`       | Sort by WRITE/s, descending                                      |
+| `c`       | Sort by CPU%, descending                                         |
+| `m`       | Sort by MEM%, descending                                         |
+| `t`       | Sort by TIME+, descending                                        |
+| `Space`   | Pause on/off                                                     |
+| `v`       | Change queries display mode: full, truncated, indented           |
+| `UP/DOWN` | Scroll processes list                                            |
+| `q`       | Quit                                                             |
+| `+`       | Increase refresh time. Maximum value : 3s                        |
+| `-`       | Decrease refresh time. Minimum Value : 1s                        |
+| `F1/1`    | Running queries list                                             |
+| `F2/2`    | Waiting queries list                                             |
+| `F3/3`    | Blocking queries list                                            |
+| `h`       | Help page                                                        |
+| `R`       | Refresh                                                          |
+| `D`       | Refresh Database Size (including when --no-dbzise option applied)|
 
 Navigation mode
 ---------------

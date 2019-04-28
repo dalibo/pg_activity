@@ -178,6 +178,8 @@ CPU, MEM, READ or WRITE columns and other system informations.
 
 =item B<R>     Refresh.
 
+=item B<D>     Refresh database size.
+
 =back
 
 =head1 NAVIGATION MODE
