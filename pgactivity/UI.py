@@ -2098,7 +2098,17 @@ class UI:
             elif process['duration'] >= 60000:
                 ctime = "%s h" % str(int(process['duration'] / 3600))
 
-            if process['duration'] < 1:
+            if process['duration'] == None:
+                # When duration is not available
+                colno += self.__print_string(
+                            l_lineno,
+                            colno,
+                            "%9s" % "N/A",
+                            self.line_colors['time_green'][typecolor])
+            elif process['duration'] < 1:
+                if process['duration'] < 0:
+                    # Set duration to 0 if < 0
+                    process['duration'] = 0
                 colno += self.__print_string(
                             l_lineno,
                             colno,
