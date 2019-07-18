@@ -1240,8 +1240,14 @@ class UI:
         if key == ord('t') and self.sort != 't':
             self.sort = 't'
             known = True
-        if key == ord('+') and self.refresh_time < 3:
+        if key == ord('+') and self.refresh_time < 5 and self.refresh_time >= 1:
             self.refresh_time += 1
+            do_refresh = True
+        if key == ord('+') and self.refresh_time < 1:
+            self.refresh_time = 1
+            do_refresh = True
+        if key == ord('-') and self.refresh_time == 1:
+            self.refresh_time = 0.5
             do_refresh = True
         if key == ord('-') and self.refresh_time > 1:
             self.refresh_time -= 1
