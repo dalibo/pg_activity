@@ -1862,7 +1862,7 @@ class UI:
                 self.lineno,
                 00,
                 "      +",
-                "increase refresh time (max:3)")
+                "increase refresh time (max:5s)")
         self.__display_help_key(
                 self.lineno,
                 45,
@@ -1873,7 +1873,7 @@ class UI:
                 self.lineno,
                 00,
                 "      -",
-                "decrease refresh time (min:1)")
+                "decrease refresh time (min:0.5s)")
         self.__display_help_key(
                 self.lineno,
                 45,
