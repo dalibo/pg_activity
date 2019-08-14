@@ -1577,7 +1577,7 @@ class UI:
         new_procs = {}
         for query in queries:
             new_procs[query['pid']] = query
-            new_procs[query['pid']][6] = \
+            new_procs[query['pid']]['duration'] = \
                 self.data.get_duration(query['duration'])
 
         # return processes sorted by query duration
