@@ -1157,23 +1157,11 @@ class UI:
         """
         Wrapper around polling
         """
-        if self.mode == 'activities':
-            return self.__poll_activities(
-                    interval,
-                    flag,
-                    indent,
-                    process,
-                    disp_proc)
-        elif self.mode == 'waiting' or self.mode == 'blocking':
-            return self.__poll_waiting_blocking(
-                    interval,
-                    flag,
-                    indent,
-                    process,
-                    disp_proc)
+        return self.__poll(interval, flag, indent, process, disp_proc,
+                           self.mode)
 
-    def __poll_activities(self, interval, flag, indent, process = None, \
-        disp_proc = None):
+    def __poll(self, interval, flag, indent, process = None, disp_proc = None,
+               mode='activities'):
         """
         Poll activities.
         """
@@ -1199,18 +1187,25 @@ class UI:
             self.__interactive(disp_proc, flag, indent)
             known = False
             do_refresh = True
+        # activities mode
+        if (key == curses.KEY_F1 or key == ord('1')):
+            self.mode = 'activities'
+            curses.flushinp()
+            queries = self.data.pg_get_activities()
+            procs = self.data.sys_get_proc(queries, self.is_local)
+            return self.__poll(0, flag, indent, procs, mode=self.mode)
         # show waiting queries
         if (key == curses.KEY_F2 or key == ord('2')):
             self.mode = 'waiting'
             self.sort = 't'
             curses.flushinp()
-            return self.__poll_waiting_blocking(0, flag, indent)
+            return self.__poll(0, flag, indent, mode=self.mode)
         # show blocking queries
         if (key == curses.KEY_F3 or key == ord('3')):
             self.mode = 'blocking'
             self.sort = 't'
             curses.flushinp()
-            return self.__poll_waiting_blocking(0, flag, indent)
+            return self.__poll(0, flag, indent, mode=self.mode)
         # change verbosity
         if key == ord('v'):
             self.verbose_mode += 1
@@ -1225,22 +1220,32 @@ class UI:
                 self.set_color()
             do_refresh = True
         # sorts
-        if key == ord('c') and (flag & PGTOP_FLAG_CPU) and self.sort != 'c':
-            self.sort = 'c'
-            known = True
-        if key == ord('m') and (flag & PGTOP_FLAG_MEM) and self.sort != 'm':
-            self.sort = 'm'
-            known = True
-        if key == ord('r') and (flag & PGTOP_FLAG_READ) and self.sort != 'r':
-            self.sort = 'r'
-            known = True
-        if key == ord('w') and (flag & PGTOP_FLAG_WRITE) and self.sort != 'w':
-            self.sort = 'w'
-            known = True
+        if self.mode == 'activites':
+            # Sorts available only for activities view
+            if (key == ord('c') and (flag & PGTOP_FLAG_CPU)
+                    and self.sort != 'c'):
+                self.sort = 'c'
+                known = True
+            if (key == ord('m') and (flag & PGTOP_FLAG_MEM)
+                    and self.sort != 'm'):
+                self.sort = 'm'
+                known = True
+            if (key == ord('r') and (flag & PGTOP_FLAG_READ)
+                    and self.sort != 'r'):
+                self.sort = 'r'
+                known = True
+            if (key == ord('w') and (flag & PGTOP_FLAG_WRITE)
+                    and self.sort != 'w'):
+                self.sort = 'w'
+                known = True
+
         if key == ord('t') and self.sort != 't':
             self.sort = 't'
             known = True
-        if key == ord('+') and self.refresh_time < 5 and self.refresh_time >= 1:
+
+        # Manage refresh interval
+        if (key == ord('+') and self.refresh_time < 5
+                and self.refresh_time >= 1):
             self.refresh_time += 1
             do_refresh = True
         if key == ord('+') and self.refresh_time < 1:
@@ -1294,13 +1299,31 @@ class UI:
         t_end = time.time()
         if key > -1 and not known and \
             (t_end - t_start) < (self.refresh_time * interval):
-            return self.__poll_activities(
+            return self.__poll(
                         ((self.refresh_time * interval) - \
                             (t_end - t_start))/self.refresh_time,
                         flag,
                         indent,
                         process,
-                        disp_proc)
+                        disp_proc,
+                        mode=self.mode)
+
+        # poll waiting/blocking queries
+        if self.mode in ('waiting', 'blocking'):
+            queries =  self.data.pg_get_waiting() if self.mode == 'waiting' \
+                            else self.data.pg_get_blocking()
+
+            new_procs = {}
+            for query in queries:
+                new_procs[query['pid']] = query
+                new_procs[query['pid']]['duration'] = \
+                    self.data.get_duration(query['duration'])
+
+            # return processes sorted by query duration
+            disp_procs = sorted(queries, key=lambda q: q['duration'],
+                                reverse=True)
+
+            return (disp_procs, new_procs)
 
         # poll postgresql activity
         queries =  self.data.pg_get_activities()
@@ -1459,133 +1482,6 @@ class UI:
             self.__store_procs(procs)
 
         self.__check_pid_yank()
-        return (disp_procs, new_procs)
-
-    def __poll_waiting_blocking(self, interval, flag, indent, \
-        process = None, disp_proc = None):
-        """
-        Poll waiting or blocking queries
-        """
-        t_start = time.time()
-        do_refresh = False
-        known = False
-        # Keyboard interactions
-        self.win.timeout(int(1000 * self.refresh_time * interval))
-
-        try:
-            k = self.win.getch()
-        except KeyboardInterrupt as err:
-            raise err
-        if k == ord('q'):
-            curses.endwin()
-            exit()
-        # PAUSE mode
-        if k == ord(' '):
-            self.__pause()
-            do_refresh = True
-        # interactive mode
-        if (k == curses.KEY_DOWN or k == curses.KEY_UP) and \
-            len(disp_proc) > 0:
-            self.__interactive(disp_proc, flag, indent)
-            known = True
-        # activities mode
-        if (k == curses.KEY_F1 or k == ord('1')):
-            self.mode = 'activities'
-            curses.flushinp()
-            queries = self.data.pg_get_activities()
-            procs = self.data.sys_get_proc(queries, self.is_local)
-            return self.__poll_activities(0, flag, indent, procs)
-        # Waiting queries
-        if (k == curses.KEY_F2 or k == ord('2')) and \
-            self.mode != 'waiting':
-            self.mode = 'waiting'
-            curses.flushinp()
-            return self.__poll_waiting_blocking(0, flag, indent)
-        # blocking queries
-        if (k == curses.KEY_F3 or k == ord('3')) and \
-            self.mode != 'blocking':
-            self.mode = 'blocking'
-            curses.flushinp()
-            return self.__poll_waiting_blocking(0, flag, indent)
-        # change verbosity
-        if k == ord('v'):
-            self.verbose_mode += 1
-            if self.verbose_mode > 3:
-                self.verbose_mode = 1
-            do_refresh = True
-        # turnoff/on colors
-        if k == ord('C'):
-            if self.color is True:
-                self.set_nocolor()
-            else:
-                self.set_color()
-            do_refresh = True
-        # sorts
-        if k == ord('t') and self.sort != 't':
-            self.sort = 't'
-            known = True
-        if k == ord('+') and self.refresh_time < 3:
-            self.refresh_time += 1
-        if k == ord('-') and self.refresh_time > 1:
-            self.refresh_time -= 1
-
-        if k == ord('h'):
-            self.__help_window()
-            do_refresh = True
-
-        # Refresh
-        if k == ord('R'):
-            known = True
-
-        if k == curses.KEY_RESIZE and self.uibuffer is not None and \
-            'procs' in self.uibuffer:
-            do_refresh = True
-
-        if do_refresh is True and self.uibuffer is not None and \
-            'procs' in self.uibuffer:
-            self.check_window_size()
-            self.refresh_window(
-                self.uibuffer['procs'],
-                self.uibuffer['extras'],
-                self.uibuffer['flag'],
-                self.uibuffer['indent'],
-                self.uibuffer['io'],
-                self.uibuffer['tps'],
-                self.uibuffer['active_connections'],
-                self.uibuffer['size_ev'],
-                self.uibuffer['total_size'])
-
-        curses.flushinp()
-        t_end = time.time()
-        if k > -1 and \
-            not known and \
-            (t_end - t_start) < (self.refresh_time * interval):
-            return self.__poll_waiting_blocking(
-                    ((self.refresh_time * interval) -\
-                        (t_end - t_start))/self.refresh_time,
-                    flag,
-                    indent,
-                    process,
-                    disp_proc)
-
-        # poll postgresql activity
-        if self.mode == 'waiting':
-            queries =  self.data.pg_get_waiting()
-        else:
-            queries =  self.data.pg_get_blocking()
-
-        new_procs = {}
-        for query in queries:
-            new_procs[query['pid']] = query
-            new_procs[query['pid']]['duration'] = \
-                self.data.get_duration(query['duration'])
-
-        # return processes sorted by query duration
-        disp_procs = sorted(
-                        queries,
-                        key=lambda q: q['duration'],
-                        reverse=True)
-
         return (disp_procs, new_procs)
 
     def print_string(self, lineno, colno, word, color = 0):
