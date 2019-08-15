@@ -374,7 +374,7 @@ class UI:
         self.maxy = 0
         self.maxx = 0
         # Init uibuffer
-        self.uibuffer = None
+        self.uibuffer = dict()
         # Refresh time
         self.refresh_time = 2
         # Maximum DATABASE columns header length
