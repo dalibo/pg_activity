@@ -22,14 +22,15 @@ BASIS, AND JULIEN TACHOIRES HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE,
 SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 """
 
-class Process():
+
+class PGProcess(object):
     """
-    Simple class for process management.
+    Simple class for Postgres process management.
     """
-    def __init__(self, pid = None, database = None, user = None, \
-        client = None, cpu = None, mem = None, read = None, write = None, \
-        state = None, query = None, duration = None, wait = None, extras = None, \
-        appname = None):
+    def __init__(self, pid=None, database=None, user=None, client=None,
+                 cpu=None, mem=None, read=None, write=None, state=None,
+                 query=None, duration=None, wait=None, extras=None,
+                 appname=None):
         self.pid = pid
         self.database = database
         self.user = user
@@ -55,5 +56,4 @@ class Process():
         """
         Get a value from extras dict
         """
-        if self.extras is not None and key in self.extras:
-            return self.extras[key]
+        return self.extras.get(key)

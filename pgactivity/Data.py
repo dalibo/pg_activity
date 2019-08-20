@@ -27,7 +27,7 @@ import psycopg2.extras
 import re
 import psutil
 import time
-from pgactivity.Process import Process
+from pgactivity.Process import PGProcess as Process
 import os
 from warnings import catch_warnings, simplefilter
 
