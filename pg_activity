@@ -277,17 +277,9 @@ server activity monitoring.")
             hostname = options.host
         # top part
         interval = 0
-        if PGAUI.get_mode() == 'activities':
-            queries =  PGAUI.data.pg_get_activities()
-            new_procs = PGAUI.data.sys_get_proc(queries, PGAUI.get_is_local())
-        elif PGAUI.get_mode() == 'waiting':
-            new_procs = PGAUI.data.pg_get_waiting()
-        elif PGAUI.get_mode() == 'blocking':
-            new_procs = PGAUI.data.pg_get_blocking()
         # draw the flag
         flag = PGAUI.get_flag_from_options(options)
         # main loop
-        disp_procs = None
         # get DB informations
         db_info = PGAUI.data.pg_get_db_info(None, using_rds=options.rds, skip_sizes=options.nodbsize)
         PGAUI.set_max_db_length(db_info['max_length'])
@@ -308,8 +300,6 @@ server activity monitoring.")
                     interval,
                     flag,
                     indent,
-                    PGAUI.uibuffer.get('new_procs', new_procs),
-                    PGAUI.uibuffer.get('procs', disp_procs),
                     PGAUI.uibuffer.get('db_info', db_info),
                     options,
                     PGAUI.get_mode(),
@@ -317,7 +307,6 @@ server activity monitoring.")
                 )
                 # refresh
                 PGAUI.refresh_window(
-                    PGAUI.uibuffer.get('procs'),
                     PGAUI.uibuffer.get('extras'),
                     PGAUI.uibuffer.get('flag'),
                     PGAUI.uibuffer.get('indent'),
@@ -411,11 +400,11 @@ def pg_connect(options, password=None, service=None, exit_on_failed=True):
     return password
 
 
-def poll_data(interval, flag, indent, new_procs, disp_procs, db_info, options, old_mode, hostname):
+def poll_data(interval, flag, indent, db_info, options, old_mode, hostname):
     delta_disk_io = None
     # poll process
-    (disp_procs, new_procs) = PGAUI.poll(interval, flag, indent,
-                                         new_procs, disp_procs)
+    PGAUI.poll(interval, flag, indent, PGAUI.get_mode())
+
     if PGAUI.get_mode() != old_mode:
         indent = PGAUI.get_indent(flag)
     if PGAUI.get_is_local():
@@ -433,8 +422,6 @@ def poll_data(interval, flag, indent, new_procs, disp_procs, db_info, options, o
     active_connections = PGAUI.data.pg_get_active_connections()
     # bufferize
     PGAUI.set_buffer({
-        'procs': disp_procs,
-        'new_procs': new_procs,
         'db_info': db_info,
         'extras': (PGAUI.data.get_pg_version(), hostname,
                    options.username, options.host,

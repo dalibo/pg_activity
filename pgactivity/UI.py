@@ -30,6 +30,7 @@ import time
 import sys
 from datetime import timedelta, datetime as dt
 from pgactivity.Data import Data, clean_str
+from pgactivity.Process import PGProcessList
 import psutil
 from getpass import getpass
 
@@ -390,6 +391,9 @@ class UI:
         self.fs_blocksize = 4096
         # Output file
         self.output = None
+        # Process list
+        self.processes = PGProcessList()
+        self.sorted_processes = []
 
     def set_verbose_mode(self, verbose_mode):
         """
@@ -788,10 +792,9 @@ class UI:
                 return 0
 
             if k == curses.KEY_RESIZE:
-                if self.uibuffer is not None and 'procs' in self.uibuffer:
+                if self.uibuffer is not None:
                     self.check_window_size()
                     self.refresh_window(
-                        self.uibuffer['procs'],
                         self.uibuffer['extras'],
                         self.uibuffer['flag'],
                         self.uibuffer['indent'],
@@ -1028,7 +1031,7 @@ class UI:
                 if self.pid.count(pid) == 0:
                     self.pid_yank.remove(pid)
 
-    def __interactive(self, process, flag, indent,):
+    def __interactive(self, flag, indent,):
         """
         Interactive mode trigged on KEY_UP or KEY_DOWN key press
         If no key hit during 3 seconds, exit this mode
@@ -1038,14 +1041,14 @@ class UI:
         self.verbose_mode = PGTOP_TRUNCATE
 
         # Refresh lines with this verbose mode
-        self.__scroll_window(process, flag, indent, 0)
+        self.__scroll_window(flag, indent, 0)
 
         self.__help_key_interactive()
 
         current_pos = 0
         offset = 0
         self.__refresh_line(
-            process[current_pos],
+            self.sorted_processes[current_pos],
             flag,
             indent,
             'cursor',
@@ -1069,7 +1072,7 @@ class UI:
             if k == PGTOP_SIGNAL_TERMINATE_BACKEND or k == PGTOP_SIGNAL_CANCEL_BACKEND:
                 if len(self.pid_yank) == 0:
                     self.__ask_terminate_or_cancel_backends( \
-                        k, [process[current_pos]['pid']],)
+                        k, [self.sorted_processes[current_pos].pid],)
                 else:
                     self.__ask_terminate_or_cancel_backends(k, self.pid_yank,)
                 self.verbose_mode = old_verbose_mode
@@ -1083,33 +1086,33 @@ class UI:
                     if (self.lines[current_pos] - offset)\
                         < (self.start_line + 3):
                         offset -= 1
-                        self.__scroll_window(process, flag, indent, offset)
+                        self.__scroll_window(flag, indent, offset)
                         self.__help_key_interactive()
 
-                    if current_pos < len(process):
+                    if current_pos < len(self.sorted_processes):
                         self.__refresh_line(
-                            process[current_pos],
+                            self.sorted_processes[current_pos],
                             flag,
                             indent,
                             'default',
                             self.lines[current_pos] - offset)
                     current_pos -= 1
-                if k == curses.KEY_DOWN and current_pos < (len(process) - 1):
+                if k == curses.KEY_DOWN and current_pos < (len(self.sorted_processes) - 1):
                     if (self.lines[current_pos] - offset) >= (self.maxy - 2):
                         offset += 1
-                        self.__scroll_window(process, flag, indent, offset)
+                        self.__scroll_window(flag, indent, offset)
                         self.__help_key_interactive()
 
                     if current_pos >= 0:
                         self.__refresh_line(
-                            process[current_pos],
+                            self.sorted_processes[current_pos],
                             flag,
                             indent,
                             'default',
                             self.lines[current_pos] - offset)
                     current_pos += 1
                 self.__refresh_line(
-                    process[current_pos],
+                    self.sorted_processes[current_pos],
                     flag,
                     indent,
                     'cursor',
@@ -1119,26 +1122,26 @@ class UI:
             # Add/remove a PID from the yank list
             if k == ord(' '):
                 known = True
-                if not self.pid_yank.count(process[current_pos]['pid']) > 0:
-                    self.pid_yank.append(process[current_pos]['pid'])
+                if not self.pid_yank.count(self.sorted_processes[current_pos].pid) > 0:
+                    self.pid_yank.append(self.sorted_processes[current_pos].pid)
                 else:
-                    self.pid_yank.remove(process[current_pos]['pid'])
+                    self.pid_yank.remove(self.sorted_processes[current_pos].pid)
 
                 self.__refresh_line(
-                    process[current_pos],
+                    self.sorted_processes[current_pos],
                     flag,
                     indent,
                     'default',
                     self.lines[current_pos] - offset)
 
-                if current_pos < (len(process) - 1):
+                if current_pos < (len(self.sorted_processes) - 1):
                     current_pos += 1
                     if (self.lines[current_pos] - offset) >= (self.maxy - 1):
                         offset += 1
-                        self.__scroll_window(process, flag, indent, offset)
+                        self.__scroll_window(flag, indent, offset)
                         self.__help_key_interactive()
                 self.__refresh_line(
-                    process[current_pos],
+                    self.sorted_processes[current_pos],
                     flag,
                     indent,
                     'cursor',
@@ -1153,27 +1156,22 @@ class UI:
                 self.verbose_mode = old_verbose_mode
                 return 0
 
-    def poll(self, interval, flag, indent, process = None, disp_proc = None):
-        """
-        Wrapper around polling
-        """
-        return self.__poll(interval, flag, indent, process, disp_proc,
-                           self.mode)
-
-    def __poll(self, interval, flag, indent, process = None, disp_proc = None,
-               mode='activities'):
+    def poll(self, interval, flag, indent, mode='activities'):
         """
         Poll activities.
         """
-        # Keyboard interactions
-        self.win.timeout(int(1000 * self.refresh_time * interval))
         t_start = time.time()
         known = False
         do_refresh = False
+
+        # Keyboard interactions
+        self.win.timeout(int(1000 * self.refresh_time * interval))
         try:
             key = self.win.getch()
         except KeyboardInterrupt as err:
             raise err
+
+        # Exit
         if key == ord('q'):
             curses.endwin()
             exit()
@@ -1183,29 +1181,27 @@ class UI:
             do_refresh = True
         # interactive mode
         if (key == curses.KEY_DOWN or key == curses.KEY_UP) and \
-            len(disp_proc) > 0:
-            self.__interactive(disp_proc, flag, indent)
+            len(self.processes) > 0:
+            self.__interactive(flag, indent)
             known = False
             do_refresh = True
         # activities mode
         if (key == curses.KEY_F1 or key == ord('1')):
             self.mode = 'activities'
             curses.flushinp()
-            queries = self.data.pg_get_activities()
-            procs = self.data.sys_get_proc(queries, self.is_local)
-            return self.__poll(0, flag, indent, procs, mode=self.mode)
+            return self.poll(0, flag, indent, mode=self.mode)
         # show waiting queries
         if (key == curses.KEY_F2 or key == ord('2')):
             self.mode = 'waiting'
             self.sort = 't'
             curses.flushinp()
-            return self.__poll(0, flag, indent, mode=self.mode)
+            return self.poll(0, flag, indent, mode=self.mode)
         # show blocking queries
         if (key == curses.KEY_F3 or key == ord('3')):
             self.mode = 'blocking'
             self.sort = 't'
             curses.flushinp()
-            return self.__poll(0, flag, indent, mode=self.mode)
+            return self.poll(0, flag, indent, mode=self.mode)
         # change verbosity
         if key == ord('v'):
             self.verbose_mode += 1
@@ -1220,7 +1216,7 @@ class UI:
                 self.set_color()
             do_refresh = True
         # sorts
-        if self.mode == 'activites':
+        if self.mode == 'activities':
             # Sorts available only for activities view
             if (key == ord('c') and (flag & PGTOP_FLAG_CPU)
                     and self.sort != 'c'):
@@ -1274,215 +1270,69 @@ class UI:
             self.__help_window()
             do_refresh = True
 
-        if key == curses.KEY_RESIZE and \
-            self.uibuffer is not None and \
-            'procs' in self.uibuffer:
+        if key == curses.KEY_RESIZE:
             do_refresh = True
 
-        if do_refresh is True and \
-            self.uibuffer is not None and \
-            type(self.uibuffer) is dict and \
-            'procs' in self.uibuffer:
-                self.check_window_size()
-                self.refresh_window(
-                    self.uibuffer['procs'],
-                    self.uibuffer['extras'],
-                    self.uibuffer['flag'],
-                    self.uibuffer['indent'],
-                    self.uibuffer['io'],
-                    self.uibuffer['tps'],
-                    self.uibuffer['active_connections'],
-                    self.uibuffer['size_ev'],
-                    self.uibuffer['total_size'])
+        if do_refresh is True and self.uibuffer is not None and \
+                type(self.uibuffer) is dict:
+            self.check_window_size()
+            self.refresh_window(
+                self.uibuffer['extras'],
+                self.uibuffer['flag'],
+                self.uibuffer['indent'],
+                self.uibuffer['io'],
+                self.uibuffer['tps'],
+                self.uibuffer['active_connections'],
+                self.uibuffer['size_ev'],
+                self.uibuffer['total_size']
+            )
 
         curses.flushinp()
+
         t_end = time.time()
         if key > -1 and not known and \
             (t_end - t_start) < (self.refresh_time * interval):
-            return self.__poll(
+            return self.poll(
                         ((self.refresh_time * interval) - \
                             (t_end - t_start))/self.refresh_time,
                         flag,
                         indent,
-                        process,
-                        disp_proc,
                         mode=self.mode)
 
-        # poll waiting/blocking queries
+        # Fetch processes
+        self.processes = self.data.poll(self.mode, self.fs_blocksize,
+                                        self.is_local)
+        self.pid = self.processes.pid_list()
+
+        # Sort processes
         if self.mode in ('waiting', 'blocking'):
-            queries =  self.data.pg_get_waiting() if self.mode == 'waiting' \
-                            else self.data.pg_get_blocking()
+            self.sorted_processes = list(self.processes.sort('duration'))
+            return
 
-            new_procs = {}
-            for query in queries:
-                new_procs[query['pid']] = query
-                new_procs[query['pid']]['duration'] = \
-                    self.data.get_duration(query['duration'])
-
-            # return processes sorted by query duration
-            disp_procs = sorted(queries, key=lambda q: q['duration'],
-                                reverse=True)
-
-            return (disp_procs, new_procs)
-
-        # poll postgresql activity
-        queries =  self.data.pg_get_activities()
-        self.pid = []
-        if self.is_local:
-            # get resource usage for each process
-            new_procs = self.data.sys_get_proc(queries, self.is_local)
-
-            procs = []
-            read_bytes_delta = 0
-            write_bytes_delta = 0
-            read_count_delta = 0
-            write_count_delta = 0
-            for pid, new_proc in new_procs.items():
-                try:
-                    if pid in process:
-                        n_io_time = time.time()
-                        # Getting informations from the previous loop
-                        proc = process[pid]
-                        # Update old process with new informations
-                        proc.duration = new_proc.duration
-                        proc.state = new_proc.state
-                        proc.query = new_proc.query
-                        proc.appname = new_proc.appname
-                        proc.client = new_proc.client
-                        proc.wait = new_proc.wait
-                        proc.set_extra(
-                            'io_wait',
-                            new_proc.get_extra('io_wait'))
-                        proc.set_extra(
-                            'read_delta',
-                            (new_proc.get_extra('io_counters').read_bytes
-                            - proc.get_extra('io_counters').read_bytes)
-                            / (n_io_time - proc.get_extra('io_time')))
-                        proc.set_extra(
-                            'write_delta',
-                            (new_proc.get_extra('io_counters').write_bytes
-                            - proc.get_extra('io_counters').write_bytes)
-                            / (n_io_time - proc.get_extra('io_time')))
-                        proc.set_extra(
-                            'io_counters',
-                            new_proc.get_extra('io_counters'))
-                        proc.set_extra(
-                            'io_time',
-                            n_io_time)
-
-                        # Global io counters
-                        read_bytes_delta  += proc.get_extra('read_delta')
-                        write_bytes_delta += proc.get_extra('write_delta')
-                    else:
-                        # No previous information about this process
-                        proc = new_proc
-
-                    if not self.pid.count(pid):
-                        self.pid.append(pid)
-
-                    proc.set_extra(
-                        'mem_percent',
-                        proc.get_extra('psutil_proc').memory_percent())
-                    proc.set_extra(
-                        'cpu_percent',
-                        proc.get_extra('psutil_proc').\
-                            cpu_percent(interval=0))
-                    new_procs[pid] = proc
-                    procs.append({
-                        'pid': pid,
-                        'appname': proc.appname,
-                        'database': proc.database,
-                        'user':proc.user,
-                        'client': proc.client,
-                        'cpu': proc.get_extra('cpu_percent'),
-                        'mem': proc.get_extra('mem_percent'),
-                        'read': proc.get_extra('read_delta'),
-                        'write': proc.get_extra('write_delta'),
-                        'state': proc.state,
-                        'query': proc.query,
-                        'duration': self.data.get_duration(proc.duration),
-                        'wait': proc.wait,
-                        'io_wait': proc.get_extra('io_wait'),
-                        'backend_type': proc.get_extra('backend_type')
-                    })
-
-                except psutil.NoSuchProcess:
-                    pass
-                except psutil.AccessDenied:
-                    pass
-                except Exception as err:
-                    raise err
-            # store io counters
-            if read_bytes_delta > 0:
-                read_count_delta  += int(read_bytes_delta/self.fs_blocksize)
-            if write_bytes_delta > 0:
-                write_count_delta += int(write_bytes_delta/self.fs_blocksize)
-            self.data.set_global_io_counters(
-                read_bytes_delta,
-                write_bytes_delta,
-                read_count_delta,
-                write_count_delta)
-        else:
-            procs = []
-            new_procs = None
-            for query in queries:
-                if not self.pid.count(query['pid']):
-                    self.pid.append(query['pid'])
-                procs.append({
-                    'pid': query['pid'],
-                    'appname': query['application_name'],
-                    'database': query['database'],
-                    'user': query['user'],
-                    'client': query['client'],
-                    'state': query['state'],
-                    'query': query['query'],
-                    'duration': self.data.get_duration(query['duration']),
-                    'wait': query['wait']
-                })
-
+        sort_key = 'duration'
         # return processes sorted by query duration
         if self.sort == 't':
             # TIME
-            disp_procs = sorted(
-                            procs,
-                            key=lambda p: p['duration'],
-                            reverse=True)
+            sort_key = 'duration'
         elif self.sort == 'c':
             # CPU
-            disp_procs = sorted(
-                            procs,
-                            key=lambda p: p['cpu'],
-                            reverse=True)
+            sort_key = 'cpu'
         elif self.sort == 'm':
             # MEM
-            disp_procs = sorted(
-                            procs,
-                            key=lambda p: p['mem'],
-                            reverse=True)
+            sort_key = 'mem'
         elif self.sort == 'r':
             # READ
-            disp_procs = sorted(
-                            procs,
-                            key=lambda p: p['read'],
-                            reverse=True)
+            sort_key = 'read'
         elif self.sort == 'w':
             # WRITE
-            disp_procs = sorted(
-                            procs,
-                            key=lambda p: p['write'],
-                            reverse=True)
-        else:
-            disp_procs = sorted(
-                            procs,
-                            key=lambda p: p['duration'],
-                            reverse=True)
+            sort_key = 'write'
 
         # Store querie list
         if self.output is not None:
-            self.__store_procs(procs)
+            self.__store_procs()
 
         self.__check_pid_yank()
-        return (disp_procs, new_procs)
+        self.sorted_processes = list(self.processes.sort(sort_key))
 
     def print_string(self, lineno, colno, word, color = 0):
         return self.__print_string(lineno, colno, word, color)
@@ -1837,8 +1687,8 @@ class UI:
                 ": %s" % (help_msg,))
         return (colno + pos1 + pos2)
 
-    def refresh_window(self, procs, extras, flag, indent, ios, \
-        tps, active_connections, size_ev, total_size):
+    def refresh_window(self, extras, flag, indent, ios, tps,
+                       active_connections, size_ev, total_size):
         """
         Refresh the window
         """
@@ -1862,9 +1712,9 @@ class UI:
         line_trunc = self.lineno
         self.__current_position()
         self.__print_cols_header(flag)
-        for proc in procs:
+        for process in self.sorted_processes:
             try:
-                self.__refresh_line(proc, flag, indent, 'default')
+                self.__refresh_line(process, flag, indent, 'default')
                 line_trunc += 1
                 self.lines.append(line_trunc)
             except curses.error:
@@ -1873,21 +1723,21 @@ class UI:
             self.__print_string(line, 0, self.__add_blank(" "))
         self.__change_mode_interactive()
 
-    def __scroll_window(self, procs, flag, indent, offset = 0):
+    def __scroll_window(self, flag, indent, offset = 0):
         """
         Scroll the window
         """
         self.lineno = (self.start_line + 2)
         pos = 0
-        for proc in procs:
+        for process in self.sorted_processes:
             if pos >= offset and self.lineno < (self.maxy - 1):
-                self.__refresh_line(proc, flag, indent, 'default')
+                self.__refresh_line(process, flag, indent, 'default')
             pos += 1
         for line in range(self.lineno, (self.maxy-1)):
             self.__print_string(line, 0, self.__add_blank(" "))
 
-    def __refresh_line(self, process, flag, indent, \
-        typecolor = 'default', line = None):
+    def __refresh_line(self, process, flag, indent, typecolor = 'default',
+                       line = None):
         """
         Refresh a line for activities mode
         """
@@ -1896,127 +1746,127 @@ class UI:
         else:
             l_lineno = self.lineno
 
-        if typecolor == 'default' and self.pid_yank.count(process['pid']) > 0:
+        if typecolor == 'default' and self.pid_yank.count(process.pid) > 0:
             typecolor = 'yellow'
 
         colno = 0
         colno += self.__print_string(
                     l_lineno,
                     colno,
-                    "%-6s " % (process['pid'],),
+                    "%-6s " % (process.pid,),
                     self.line_colors['pid'][typecolor])
-        process['query'] = clean_str(process['query'])
+        process.query = clean_str(process.query)
         if flag & PGTOP_FLAG_DATABASE:
             colno += self.__print_string(
                         l_lineno,
                         colno,
                         PGTOP_COLS[self.mode]['database']['template_h'] % \
-                            (str(process['database'])[:16],),
+                            (str(process.database)[:16],),
                         self.line_colors['database'][typecolor])
         if self.mode == 'activities':
             if flag & PGTOP_FLAG_APPNAME:
                 colno += self.__print_string(
                             l_lineno,
                             colno,
-                            "%16s " % (str(process['appname'])[:16],),
+                            "%16s " % (str(process.appname)[:16],),
                             self.line_colors['appname'][typecolor])
             if flag & PGTOP_FLAG_USER:
                 colno += self.__print_string(
                             l_lineno,
                             colno,
-                            "%16s " % (str(process['user'])[:16],),
+                            "%16s " % (str(process.user)[:16],),
                             self.line_colors['user'][typecolor])
             if flag & PGTOP_FLAG_CLIENT:
                 colno += self.__print_string(
                             l_lineno,
                             colno,
-                            "%16s " % (str(process['client'])[:16],),
+                            "%16s " % (str(process.client)[:16],),
                             self.line_colors['client'][typecolor])
             if flag & PGTOP_FLAG_CPU:
                 colno += self.__print_string(
                             l_lineno,
                             colno,
-                            "%6s " % (process['cpu'],),
+                            "%6s " % (process.cpu,),
                             self.line_colors['cpu'][typecolor])
             if flag & PGTOP_FLAG_MEM:
                 colno += self.__print_string(
                             l_lineno,
                             colno,
-                            "%4s " % (round(process['mem'], 1),),
+                            "%4s " % (round(process.mem, 1),),
                             self.line_colors['mem'][typecolor])
             if flag & PGTOP_FLAG_READ:
                 colno += self.__print_string(
                             l_lineno,
                             colno,
-                            "%8s " % (bytes2human(process['read']),),
+                            "%8s " % (bytes2human(process.read),),
                             self.line_colors['read'][typecolor])
             if flag & PGTOP_FLAG_WRITE:
                 colno += self.__print_string(
                             l_lineno,
                             colno,
-                            "%8s " % (bytes2human(process['write']),),
+                            "%8s " % (bytes2human(process.write),),
                             self.line_colors['write'][typecolor])
         elif self.mode == 'waiting' or self.mode == 'blocking':
             if flag & PGTOP_FLAG_APPNAME:
                 colno += self.__print_string(
                             l_lineno,
                             colno,
-                            "%16s " % (str(process['appname'])[:16],),
+                            "%16s " % (str(process.appname)[:16],),
                             self.line_colors['appname'][typecolor])
             if flag & PGTOP_FLAG_RELATION:
                 colno += self.__print_string(
                             l_lineno,
                             colno,
-                            "%9s " % (str(process['relation'])[:9],),
+                            "%9s " % (str(process.get_extra('relation'))[:9],),
                             self.line_colors['relation'][typecolor])
             if flag & PGTOP_FLAG_TYPE:
                 colno += self.__print_string(
                             l_lineno,
                             colno,
-                            "%16s " % (str(process['type'])[:16],),
+                            "%16s " % (str(process.get_extra('type'))[:16],),
                             self.line_colors['type'][typecolor])
             if flag & PGTOP_FLAG_MODE:
-                if process['mode'] == 'ExclusiveLock' or \
-                    process['mode'] == 'RowExclusiveLock' or \
-                    process['mode'] == 'AccessExclusiveLock':
+                if process.get_extra('mode') == 'ExclusiveLock' or \
+                    process.get_extra('mode') == 'RowExclusiveLock' or \
+                    process.get_extra('mode') == 'AccessExclusiveLock':
                     colno += self.__print_string(
                                 l_lineno,
                                 colno,
-                                "%16s " % (str(process['mode'])[:16],),
+                                "%16s " % (str(process.get_extra('mode'))[:16],),
                                 self.line_colors['mode_red'][typecolor])
                 else:
                     colno += self.__print_string(
                                 l_lineno,
                                 colno,
-                                "%16s " % (str(process['mode'])[:16],),
+                                "%16s " % (str(process.get_extra('mode'))[:16],),
                                 self.line_colors['mode_yellow'][typecolor])
 
         if flag & PGTOP_FLAG_TIME:
-            if process['duration'] >= 1 and process['duration'] < 60000:
-                ctime = timedelta(seconds=float(process['duration']))
+            if process.duration >= 1 and process.duration < 60000:
+                ctime = timedelta(seconds=float(process.duration))
                 mic = '%.6d' % (ctime.microseconds)
                 ctime = "%s:%s.%s" % (str((ctime.seconds // 60)).zfill(2), \
                             str((ctime.seconds % 60)).zfill(2), str(mic)[:2])
-            elif process['duration'] >= 60000:
-                ctime = "%s h" % str(int(process['duration'] / 3600))
+            elif process.duration >= 60000:
+                ctime = "%s h" % str(int(process.duration / 3600))
 
-            if process['duration'] == None:
+            if process.duration == None:
                 # When duration is not available
                 colno += self.__print_string(
                             l_lineno,
                             colno,
                             "%9s" % "N/A",
                             self.line_colors['time_green'][typecolor])
-            elif process['duration'] < 1:
-                if process['duration'] < 0:
+            elif process.duration < 1:
+                if process.duration < 0:
                     # Set duration to 0 if < 0
-                    process['duration'] = 0
+                    process.duration = 0
                 colno += self.__print_string(
                             l_lineno,
                             colno,
-                            " %.6f " % (process['duration'],),
+                            " %.6f " % (process.duration,),
                             self.line_colors['time_green'][typecolor])
-            elif process['duration'] >= 1 and process['duration'] < 3:
+            elif process.duration >= 1 and process.duration < 3:
                 colno += self.__print_string(
                             l_lineno,
                             colno,
@@ -2029,7 +1879,7 @@ class UI:
                             "%9s " % (ctime,),
                             self.line_colors['time_red'][typecolor])
         if self.mode == 'activities' and flag & PGTOP_FLAG_WAIT:
-            if process['wait']:
+            if process.wait:
                 colno += self.__print_string(
                             l_lineno,
                             colno,
@@ -2043,7 +1893,7 @@ class UI:
                             self.line_colors['wait_green'][typecolor])
 
         if self.mode == 'activities' and flag & PGTOP_FLAG_IOWAIT:
-            if process['io_wait'] == 'Y':
+            if process.io_wait == 'Y':
                 colno += self.__print_string(
                             l_lineno,
                             colno,
@@ -2056,7 +1906,7 @@ class UI:
                             "%4s " % ('N',),
                             self.line_colors['wait_green'][typecolor])
 
-        state = MAP_STATES.get(process['state']) or process['state']
+        state = MAP_STATES.get(process.state) or process.state
         if state == 'active':
             color_state = 'state_green'
         elif state == 'idle in trans':
@@ -2075,12 +1925,11 @@ class UI:
         dif = self.maxx - len(indent) - 1
 
         query = ''
-        if 'backend_type' in process and \
-                process['backend_type'] == 'background worker':
+        if process.get_extra('backend_type') == 'background worker':
 
             query += '\_ '
         if self.verbose_mode == PGTOP_TRUNCATE:
-            query += process['query'][:dif]
+            query += process.query[:dif]
             colno += self.__print_string(
                         l_lineno,
                         colno,
@@ -2088,7 +1937,7 @@ class UI:
                         self.line_colors['query'][typecolor])
         elif self.verbose_mode == PGTOP_WRAP or \
             self.verbose_mode == PGTOP_WRAP_NOINDENT:
-            query += process['query']
+            query += process.query
             query_wrote = ''
             offset = 0
             if len(query) > dif and dif > 1:
@@ -2131,7 +1980,7 @@ class UI:
         s = s.replace('"', '\\"')
         return s
 
-    def __store_procs(self, procs):
+    def __store_procs(self):
         # Store process list into CSV file
         with open(self.output, 'a') as f:
             if f.tell() == 0:
@@ -2140,25 +1989,24 @@ class UI:
                         "memory;read;write;duration;wait;io_wait;state;"
                         "query\n")
 
-            for p in procs:
+            for p in self.processes:
                 f.write("\"{dt}\";\"{pid}\";\"{database}\";\"{appname}\";"
                         "\"{user}\";\"{client}\";\"{cpu}\";\"{mem}\";"
                         "\"{read}\";\"{write}\";\"{duration}\";\"{wait}\";"
                         "\"{io_wait}\";\"{state}\";\"{query}\"\n".format(
                             dt=dt.utcnow().strftime("%Y-%m-%dT%H:%m:%SZ"),
-                            pid=p.get('pid', 'N/A'),
-                            database=p.get('database', 'N/A'),
-                            appname=p.get('appname', 'N/A'),
-                            user=p.get('user', 'N/A'),
-                            client=p.get('client', 'N/A'),
-                            cpu=p.get('cpu', 'N/A'),
-                            mem=p.get('mem', 'N/A'),
-                            read=p.get('read', 'N/A'),
-                            write=p.get('write', 'N/A'),
-                            duration=p.get('duration', 'N/A'),
-                            wait=p.get('wait', 'N/A'),
-                            io_wait=p.get('io_wait', 'N/A'),
-                            state=p.get('state', 'N/A'),
-                            query=self.__clean_str_csv(p.get('query', 'N/A'))
+                            pid=p.pid or 'N/A',
+                            database=p.database or 'N/A',
+                            appname=p.appname or 'N/A',
+                            user=p.user or 'N/A',
+                            client=p.client or 'N/A',
+                            cpu=p.cpu or 'N/A',
+                            mem=p.mem or 'N/A',
+                            read=p.read or 'N/A',
+                            write=p.write or 'N/A',
+                            duration=p.duration or 'N/A',
+                            wait=p.wait or 'N/A',
+                            io_wait=p.get_extra('io_wait') or 'N/A',
+                            state=p.state or 'N/A',
+                            query=self.__clean_str_csv(p.query or 'N/A'))
                         )
-                )

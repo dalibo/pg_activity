@@ -22,12 +22,13 @@ BASIS, AND JULIEN TACHOIRES HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE,
 SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 """
 
+import copy
 import psycopg2
 import psycopg2.extras
 import re
 import psutil
 import time
-from pgactivity.Process import PGProcess as Process
+from pgactivity.Process import PGProcess, PGProcessList
 import os
 from warnings import catch_warnings, simplefilter
 
@@ -441,6 +442,7 @@ class Data:
         EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
         pg_stat_activity.waiting AS wait,
         pg_stat_activity.usename AS user,
+        null AS state,
         pg_stat_activity.current_query AS query,
         null AS backend_type
     FROM
@@ -453,8 +455,23 @@ class Data:
             """
         cur = self.pg_conn.cursor()
         cur.execute(query)
-        ret = cur.fetchall()
-        return ret
+
+        processes = PGProcessList()
+        for row in cur.fetchall():
+            process = PGProcess(
+                pid=row['pid'],
+                database=row['database'],
+                appname=row['application_name'],
+                client=row['client'],
+                duration=self.get_duration(row['duration']),
+                wait=row['wait'],
+                user=row['user'],
+                state=row['state'],
+                query=row['query'],
+            )
+            process.set_extra('backend_type', row['backend_type'])
+            processes.add(process)
+        return processes
 
     def pg_get_waiting(self,):
         """
@@ -464,7 +481,7 @@ class Data:
             query = """
     SELECT
         pg_locks.pid AS pid,
-        pg_stat_activity.application_name AS appname,
+        pg_stat_activity.application_name AS application_name,
         CASE WHEN LENGTH(pg_stat_activity.datname) > 16
             THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
             ELSE pg_stat_activity.datname
@@ -490,7 +507,7 @@ class Data:
             query = """
     SELECT
         pg_locks.pid AS pid,
-        '<unknown>' AS appname,
+        '<unknown>' AS application_name,
         CASE
             WHEN LENGTH(pg_stat_activity.datname) > 16
             THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
@@ -515,8 +532,23 @@ class Data:
             """
         cur = self.pg_conn.cursor()
         cur.execute(query)
-        ret = cur.fetchall()
-        return ret
+
+        processes = PGProcessList()
+        for row in cur.fetchall():
+            process = PGProcess(
+                pid=row['pid'],
+                database=row['database'],
+                appname=row['application_name'],
+                duration=self.get_duration(row['duration']),
+                user=row['user'],
+                state=row['state'],
+                query=row['query'],
+            )
+            process.set_extra('relation', row['relation'])
+            process.set_extra('type', row['type'])
+            process.set_extra('mode', row['mode'])
+            processes.add(process)
+        return processes
 
     def pg_get_blocking(self,):
         """
@@ -526,7 +558,7 @@ class Data:
             query = """
     SELECT
         pid,
-        application_name AS appname,
+        application_name AS application_name,
         CASE
             WHEN LENGTH(datname) > 16
             THEN SUBSTRING(datname FROM 0 FOR 6)||'...'||SUBSTRING(datname FROM '........$')
@@ -611,6 +643,7 @@ class Data:
             query = """
     SELECT
         pid,
+        application_name,
         CASE
             WHEN LENGTH(datname) > 16
             THEN SUBSTRING(datname FROM 0 FOR 6)||'...'||SUBSTRING(datname FROM '........$')
@@ -628,7 +661,7 @@ class Data:
         (
         SELECT
             blocking.pid,
-            '<unknown>' AS appname,
+            '<unknown>' AS application_name,
             pg_stat_activity.current_query AS query,
             blocking.mode,
             pg_stat_activity.datname,
@@ -651,7 +684,7 @@ class Data:
         UNION ALL
         SELECT
             blocking.pid,
-            '<unknown>' AS appname,
+            '<unknown>' AS application_name,
             pg_stat_activity.current_query AS query,
             blocking.mode,
             pg_stat_activity.datname,
@@ -678,7 +711,7 @@ class Data:
         ) AS sq
     GROUP BY
         pid,
-        appname,
+        application_name,
         query,
         mode,
         locktype,
@@ -692,8 +725,23 @@ class Data:
             """
         cur = self.pg_conn.cursor()
         cur.execute(query)
-        ret = cur.fetchall()
-        return ret
+
+        processes = PGProcessList()
+        for row in cur.fetchall():
+            process = PGProcess(
+                pid=row['pid'],
+                database=row['database'],
+                appname=row['application_name'],
+                duration=self.get_duration(row['duration']),
+                user=row['user'],
+                state=row['state'],
+                query=row['query'],
+            )
+            process.set_extra('relation', row['relation'])
+            process.set_extra('type', row['type'])
+            process.set_extra('mode', row['mode'])
+            processes.add(process)
+        return processes
 
     def pg_is_local(self,):
         """
@@ -726,58 +774,6 @@ class Data:
             return 'Y'
         else:
             return 'N'
-
-    def sys_get_proc(self, queries, is_local):
-        """
-        Get system informations (CPU, memory, IO read & write)
-        for each process PID using psutil module.
-        """
-        processes = {}
-        if not is_local:
-            return processes
-        for query in queries:
-            try:
-                psproc = PSProcess(query['pid'])
-                process = Process(
-                    pid = query['pid'],
-                    database = query['database'],
-                    user = query['user'],
-                    client = query['client'],
-                    duration = query['duration'],
-                    wait = query['wait'],
-                    state = query['state'],
-                    query = query['query'],
-                    extras = {},
-                    appname = query['application_name']
-                    )
-
-                process.set_extra('meminfo',
-                    psproc.memory_info())
-                process.set_extra('io_counters',
-                    psproc.io_counters())
-                process.set_extra('io_time',
-                    time.time())
-                process.set_extra('mem_percent',
-                    psproc.memory_percent())
-                process.set_extra('cpu_percent',
-                    psproc.cpu_percent(interval=0))
-                process.set_extra('cpu_times',
-                    psproc.cpu_times())
-                process.set_extra('read_delta', 0)
-                process.set_extra('write_delta', 0)
-                process.set_extra('io_wait',
-                    self.__sys_get_iow_status(psproc.status_iow()))
-                process.set_extra('psutil_proc', psproc)
-                process.set_extra('backend_type', query['backend_type'])
-                process.set_extra('appname', query['application_name'])
-
-                processes[process.pid] = process
-
-            except psutil.NoSuchProcess:
-                pass
-            except psutil.AccessDenied:
-                pass
-        return processes
 
     def set_global_io_counters(self,
         read_bytes_delta,
@@ -841,3 +837,90 @@ class Data:
         Set self.refresh_dbsize
         """
         self.refresh_dbsize = refresh_dbsize
+
+    def poll(self, mode, fs_blocksize, is_local=True):
+        """
+        Fetch the list of backends according to the mode (activities, waiting,
+        blocking).
+        When connected to local PostgreSQL cluster, we're getting system
+        ressource usage for each process.
+        """
+        # Reset global IO counters
+        self.set_global_io_counters(0, 0, 0, 0)
+
+        # Poll waiting queries
+        if mode == 'waiting':
+            return self.pg_get_waiting()
+
+        # Poll blocking queries
+        if mode == 'blocking':
+            return self.pg_get_blocking()
+
+        # Poll postgresql activity
+        processes = self.pg_get_activities()
+
+        if not is_local:
+            return processes
+
+        total_read_bytes_delta = 0
+        total_write_bytes_delta = 0
+        total_read_count_delta = 0
+        total_write_count_delta = 0
+
+        # Get resource usage for each process
+        # First loop we initiate CPU and IO counters
+        for p in processes:
+            try:
+                psproc = PSProcess(p.pid)
+                p.psproc = psproc
+                p.read_bytes = psproc.io_counters().read_bytes
+                p.write_bytes = psproc.io_counters().write_bytes
+                p.io_time = time.time()
+                p.cpu = p.psproc.cpu_percent(interval=0)
+                processes.rw_store(p)
+                processes.update(p)
+            except psutil.NoSuchProcess:
+                pass
+            except psutil.AccessDenied:
+                pass
+
+        time.sleep(0.1)
+
+        # Second loop
+        for p in processes:
+            try:
+                p.meminfo = psproc.memory_info()
+                p.read_bytes = p.psproc.io_counters().read_bytes
+                p.write_bytes = p.psproc.io_counters().write_bytes
+                p.mem = p.psproc.memory_percent()
+                p.cpu_times = psproc.cpu_times()
+                p.cpu = p.psproc.cpu_percent(interval=0)
+                p.io_wait = self.__sys_get_iow_status(psproc.status_iow())
+                p.io_time = time.time()
+                # Delta read/write processing
+                (read_delta, write_delta) = processes.rw_delta(p)
+                p.read = read_delta
+                p.write = write_delta
+                total_read_bytes_delta += read_delta
+                total_write_bytes_delta += write_delta
+                processes.update(p)
+            except psutil.NoSuchProcess:
+                pass
+            except psutil.AccessDenied:
+                pass
+
+        # Process and store global IO counters
+        if total_read_bytes_delta > 0:
+            total_read_count_delta  += int(total_read_bytes_delta/fs_blocksize)
+        if total_write_bytes_delta > 0:
+            total_write_count_delta += int(total_write_bytes_delta/
+                                           fs_blocksize)
+
+        self.set_global_io_counters(
+            total_read_bytes_delta,
+            total_write_bytes_delta,
+            total_read_count_delta,
+            total_write_count_delta
+        )
+
+        return processes
