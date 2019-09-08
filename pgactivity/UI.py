@@ -23,7 +23,6 @@ SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 """
 
 from __future__ import print_function
-from pprint import pprint
 import curses
 import re
 import time
@@ -31,45 +30,44 @@ import sys
 from datetime import timedelta, datetime as dt
 from pgactivity.Data import Data, clean_str
 from pgactivity.Process import PGProcessList
-import psutil
 from getpass import getpass
 
 # Define some color pairs
 C_BLACK_GREEN = 1
-C_CYAN =        2
-C_RED =         3
-C_GREEN =       4
-C_YELLOW =      5
-C_MAGENTA =     6
-C_WHITE =       7
-C_BLACK_CYAN =  8
-C_RED_BLACK =   9
-C_GRAY =        10
+C_CYAN = 2
+C_RED = 3
+C_GREEN = 4
+C_YELLOW = 5
+C_MAGENTA = 6
+C_WHITE = 7
+C_BLACK_CYAN = 8
+C_RED_BLACK = 9
+C_GRAY = 10
 
 # Columns
-PGTOP_FLAG_DATABASE =   1
-PGTOP_FLAG_APPNAME =    2
-PGTOP_FLAG_CLIENT =     4
-PGTOP_FLAG_USER =       8
-PGTOP_FLAG_CPU =        16
-PGTOP_FLAG_MEM =        32
-PGTOP_FLAG_READ =       64
-PGTOP_FLAG_WRITE =      128
-PGTOP_FLAG_TIME =       256
-PGTOP_FLAG_WAIT =       512
-PGTOP_FLAG_RELATION =   1024
-PGTOP_FLAG_TYPE =       2048
-PGTOP_FLAG_MODE =       4096
-PGTOP_FLAG_IOWAIT =     8192
-PGTOP_FLAG_NONE =       None
+PGTOP_FLAG_DATABASE = 1
+PGTOP_FLAG_APPNAME = 2
+PGTOP_FLAG_CLIENT = 4
+PGTOP_FLAG_USER = 8
+PGTOP_FLAG_CPU = 16
+PGTOP_FLAG_MEM = 32
+PGTOP_FLAG_READ = 64
+PGTOP_FLAG_WRITE = 128
+PGTOP_FLAG_TIME = 256
+PGTOP_FLAG_WAIT = 512
+PGTOP_FLAG_RELATION = 1024
+PGTOP_FLAG_TYPE = 2048
+PGTOP_FLAG_MODE = 4096
+PGTOP_FLAG_IOWAIT = 8192
+PGTOP_FLAG_NONE = None
 
 # Display query mode
-PGTOP_TRUNCATE =        1
-PGTOP_WRAP_NOINDENT =   2
-PGTOP_WRAP =            3
+PGTOP_TRUNCATE = 1
+PGTOP_WRAP_NOINDENT = 2
+PGTOP_WRAP = 3
 
 # Cancel/Terminate backend
-PGTOP_SIGNAL_CANCEL_BACKEND =    ord('c')
+PGTOP_SIGNAL_CANCEL_BACKEND = ord('c')
 PGTOP_SIGNAL_TERMINATE_BACKEND = ord('k')
 
 PGTOP_SIGNAL_MESSAGE = {
@@ -88,71 +86,71 @@ PGTOP_MAX_NCOL = 15
 
 PGTOP_COLS = {
     'activities': {
-        'pid'       : {
-            'n':  1,
+        'pid': {
+            'n': 1,
             'name': 'PID',
             'template_h': '%-6s ',
             'flag': PGTOP_FLAG_NONE,
             'mandatory': True
         },
         'database': {
-            'n':  2,
+            'n': 2,
             'name': 'DATABASE',
             'template_h': '%-16s ',
             'flag': PGTOP_FLAG_DATABASE,
             'mandatory': False
         },
         'appname': {
-            'n':  3,
+            'n': 3,
             'name': 'APP',
             'template_h': '%16s ',
             'flag': PGTOP_FLAG_APPNAME,
             'mandatory': False
         },
         'user': {
-            'n':  4,
+            'n': 4,
             'name': 'USER',
             'template_h': '%16s ',
             'flag': PGTOP_FLAG_USER,
             'mandatory': False
         },
         'client': {
-            'n':  5,
+            'n': 5,
             'name': 'CLIENT',
             'template_h': '%16s ',
             'flag': PGTOP_FLAG_CLIENT,
             'mandatory': False
         },
         'cpu': {
-            'n':  6,
+            'n': 6,
             'name': 'CPU%',
             'template_h': '%6s ',
             'flag': PGTOP_FLAG_CPU,
             'mandatory': False
         },
         'mem': {
-            'n':  7,
+            'n': 7,
             'name': 'MEM%',
             'template_h': '%4s ',
             'flag': PGTOP_FLAG_MEM,
             'mandatory': False
         },
         'read': {
-            'n':  8,
+            'n': 8,
             'name': 'READ/s',
             'template_h': '%8s ',
             'flag': PGTOP_FLAG_READ,
             'mandatory': False
         },
         'write': {
-            'n':  9,
+            'n': 9,
             'name': 'WRITE/s',
             'template_h': '%8s ',
             'flag': PGTOP_FLAG_WRITE,
             'mandatory': False
         },
         'time': {
-            'n':  10,
+            'n': 10,
             'name': 'TIME+',
             'template_h': '%9s ',
             'flag': PGTOP_FLAG_TIME,
@@ -324,6 +322,7 @@ MAP_STATES = {
     'idle in transaction (aborted)': 'idle in trans (a)',
     }
 
+
 def bytes2human(num):
     """
     Convert a size into a human readable format.
@@ -341,6 +340,7 @@ def bytes2human(num):
             value = "%.2f" % float(float(num) / float(prefix[sym]))
             return "%s%s%s" % (nume, value, sym)
     return "%s%.2fB" % (nume, num)
+
 
 class UI:
     """
@@ -458,118 +458,118 @@ class UI:
         self.line_colors = {
             'pid': {
                 'default': self.__get_color(C_CYAN),
-                'cursor':  self.__get_color(C_CYAN)|curses.A_REVERSE,
-                'yellow':  self.__get_color(C_YELLOW)|curses.A_BOLD
-             },
+                'cursor':  self.__get_color(C_CYAN) | curses.A_REVERSE,
+                'yellow':  self.__get_color(C_YELLOW) | curses.A_BOLD
+            },
             'database': {
-                'default': curses.A_BOLD|self.__get_color(C_GRAY),
-                'cursor':  self.__get_color(C_CYAN)|curses.A_REVERSE,
-                'yellow':  self.__get_color(C_YELLOW)|curses.A_BOLD
+                'default': curses.A_BOLD | self.__get_color(C_GRAY),
+                'cursor':  self.__get_color(C_CYAN) | curses.A_REVERSE,
+                'yellow':  self.__get_color(C_YELLOW) | curses.A_BOLD
             },
             'appname': {
-                'default': curses.A_BOLD|self.__get_color(C_GRAY),
-                'cursor':  self.__get_color(C_CYAN)|curses.A_REVERSE,
-                'yellow':  self.__get_color(C_YELLOW)|curses.A_BOLD
+                'default': curses.A_BOLD | self.__get_color(C_GRAY),
+                'cursor':  self.__get_color(C_CYAN) | curses.A_REVERSE,
+                'yellow':  self.__get_color(C_YELLOW) | curses.A_BOLD
             },
-           'user': {
-                'default': curses.A_BOLD|self.__get_color(C_GRAY),
-                'cursor':  self.__get_color(C_CYAN)|curses.A_REVERSE,
-                'yellow':  self.__get_color(C_YELLOW)|curses.A_BOLD
+            'user': {
+                'default': curses.A_BOLD | self.__get_color(C_GRAY),
+                'cursor':  self.__get_color(C_CYAN) | curses.A_REVERSE,
+                'yellow':  self.__get_color(C_YELLOW) | curses.A_BOLD
             },
             'client': {
                 'default': self.__get_color(C_CYAN),
-                'cursor':  self.__get_color(C_CYAN)|curses.A_REVERSE,
-                'yellow':  self.__get_color(C_YELLOW)|curses.A_BOLD
+                'cursor':  self.__get_color(C_CYAN) | curses.A_REVERSE,
+                'yellow':  self.__get_color(C_YELLOW) | curses.A_BOLD
             },
             'cpu': {
                 'default': self.__get_color(0),
-                'cursor':  self.__get_color(C_CYAN)|curses.A_REVERSE,
-                'yellow':  self.__get_color(C_YELLOW)|curses.A_BOLD
+                'cursor':  self.__get_color(C_CYAN) | curses.A_REVERSE,
+                'yellow':  self.__get_color(C_YELLOW) | curses.A_BOLD
             },
             'mem': {
                 'default': self.__get_color(0),
-                'cursor':  self.__get_color(C_CYAN)|curses.A_REVERSE,
-                'yellow':  self.__get_color(C_YELLOW)|curses.A_BOLD
+                'cursor':  self.__get_color(C_CYAN) | curses.A_REVERSE,
+                'yellow':  self.__get_color(C_YELLOW) | curses.A_BOLD
             },
             'read': {
                 'default': self.__get_color(0),
-                'cursor':  self.__get_color(C_CYAN)|curses.A_REVERSE,
-                'yellow':  self.__get_color(C_YELLOW)|curses.A_BOLD
+                'cursor':  self.__get_color(C_CYAN) | curses.A_REVERSE,
+                'yellow':  self.__get_color(C_YELLOW) | curses.A_BOLD
             },
             'write': {
                 'default': self.__get_color(0),
-                'cursor':  self.__get_color(C_CYAN)|curses.A_REVERSE,
-                'yellow':  self.__get_color(C_YELLOW)|curses.A_BOLD
+                'cursor':  self.__get_color(C_CYAN) | curses.A_REVERSE,
+                'yellow':  self.__get_color(C_YELLOW) | curses.A_BOLD
             },
             'time_red': {
                 'default': self.__get_color(C_RED),
-                'cursor':  self.__get_color(C_CYAN)|curses.A_REVERSE,
-                'yellow':  self.__get_color(C_YELLOW)|curses.A_BOLD
+                'cursor':  self.__get_color(C_CYAN) | curses.A_REVERSE,
+                'yellow':  self.__get_color(C_YELLOW) | curses.A_BOLD
             },
             'time_yellow': {
                 'default': self.__get_color(C_YELLOW),
-                'cursor':  self.__get_color(C_CYAN)|curses.A_REVERSE,
-                'yellow':  self.__get_color(C_YELLOW)|curses.A_BOLD
+                'cursor':  self.__get_color(C_CYAN) | curses.A_REVERSE,
+                'yellow':  self.__get_color(C_YELLOW) | curses.A_BOLD
             },
             'time_green': {
                 'default': self.__get_color(C_GREEN),
-                'cursor':  self.__get_color(C_CYAN)|curses.A_REVERSE,
-                'yellow':  self.__get_color(C_YELLOW)|curses.A_BOLD
+                'cursor':  self.__get_color(C_CYAN) | curses.A_REVERSE,
+                'yellow':  self.__get_color(C_YELLOW) | curses.A_BOLD
             },
             'wait_green': {
-                'default': self.__get_color(C_GREEN)|curses.A_BOLD,
-                'cursor':  self.__get_color(C_CYAN)|curses.A_REVERSE,
-                'yellow':  self.__get_color(C_YELLOW)|curses.A_BOLD
+                'default': self.__get_color(C_GREEN) | curses.A_BOLD,
+                'cursor':  self.__get_color(C_CYAN) | curses.A_REVERSE,
+                'yellow':  self.__get_color(C_YELLOW) | curses.A_BOLD
             },
             'wait_red': {
-                'default': self.__get_color(C_RED)|curses.A_BOLD,
-                'cursor':  self.__get_color(C_CYAN)|curses.A_REVERSE,
-                'yellow':  self.__get_color(C_YELLOW)|curses.A_BOLD
+                'default': self.__get_color(C_RED) | curses.A_BOLD,
+                'cursor':  self.__get_color(C_CYAN) | curses.A_REVERSE,
+                'yellow':  self.__get_color(C_YELLOW) | curses.A_BOLD
             },
             'state_default': {
                 'default': self.__get_color(0),
-                'cursor':  self.__get_color(C_CYAN)|curses.A_REVERSE,
-                'yellow':  self.__get_color(C_YELLOW)|curses.A_BOLD
+                'cursor':  self.__get_color(C_CYAN) | curses.A_REVERSE,
+                'yellow':  self.__get_color(C_YELLOW) | curses.A_BOLD
             },
             'state_yellow': {
                 'default': self.__get_color(C_YELLOW),
-                'cursor':  self.__get_color(C_CYAN)|curses.A_REVERSE,
-                'yellow':  self.__get_color(C_YELLOW)|curses.A_BOLD
+                'cursor':  self.__get_color(C_CYAN) | curses.A_REVERSE,
+                'yellow':  self.__get_color(C_YELLOW) | curses.A_BOLD
             },
             'state_green': {
                 'default': self.__get_color(C_GREEN),
-                'cursor':  self.__get_color(C_CYAN)|curses.A_REVERSE,
-                'yellow':  self.__get_color(C_YELLOW)|curses.A_BOLD
+                'cursor':  self.__get_color(C_CYAN) | curses.A_REVERSE,
+                'yellow':  self.__get_color(C_YELLOW) | curses.A_BOLD
             },
             'state_red': {
                 'default': self.__get_color(C_RED),
-                'cursor':  self.__get_color(C_CYAN)|curses.A_REVERSE,
-                'yellow':  self.__get_color(C_YELLOW)|curses.A_BOLD
+                'cursor':  self.__get_color(C_CYAN) | curses.A_REVERSE,
+                'yellow':  self.__get_color(C_YELLOW) | curses.A_BOLD
             },
             'query': {
                 'default': self.__get_color(0),
-                'cursor':  self.__get_color(C_CYAN)|curses.A_REVERSE,
-                'yellow':  self.__get_color(C_YELLOW)|curses.A_BOLD
+                'cursor':  self.__get_color(C_CYAN) | curses.A_REVERSE,
+                'yellow':  self.__get_color(C_YELLOW) | curses.A_BOLD
             },
             'relation': {
                 'default': self.__get_color(C_CYAN),
-                'cursor':  self.__get_color(C_CYAN)|curses.A_REVERSE,
-                'yellow':  self.__get_color(C_YELLOW)|curses.A_BOLD
+                'cursor':  self.__get_color(C_CYAN) | curses.A_REVERSE,
+                'yellow':  self.__get_color(C_YELLOW) | curses.A_BOLD
             },
             'type': {
                 'default': self.__get_color(0),
-                'cursor':  self.__get_color(C_CYAN)|curses.A_REVERSE,
-                'yellow':  self.__get_color(C_YELLOW)|curses.A_BOLD
+                'cursor':  self.__get_color(C_CYAN) | curses.A_REVERSE,
+                'yellow':  self.__get_color(C_YELLOW) | curses.A_BOLD
             },
             'mode_yellow': {
-                'default': self.__get_color(C_YELLOW)|curses.A_BOLD,
-                'cursor':  self.__get_color(C_CYAN)|curses.A_REVERSE,
-                'yellow':  self.__get_color(C_YELLOW)|curses.A_BOLD
+                'default': self.__get_color(C_YELLOW) | curses.A_BOLD,
+                'cursor':  self.__get_color(C_CYAN) | curses.A_REVERSE,
+                'yellow':  self.__get_color(C_YELLOW) | curses.A_BOLD
             },
             'mode_red': {
-                'default': self.__get_color(C_RED)|curses.A_BOLD,
-                'cursor':  self.__get_color(C_CYAN)|curses.A_REVERSE,
-                'yellow':  self.__get_color(C_YELLOW)|curses.A_BOLD
+                'default': self.__get_color(C_RED) | curses.A_BOLD,
+                'cursor':  self.__get_color(C_CYAN) | curses.A_REVERSE,
+                'yellow':  self.__get_color(C_YELLOW) | curses.A_BOLD
             }
         }
 
@@ -778,7 +778,7 @@ class UI:
             self.start_line,
             0,
             self.__get_pause_msg(),
-            self.__get_color(C_RED_BLACK)|curses.A_REVERSE|curses.A_BOLD)
+            self.__get_color(C_RED_BLACK) | curses.A_REVERSE | curses.A_BOLD)
         while 1:
             try:
                 k = self.win.getch()
@@ -807,8 +807,8 @@ class UI:
                         self.start_line,
                         0,
                         self.__get_pause_msg(),
-                        self.__get_color(C_RED_BLACK)|\
-                            curses.A_REVERSE|curses.A_BOLD)
+                        self.__get_color(C_RED_BLACK) | curses.A_REVERSE |
+                        curses.A_BOLD)
             curses.flushinp()
 
     def __current_position(self,):
@@ -826,7 +826,7 @@ class UI:
         line += " " * (int(self.maxx/2) - len(msg))
         line += msg
         line += " " * (self.maxx - len(line) - 0)
-        self.__print_string(self.start_line, 0, line, color|curses.A_BOLD)
+        self.__print_string(self.start_line, 0, line, color | curses.A_BOLD)
 
     def __help_key_interactive(self,):
         """
@@ -841,7 +841,7 @@ class UI:
             (self.maxy - 1),
             colno,
             "Cancel current query     ",
-            self.__get_color(C_CYAN)|curses.A_REVERSE)
+            self.__get_color(C_CYAN) | curses.A_REVERSE)
         colno += self.__print_string(
             (self.maxy - 1),
             colno,
@@ -851,7 +851,7 @@ class UI:
             (self.maxy - 1),
             colno,
             "Terminate the backend    ",
-            self.__get_color(C_CYAN)|curses.A_REVERSE)
+            self.__get_color(C_CYAN) | curses.A_REVERSE)
         colno += self.__print_string(
             (self.maxy - 1),
             colno,
@@ -861,7 +861,7 @@ class UI:
             (self.maxy - 1),
             colno,
             "Tag/untag the process    ",
-            self.__get_color(C_CYAN)|curses.A_REVERSE)
+            self.__get_color(C_CYAN) | curses.A_REVERSE)
         colno += self.__print_string(
             (self.maxy - 1),
             colno,
@@ -871,7 +871,7 @@ class UI:
             (self.maxy - 1),
             colno,
             "Back to activity    ",
-            self.__get_color(C_CYAN)|curses.A_REVERSE)
+            self.__get_color(C_CYAN) | curses.A_REVERSE)
         colno += self.__print_string(
             (self.maxy - 1),
             colno,
@@ -881,12 +881,12 @@ class UI:
             (self.maxy - 1),
             colno,
             "Quit    ",
-            self.__get_color(C_CYAN)|curses.A_REVERSE)
+            self.__get_color(C_CYAN) | curses.A_REVERSE)
         colno += self.__print_string(
             (self.maxy - 1),
             colno,
             self.__add_blank(" "),
-            self.__get_color(C_CYAN)|curses.A_REVERSE)
+            self.__get_color(C_CYAN) | curses.A_REVERSE)
 
     def __change_mode_interactive(self,):
         """
@@ -901,7 +901,7 @@ class UI:
             (self.maxy - 1),
             colno,
             "Running queries    ",
-            self.__get_color(C_CYAN)|curses.A_REVERSE)
+            self.__get_color(C_CYAN) | curses.A_REVERSE)
         colno += self.__print_string(
             (self.maxy - 1),
             colno,
@@ -911,7 +911,7 @@ class UI:
             (self.maxy - 1),
             colno,
             "Waiting queries    ",
-            self.__get_color(C_CYAN)|curses.A_REVERSE)
+            self.__get_color(C_CYAN) | curses.A_REVERSE)
         colno += self.__print_string(
             (self.maxy - 1),
             colno,
@@ -921,7 +921,7 @@ class UI:
             (self.maxy - 1),
             colno,
             "Blocking queries ",
-            self.__get_color(C_CYAN)|curses.A_REVERSE)
+            self.__get_color(C_CYAN) | curses.A_REVERSE)
         colno += self.__print_string(
             (self.maxy - 1),
             colno,
@@ -931,7 +931,7 @@ class UI:
             (self.maxy - 1),
             colno,
             "Pause    ",
-            self.__get_color(C_CYAN)|curses.A_REVERSE)
+            self.__get_color(C_CYAN) | curses.A_REVERSE)
         colno += self.__print_string(
             (self.maxy - 1),
             colno,
@@ -941,7 +941,7 @@ class UI:
             (self.maxy - 1),
             colno,
             "Quit    ",
-            self.__get_color(C_CYAN)|curses.A_REVERSE)
+            self.__get_color(C_CYAN) | curses.A_REVERSE)
         colno += self.__print_string(
             (self.maxy - 1),
             colno,
@@ -951,12 +951,12 @@ class UI:
             (self.maxy - 1),
             colno,
             "Help    ",
-            self.__get_color(C_CYAN)|curses.A_REVERSE)
+            self.__get_color(C_CYAN) | curses.A_REVERSE)
         colno += self.__print_string(
             (self.maxy - 1),
             colno,
             self.__add_blank(" ", colno + 1),
-            self.__get_color(C_CYAN)|curses.A_REVERSE)
+            self.__get_color(C_CYAN) | curses.A_REVERSE)
 
     def __ask_terminate_or_cancel_backends(self, action, pids,):
         """
@@ -989,7 +989,7 @@ class UI:
                     (self.maxy - 1),
                     colno,
                     self.__add_blank(" "),
-                    self.__get_color(C_CYAN)|curses.A_REVERSE)
+                    self.__get_color(C_CYAN) | curses.A_REVERSE)
         while 1:
             try:
                 key = self.win.getch()
@@ -1069,10 +1069,13 @@ class UI:
                 curses.endwin()
                 exit()
             # terminate/cancel the backend attached to this PID
-            if k == PGTOP_SIGNAL_TERMINATE_BACKEND or k == PGTOP_SIGNAL_CANCEL_BACKEND:
+            if (k == PGTOP_SIGNAL_TERMINATE_BACKEND
+                    or k == PGTOP_SIGNAL_CANCEL_BACKEND):
                 if len(self.pid_yank) == 0:
-                    self.__ask_terminate_or_cancel_backends( \
-                        k, [self.sorted_processes[current_pos].pid],)
+                    self.__ask_terminate_or_cancel_backends(
+                        k,
+                        [self.sorted_processes[current_pos].pid]
+                    )
                 else:
                     self.__ask_terminate_or_cancel_backends(k, self.pid_yank,)
                 self.verbose_mode = old_verbose_mode
@@ -1083,8 +1086,8 @@ class UI:
                 nb_nk = 0
                 known = True
                 if k == curses.KEY_UP and current_pos > 0:
-                    if (self.lines[current_pos] - offset)\
-                        < (self.start_line + 3):
+                    if ((self.lines[current_pos] - offset)
+                            < (self.start_line + 3)):
                         offset -= 1
                         self.__scroll_window(flag, indent, offset)
                         self.__help_key_interactive()
@@ -1097,7 +1100,8 @@ class UI:
                             'default',
                             self.lines[current_pos] - offset)
                     current_pos -= 1
-                if k == curses.KEY_DOWN and current_pos < (len(self.sorted_processes) - 1):
+                if (k == curses.KEY_DOWN
+                        and current_pos < (len(self.sorted_processes) - 1)):
                     if (self.lines[current_pos] - offset) >= (self.maxy - 2):
                         offset += 1
                         self.__scroll_window(flag, indent, offset)
@@ -1122,10 +1126,10 @@ class UI:
             # Add/remove a PID from the yank list
             if k == ord(' '):
                 known = True
-                if not self.pid_yank.count(self.sorted_processes[current_pos].pid) > 0:
-                    self.pid_yank.append(self.sorted_processes[current_pos].pid)
+                if not self.pid_yank.count(self.sorted_processes[current_pos].pid) > 0:  # noqa
+                    self.pid_yank.append(self.sorted_processes[current_pos].pid)  # noqa
                 else:
-                    self.pid_yank.remove(self.sorted_processes[current_pos].pid)
+                    self.pid_yank.remove(self.sorted_processes[current_pos].pid)  # noqa
 
                 self.__refresh_line(
                     self.sorted_processes[current_pos],
@@ -1181,7 +1185,7 @@ class UI:
             do_refresh = True
         # interactive mode
         if (key == curses.KEY_DOWN or key == curses.KEY_UP) and \
-            len(self.processes) > 0:
+                len(self.processes) > 0:
             self.__interactive(flag, indent)
             known = False
             do_refresh = True
@@ -1291,9 +1295,9 @@ class UI:
 
         t_end = time.time()
         if key > -1 and not known and \
-            (t_end - t_start) < (self.refresh_time * interval):
+                (t_end - t_start) < (self.refresh_time * interval):
             return self.poll(
-                        ((self.refresh_time * interval) - \
+                        ((self.refresh_time * interval) -
                             (t_end - t_start))/self.refresh_time,
                         flag,
                         indent,
@@ -1334,10 +1338,10 @@ class UI:
         self.__check_pid_yank()
         self.sorted_processes = list(self.processes.sort(sort_key))
 
-    def print_string(self, lineno, colno, word, color = 0):
+    def print_string(self, lineno, colno, word, color=0):
         return self.__print_string(lineno, colno, word, color)
 
-    def __print_string(self, lineno, colno, word, color = 0):
+    def __print_string(self, lineno, colno, word, color=0):
         """
         Print a string at position (lineno, colno) and returns its length.
         """
@@ -1347,9 +1351,10 @@ class UI:
             pass
         return len(word)
 
-    def __add_blank(self, line, offset = 0):
+    def __add_blank(self, line, offset=0):
         """
-        Complete string with white spaces from the end of string to the end of line.
+        Complete string with white spaces from the end of string to the end of
+        line.
         """
         line += " " * (self.maxx - (len(line) + offset))
         return line
@@ -1362,11 +1367,11 @@ class UI:
         res = [0] * self.max_ncol
         for _, val in PGTOP_COLS[self.mode].items():
             if val['mandatory'] or \
-                (not val['mandatory'] and val['flag'] & flag):
+                    (not val['mandatory'] and val['flag'] & flag):
                 res[int(val['n'])] = val
         for val in res:
-            if val is not 0:
-                if val['name'] is not 'Query':
+            if val != 0:
+                if val['name'] != 'Query':
                     indent += val['template_h'] % ' '
         return indent
 
@@ -1381,16 +1386,16 @@ class UI:
         color = self.__get_color(C_GREEN)
         for _, val in PGTOP_COLS[self.mode].items():
             if val['mandatory'] or \
-                (not val['mandatory'] and val['flag'] & flag):
+                    (not val['mandatory'] and val['flag'] & flag):
                 res[int(val['n'])] = val
         for val in res:
-            if val is not 0:
+            if val != 0:
                 disp = val['template_h'] % val['name']
                 if ((val['name'] == "CPU%" and self.sort == 'c') or
-                    (val['name'] == "MEM%" and self.sort == 'm') or
-                    (val['name'] == "READ/s" and self.sort == 'r') or
-                    (val['name'] == "WRITE/s" and self.sort == 'w') or
-                    (val['name'] == "TIME+" and self.sort == 't')):
+                        (val['name'] == "MEM%" and self.sort == 'm') or
+                        (val['name'] == "READ/s" and self.sort == 'r') or
+                        (val['name'] == "WRITE/s" and self.sort == 'w') or
+                        (val['name'] == "TIME+" and self.sort == 't')):
                     color_highlight = self.__get_color(C_CYAN)
                 else:
                     color_highlight = color
@@ -1402,12 +1407,12 @@ class UI:
                     self.lineno,
                     xpos,
                     disp,
-                    color_highlight|curses.A_REVERSE)
+                    color_highlight | curses.A_REVERSE)
                 xpos += len(disp)
         self.lineno += 1
 
-    def __print_header(self, pg_version, hostname, user, host, \
-        port, database, ios, tps, active_connections, size_ev, total_size):
+    def __print_header(self, pg_version, hostname, user, host, port, database,
+                       ios, tps, active_connections, size_ev, total_size):
         """
         Print window header
         """
@@ -1489,7 +1494,7 @@ class UI:
                     self.lineno,
                     colno,
                     "%11s" % (tps,),
-                    self.__get_color(C_GREEN)|curses.A_BOLD)
+                    self.__get_color(C_GREEN) | curses.A_BOLD)
         colno += self.__print_string(
                     self.lineno,
                     colno,
@@ -1498,22 +1503,23 @@ class UI:
                     self.lineno,
                     colno,
                     "%11s" % (active_connections,),
-                    self.__get_color(C_GREEN)|curses.A_BOLD)
+                    self.__get_color(C_GREEN) | curses.A_BOLD)
 
         # If not local connection, don't get and display system informations
         if not self.is_local:
             return
 
         # Get memory & swap usage
-        (mem_used_per, mem_used, mem_total, swap_used_per, \
+        (mem_used_per, mem_used, mem_total, swap_used_per,
             swap_used, swap_total) = self.data.get_mem_swap()
         # Get load average
         (av1, av2, av3) = self.data.get_load_average()
 
         self.lineno += 1
-        line = "  Mem.: %6s0%% - %9s/%-8s" % \
-            (mem_used_per, bytes2human(mem_used), \
-                bytes2human(mem_total))
+        line = "  Mem.: %6s0%% - %9s/%-8s" % (
+            mem_used_per, bytes2human(mem_used),
+            bytes2human(mem_total)
+        )
         colno_io = self.__print_string(self.lineno, 0, line)
 
         if (int(ios['read_count'])+int(ios['write_count'])) > self.max_iops:
@@ -1523,9 +1529,10 @@ class UI:
         colno = self.__print_string(self.lineno, colno_io, line_io)
 
         # swap usage
-        line = "  Swap: %6s0%% - %9s/%-8s" % \
-            (swap_used_per, bytes2human(swap_used), \
-                bytes2human(swap_total))
+        line = "  Swap: %6s0%% - %9s/%-8s" % (
+            swap_used_per, bytes2human(swap_used),
+            bytes2human(swap_total)
+        )
         self.lineno += 1
         colno = self.__print_string(self.lineno, 0, line)
         line_io = " | Read : %10s/s - %6s/s" % \
@@ -1552,7 +1559,7 @@ class UI:
                 self.lineno,
                 0,
                 text,
-                self.__get_color(C_GREEN)|curses.A_BOLD)
+                self.__get_color(C_GREEN) | curses.A_BOLD)
         self.lineno += 1
         text = "Released under PostgreSQL License."
         self.__print_string(
@@ -1680,7 +1687,7 @@ class UI:
                 lineno,
                 colno,
                 key,
-                self.__get_color(C_CYAN)|curses.A_BOLD)
+                self.__get_color(C_CYAN) | curses.A_BOLD)
         pos2 = self.__print_string(
                 lineno,
                 colno + pos1,
@@ -1723,7 +1730,7 @@ class UI:
             self.__print_string(line, 0, self.__add_blank(" "))
         self.__change_mode_interactive()
 
-    def __scroll_window(self, flag, indent, offset = 0):
+    def __scroll_window(self, flag, indent, offset=0):
         """
         Scroll the window
         """
@@ -1736,8 +1743,8 @@ class UI:
         for line in range(self.lineno, (self.maxy-1)):
             self.__print_string(line, 0, self.__add_blank(" "))
 
-    def __refresh_line(self, process, flag, indent, typecolor = 'default',
-                       line = None):
+    def __refresh_line(self, process, flag, indent, typecolor='default',
+                       line=None):
         """
         Refresh a line for activities mode
         """
@@ -1760,8 +1767,8 @@ class UI:
             colno += self.__print_string(
                         l_lineno,
                         colno,
-                        PGTOP_COLS[self.mode]['database']['template_h'] % \
-                            (str(process.database)[:16],),
+                        PGTOP_COLS[self.mode]['database']['template_h'] %
+                        str(process.database)[:16],
                         self.line_colors['database'][typecolor])
         if self.mode == 'activities':
             if flag & PGTOP_FLAG_APPNAME:
@@ -1827,30 +1834,33 @@ class UI:
                             self.line_colors['type'][typecolor])
             if flag & PGTOP_FLAG_MODE:
                 if process.get_extra('mode') == 'ExclusiveLock' or \
-                    process.get_extra('mode') == 'RowExclusiveLock' or \
-                    process.get_extra('mode') == 'AccessExclusiveLock':
+                        process.get_extra('mode') == 'RowExclusiveLock' or \
+                        process.get_extra('mode') == 'AccessExclusiveLock':
                     colno += self.__print_string(
                                 l_lineno,
                                 colno,
-                                "%16s " % (str(process.get_extra('mode'))[:16],),
+                                "%16s " % str(process.get_extra('mode'))[:16],
                                 self.line_colors['mode_red'][typecolor])
                 else:
                     colno += self.__print_string(
                                 l_lineno,
                                 colno,
-                                "%16s " % (str(process.get_extra('mode'))[:16],),
+                                "%16s " % str(process.get_extra('mode'))[:16],
                                 self.line_colors['mode_yellow'][typecolor])
 
         if flag & PGTOP_FLAG_TIME:
             if process.duration >= 1 and process.duration < 60000:
                 ctime = timedelta(seconds=float(process.duration))
                 mic = '%.6d' % (ctime.microseconds)
-                ctime = "%s:%s.%s" % (str((ctime.seconds // 60)).zfill(2), \
-                            str((ctime.seconds % 60)).zfill(2), str(mic)[:2])
+                ctime = "%s:%s.%s" % (
+                    str((ctime.seconds // 60)).zfill(2),
+                    str((ctime.seconds % 60)).zfill(2),
+                    str(mic)[:2]
+                )
             elif process.duration >= 60000:
                 ctime = "%s h" % str(int(process.duration / 3600))
 
-            if process.duration == None:
+            if process.duration is None:
                 # When duration is not available
                 colno += self.__print_string(
                             l_lineno,
@@ -1927,7 +1937,7 @@ class UI:
         query = ''
         if process.get_extra('backend_type') == 'background worker':
 
-            query += '\_ '
+            query += '\_ '  # noqa
         if self.verbose_mode == PGTOP_TRUNCATE:
             query += process.query[:dif]
             colno += self.__print_string(
@@ -1936,7 +1946,7 @@ class UI:
                         " %s" % (self.__add_blank(query, len(indent)+1),),
                         self.line_colors['query'][typecolor])
         elif self.verbose_mode == PGTOP_WRAP or \
-            self.verbose_mode == PGTOP_WRAP_NOINDENT:
+                self.verbose_mode == PGTOP_WRAP_NOINDENT:
             query += process.query
             query_wrote = ''
             offset = 0
@@ -1961,8 +1971,10 @@ class UI:
                     self.__print_string(
                         l_lineno,
                         0,
-                        "%s" % (self.__add_blank(p_indent + " " + \
-                                    query_part, len(indent)+1)),
+                        "%s" % (
+                            self.__add_blank(p_indent + " " + query_part,
+                                             len(indent)+1)
+                        ),
                         self.line_colors['query'][typecolor])
                     query_wrote += query_part
                     offset = len(query_wrote)

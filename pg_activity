@@ -26,12 +26,9 @@ SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 from __future__ import print_function
 
-PGTOP_VERSION = "1.5.0"
 
 import os
 import sys
-if os.name != 'posix':
-    sys.exit("FATAL: Platform not supported.")
 import signal
 from optparse import OptionParser, OptionGroup
 import socket
@@ -44,6 +41,12 @@ from psycopg2 import errorcodes
 
 from pgactivity import UI
 
+if os.name != 'posix':
+    sys.exit("FATAL: Platform not supported.")
+
+PGTOP_VERSION = "1.5.0"
+
+
 # Customized OptionParser
 class ModifiedOptionParser(OptionParser):
     """
@@ -52,6 +55,7 @@ class ModifiedOptionParser(OptionParser):
     def error(self, msg):
         raise OptionParsingError(msg)
 
+
 class OptionParsingError(RuntimeError):
     """
     OptionParsingError
@@ -59,8 +63,10 @@ class OptionParsingError(RuntimeError):
     def __init__(self, msg):
         self.msg = msg
 
+
 # Create the UI
 PGAUI = UI.UI(PGTOP_VERSION)
+
 
 def main():
     """
@@ -69,102 +75,103 @@ def main():
     try:
         try:
             parser = ModifiedOptionParser(
-                add_help_option = False,
-                version = "%prog "+PGTOP_VERSION,
-                description = "htop like application for PostgreSQL \
-server activity monitoring.")
+                add_help_option=False,
+                version="%prog "+PGTOP_VERSION,
+                description="htop like application for PostgreSQL "
+                            "server activity monitoring.")
             # -U / --username
             parser.add_option(
                 '-U',
                 '--username',
-                dest = 'username',
-                default = os.environ.get('PGUSER') or getpass.getuser(),
-                help = "Database user name (default: \"%s\")."
-                    % (getpass.getuser(),),
-                metavar = 'USERNAME')
+                dest='username',
+                default=os.environ.get('PGUSER') or getpass.getuser(),
+                help="Database user name (default: \"%s\")."
+                     % (getpass.getuser(),),
+                metavar='USERNAME')
             # -p / --port
             parser.add_option(
                 '-p',
                 '--port',
-                dest = 'port',
-                default = os.environ.get('PGPORT') or '5432',
-                help = "Database server port (default: \"5432\").",
-                metavar = 'PORT')
+                dest='port',
+                default=os.environ.get('PGPORT') or '5432',
+                help="Database server port (default: \"5432\").",
+                metavar='PORT')
             # -h / --host
             parser.add_option(
                 '-h',
                 '--host',
-                dest = 'host',
-                help = "Database server host or socket directory \
+                dest='host',
+                help="Database server host or socket directory \
                             (default: \"localhost\").",
-                metavar = 'HOSTNAME',
-                default = os.environ.get('PGHOST') or 'localhost')
+                metavar='HOSTNAME',
+                default=os.environ.get('PGHOST') or 'localhost')
             # -d / --dbname
             parser.add_option(
                 '-d',
                 '--dbname',
-                dest = 'dbname',
-                help = "Database name to connect to (default: \"postgres\").",
-                metavar = 'DBNAME',
-                default = 'postgres')
+                dest='dbname',
+                help="Database name to connect to (default: \"postgres\").",
+                metavar='DBNAME',
+                default='postgres')
             # -C / --no-color
             parser.add_option(
                 '-C',
                 '--no-color',
-                dest = 'nocolor',
-                action = 'store_true',
-                help = "Disable color usage.",
-                default = 'false')
+                dest='nocolor',
+                action='store_true',
+                help="Disable color usage.",
+                default='false')
             # --blocksize
             parser.add_option(
                 '--blocksize',
-                dest = 'blocksize',
-                help = "Filesystem blocksize (default: 4096)",
-                metavar = 'BLOCKSIZE',
-                default = 4096)
+                dest='blocksize',
+                help="Filesystem blocksize (default: 4096)",
+                metavar='BLOCKSIZE',
+                default=4096)
             # --rds
             parser.add_option(
                 '--rds',
-                dest = 'rds',
-                action = 'store_true',
-                help = "Enable support for AWS RDS",
-                default = False)
+                dest='rds',
+                action='store_true',
+                help="Enable support for AWS RDS",
+                default=False)
             # --output
             parser.add_option(
                 '--output',
-                dest = 'output',
-                help = "Store running queries as CSV.",
-                metavar = "FILEPATH",
-                default = None)
+                dest='output',
+                help="Store running queries as CSV.",
+                metavar="FILEPATH",
+                default=None)
             # --help
             parser.add_option(
                 '--help',
-                dest = 'help',
-                action = 'store_true',
-                help = "Show this help message and exit.",
-                default = 'false')
+                dest='help',
+                action='store_true',
+                help="Show this help message and exit.",
+                default='false')
             # --debug
             parser.add_option(
                 '--debug',
-                dest = 'debug',
-                action = 'store_true',
-                help = "Enable debug mode for traceback tracking.",
-                default = 'false')
+                dest='debug',
+                action='store_true',
+                help="Enable debug mode for traceback tracking.",
+                default='false')
             # --no-db-size
             parser.add_option(
                 '--no-db-size',
-                dest = 'nodbsize',
-                action = 'store_true',
-                help = "Skip total size of DB.",
-                default = False)
+                dest='nodbsize',
+                action='store_true',
+                help="Skip total size of DB.",
+                default=False)
             # --verbose-mode
             parser.add_option(
                 '--verbose-mode',
-                dest = 'verbosemode',
-                help = "Queries display mode. Values: 1-TRUNCATED, 2-FULL(default), 3-INDENTED",
-                metavar = 'VERBOSE_MODE',
-                choices = ['1', '2', '3'],
-                default = '2')
+                dest='verbosemode',
+                help="Queries display mode. Values: 1-TRUNCATED, "
+                     "2-FULL(default), 3-INDENTED",
+                metavar='VERBOSE_MODE',
+                choices=['1', '2', '3'],
+                default='2')
 
             group = OptionGroup(
                 parser,
@@ -172,73 +179,73 @@ server activity monitoring.")
             # --no-database
             group.add_option(
                 '--no-database',
-                dest = 'nodb',
-                action = 'store_true',
-                help = "Disable DATABASE.",
-                default = 'false')
+                dest='nodb',
+                action='store_true',
+                help="Disable DATABASE.",
+                default='false')
             # --no-user
             group.add_option(
                 '--no-user',
-                dest = 'nouser',
-                action = 'store_true',
-                help = "Disable USER.",
-                default = 'false')
+                dest='nouser',
+                action='store_true',
+                help="Disable USER.",
+                default='false')
             # --no-client
             group.add_option(
                 '--no-client',
-                dest = 'noclient',
-                action = 'store_true',
-                help = "Disable CLIENT.",
-                default = 'false')
+                dest='noclient',
+                action='store_true',
+                help="Disable CLIENT.",
+                default='false')
             # --no-cpu
             group.add_option(
                 '--no-cpu',
-                dest = 'nocpu',
-                action = 'store_true',
-                help = "Disable CPU%.",
-                default = 'false')
+                dest='nocpu',
+                action='store_true',
+                help="Disable CPU%.",
+                default='false')
             # --no-mem
             group.add_option(
                 '--no-mem',
-                dest = 'nomem',
-                action = 'store_true',
-                help = "Disable MEM%.",
-                default = 'false')
+                dest='nomem',
+                action='store_true',
+                help="Disable MEM%.",
+                default='false')
             # --no-read
             group.add_option(
                 '--no-read',
-                dest = 'noread',
-                action = 'store_true',
-                help = "Disable READ/s.",
-                default = 'false')
+                dest='noread',
+                action='store_true',
+                help="Disable READ/s.",
+                default='false')
             # --no-write
             group.add_option(
                 '--no-write',
-                dest = 'nowrite',
-                action = 'store_true',
-                help = "Disable WRITE/s.",
-                default = 'false')
+                dest='nowrite',
+                action='store_true',
+                help="Disable WRITE/s.",
+                default='false')
             # --no-time
             group.add_option(
                 '--no-time',
-                dest = 'notime',
-                action = 'store_true',
-                help = "Disable TIME+.",
-                default = 'false')
+                dest='notime',
+                action='store_true',
+                help="Disable TIME+.",
+                default='false')
             # --no-wait
             group.add_option(
                 '--no-wait',
-                dest = 'nowait',
-                action = 'store_true',
-                help = "Disable W.",
-                default = 'false')
+                dest='nowait',
+                action='store_true',
+                help="Disable W.",
+                default='false')
             # --no-app-name
             group.add_option(
                 '--no-app-name',
-                dest = 'noappname',
-                action = 'store_true',
-                help = "Disable App.",
-                default = 'false')
+                dest='noappname',
+                action='store_true',
+                help="Disable App.",
+                default='false')
 
             parser.add_option_group(group)
             (options, _) = parser.parse_args()
@@ -281,14 +288,15 @@ server activity monitoring.")
         flag = PGAUI.get_flag_from_options(options)
         # main loop
         # get DB informations
-        db_info = PGAUI.data.pg_get_db_info(None, using_rds=options.rds, skip_sizes=options.nodbsize)
+        db_info = PGAUI.data.pg_get_db_info(None, using_rds=options.rds,
+                                            skip_sizes=options.nodbsize)
         PGAUI.set_max_db_length(db_info['max_length'])
         # indentation
         indent = PGAUI.get_indent(flag)
         # Init curses
         PGAUI.init_curses()
         # color ?
-        if options.nocolor == True:
+        if options.nocolor is True:
             PGAUI.set_nocolor()
         else:
             PGAUI.set_color()
@@ -327,11 +335,12 @@ server activity monitoring.")
                     print("ERROR: Not connected to PostgreSQL, trying to open "
                           "a new connection")
                     try:
-                        pg_connect(options, password, os.environ.get('PGSERVICE'),
+                        pg_connect(options, password,
+                                   os.environ.get('PGSERVICE'),
                                    exit_on_failed=False)
                         not_connected = False
                     except Exception:
-                        print("ERROR: Connecton failed, retrying in 1 second...")
+                        print("ERROR: Connecton failed, retrying in 1 second.")
                         time.sleep(1)
                 # Reinit curses env. when the connection is back
                 PGAUI.init_curses()
@@ -352,7 +361,7 @@ server activity monitoring.")
                 exc_traceback,
                 file=sys.stdout)
         sys.exit("FATAL: %s" % (str(err),))
-    except KeyboardInterrupt as err:
+    except KeyboardInterrupt:
         PGAUI.at_exit_curses()
         sys.exit(1)
     except Exception as err:
@@ -384,16 +393,15 @@ def pg_connect(options, password=None, service=None, exit_on_failed=True):
             )
             break
         except psycopg2.OperationalError as err:
-            if nb_try < 1 and (err.pgcode == errorcodes.INVALID_PASSWORD or
-                str(err).strip().startswith(
-                    "FATAL:  password authentication failed for user")):
+            if (nb_try < 1 and (err.pgcode == errorcodes.INVALID_PASSWORD or
+                    str(err).strip().startswith("FATAL:  password authentication failed"))):  # noqa
                 nb_try += 1
                 password = PGAUI.ask_password()
-            elif nb_try < 1 and str(err).strip() == "fe_sendauth: no password supplied":
+            elif nb_try < 1 and str(err).strip() == "fe_sendauth: no password supplied":  # noqa
                 nb_try += 1
                 password = PGAUI.ask_password()
             elif exit_on_failed:
-                sys.exit("pg_activity: FATAL: %s" % (PGAUI.clean_str(str(err),)))
+                sys.exit("pg_activity: FATAL: %s" % PGAUI.clean_str(str(err)))
             else:
                 raise Exception("Could not connect to PostgreSQL")
     # Return the password in case of reconnection

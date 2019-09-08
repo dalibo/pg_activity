@@ -22,7 +22,6 @@ BASIS, AND JULIEN TACHOIRES HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE,
 SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 """
 
-import copy
 import psycopg2
 import psycopg2.extras
 import re
@@ -53,8 +52,8 @@ if psutil.version_info < (2, 0, 0):
         def memory_percent(self,):
             return self.get_memory_percent()
 
-        def cpu_percent(self, interval = 0):
-            return self.get_cpu_percent(interval = interval)
+        def cpu_percent(self, interval=0):
+            return self.get_cpu_percent(interval=interval)
 
         def cpu_times(self,):
             return self.get_cpu_times()
@@ -62,6 +61,7 @@ else:
     class PSProcess(psutil.Process):
         def status_iow(self,):
             return str(self.status())
+
 
 def clean_str(string):
     """
@@ -73,6 +73,7 @@ def clean_str(string):
     msg = re.sub(r"^\s", r"", msg)
     msg = re.sub(r"\s$", r"", msg)
     return msg
+
 
 class Data:
     """
@@ -110,14 +111,8 @@ class Data:
         """
         return self.pg_version
 
-    def pg_connect(self,
-        host = None,
-        port = 5432,
-        user = 'postgres',
-        password = None,
-        database = 'postgres',
-        rds_mode = False,
-        service = None):
+    def pg_connect(self, host=None, port=5432, user='postgres', password=None,
+                   database='postgres', rds_mode=False, service=None):
         """
         Connect to a PostgreSQL server and return
         cursor & connector.
@@ -128,42 +123,45 @@ class Data:
             try:
                 if service is not None:
                     self.pg_conn = psycopg2.connect(
-                        service = service,
-                        connection_factory = psycopg2.extras.DictConnection
+                        service=service,
+                        connection_factory=psycopg2.extras.DictConnection
                     )
                 else:
                     self.pg_conn = psycopg2.connect(
-                        database = database,
-                        user = user,
-                        port = port,
-                        password = password,
-                        connection_factory = psycopg2.extras.DictConnection
+                        database=database,
+                        user=user,
+                        port=port,
+                        password=password,
+                        connection_factory=psycopg2.extras.DictConnection
                     )
             except psycopg2.Error as psy_err:
                 if host is None:
                     raise psy_err
-        if self.pg_conn is None: # fallback on TCP/IP connection
+        if self.pg_conn is None:
+            # Fallback on TCP/IP connection
             if service is not None:
                 self.pg_conn = psycopg2.connect(
-                    service = service,
-                    connection_factory = psycopg2.extras.DictConnection
+                    service=service,
+                    connection_factory=psycopg2.extras.DictConnection
                 )
             else:
                 self.pg_conn = psycopg2.connect(
-                    database = database,
-                    host = host,
-                    port = port,
-                    user = user,
-                    password = password,
-                    connection_factory = psycopg2.extras.DictConnection
+                    database=database,
+                    host=host,
+                    port=port,
+                    user=user,
+                    password=password,
+                    connection_factory=psycopg2.extras.DictConnection
                 )
         self.pg_conn.set_isolation_level(0)
-        if rds_mode != True: # Make sure we are using superuser if not on RDS
-          cur = self.pg_conn.cursor()
-          cur.execute("SELECT current_setting('is_superuser')")
-          ret = cur.fetchone()
-          if ret[0] != "on":
-              raise Exception("Must be run with database superuser privileges.")
+        if rds_mode is not True:
+            # Make sure we are using superuser if not on RDS
+            cur = self.pg_conn.cursor()
+            cur.execute("SELECT current_setting('is_superuser')")
+            ret = cur.fetchone()
+            if ret[0] != "on":
+                raise Exception("Must be run with database superuser "
+                                "privileges.")
 
     def pg_is_local_access(self,):
         """
@@ -171,7 +169,10 @@ class Data:
         system informations for the postmaster process.
         """
         try:
-            query = "SELECT setting||'/postmaster.pid' AS pid_file FROM pg_settings WHERE name = 'data_directory'"
+            query = """
+SELECT setting||'/postmaster.pid' AS pid_file
+FROM pg_settings WHERE name = 'data_directory'
+            """
             cur = self.pg_conn.cursor()
             cur.execute(query)
             ret = cur.fetchone()
@@ -229,8 +230,9 @@ class Data:
         a string (SELECT version()).
         """
         res = re.match(
-                r"^(PostgreSQL|EnterpriseDB) ([0-9]+)\.([0-9]+)(?:\.([0-9]+))?",
-                text_version)
+            r"^(PostgreSQL|EnterpriseDB) ([0-9]+)\.([0-9]+)(?:\.([0-9]+))?",
+            text_version
+        )
         if res is not None:
             rmatch = res.group(2)
             if int(res.group(3)) < 10:
@@ -253,7 +255,7 @@ class Data:
         from a string (SELECT version()).
         """
         res = re.match(
-            r"^(PostgreSQL|EnterpriseDB) ([0-9]+)(?:\.([0-9]+))?(devel|beta[0-9]+|rc[0-9]+)",
+            r"^(PostgreSQL|EnterpriseDB) ([0-9]+)(?:\.([0-9]+))?(devel|beta[0-9]+|rc[0-9]+)",  # noqa
             text_version)
         if res is not None:
             rmatch = res.group(2)
@@ -277,20 +279,23 @@ class Data:
         if prev_db_infos is not None:
             prev_total_size = prev_db_infos['total_size']
 
-        skip_dbsize = skip_sizes and (not self.refresh_dbsize)    
-        
+        skip_dbsize = skip_sizes and (not self.refresh_dbsize)
+
         query = """
-    SELECT
-        EXTRACT(EPOCH FROM NOW()) AS timestamp,
-        SUM(pg_stat_get_db_xact_commit(oid)+pg_stat_get_db_xact_rollback(oid))::BIGINT AS no_xact,
-        {db_size} AS total_size,
-        MAX(LENGTH(datname)) AS max_length
-    FROM
-        pg_database
-        {no_rds}
-        """.format(
-            db_size = prev_total_size if skip_dbsize else "SUM(pg_database_size(datname))",
-            no_rds = "WHERE datname <> 'rdsadmin'" if using_rds else ''
+SELECT
+    EXTRACT(EPOCH FROM NOW()) AS timestamp,
+    SUM(pg_stat_get_db_xact_commit(oid)
+        + pg_stat_get_db_xact_rollback(oid))::BIGINT AS no_xact,
+    {db_size} AS total_size,
+    MAX(LENGTH(datname)) AS max_length
+FROM
+    pg_database
+    {no_rds}
+        """
+        query = query.format(
+            db_size=prev_total_size if skip_dbsize
+            else "SUM(pg_database_size(datname))",
+            no_rds="WHERE datname <> 'rdsadmin'" if using_rds else ''
         )
         cur = self.pg_conn.cursor()
         cur.execute(query,)
@@ -299,10 +304,10 @@ class Data:
         size_ev = 0
         if prev_db_infos is not None:
             tps = int((ret['no_xact'] - prev_db_infos['no_xact'])
-                    / (ret['timestamp'] - prev_db_infos['timestamp']))
+                      / (ret['timestamp'] - prev_db_infos['timestamp']))
             size_ev = float(float(ret['total_size']
-                        - prev_db_infos['total_size'])
-                    / (ret['timestamp'] - prev_db_infos['timestamp']))
+                            - prev_db_infos['total_size'])
+                            / (ret['timestamp'] - prev_db_infos['timestamp']))
         return {
             'timestamp': ret['timestamp'],
             'no_xact': ret['no_xact'],
@@ -316,10 +321,10 @@ class Data:
         Get total of active connections.
         """
         query = """
-        SELECT
-            COUNT(*) as active_connections
-        FROM pg_stat_activity
-        WHERE state = 'active'
+SELECT
+    COUNT(*) as active_connections
+FROM pg_stat_activity
+WHERE state = 'active'
         """
 
         cur = self.pg_conn.cursor()
@@ -335,124 +340,128 @@ class Data:
         if self.pg_num_version >= 100000:
             # PostgreSQL 10 and more
             query = """
-    SELECT
-        pg_stat_activity.pid AS pid,
-        pg_stat_activity.application_name AS application_name,
-        CASE WHEN LENGTH(pg_stat_activity.datname) > 16
-            THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
-            ELSE pg_stat_activity.datname
-            END
-        AS database,
-        CASE WHEN pg_stat_activity.client_addr IS NULL
-            THEN 'local'
-            ELSE pg_stat_activity.client_addr::TEXT
-            END
-        AS client,
-        EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
-        CASE WHEN pg_stat_activity.wait_event_type IN ('LWLock', 'Lock', 'BufferPin') THEN true ELSE false END AS wait,
-        pg_stat_activity.usename AS user,
-        pg_stat_activity.state AS state,
-        pg_stat_activity.query AS query,
-        pg_stat_activity.backend_type AS backend_type
-    FROM
-        pg_stat_activity
-    WHERE
-        state <> 'idle'
-        AND pid <> pg_backend_pid()
-    ORDER BY
-        EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
-            """
+SELECT
+    pg_stat_activity.pid AS pid,
+    pg_stat_activity.application_name AS application_name,
+    CASE WHEN LENGTH(pg_stat_activity.datname) > 16
+        THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
+        ELSE pg_stat_activity.datname
+        END
+    AS database,
+    CASE WHEN pg_stat_activity.client_addr IS NULL
+        THEN 'local'
+        ELSE pg_stat_activity.client_addr::TEXT
+        END
+    AS client,
+    EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
+    CASE WHEN pg_stat_activity.wait_event_type IN ('LWLock', 'Lock', 'BufferPin')
+        THEN true
+        ELSE false
+        END
+    AS wait,
+    pg_stat_activity.usename AS user,
+    pg_stat_activity.state AS state,
+    pg_stat_activity.query AS query,
+    pg_stat_activity.backend_type AS backend_type
+FROM
+    pg_stat_activity
+WHERE
+    state <> 'idle'
+    AND pid <> pg_backend_pid()
+ORDER BY
+    EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
+            """  # noqa
         elif self.pg_num_version >= 90600:
             # PostgreSQL prior to 10.0 and >= 9.6.0
             query = """
-    SELECT
-        pg_stat_activity.pid AS pid,
-        pg_stat_activity.application_name AS application_name,
-        CASE WHEN LENGTH(pg_stat_activity.datname) > 16
-            THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
-            ELSE pg_stat_activity.datname
-            END
-        AS database,
-        CASE WHEN pg_stat_activity.client_addr IS NULL
-            THEN 'local'
-            ELSE pg_stat_activity.client_addr::TEXT
-            END
-        AS client,
-        EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
-        pg_stat_activity.wait_event IS NOT NULL AS wait,
-        pg_stat_activity.usename AS user,
-        pg_stat_activity.state AS state,
-        pg_stat_activity.query AS query,
-        null AS backend_type
-    FROM
-        pg_stat_activity
-    WHERE
-        state <> 'idle'
-        AND pid <> pg_backend_pid()
-    ORDER BY
-        EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
-            """
+SELECT
+    pg_stat_activity.pid AS pid,
+    pg_stat_activity.application_name AS application_name,
+    CASE WHEN LENGTH(pg_stat_activity.datname) > 16
+        THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
+        ELSE pg_stat_activity.datname
+        END
+    AS database,
+    CASE WHEN pg_stat_activity.client_addr IS NULL
+        THEN 'local'
+        ELSE pg_stat_activity.client_addr::TEXT
+        END
+    AS client,
+    EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
+    pg_stat_activity.wait_event IS NOT NULL AS wait,
+    pg_stat_activity.usename AS user,
+    pg_stat_activity.state AS state,
+    pg_stat_activity.query AS query,
+    null AS backend_type
+FROM
+    pg_stat_activity
+WHERE
+    state <> 'idle'
+    AND pid <> pg_backend_pid()
+ORDER BY
+    EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
+            """  # noqa
         elif self.pg_num_version >= 90200:
             # PostgreSQL prior to 9.6.0 and >= 9.2.0
             query = """
-    SELECT
-        pg_stat_activity.pid AS pid,
-        pg_stat_activity.application_name AS application_name,
-        CASE WHEN LENGTH(pg_stat_activity.datname) > 16
-            THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
-            ELSE pg_stat_activity.datname
-            END
-        AS database,
-        CASE WHEN pg_stat_activity.client_addr IS NULL
-            THEN 'local'
-            ELSE pg_stat_activity.client_addr::TEXT
-            END
-        AS client,
-        EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
-        pg_stat_activity.waiting AS wait,
-        pg_stat_activity.usename AS user,
-        pg_stat_activity.state AS state,
-        pg_stat_activity.query AS query,
-        null AS backend_type
-    FROM
-        pg_stat_activity
-    WHERE
-        state <> 'idle'
-        AND pid <> pg_backend_pid()
-    ORDER BY
-        EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
-            """
+SELECT
+    pg_stat_activity.pid AS pid,
+    pg_stat_activity.application_name AS application_name,
+    CASE WHEN LENGTH(pg_stat_activity.datname) > 16
+        THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
+        ELSE pg_stat_activity.datname
+        END
+    AS database,
+    CASE WHEN pg_stat_activity.client_addr IS NULL
+        THEN 'local'
+        ELSE pg_stat_activity.client_addr::TEXT
+        END
+    AS client,
+    EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
+    pg_stat_activity.waiting AS wait,
+    pg_stat_activity.usename AS user,
+    pg_stat_activity.state AS state,
+    pg_stat_activity.query AS query,
+    null AS backend_type
+FROM
+    pg_stat_activity
+WHERE
+    state <> 'idle'
+    AND pid <> pg_backend_pid()
+ORDER BY
+    EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
+            """  # noqa
         elif self.pg_num_version < 90200:
             # PostgreSQL prior to 9.2.0
             query = """
-    SELECT
-        pg_stat_activity.procpid AS pid,
-        '<unknown>' AS application_name,
-        CASE
-            WHEN LENGTH(pg_stat_activity.datname) > 16
-            THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
-            ELSE pg_stat_activity.datname
-            END
-        AS database,
-        CASE WHEN pg_stat_activity.client_addr IS NULL
-            THEN 'local'
-            ELSE pg_stat_activity.client_addr::TEXT
-            END
-        AS client,
-        EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
-        pg_stat_activity.waiting AS wait,
-        pg_stat_activity.usename AS user,
-        null AS state,
-        pg_stat_activity.current_query AS query,
-        null AS backend_type
-    FROM
-        pg_stat_activity
-    WHERE
-        current_query <> '<IDLE>'
-        AND procpid <> pg_backend_pid()
-    ORDER BY
-        EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
-            """
+SELECT
+    pg_stat_activity.procpid AS pid,
+    '<unknown>' AS application_name,
+    CASE
+        WHEN LENGTH(pg_stat_activity.datname) > 16
+        THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
+        ELSE pg_stat_activity.datname
+        END
+    AS database,
+    CASE WHEN pg_stat_activity.client_addr IS NULL
+        THEN 'local'
+        ELSE pg_stat_activity.client_addr::TEXT
+        END
+    AS client,
+    EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
+    pg_stat_activity.waiting AS wait,
+    pg_stat_activity.usename AS user,
+    null AS state,
+    pg_stat_activity.current_query AS query,
+    null AS backend_type
+FROM
+    pg_stat_activity
+WHERE
+    current_query <> '<IDLE>'
+    AND procpid <> pg_backend_pid()
+ORDER BY
+    EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
+            """  # noqa
         cur = self.pg_conn.cursor()
         cur.execute(query)
 
@@ -479,57 +488,57 @@ class Data:
         """
         if self.pg_num_version >= 90200:
             query = """
-    SELECT
-        pg_locks.pid AS pid,
-        pg_stat_activity.application_name AS application_name,
-        CASE WHEN LENGTH(pg_stat_activity.datname) > 16
-            THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
-            ELSE pg_stat_activity.datname
-            END
-        AS database,
-        pg_stat_activity.usename AS user,
-        pg_locks.mode AS mode,
-        pg_locks.locktype AS type,
-        pg_locks.relation::regclass AS relation,
-        EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
-        pg_stat_activity.state as state,
-        pg_stat_activity.query AS query
-    FROM
-        pg_catalog.pg_locks
-        JOIN pg_catalog.pg_stat_activity ON(pg_catalog.pg_locks.pid = pg_catalog.pg_stat_activity.pid)
-    WHERE
-        NOT pg_catalog.pg_locks.granted
-        AND pg_catalog.pg_stat_activity.pid <> pg_backend_pid()
-    ORDER BY
-        EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
-            """
+SELECT
+    pg_locks.pid AS pid,
+    pg_stat_activity.application_name AS application_name,
+    CASE WHEN LENGTH(pg_stat_activity.datname) > 16
+        THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
+        ELSE pg_stat_activity.datname
+        END
+    AS database,
+    pg_stat_activity.usename AS user,
+    pg_locks.mode AS mode,
+    pg_locks.locktype AS type,
+    pg_locks.relation::regclass AS relation,
+    EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
+    pg_stat_activity.state as state,
+    pg_stat_activity.query AS query
+FROM
+    pg_catalog.pg_locks
+    JOIN pg_catalog.pg_stat_activity ON(pg_catalog.pg_locks.pid = pg_catalog.pg_stat_activity.pid)
+WHERE
+    NOT pg_catalog.pg_locks.granted
+    AND pg_catalog.pg_stat_activity.pid <> pg_backend_pid()
+ORDER BY
+    EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
+            """  # noqa
         elif self.pg_num_version < 90200:
             query = """
-    SELECT
-        pg_locks.pid AS pid,
-        '<unknown>' AS application_name,
-        CASE
-            WHEN LENGTH(pg_stat_activity.datname) > 16
-            THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
-            ELSE pg_stat_activity.datname
-            END
-        AS database,
-        pg_stat_activity.usename AS user,
-        pg_locks.mode AS mode,
-        pg_locks.locktype AS type,
-        pg_locks.relation::regclass AS relation,
-        EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
-        NULL AS state,
-        pg_stat_activity.current_query AS query
-    FROM
-        pg_catalog.pg_locks
-        JOIN pg_catalog.pg_stat_activity ON(pg_catalog.pg_locks.pid = pg_catalog.pg_stat_activity.procpid)
-    WHERE
-        NOT pg_catalog.pg_locks.granted
-        AND pg_catalog.pg_stat_activity.procpid <> pg_backend_pid()
-    ORDER BY
-        EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
-            """
+SELECT
+    pg_locks.pid AS pid,
+    '<unknown>' AS application_name,
+    CASE
+        WHEN LENGTH(pg_stat_activity.datname) > 16
+        THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
+        ELSE pg_stat_activity.datname
+        END
+    AS database,
+    pg_stat_activity.usename AS user,
+    pg_locks.mode AS mode,
+    pg_locks.locktype AS type,
+    pg_locks.relation::regclass AS relation,
+    EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
+    NULL AS state,
+    pg_stat_activity.current_query AS query
+FROM
+    pg_catalog.pg_locks
+    JOIN pg_catalog.pg_stat_activity ON(pg_catalog.pg_locks.pid = pg_catalog.pg_stat_activity.procpid)
+WHERE
+    NOT pg_catalog.pg_locks.granted
+    AND pg_catalog.pg_stat_activity.procpid <> pg_backend_pid()
+ORDER BY
+    EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
+            """  # noqa
         cur = self.pg_conn.cursor()
         cur.execute(query)
 
@@ -556,173 +565,173 @@ class Data:
         """
         if self.pg_num_version >= 90200:
             query = """
+SELECT
+    pid,
+    application_name AS application_name,
+    CASE
+        WHEN LENGTH(datname) > 16
+        THEN SUBSTRING(datname FROM 0 FOR 6)||'...'||SUBSTRING(datname FROM '........$')
+        ELSE datname
+        END
+    AS database,
+    usename AS user,
+    relation,
+    mode,
+    locktype AS type,
+    duration,
+    state,
+    query
+FROM
+    (
     SELECT
-        pid,
-        application_name AS application_name,
-        CASE
-            WHEN LENGTH(datname) > 16
-            THEN SUBSTRING(datname FROM 0 FOR 6)||'...'||SUBSTRING(datname FROM '........$')
-            ELSE datname
-            END
-        AS database,
-        usename AS user,
-        relation,
-        mode,
-        locktype AS type,
-        duration,
-        state,
-        query
+        blocking.pid,
+        pg_stat_activity.application_name,
+        pg_stat_activity.query,
+        blocking.mode,
+        pg_stat_activity.datname,
+        pg_stat_activity.usename,
+        blocking.locktype,
+        EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
+        pg_stat_activity.state as state,
+        blocking.relation::regclass AS relation
     FROM
-        (
-        SELECT
-            blocking.pid,
-            pg_stat_activity.application_name,
-            pg_stat_activity.query,
-            blocking.mode,
-            pg_stat_activity.datname,
-            pg_stat_activity.usename,
-            blocking.locktype,
-            EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
-            pg_stat_activity.state as state,
-            blocking.relation::regclass AS relation
-        FROM
-            pg_locks AS blocking
-            JOIN (
-                SELECT
-                    transactionid
-                FROM
-                    pg_locks
-                WHERE
-                    NOT granted) AS blocked ON (blocking.transactionid = blocked.transactionid)
-            JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.pid)
-        WHERE
-            blocking.granted
-        UNION ALL
-        SELECT
-            blocking.pid,
-            pg_stat_activity.application_name,
-            pg_stat_activity.query,
-            blocking.mode,
-            pg_stat_activity.datname,
-            pg_stat_activity.usename,
-            blocking.locktype,
-            EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
-            pg_stat_activity.state as state,
-            blocking.relation::regclass AS relation
-        FROM
-            pg_locks AS blocking
-            JOIN (
-                SELECT
-                    database,
-                    relation,
-                    mode
-                FROM
-                    pg_locks
-                WHERE
-                    NOT granted
-                    AND relation IS NOT NULL) AS blocked ON (blocking.database = blocked.database AND blocking.relation = blocked.relation)
-            JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.pid)
-        WHERE
-            blocking.granted
-        ) AS sq
-    GROUP BY
-        pid,
-        application_name,
-        query,
-        mode,
-        locktype,
-        duration,
-        datname,
-        usename,
-        state,
-        relation
-    ORDER BY
-        duration DESC
-            """
+        pg_locks AS blocking
+        JOIN (
+            SELECT
+                transactionid
+            FROM
+                pg_locks
+            WHERE
+                NOT granted) AS blocked ON (blocking.transactionid = blocked.transactionid)
+        JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.pid)
+    WHERE
+        blocking.granted
+    UNION ALL
+    SELECT
+        blocking.pid,
+        pg_stat_activity.application_name,
+        pg_stat_activity.query,
+        blocking.mode,
+        pg_stat_activity.datname,
+        pg_stat_activity.usename,
+        blocking.locktype,
+        EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
+        pg_stat_activity.state as state,
+        blocking.relation::regclass AS relation
+    FROM
+        pg_locks AS blocking
+        JOIN (
+            SELECT
+                database,
+                relation,
+                mode
+            FROM
+                pg_locks
+            WHERE
+                NOT granted
+                AND relation IS NOT NULL) AS blocked ON (blocking.database = blocked.database AND blocking.relation = blocked.relation)
+        JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.pid)
+    WHERE
+        blocking.granted
+    ) AS sq
+GROUP BY
+    pid,
+    application_name,
+    query,
+    mode,
+    locktype,
+    duration,
+    datname,
+    usename,
+    state,
+    relation
+ORDER BY
+    duration DESC
+            """  # noqa
         elif self.pg_num_version < 90200:
             query = """
+SELECT
+    pid,
+    application_name,
+    CASE
+        WHEN LENGTH(datname) > 16
+        THEN SUBSTRING(datname FROM 0 FOR 6)||'...'||SUBSTRING(datname FROM '........$')
+        ELSE datname
+        END
+    AS database,
+    usename AS user,
+    relation,
+    mode,
+    locktype AS type,
+    duration,
+    state,
+    query
+FROM
+    (
     SELECT
-        pid,
-        application_name,
-        CASE
-            WHEN LENGTH(datname) > 16
-            THEN SUBSTRING(datname FROM 0 FOR 6)||'...'||SUBSTRING(datname FROM '........$')
-            ELSE datname
-            END
-        AS database,
-        usename AS user,
-        relation,
-        mode,
-        locktype AS type,
-        duration,
-        state,
-        query
+        blocking.pid,
+        '<unknown>' AS application_name,
+        pg_stat_activity.current_query AS query,
+        blocking.mode,
+        pg_stat_activity.datname,
+        pg_stat_activity.usename,
+        blocking.locktype,EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
+        NULL AS state,
+        blocking.relation::regclass AS relation
     FROM
-        (
-        SELECT
-            blocking.pid,
-            '<unknown>' AS application_name,
-            pg_stat_activity.current_query AS query,
-            blocking.mode,
-            pg_stat_activity.datname,
-            pg_stat_activity.usename,
-            blocking.locktype,EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
-            NULL AS state,
-            blocking.relation::regclass AS relation
-        FROM
-            pg_locks AS blocking
-            JOIN (
-                SELECT
-                    transactionid
-                FROM
-                    pg_locks
-                WHERE
-                    NOT granted) AS blocked ON (blocking.transactionid = blocked.transactionid)
-            JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.procpid)
-        WHERE
-            blocking.granted
-        UNION ALL
-        SELECT
-            blocking.pid,
-            '<unknown>' AS application_name,
-            pg_stat_activity.current_query AS query,
-            blocking.mode,
-            pg_stat_activity.datname,
-            pg_stat_activity.usename,
-            blocking.locktype,
-            EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
-            NULL AS state,
-            blocking.relation::regclass AS relation
-        FROM
-            pg_locks AS blocking
-            JOIN (
-                SELECT
-                    database,
-                    relation,
-                    mode
-                FROM
-                    pg_locks
-                WHERE
-                    NOT granted
-                    AND relation IS NOT NULL) AS blocked ON (blocking.database = blocked.database AND blocking.relation = blocked.relation)
-            JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.procpid)
-        WHERE
-            blocking.granted
-        ) AS sq
-    GROUP BY
-        pid,
-        application_name,
-        query,
-        mode,
-        locktype,
-        duration,
-        datname,
-        usename,
-        state,
-        relation
-    ORDER BY
-        duration DESC
-            """
+        pg_locks AS blocking
+        JOIN (
+            SELECT
+                transactionid
+            FROM
+                pg_locks
+            WHERE
+                NOT granted) AS blocked ON (blocking.transactionid = blocked.transactionid)
+        JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.procpid)
+    WHERE
+        blocking.granted
+    UNION ALL
+    SELECT
+        blocking.pid,
+        '<unknown>' AS application_name,
+        pg_stat_activity.current_query AS query,
+        blocking.mode,
+        pg_stat_activity.datname,
+        pg_stat_activity.usename,
+        blocking.locktype,
+        EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
+        NULL AS state,
+        blocking.relation::regclass AS relation
+    FROM
+        pg_locks AS blocking
+        JOIN (
+            SELECT
+                database,
+                relation,
+                mode
+            FROM
+                pg_locks
+            WHERE
+                NOT granted
+                AND relation IS NOT NULL) AS blocked ON (blocking.database = blocked.database AND blocking.relation = blocked.relation)
+        JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.procpid)
+    WHERE
+        blocking.granted
+    ) AS sq
+GROUP BY
+    pid,
+    application_name,
+    query,
+    mode,
+    locktype,
+    duration,
+    datname,
+    usename,
+    state,
+    relation
+ORDER BY
+    duration DESC
+            """  # noqa
         cur = self.pg_conn.cursor()
         cur.execute(query)
 
@@ -748,12 +757,12 @@ class Data:
         Is pg_activity connected localy ?
         """
         query = """
-        SELECT inet_server_addr() AS inet_server_addr, inet_client_addr() AS inet_client_addr
+SELECT inet_server_addr() AS server_addr, inet_client_addr() AS client_addr
         """
         cur = self.pg_conn.cursor()
         cur.execute(query)
         ret = cur.fetchone()
-        if ret['inet_server_addr'] == ret['inet_client_addr']:
+        if ret['server_addr'] == ret['client_addr']:
             return True
         return False
 
@@ -775,11 +784,8 @@ class Data:
         else:
             return 'N'
 
-    def set_global_io_counters(self,
-        read_bytes_delta,
-        write_bytes_delta,
-        read_count_delta,
-        write_count_delta):
+    def set_global_io_counters(self, read_bytes_delta, write_bytes_delta,
+                               read_count_delta, write_count_delta):
         """
         Set IO counters.
         """
@@ -911,9 +917,9 @@ class Data:
 
         # Process and store global IO counters
         if total_read_bytes_delta > 0:
-            total_read_count_delta  += int(total_read_bytes_delta/fs_blocksize)
+            total_read_count_delta += int(total_read_bytes_delta/fs_blocksize)
         if total_write_bytes_delta > 0:
-            total_write_count_delta += int(total_write_bytes_delta/
+            total_write_count_delta += int(total_write_bytes_delta /
                                            fs_blocksize)
 
         self.set_global_io_counters(

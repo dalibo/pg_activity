@@ -89,7 +89,7 @@ class PGProcessList(object):
 
     def sort(self, key, reverse=True):
         for pid, proc in sorted(self.procs.items(),
-                                key=lambda (pid, proc): getattr(proc, key),
+                                key=lambda (pid, proc): getattr(proc, key),  # noqa
                                 reverse=reverse):
             yield proc
 
