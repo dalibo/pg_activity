@@ -11,6 +11,9 @@ from setuptools import setup
 if sys.version_info < (2, 6):
     raise SystemExit('ERROR: pg_activity need at least python 2.6 to work.')
 
+with open('README.md') as fo:
+    long_description = fo.read()
+
 setup(
     name = 'pg_activity',
     version = '1.5.0',
@@ -21,6 +24,8 @@ setup(
     url = 'https://github.com/julmon/pg_activity',
     license = 'LICENSE.txt',
     description = 'Command line tool for PostgreSQL server activity monitoring.',
+    long_description = long_description,
+    long_description_content_type='text/markdown',
     install_requires = [
         "psutil >= 0.4.1",
         "psycopg2 >= 2.2.1",
