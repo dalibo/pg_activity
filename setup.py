@@ -26,6 +26,11 @@ setup(
     description = 'Command line tool for PostgreSQL server activity monitoring.',
     long_description = long_description,
     long_description_content_type='text/markdown',
+    classifiers=[
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 2.6",
+        "Programming Language :: Python :: 2.7",
+    ],
     install_requires = [
         "psutil >= 0.4.1",
         "psycopg2 >= 2.2.1",
