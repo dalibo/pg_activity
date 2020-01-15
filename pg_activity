@@ -250,10 +250,11 @@ server activity monitoring.")
             print(parser.format_help().strip())
             sys.exit(1)
 
+        debug = options.debug
+
         password = pg_connect(options, password=os.environ.get('PGPASSWORD'),
                               service=os.environ.get('PGSERVICE'))
 
-        debug = options.debug
         pg_version = PGAUI.data.pg_get_version()
         PGAUI.data.pg_get_num_version(pg_version)
         hostname = socket.gethostname()
