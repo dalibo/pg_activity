@@ -90,7 +90,7 @@ Interactives commands
 | `m`       | Sort by MEM%, descending                                         |
 | `t`       | Sort by TIME+, descending                                        |
 | `Space`   | Pause on/off                                                     |
-| `v`       | Change queries display mode: full, truncated, indented           |
+| `v`       | Change queries display mode: full, indented, truncated           |
 | `UP/DOWN` | Scroll processes list                                            |
 | `q`       | Quit                                                             |
 | `+`       | Increase refresh time. Maximum value : 5s                        |
