@@ -33,7 +33,6 @@ setup(
     ],
     install_requires = [
         "psutil >= 0.4.1",
-        "psycopg2 >= 2.2.1",
     ],
     data_files = data_files,
 )

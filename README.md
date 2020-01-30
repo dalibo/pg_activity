@@ -14,6 +14,8 @@ Dependencies
 Installation from sources:
 `setuptools` &ge; **0.6.14**
 
+You have to install the package `psycopg2` from `pgdg` [APT](https://wiki.postgresql.org/wiki/Apt) or [YUM](https://yum.postgresql.org/) repositories. `psycopg2` can also been installed from `pip` with `pip install psycopg2` or `pip install psycopg2-binary` for the binary version.
+
 Installation
 ------------
 
