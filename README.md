@@ -14,6 +14,8 @@ Dependencies
 Installation from sources:
 `setuptools` &ge; **0.6.14**
 
+In order to use `pg_activty` after an install using `pip`, you have to install the package `psycopg2` from `pgdg` first (see [here](https://github.com/dalibo/pg_activity/issues/118) for more info).
+
 Installation
 ------------
 
