@@ -87,6 +87,7 @@ class Data:
     read_count_delta = 0
     write_count_delta = 0
     refresh_dbsize = False
+    min_duration = 0
 
     def __init__(self,):
         """
@@ -102,6 +103,7 @@ class Data:
         self.read_count_delta = 0
         self.write_count_delta = 0
         self.refresh_dbsize = False
+        self.min_duration = 0
 
     def get_pg_version(self,):
         """
@@ -327,7 +329,7 @@ class Data:
         active_connections = int(ret['active_connections'])
         return active_connections
 
-    def pg_get_activities(self,):
+    def pg_get_activities(self):
         """
         Get activity from pg_stat_activity view.
         """
@@ -358,6 +360,9 @@ class Data:
     WHERE
         state <> 'idle'
         AND pid <> pg_backend_pid()
+        AND CASE WHEN %(min_duration)s = 0 THEN true
+            ELSE extract(epoch from now() - query_start) > %(min_duration)s
+            END
     ORDER BY
         EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
             """
@@ -388,6 +393,9 @@ class Data:
     WHERE
         state <> 'idle'
         AND pid <> pg_backend_pid()
+        AND CASE WHEN %(min_duration)s = 0 THEN true
+            ELSE extract(epoch from now() - query_start) > %(min_duration)s
+            END
     ORDER BY
         EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
             """
@@ -418,6 +426,9 @@ class Data:
     WHERE
         state <> 'idle'
         AND pid <> pg_backend_pid()
+        AND CASE WHEN %(min_duration)s = 0 THEN true
+            ELSE extract(epoch from now() - query_start) > %(min_duration)s
+            END
     ORDER BY
         EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
             """
@@ -448,15 +459,18 @@ class Data:
     WHERE
         current_query <> '<IDLE>'
         AND procpid <> pg_backend_pid()
+        AND CASE WHEN %(min_duration)s = 0 THEN true
+            ELSE extract(epoch from now() - query_start) > %(min_duration)s
+            END
     ORDER BY
         EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
             """
         cur = self.pg_conn.cursor()
-        cur.execute(query)
+        cur.execute(query, {'min_duration': self.min_duration})
         ret = cur.fetchall()
         return ret
 
-    def pg_get_waiting(self,):
+    def pg_get_waiting(self):
         """
         Get waiting queries.
         """
@@ -483,6 +497,9 @@ class Data:
     WHERE
         NOT pg_catalog.pg_locks.granted
         AND pg_catalog.pg_stat_activity.pid <> pg_backend_pid()
+        AND CASE WHEN %(min_duration)s = 0 THEN true
+            ELSE extract(epoch from now() - query_start) > %(min_duration)s
+            END
     ORDER BY
         EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
             """
@@ -510,11 +527,14 @@ class Data:
     WHERE
         NOT pg_catalog.pg_locks.granted
         AND pg_catalog.pg_stat_activity.procpid <> pg_backend_pid()
+        AND CASE WHEN %(min_duration)s = 0 THEN true
+            ELSE extract(epoch from now() - query_start) > %(min_duration)s
+            END
     ORDER BY
         EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
             """
         cur = self.pg_conn.cursor()
-        cur.execute(query)
+        cur.execute(query, {'min_duration': self.min_duration})
         ret = cur.fetchall()
         return ret
 
@@ -565,6 +585,9 @@ class Data:
             JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.pid)
         WHERE
             blocking.granted
+            AND CASE WHEN %(min_duration)s = 0 THEN true
+                ELSE extract(epoch from now() - query_start) > %(min_duration)s
+                END
         UNION ALL
         SELECT
             blocking.pid,
@@ -592,6 +615,9 @@ class Data:
             JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.pid)
         WHERE
             blocking.granted
+            AND CASE WHEN %(min_duration)s = 0 THEN true
+                ELSE extract(epoch from now() - query_start) > %(min_duration)s
+                END
         ) AS sq
     GROUP BY
         pid,
@@ -648,6 +674,9 @@ class Data:
             JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.procpid)
         WHERE
             blocking.granted
+            AND CASE WHEN %(min_duration)s = 0 THEN true
+                ELSE extract(epoch from now() - query_start) > %(min_duration)s
+                END
         UNION ALL
         SELECT
             blocking.pid,
@@ -675,6 +704,9 @@ class Data:
             JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.procpid)
         WHERE
             blocking.granted
+            AND CASE WHEN %(min_duration)s = 0 THEN true
+                ELSE extract(epoch from now() - query_start) > %(min_duration)s
+                END
         ) AS sq
     GROUP BY
         pid,
@@ -691,7 +723,7 @@ class Data:
         duration DESC
             """
         cur = self.pg_conn.cursor()
-        cur.execute(query)
+        cur.execute(query, {'min_duration': self.min_duration})
         ret = cur.fetchall()
         return ret
 

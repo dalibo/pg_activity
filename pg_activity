@@ -165,6 +165,14 @@ server activity monitoring.")
                 metavar = 'VERBOSE_MODE',
                 choices = ['1', '2', '3'],
                 default = '2')
+            # --min-duration
+            parser.add_option(
+                '--min-duration',
+                dest = 'minduration',
+                help = "Show only queries older than given seconds (default: 0)",
+                metavar = "SECONDS",
+                type = float,
+                default = 0)
 
             group = OptionGroup(
                 parser,
@@ -266,6 +274,8 @@ server activity monitoring.")
         PGAUI.set_verbose_mode(int(options.verbosemode))
         # output
         PGAUI.set_output(options.output)
+        # make cmdline flags easily accesible
+        PGAUI.set_options(options)
         # does pg_activity runing against local PG instance
         if not PGAUI.data.pg_is_local():
             PGAUI.set_is_local(False)

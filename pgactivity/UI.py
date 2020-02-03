@@ -390,6 +390,8 @@ class UI:
         self.fs_blocksize = 4096
         # Output file
         self.output = None
+        # Parsed Cmd line options
+        self.options = None
 
     def set_verbose_mode(self, verbose_mode):
         """
@@ -728,6 +730,11 @@ class UI:
 
     def set_output(self, output):
         self.output = output
+
+    def set_options(self, options):
+        self.options = options
+        if self.data:
+            self.data.min_duration = options.minduration
 
     def clean_str(self, string):
         """
@@ -1721,6 +1728,11 @@ class UI:
                     self.lineno,
                     colno,
                     " - Ref.: %ss" % (self.refresh_time,))
+        if self.options.minduration > 0:
+            colno += self.__print_string(
+                        self.lineno,
+                        colno,
+                        " - Query min. duration: %ss" % (self.options.minduration,))
         colno = 0
         self.lineno += 1
         colno += self.__print_string(
