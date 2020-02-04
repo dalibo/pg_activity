@@ -4,6 +4,7 @@ author: Julien Tachoires <julmon@gmail.com>
 license: PostgreSQL License
 
 Copyright (c) 2012 - 2019, Julien Tachoires
+Copyright (c) 2020, Dalibo
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose, without fee, and without a written
@@ -276,8 +277,8 @@ class Data:
         if prev_db_infos is not None:
             prev_total_size = prev_db_infos['total_size']
 
-        skip_dbsize = skip_sizes and (not self.refresh_dbsize)    
-        
+        skip_dbsize = skip_sizes and (not self.refresh_dbsize)
+
         query = """
     SELECT
         EXTRACT(EPOCH FROM NOW()) AS timestamp,
