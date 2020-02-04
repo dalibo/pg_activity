@@ -4,6 +4,7 @@ author: Julien Tachoires <julmon@gmail.com>
 license: PostgreSQL License
 
 Copyright (c) 2012 - 2019, Julien Tachoires
+Copyright (c) 2020, Dalibo
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose, without fee, and without a written
