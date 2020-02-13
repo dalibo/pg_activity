@@ -33,4 +33,4 @@ pg_activity is an open project. Feel free to join us and improve this tool.
 * Matheus de Oliveira <matioli.matheus@gmail.com>
 * Mickaël Le Baillif <mickael.le.baillif@gmail.com>
 * Nicolas Dandrimont <olasd@softwareheritage.org>
-
+* Nils Hamerlinck <nils@trobz.com>

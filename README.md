@@ -59,6 +59,9 @@ Options
         --verbose-mode=VERBOSE_MODE
                               Queries display mode. Values: 1-TRUNCATED,
                               2-FULL(default), 3-INDENTED
+        --duration-mode=DURATION_MODE
+                              Duration mode. Values: 1-QUERY(default),
+                              2-TRANSACTION, 3-BACKEND
 
 
     Display options, you can exclude some columns by using them :
@@ -91,6 +94,7 @@ Interactives commands
 | `c`       | Sort by CPU%, descending                                         |
 | `m`       | Sort by MEM%, descending                                         |
 | `t`       | Sort by TIME+, descending                                        |
+| `T`       | Change duration mode: query, transaction, backend                |
 | `Space`   | Pause on/off                                                     |
 | `v`       | Change queries display mode: full, indented, truncated           |
 | `UP/DOWN` | Scroll processes list                                            |

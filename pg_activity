@@ -166,6 +166,14 @@ server activity monitoring.")
                 metavar = 'VERBOSE_MODE',
                 choices = ['1', '2', '3'],
                 default = '2')
+            # --duration-mode
+            parser.add_option(
+                '--duration-mode',
+                dest = 'durationmode',
+                help = "Duration mode. Values: 1-QUERY(default), 2-TRANSACTION, 3-BACKEND",
+                metavar = 'DURATION_MODE',
+                choices = ['1', '2', '3'],
+                default = '1')
 
             group = OptionGroup(
                 parser,
@@ -265,6 +273,8 @@ server activity monitoring.")
         PGAUI.set_blocksize(int(options.blocksize))
         # verbose mode
         PGAUI.set_verbose_mode(int(options.verbosemode))
+        # duration mode
+        PGAUI.set_duration_mode(int(options.durationmode))
         # output
         PGAUI.set_output(options.output)
         # does pg_activity runing against local PG instance
