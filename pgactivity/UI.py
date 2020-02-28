@@ -68,6 +68,11 @@ PGTOP_TRUNCATE =        1
 PGTOP_WRAP_NOINDENT =   2
 PGTOP_WRAP =            3
 
+# Duration mode
+PGTOP_DURATION_QUERY =          1
+PGTOP_DURATION_TRANSACTION =    2
+PGTOP_DURATION_BACKEND =        3
+
 # Cancel/Terminate backend
 PGTOP_SIGNAL_CANCEL_BACKEND =    ord('c')
 PGTOP_SIGNAL_TERMINATE_BACKEND = ord('k')
@@ -403,6 +408,18 @@ class UI:
         Get self.verbose_mode
         """
         return self.verbose_mode
+
+    def set_duration_mode(self, duration_mode):
+        """
+        Set self.duration_mode
+        """
+        self.duration_mode = duration_mode
+
+    def get_duration_mode(self,):
+        """
+        Get self.duration_mode
+        """
+        return self.duration_mode
 
     def set_is_local(self, is_local):
         """
@@ -1218,6 +1235,12 @@ class UI:
             if self.verbose_mode > 3:
                 self.verbose_mode = 1
             do_refresh = True
+        # change duration mode
+        if key == ord('T'):
+            self.duration_mode += 1
+            if self.duration_mode > 3:
+                self.duration_mode = 1
+            do_refresh = True
         # turn off/on colors
         if key == ord('C'):
             if self.color is True:
@@ -1304,7 +1327,7 @@ class UI:
                         disp_proc)
 
         # poll postgresql activity
-        queries =  self.data.pg_get_activities()
+        queries =  self.data.pg_get_activities(self.duration_mode)
         self.pid = []
         if self.is_local:
             # get resource usage for each process
@@ -1493,7 +1516,7 @@ class UI:
         if (k == curses.KEY_F1 or k == ord('1')):
             self.mode = 'activities'
             curses.flushinp()
-            queries = self.data.pg_get_activities()
+            queries = self.data.pg_get_activities(self.duration_mode)
             procs = self.data.sys_get_proc(queries, self.is_local)
             return self.__poll_activities(0, flag, indent, procs)
         # Waiting queries
@@ -1513,6 +1536,12 @@ class UI:
             self.verbose_mode += 1
             if self.verbose_mode > 3:
                 self.verbose_mode = 1
+            do_refresh = True
+        # change duration mode
+        if k == ord('T'):
+            self.duration_mode += 1
+            if self.duration_mode > 3:
+                self.duration_mode = 1
             do_refresh = True
         # turnoff/on colors
         if k == ord('C'):
@@ -1571,9 +1600,9 @@ class UI:
 
         # poll postgresql activity
         if self.mode == 'waiting':
-            queries =  self.data.pg_get_waiting()
+            queries =  self.data.pg_get_waiting(self.duration_mode)
         else:
-            queries =  self.data.pg_get_blocking()
+            queries =  self.data.pg_get_blocking(self.duration_mode)
 
         new_procs = {}
         for query in queries:
@@ -1581,7 +1610,7 @@ class UI:
             new_procs[query['pid']]['duration'] = \
                 self.data.get_duration(query['duration'])
 
-        # return processes sorted by query duration
+        # return processes sorted by query/transaction/backend duration
         disp_procs = sorted(
                         queries,
                         key=lambda q: q['duration'],
@@ -1754,6 +1783,15 @@ class UI:
                     colno,
                     "%11s" % (active_connections,),
                     self.__get_color(C_GREEN)|curses.A_BOLD)
+        colno += self.__print_string(
+                    self.lineno,
+                    colno,
+                    "        | Duration mode: ")
+        colno += self.__print_string(
+                    self.lineno,
+                    colno,
+                    "%11s" % (self.data.get_duration_mode_name(self.duration_mode),),
+                    self.__get_color(C_GREEN)|curses.A_BOLD)
 
         # If not local connection, don't get and display system informations
         if not self.is_local:
@@ -1886,6 +1924,11 @@ class UI:
                 00,
                 "      R",
                 "force refresh")
+        self.__display_help_key(
+                self.lineno,
+                45,
+                "      T",
+                "change duration mode")
         self.lineno += 1
         self.__display_help_key(
                 self.lineno,
