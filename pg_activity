@@ -6,6 +6,7 @@ author: Julien Tachoires <julmon@gmail.com>
 license: PostgreSQL License
 
 Copyright (c) 2012 - 2019, Julien Tachoires
+Copyright (c) 2020, Dalibo
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose, without fee, and without a written
@@ -165,6 +166,14 @@ server activity monitoring.")
                 metavar = 'VERBOSE_MODE',
                 choices = ['1', '2', '3'],
                 default = '2')
+            # --duration-mode
+            parser.add_option(
+                '--duration-mode',
+                dest = 'durationmode',
+                help = "Duration mode. Values: 1-QUERY(default), 2-TRANSACTION, 3-BACKEND",
+                metavar = 'DURATION_MODE',
+                choices = ['1', '2', '3'],
+                default = '1')
             # --min-duration
             parser.add_option(
                 '--min-duration',
@@ -272,6 +281,8 @@ server activity monitoring.")
         PGAUI.set_blocksize(int(options.blocksize))
         # verbose mode
         PGAUI.set_verbose_mode(int(options.verbosemode))
+        # duration mode
+        PGAUI.set_duration_mode(int(options.durationmode))
         # output
         PGAUI.set_output(options.output)
         # make cmdline flags easily accesible
@@ -329,7 +340,7 @@ server activity monitoring.")
                     db_info,
                     using_rds=options.rds,
                     skip_sizes=options.nodbsize
-                ) 
+                )
                 PGAUI.data.set_refresh_dbsize(False)
                 PGAUI.set_max_db_length(db_info['max_length'])
                 # get active connections

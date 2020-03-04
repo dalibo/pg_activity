@@ -62,6 +62,10 @@ CPU, MEM, READ or WRITE columns and other system informations.
 
 	Queries display mode. Values: 1-TRUNCATED, 2-FULL(default), 3-INDENTED
 
+=item B<--duration-mode=DURATION_MODE>
+
+	Duration mode. Values: 1-QUERY(default), 2-TRANSACTION, 3-BACKEND
+
 =item B<--help>
 
 	Show this help message and exit.

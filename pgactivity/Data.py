@@ -4,6 +4,7 @@ author: Julien Tachoires <julmon@gmail.com>
 license: PostgreSQL License
 
 Copyright (c) 2012 - 2019, Julien Tachoires
+Copyright (c) 2020, Dalibo
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose, without fee, and without a written
@@ -278,8 +279,8 @@ class Data:
         if prev_db_infos is not None:
             prev_total_size = prev_db_infos['total_size']
 
-        skip_dbsize = skip_sizes and (not self.refresh_dbsize)    
-        
+        skip_dbsize = skip_sizes and (not self.refresh_dbsize)
+
         query = """
     SELECT
         EXTRACT(EPOCH FROM NOW()) AS timestamp,
@@ -329,7 +330,7 @@ class Data:
         active_connections = int(ret['active_connections'])
         return active_connections
 
-    def pg_get_activities(self):
+    def pg_get_activities(self, duration_mode=1):
         """
         Get activity from pg_stat_activity view.
         """
@@ -349,7 +350,7 @@ class Data:
             ELSE pg_stat_activity.client_addr::TEXT
             END
         AS client,
-        EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
+        EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
         CASE WHEN pg_stat_activity.wait_event_type IN ('LWLock', 'Lock', 'BufferPin') THEN true ELSE false END AS wait,
         pg_stat_activity.usename AS user,
         pg_stat_activity.state AS state,
@@ -364,7 +365,7 @@ class Data:
             ELSE extract(epoch from now() - query_start) > %(min_duration)s
             END
     ORDER BY
-        EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
+        EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) DESC
             """
         elif self.pg_num_version >= 90600:
             # PostgreSQL prior to 10.0 and >= 9.6.0
@@ -382,7 +383,7 @@ class Data:
             ELSE pg_stat_activity.client_addr::TEXT
             END
         AS client,
-        EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
+        EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
         pg_stat_activity.wait_event IS NOT NULL AS wait,
         pg_stat_activity.usename AS user,
         pg_stat_activity.state AS state,
@@ -397,7 +398,7 @@ class Data:
             ELSE extract(epoch from now() - query_start) > %(min_duration)s
             END
     ORDER BY
-        EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
+        EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) DESC
             """
         elif self.pg_num_version >= 90200:
             # PostgreSQL prior to 9.6.0 and >= 9.2.0
@@ -415,7 +416,7 @@ class Data:
             ELSE pg_stat_activity.client_addr::TEXT
             END
         AS client,
-        EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
+        EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
         pg_stat_activity.waiting AS wait,
         pg_stat_activity.usename AS user,
         pg_stat_activity.state AS state,
@@ -430,7 +431,7 @@ class Data:
             ELSE extract(epoch from now() - query_start) > %(min_duration)s
             END
     ORDER BY
-        EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
+        EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) DESC
             """
         elif self.pg_num_version < 90200:
             # PostgreSQL prior to 9.2.0
@@ -449,7 +450,7 @@ class Data:
             ELSE pg_stat_activity.client_addr::TEXT
             END
         AS client,
-        EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
+        EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
         pg_stat_activity.waiting AS wait,
         pg_stat_activity.usename AS user,
         pg_stat_activity.current_query AS query,
@@ -463,14 +464,18 @@ class Data:
             ELSE extract(epoch from now() - query_start) > %(min_duration)s
             END
     ORDER BY
-        EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
+        EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) DESC
             """
+
+        duration_column = self.get_duration_column(duration_mode)
+        query = query.format(duration_column=duration_column)
+
         cur = self.pg_conn.cursor()
         cur.execute(query, {'min_duration': self.min_duration})
         ret = cur.fetchall()
         return ret
 
-    def pg_get_waiting(self):
+    def pg_get_waiting(self, duration_mode=1):
         """
         Get waiting queries.
         """
@@ -488,7 +493,7 @@ class Data:
         pg_locks.mode AS mode,
         pg_locks.locktype AS type,
         pg_locks.relation::regclass AS relation,
-        EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
+        EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
         pg_stat_activity.state as state,
         pg_stat_activity.query AS query
     FROM
@@ -501,7 +506,7 @@ class Data:
             ELSE extract(epoch from now() - query_start) > %(min_duration)s
             END
     ORDER BY
-        EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
+        EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) DESC
             """
         elif self.pg_num_version < 90200:
             query = """
@@ -518,7 +523,7 @@ class Data:
         pg_locks.mode AS mode,
         pg_locks.locktype AS type,
         pg_locks.relation::regclass AS relation,
-        EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
+        EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
         NULL AS state,
         pg_stat_activity.current_query AS query
     FROM
@@ -531,14 +536,18 @@ class Data:
             ELSE extract(epoch from now() - query_start) > %(min_duration)s
             END
     ORDER BY
-        EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
+        EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) DESC
             """
+
+        duration_column = self.get_duration_column(duration_mode)
+        query = query.format(duration_column=duration_column)
+
         cur = self.pg_conn.cursor()
         cur.execute(query, {'min_duration': self.min_duration})
         ret = cur.fetchall()
         return ret
 
-    def pg_get_blocking(self,):
+    def pg_get_blocking(self, duration_mode=1):
         """
         Get blocking queries
         """
@@ -570,7 +579,7 @@ class Data:
             pg_stat_activity.datname,
             pg_stat_activity.usename,
             blocking.locktype,
-            EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
+            EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
             pg_stat_activity.state as state,
             blocking.relation::regclass AS relation
         FROM
@@ -597,7 +606,7 @@ class Data:
             pg_stat_activity.datname,
             pg_stat_activity.usename,
             blocking.locktype,
-            EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
+            EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
             pg_stat_activity.state as state,
             blocking.relation::regclass AS relation
         FROM
@@ -659,7 +668,7 @@ class Data:
             blocking.mode,
             pg_stat_activity.datname,
             pg_stat_activity.usename,
-            blocking.locktype,EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
+            blocking.locktype,EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
             NULL AS state,
             blocking.relation::regclass AS relation
         FROM
@@ -686,7 +695,7 @@ class Data:
             pg_stat_activity.datname,
             pg_stat_activity.usename,
             blocking.locktype,
-            EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
+            EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
             NULL AS state,
             blocking.relation::regclass AS relation
         FROM
@@ -722,6 +731,10 @@ class Data:
     ORDER BY
         duration DESC
             """
+
+        duration_column = self.get_duration_column(duration_mode)
+        query = query.format(duration_column=duration_column)
+
         cur = self.pg_conn.cursor()
         cur.execute(query, {'min_duration': self.min_duration})
         ret = cur.fetchall()
@@ -740,6 +753,16 @@ class Data:
         if ret['inet_server_addr'] == ret['inet_client_addr']:
             return True
         return False
+
+    def get_duration_column(self, duration_mode=1):
+        if duration_mode not in (1, 2, 3):
+            duration_mode = 1
+        return ['query_start', 'xact_start', 'backend_start'][duration_mode-1]
+
+    def get_duration_mode_name(self, duration_mode=1):
+        if duration_mode not in (1, 2, 3):
+            duration_mode = 1
+        return ['query', 'transaction', 'backend'][duration_mode-1]
 
     def get_duration(self, duration):
         """
