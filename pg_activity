@@ -169,7 +169,7 @@ server activity monitoring.")
             parser.add_option(
                 '--min-duration',
                 dest = 'minduration',
-                help = "Show only queries older than given seconds (default: 0)",
+                help = "Don't display queries with smaller than specified duration (in seconds).",
                 metavar = "SECONDS",
                 type = float,
                 default = 0)

@@ -54,6 +54,10 @@ CPU, MEM, READ or WRITE columns and other system informations.
 
 	Skip total size of DB.
 
+=item B<--min-duration=SECONDS>
+
+	Don't display queries with smaller than specified duration (in seconds).
+
 =item B<--verbose-mode=VERBOSE_MODE>
 
 	Queries display mode. Values: 1-TRUNCATED, 2-FULL(default), 3-INDENTED
