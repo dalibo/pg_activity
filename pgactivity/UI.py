@@ -1762,7 +1762,7 @@ class UI:
             colno += self.__print_string(
                         self.lineno,
                         colno,
-                        " - Query min. duration: %ss" % (self.options.minduration,))
+                        " - Min. duration: %ss" % (self.options.minduration,))
         colno = 0
         self.lineno += 1
         colno += self.__print_string(

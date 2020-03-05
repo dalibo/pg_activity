@@ -362,7 +362,7 @@ class Data:
         state <> 'idle'
         AND pid <> pg_backend_pid()
         AND CASE WHEN %(min_duration)s = 0 THEN true
-            ELSE extract(epoch from now() - query_start) > %(min_duration)s
+            ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
             END
     ORDER BY
         EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) DESC
@@ -395,7 +395,7 @@ class Data:
         state <> 'idle'
         AND pid <> pg_backend_pid()
         AND CASE WHEN %(min_duration)s = 0 THEN true
-            ELSE extract(epoch from now() - query_start) > %(min_duration)s
+            ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
             END
     ORDER BY
         EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) DESC
@@ -428,7 +428,7 @@ class Data:
         state <> 'idle'
         AND pid <> pg_backend_pid()
         AND CASE WHEN %(min_duration)s = 0 THEN true
-            ELSE extract(epoch from now() - query_start) > %(min_duration)s
+            ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
             END
     ORDER BY
         EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) DESC
@@ -461,7 +461,7 @@ class Data:
         current_query <> '<IDLE>'
         AND procpid <> pg_backend_pid()
         AND CASE WHEN %(min_duration)s = 0 THEN true
-            ELSE extract(epoch from now() - query_start) > %(min_duration)s
+            ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
             END
     ORDER BY
         EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) DESC
@@ -503,7 +503,7 @@ class Data:
         NOT pg_catalog.pg_locks.granted
         AND pg_catalog.pg_stat_activity.pid <> pg_backend_pid()
         AND CASE WHEN %(min_duration)s = 0 THEN true
-            ELSE extract(epoch from now() - query_start) > %(min_duration)s
+            ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
             END
     ORDER BY
         EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) DESC
@@ -533,7 +533,7 @@ class Data:
         NOT pg_catalog.pg_locks.granted
         AND pg_catalog.pg_stat_activity.procpid <> pg_backend_pid()
         AND CASE WHEN %(min_duration)s = 0 THEN true
-            ELSE extract(epoch from now() - query_start) > %(min_duration)s
+            ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
             END
     ORDER BY
         EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) DESC
@@ -595,7 +595,7 @@ class Data:
         WHERE
             blocking.granted
             AND CASE WHEN %(min_duration)s = 0 THEN true
-                ELSE extract(epoch from now() - query_start) > %(min_duration)s
+                ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
                 END
         UNION ALL
         SELECT
@@ -625,7 +625,7 @@ class Data:
         WHERE
             blocking.granted
             AND CASE WHEN %(min_duration)s = 0 THEN true
-                ELSE extract(epoch from now() - query_start) > %(min_duration)s
+                ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
                 END
         ) AS sq
     GROUP BY
@@ -684,7 +684,7 @@ class Data:
         WHERE
             blocking.granted
             AND CASE WHEN %(min_duration)s = 0 THEN true
-                ELSE extract(epoch from now() - query_start) > %(min_duration)s
+                ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
                 END
         UNION ALL
         SELECT
@@ -714,7 +714,7 @@ class Data:
         WHERE
             blocking.granted
             AND CASE WHEN %(min_duration)s = 0 THEN true
-                ELSE extract(epoch from now() - query_start) > %(min_duration)s
+                ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
                 END
         ) AS sq
     GROUP BY
