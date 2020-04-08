@@ -334,8 +334,42 @@ class Data:
         """
         Get activity from pg_stat_activity view.
         """
-        if self.pg_num_version >= 100000:
-            # PostgreSQL 10 and more
+        if self.pg_num_version >= 110000:
+            # PostgreSQL 11 and more
+            query = """
+    SELECT
+        pg_stat_activity.pid AS pid,
+        pg_stat_activity.application_name AS application_name,
+        CASE WHEN LENGTH(pg_stat_activity.datname) > 16
+            THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
+            ELSE pg_stat_activity.datname
+            END
+        AS database,
+        CASE WHEN pg_stat_activity.client_addr IS NULL
+            THEN 'local'
+            ELSE pg_stat_activity.client_addr::TEXT
+            END
+        AS client,
+        EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) AS duration,
+        CASE WHEN pg_stat_activity.wait_event_type IN ('LWLock', 'Lock', 'BufferPin') THEN true ELSE false END AS wait,
+        pg_stat_activity.usename AS user,
+        pg_stat_activity.state AS state,
+        pg_stat_activity.query AS query,
+        pg_stat_activity.backend_type = 'parallel worker' AS is_parallel_worker
+    FROM
+        pg_stat_activity
+    WHERE
+        state <> 'idle'
+        AND pid <> pg_backend_pid()
+        AND CASE WHEN %(min_duration)s = 0 THEN true
+            ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
+            END
+    ORDER BY
+        EXTRACT(epoch FROM (NOW() - pg_stat_activity.query_start)) DESC
+            """
+        elif self.pg_num_version >= 100000:
+            # PostgreSQL 10
+            # We assume a background_worker with a not null query is a parallel worker.
             query = """
     SELECT
         pg_stat_activity.pid AS pid,
@@ -355,7 +389,7 @@ class Data:
         pg_stat_activity.usename AS user,
         pg_stat_activity.state AS state,
         pg_stat_activity.query AS query,
-        pg_stat_activity.backend_type AS backend_type
+        (pg_stat_activity.backend_type = 'background worker' AND pg_stat_activity.query IS NOT NULL) AS is_parallel_worker
     FROM
         pg_stat_activity
     WHERE
@@ -369,6 +403,7 @@ class Data:
             """
         elif self.pg_num_version >= 90600:
             # PostgreSQL prior to 10.0 and >= 9.6.0
+            # There is no way to see parallel workers
             query = """
     SELECT
         pg_stat_activity.pid AS pid,
@@ -388,7 +423,7 @@ class Data:
         pg_stat_activity.usename AS user,
         pg_stat_activity.state AS state,
         pg_stat_activity.query AS query,
-        null AS backend_type
+        false AS is_parallel_worker
     FROM
         pg_stat_activity
     WHERE
@@ -421,7 +456,7 @@ class Data:
         pg_stat_activity.usename AS user,
         pg_stat_activity.state AS state,
         pg_stat_activity.query AS query,
-        null AS backend_type
+        false AS is_parallel_worker
     FROM
         pg_stat_activity
     WHERE
@@ -454,7 +489,7 @@ class Data:
         pg_stat_activity.waiting AS wait,
         pg_stat_activity.usename AS user,
         pg_stat_activity.current_query AS query,
-        null AS backend_type
+        false AS is_parallel_worker
     FROM
         pg_stat_activity
     WHERE
@@ -473,6 +508,7 @@ class Data:
         cur = self.pg_conn.cursor()
         cur.execute(query, {'min_duration': self.min_duration})
         ret = cur.fetchall()
+
         return ret
 
     def pg_get_waiting(self, duration_mode=1):
@@ -823,7 +859,7 @@ class Data:
                 process.set_extra('io_wait',
                     self.__sys_get_iow_status(psproc.status_iow()))
                 process.set_extra('psutil_proc', psproc)
-                process.set_extra('backend_type', query['backend_type'])
+                process.set_extra('is_parallel_worker', query['is_parallel_worker'])
                 process.set_extra('appname', query['application_name'])
 
                 processes[process.pid] = process
