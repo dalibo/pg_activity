@@ -2235,10 +2235,9 @@ class UI:
         dif = self.maxx - len(indent) - 1
 
         query = ''
-        if 'is_parallel_worker' in process and \
-                process['is_parallel_worker']:
-
+        if process.get('is_parallel_worker'):
             query += '\_ '
+
         if self.verbose_mode == PGTOP_TRUNCATE:
             query += process['query'][:dif]
             colno += self.__print_string(
