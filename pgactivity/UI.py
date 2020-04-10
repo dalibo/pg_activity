@@ -1411,7 +1411,7 @@ class UI:
                         'duration': self.data.get_duration(proc.duration),
                         'wait': proc.wait,
                         'io_wait': proc.get_extra('io_wait'),
-                        'backend_type': proc.get_extra('backend_type')
+                        'is_parallel_worker': proc.get_extra('is_parallel_worker')
                     })
 
                 except psutil.NoSuchProcess:
@@ -2235,10 +2235,9 @@ class UI:
         dif = self.maxx - len(indent) - 1
 
         query = ''
-        if 'backend_type' in process and \
-                process['backend_type'] == 'background worker':
-
+        if process.get('is_parallel_worker'):
             query += '\_ '
+
         if self.verbose_mode == PGTOP_TRUNCATE:
             query += process['query'][:dif]
             colno += self.__print_string(
