@@ -148,10 +148,10 @@ What is more, `pg_activity` uses different queries to get :
      `pg_stat_get_db_xact_rollback()`
 *    and more ( eg : `pg_cancel_backend()` and `pg_terminate_backend()` )
 
-Thoses queries dont show in the query tab because all queries issued from the
-`pg_activity` backend are considered as noise and are not displayed . On the
-other hand, the transactions used to get the info for `pg_activity`'s reporting
-are still accounted for by postgres in `pg_stat_get_db_xact_commit()` and
-`pg_stat_get_db_xact_commit()`. Therefore `pg_activity` will display a non zero
-TPS even with no activity on the database, and/or no activity displayed on
+Thoses queries cannot be seen in the query tab because all queries issued from
+the `pg_activity` backend are considered as noise and are not displayed . On
+the other hand, the transactions used to get the info for `pg_activity`'s
+reporting are still accounted for by postgres in `pg_stat_get_db_xact_commit()`
+and `pg_stat_get_db_xact_commit()`. Therefore `pg_activity` will display a non
+zero TPS even with no activity on the database, and/or no activity displayed on
 screen.
