@@ -126,3 +126,32 @@ Screenshot
 ----------
 
 ![pg_activity screenshot](https://raw.github.com/julmon/pg_activity/master/docs/imgs/screenshot.png)
+
+FAQ
+---
+
+**I can't see my queries only TPS is shown**
+
+`pg_activity` scans the view `pg_stat_activity` with a user defined refresh
+time comprised between O.5 and 5 seconds. It can be modified in the interface
+with the `+` and `-` keys. Any query executed between two scans won't be
+displayed.
+
+
+What is more, `pg_activity` uses different queries to get :
+
+*    settings from `pg_settings`
+*    version info using `version()`
+*    queries and number of connections from `pg_stat_activity`
+*    locks from `pg_locks`
+*    tps from `pg_database` using `pg_stat_get_db_xact_commit()` and
+     `pg_stat_get_db_xact_rollback()`
+*    and more ( eg : `pg_cancel_backend()` and `pg_terminate_backend()` )
+
+Thoses queries dont show in the query tab because all queries issued from the
+`pg_activity` backend are considered as noise and are not displayed . On the
+other hand, the transactions used to get the info for `pg_activity`'s reporting
+are still accounted for by postgres in `pg_stat_get_db_xact_commit()` and
+`pg_stat_get_db_xact_commit()`. Therefore `pg_activity` will display a non zero
+TPS even with no activity on the database, and/or no activity displayed on
+screen.
