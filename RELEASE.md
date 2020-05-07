@@ -110,3 +110,26 @@ Uploading pg_activity-1.6.0.tar.gz
 View at:
 https://pypi.org/project/pg-activity/1.6.0/
 ```
+
+## Send a mail to pgsql-announce
+
+Example for release 1.6.0 : 
+```
+mailto  : pgsql-announce(at)postgresql(dot)org
+Subject : pg_activity release 1.6.0
+Content :
+
+pg_activity (https://github.com/dalibo/pg_activity) 1.6.0 has been released.
+
+This release adds the following features :
+
+* the --min-duration flag to only show laggy queries (kmoppel)
+* the --duration-mode and the shortcut (T) to choose from the duration modes:
+  query, transaction, backend (nilshamerlinck)
+* the D shortcut to refresh dbsize (Fabio Renato Geiss)
+* an expanded refresh interval from 1-3s to 0.5-5s (kmoppel)
+
+The full release notes can be read here :
+https://github.com/dalibo/pg_activity/releases/tag/v1.6.0
+```
+
