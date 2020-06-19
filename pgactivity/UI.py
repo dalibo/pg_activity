@@ -1207,10 +1207,7 @@ class UI:
         t_start = time.time()
         known = False
         do_refresh = False
-        try:
-            key = self.win.getch()
-        except KeyboardInterrupt as err:
-            raise err
+        key = self.win.getch()
         if key == ord('q'):
             curses.endwin()
             exit()
@@ -1503,10 +1500,7 @@ class UI:
         # Keyboard interactions
         self.win.timeout(int(1000 * self.refresh_time * interval))
 
-        try:
-            k = self.win.getch()
-        except KeyboardInterrupt as err:
-            raise err
+        k = self.win.getch()
         if k == ord('q'):
             curses.endwin()
             exit()
