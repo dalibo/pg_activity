@@ -7,7 +7,7 @@ Command line tool for PostgreSQL server activity monitoring.
 Dependencies
 ------------
 
-  - `python` &ge; **2.6**
+  - `python` &ge; **3.6**
   - `psycopg2` &ge; **2.2.1**
   - `psutil` &ge;  **0.5.1**
 
