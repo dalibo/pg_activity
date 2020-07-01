@@ -829,8 +829,8 @@ class UI:
                         self.start_line,
                         0,
                         self.__get_pause_msg(),
-                        self.__get_color(C_RED_BLACK)|
-                            curses.A_REVERSE|curses.A_BOLD)
+                        self.__get_color(C_RED_BLACK) | curses.A_REVERSE | curses.A_BOLD,
+                    )
             curses.flushinp()
 
     def __current_position(self,):
@@ -1323,8 +1323,8 @@ class UI:
         if key > -1 and not known and \
                 (t_end - t_start) < (self.refresh_time * interval):
             return self.__poll_activities(
-                ((self.refresh_time * interval) -
-                 (t_end - t_start))/self.refresh_time,
+                ((self.refresh_time * interval)
+                 - (t_end - t_start))/self.refresh_time,
                 flag,
                 indent,
                 process,
@@ -1376,7 +1376,7 @@ class UI:
                             n_io_time)
 
                         # Global io counters
-                        read_bytes_delta  += proc.get_extra('read_delta')
+                        read_bytes_delta += proc.get_extra('read_delta')
                         write_bytes_delta += proc.get_extra('write_delta')
                     else:
                         # No previous information about this process
@@ -1397,7 +1397,7 @@ class UI:
                         'pid': pid,
                         'appname': proc.appname,
                         'database': proc.database,
-                        'user':proc.user,
+                        'user': proc.user,
                         'client': proc.client,
                         'cpu': proc.get_extra('cpu_percent'),
                         'mem': proc.get_extra('mem_percent'),
@@ -1419,7 +1419,7 @@ class UI:
                     raise err
             # store io counters
             if read_bytes_delta > 0:
-                read_count_delta  += int(read_bytes_delta/self.fs_blocksize)
+                read_count_delta += int(read_bytes_delta/self.fs_blocksize)
             if write_bytes_delta > 0:
                 write_count_delta += int(write_bytes_delta/self.fs_blocksize)
             self.data.set_global_io_counters(
@@ -1592,8 +1592,8 @@ class UI:
                 not known and \
                 (t_end - t_start) < (self.refresh_time * interval):
             return self.__poll_waiting_blocking(
-                ((self.refresh_time * interval) -
-                 (t_end - t_start))/self.refresh_time,
+                ((self.refresh_time * interval)
+                 - (t_end - t_start))/self.refresh_time,
                 flag,
                 indent,
                 process,
@@ -1650,8 +1650,8 @@ class UI:
                     (not val['mandatory'] and val['flag'] & flag):
                 res[int(val['n'])] = val
         for val in res:
-            if val is not 0:
-                if val['name'] is not 'Query':
+            if val != 0:
+                if val['name'] != 'Query':
                     indent += val['template_h'] % ' '
         return indent
 
@@ -1669,13 +1669,15 @@ class UI:
                     (not val['mandatory'] and val['flag'] & flag):
                 res[int(val['n'])] = val
         for val in res:
-            if val is not 0:
+            if val != 0:
                 disp = val['template_h'] % val['name']
-                if ((val['name'] == "CPU%" and self.sort == 'c') or
-                    (val['name'] == "MEM%" and self.sort == 'm') or
-                    (val['name'] == "READ/s" and self.sort == 'r') or
-                    (val['name'] == "WRITE/s" and self.sort == 'w') or
-                        (val['name'] == "TIME+" and self.sort == 't')):
+                if (
+                    (val['name'] == "CPU%" and self.sort == 'c')
+                    or (val['name'] == "MEM%" and self.sort == 'm')
+                    or (val['name'] == "READ/s" and self.sort == 'r')
+                    or (val['name'] == "WRITE/s" and self.sort == 'w')
+                    or (val['name'] == "TIME+" and self.sort == 't')
+                ):
                     color_highlight = self.__get_color(C_CYAN)
                 else:
                     color_highlight = color
@@ -2154,7 +2156,7 @@ class UI:
             elif process['duration'] >= 60000:
                 ctime = "%s h" % str(int(process['duration'] / 3600))
 
-            if process['duration'] == None:
+            if process['duration'] is None:
                 # When duration is not available
                 colno += self.__print_string(
                     l_lineno,
@@ -2230,7 +2232,7 @@ class UI:
 
         query = ''
         if process.get('is_parallel_worker'):
-            query += '\_ '
+            query += r'\_ '
 
         if self.verbose_mode == PGTOP_TRUNCATE:
             query += process['query'][:dif]
@@ -2265,8 +2267,8 @@ class UI:
                     self.__print_string(
                         l_lineno,
                         0,
-                        "%s" % (self.__add_blank(p_indent + " " +
-                                                 query_part, len(indent)+1)),
+                        "%s" % (self.__add_blank(p_indent + " "
+                                                 + query_part, len(indent)+1)),
                         self.line_colors['query'][typecolor])
                     query_wrote += query_part
                     offset = len(query_wrote)
