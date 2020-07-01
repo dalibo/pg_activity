@@ -111,7 +111,7 @@ server activity monitoring.")
         dest = 'nocolor',
         action = 'store_true',
         help = "Disable color usage.",
-        default = 'false')
+        default = False)
     # --blocksize
     parser.add_option(
         '--blocksize',
@@ -139,14 +139,14 @@ server activity monitoring.")
         dest = 'help',
         action = 'store_true',
         help = "Show this help message and exit.",
-        default = 'false')
+        default = False)
     # --debug
     parser.add_option(
         '--debug',
         dest = 'debug',
         action = 'store_true',
         help = "Enable debug mode for traceback tracking.",
-        default = 'false')
+        default = False)
     # --no-db-size
     parser.add_option(
         '--no-db-size',
@@ -188,70 +188,70 @@ server activity monitoring.")
         dest = 'nodb',
         action = 'store_true',
         help = "Disable DATABASE.",
-        default = 'false')
+        default = False)
     # --no-user
     group.add_option(
         '--no-user',
         dest = 'nouser',
         action = 'store_true',
         help = "Disable USER.",
-        default = 'false')
+        default = False)
     # --no-client
     group.add_option(
         '--no-client',
         dest = 'noclient',
         action = 'store_true',
         help = "Disable CLIENT.",
-        default = 'false')
+        default = False)
     # --no-cpu
     group.add_option(
         '--no-cpu',
         dest = 'nocpu',
         action = 'store_true',
         help = "Disable CPU%.",
-        default = 'false')
+        default = False)
     # --no-mem
     group.add_option(
         '--no-mem',
         dest = 'nomem',
         action = 'store_true',
         help = "Disable MEM%.",
-        default = 'false')
+        default = False)
     # --no-read
     group.add_option(
         '--no-read',
         dest = 'noread',
         action = 'store_true',
         help = "Disable READ/s.",
-        default = 'false')
+        default = False)
     # --no-write
     group.add_option(
         '--no-write',
         dest = 'nowrite',
         action = 'store_true',
         help = "Disable WRITE/s.",
-        default = 'false')
+        default = False)
     # --no-time
     group.add_option(
         '--no-time',
         dest = 'notime',
         action = 'store_true',
         help = "Disable TIME+.",
-        default = 'false')
+        default = False)
     # --no-wait
     group.add_option(
         '--no-wait',
         dest = 'nowait',
         action = 'store_true',
         help = "Disable W.",
-        default = 'false')
+        default = False)
     # --no-app-name
     group.add_option(
         '--no-app-name',
         dest = 'noappname',
         action = 'store_true',
         help = "Disable App.",
-        default = 'false')
+        default = False)
 
     parser.add_option_group(group)
 
@@ -270,7 +270,7 @@ def main():
         print('Try "pg_activity --help" for more information.')
         sys.exit(1)
     try:
-        if options.help is True:
+        if options.help:
             print(parser.format_help().strip())
             sys.exit(1)
 
@@ -326,7 +326,7 @@ def main():
         # Init curses
         PGAUI.init_curses()
         # color ?
-        if options.nocolor == True:
+        if options.nocolor:
             PGAUI.set_nocolor()
         else:
             PGAUI.set_color()
@@ -406,7 +406,7 @@ def main():
             % (str(err),))
     except curses.error as err:
         PGAUI.at_exit_curses()
-        if debug is True:
+        if debug:
             import traceback
             exc_type, exc_value, exc_traceback = sys.exc_info()
             traceback.print_exception(
@@ -421,7 +421,7 @@ def main():
     except Exception as err:
         PGAUI.at_exit_curses()
         # DEBUG
-        if debug is True:
+        if debug:
             import traceback
             exc_type, exc_value, exc_traceback = sys.exc_info()
             traceback.print_exception(
