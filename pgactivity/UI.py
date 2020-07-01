@@ -619,25 +619,25 @@ class UI:
         flag = flag | PGTOP_FLAG_WRITE | PGTOP_FLAG_TIME | PGTOP_FLAG_WAIT
         flag = flag | PGTOP_FLAG_RELATION | PGTOP_FLAG_TYPE | PGTOP_FLAG_MODE
         flag = flag | PGTOP_FLAG_IOWAIT | PGTOP_FLAG_APPNAME
-        if options.nodb is True:
+        if options.nodb:
             flag -= PGTOP_FLAG_DATABASE
-        if options.nouser is True:
+        if options.nouser:
             flag -= PGTOP_FLAG_USER
-        if options.nocpu is True:
+        if options.nocpu:
             flag -= PGTOP_FLAG_CPU
-        if options.noclient is True:
+        if options.noclient:
             flag -= PGTOP_FLAG_CLIENT
-        if options.nomem is True:
+        if options.nomem:
             flag -= PGTOP_FLAG_MEM
-        if options.noread is True:
+        if options.noread:
             flag -= PGTOP_FLAG_READ
-        if options.nowrite is True:
+        if options.nowrite:
             flag -= PGTOP_FLAG_WRITE
-        if options.notime is True:
+        if options.notime:
             flag -= PGTOP_FLAG_TIME
-        if options.nowait is True:
+        if options.nowait:
             flag -= PGTOP_FLAG_WAIT
-        if options.noappname is True:
+        if options.noappname:
             flag -= PGTOP_FLAG_APPNAME
 
         # Remove some if no running against local pg server.
