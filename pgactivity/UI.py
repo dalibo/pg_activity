@@ -93,7 +93,7 @@ PGTOP_MAX_NCOL = 15
 
 PGTOP_COLS = {
     'activities': {
-        'pid'       : {
+        'pid': {
             'n':  1,
             'name': 'PID',
             'template_h': '%-6s ',
@@ -327,7 +327,7 @@ PGTOP_COLS = {
 MAP_STATES = {
     'idle in transaction': 'idle in trans',
     'idle in transaction (aborted)': 'idle in trans (a)',
-    }
+}
 
 def bytes2human(num):
     """
@@ -476,7 +476,7 @@ class UI:
                 'default': self.__get_color(C_CYAN),
                 'cursor':  self.__get_color(C_CYAN)|curses.A_REVERSE,
                 'yellow':  self.__get_color(C_YELLOW)|curses.A_BOLD
-             },
+            },
             'database': {
                 'default': curses.A_BOLD|self.__get_color(C_GRAY),
                 'cursor':  self.__get_color(C_CYAN)|curses.A_REVERSE,
@@ -986,10 +986,10 @@ class UI:
         """
         if len(pids) == 1:
             colno = self.__print_string(
-                        (self.maxy - 1),
-                        0,
-                        PGTOP_SIGNAL_MESSAGE[action]['s'] % (str(pids[0]),),
-                        self.__get_color(0))
+                (self.maxy - 1),
+                0,
+                PGTOP_SIGNAL_MESSAGE[action]['s'] % (str(pids[0]),),
+                self.__get_color(0))
         else:
             pos = 0
             disp = ""
@@ -1002,16 +1002,16 @@ class UI:
                 disp += "%s" % (pid,)
                 pos += 1
             colno = self.__print_string(
-                        (self.maxy - 1),
-                        0,
-                        PGTOP_SIGNAL_MESSAGE[action]['p'] % (str(disp),),
-                        self.__get_color(0))
+                (self.maxy - 1),
+                0,
+                PGTOP_SIGNAL_MESSAGE[action]['p'] % (str(disp),),
+                self.__get_color(0))
 
         colno += self.__print_string(
-                    (self.maxy - 1),
-                    colno,
-                    self.__add_blank(" "),
-                    self.__get_color(C_CYAN)|curses.A_REVERSE)
+            (self.maxy - 1),
+            colno,
+            self.__add_blank(" "),
+            self.__get_color(C_CYAN)|curses.A_REVERSE)
         while 1:
             try:
                 key = self.win.getch()
@@ -1106,7 +1106,7 @@ class UI:
                 known = True
                 if k == curses.KEY_UP and current_pos > 0:
                     if (self.lines[current_pos] - offset)\
-                        < (self.start_line + 3):
+                            < (self.start_line + 3):
                         offset -= 1
                         self.__scroll_window(process, flag, indent, offset)
                         self.__help_key_interactive()
@@ -1184,21 +1184,21 @@ class UI:
         """
         if self.mode == 'activities':
             return self.__poll_activities(
-                    interval,
-                    flag,
-                    indent,
-                    process,
-                    disp_proc)
+                interval,
+                flag,
+                indent,
+                process,
+                disp_proc)
         elif self.mode == 'waiting' or self.mode == 'blocking':
             return self.__poll_waiting_blocking(
-                    interval,
-                    flag,
-                    indent,
-                    process,
-                    disp_proc)
+                interval,
+                flag,
+                indent,
+                process,
+                disp_proc)
 
     def __poll_activities(self, interval, flag, indent, process = None, \
-        disp_proc = None):
+                          disp_proc = None):
         """
         Poll activities.
         """
@@ -1217,7 +1217,7 @@ class UI:
             do_refresh = True
         # interactive mode
         if (key == curses.KEY_DOWN or key == curses.KEY_UP) and \
-            len(disp_proc) > 0:
+                len(disp_proc) > 0:
             self.__interactive(disp_proc, flag, indent)
             known = False
             do_refresh = True
@@ -1298,37 +1298,37 @@ class UI:
             do_refresh = True
 
         if key == curses.KEY_RESIZE and \
-            self.uibuffer is not None and \
-            'procs' in self.uibuffer:
+                self.uibuffer is not None and \
+                'procs' in self.uibuffer:
             do_refresh = True
 
         if do_refresh is True and \
-            self.uibuffer is not None and \
-            type(self.uibuffer) is dict and \
-            'procs' in self.uibuffer:
-                self.check_window_size()
-                self.refresh_window(
-                    self.uibuffer['procs'],
-                    self.uibuffer['extras'],
-                    self.uibuffer['flag'],
-                    self.uibuffer['indent'],
-                    self.uibuffer['io'],
-                    self.uibuffer['tps'],
-                    self.uibuffer['active_connections'],
-                    self.uibuffer['size_ev'],
-                    self.uibuffer['total_size'])
+                self.uibuffer is not None and \
+                type(self.uibuffer) is dict and \
+                'procs' in self.uibuffer:
+            self.check_window_size()
+            self.refresh_window(
+                self.uibuffer['procs'],
+                self.uibuffer['extras'],
+                self.uibuffer['flag'],
+                self.uibuffer['indent'],
+                self.uibuffer['io'],
+                self.uibuffer['tps'],
+                self.uibuffer['active_connections'],
+                self.uibuffer['size_ev'],
+                self.uibuffer['total_size'])
 
         curses.flushinp()
         t_end = time.time()
         if key > -1 and not known and \
-            (t_end - t_start) < (self.refresh_time * interval):
+                (t_end - t_start) < (self.refresh_time * interval):
             return self.__poll_activities(
-                        ((self.refresh_time * interval) - \
-                            (t_end - t_start))/self.refresh_time,
-                        flag,
-                        indent,
-                        process,
-                        disp_proc)
+                ((self.refresh_time * interval) - \
+                 (t_end - t_start))/self.refresh_time,
+                flag,
+                indent,
+                process,
+                disp_proc)
 
         # poll postgresql activity
         queries =  self.data.pg_get_activities(self.duration_mode)
@@ -1361,12 +1361,12 @@ class UI:
                         proc.set_extra(
                             'read_delta',
                             (new_proc.get_extra('io_counters').read_bytes
-                            - proc.get_extra('io_counters').read_bytes)
+                             - proc.get_extra('io_counters').read_bytes)
                             / (n_io_time - proc.get_extra('io_time')))
                         proc.set_extra(
                             'write_delta',
                             (new_proc.get_extra('io_counters').write_bytes
-                            - proc.get_extra('io_counters').write_bytes)
+                             - proc.get_extra('io_counters').write_bytes)
                             / (n_io_time - proc.get_extra('io_time')))
                         proc.set_extra(
                             'io_counters',
@@ -1449,38 +1449,38 @@ class UI:
         if self.sort == 't':
             # TIME
             disp_procs = sorted(
-                            procs,
-                            key=lambda p: p['duration'],
-                            reverse=True)
+                procs,
+                key=lambda p: p['duration'],
+                reverse=True)
         elif self.sort == 'c':
             # CPU
             disp_procs = sorted(
-                            procs,
-                            key=lambda p: p['cpu'],
-                            reverse=True)
+                procs,
+                key=lambda p: p['cpu'],
+                reverse=True)
         elif self.sort == 'm':
             # MEM
             disp_procs = sorted(
-                            procs,
-                            key=lambda p: p['mem'],
-                            reverse=True)
+                procs,
+                key=lambda p: p['mem'],
+                reverse=True)
         elif self.sort == 'r':
             # READ
             disp_procs = sorted(
-                            procs,
-                            key=lambda p: p['read'],
-                            reverse=True)
+                procs,
+                key=lambda p: p['read'],
+                reverse=True)
         elif self.sort == 'w':
             # WRITE
             disp_procs = sorted(
-                            procs,
-                            key=lambda p: p['write'],
-                            reverse=True)
+                procs,
+                key=lambda p: p['write'],
+                reverse=True)
         else:
             disp_procs = sorted(
-                            procs,
-                            key=lambda p: p['duration'],
-                            reverse=True)
+                procs,
+                key=lambda p: p['duration'],
+                reverse=True)
 
         # Store querie list
         if self.output is not None:
@@ -1490,7 +1490,7 @@ class UI:
         return (disp_procs, new_procs)
 
     def __poll_waiting_blocking(self, interval, flag, indent, \
-        process = None, disp_proc = None):
+                                process = None, disp_proc = None):
         """
         Poll waiting or blocking queries
         """
@@ -1510,7 +1510,7 @@ class UI:
             do_refresh = True
         # interactive mode
         if (k == curses.KEY_DOWN or k == curses.KEY_UP) and \
-            len(disp_proc) > 0:
+                len(disp_proc) > 0:
             self.__interactive(disp_proc, flag, indent)
             known = True
         # activities mode
@@ -1522,13 +1522,13 @@ class UI:
             return self.__poll_activities(0, flag, indent, procs)
         # Waiting queries
         if (k == curses.KEY_F2 or k == ord('2')) and \
-            self.mode != 'waiting':
+                self.mode != 'waiting':
             self.mode = 'waiting'
             curses.flushinp()
             return self.__poll_waiting_blocking(0, flag, indent)
         # blocking queries
         if (k == curses.KEY_F3 or k == ord('3')) and \
-            self.mode != 'blocking':
+                self.mode != 'blocking':
             self.mode = 'blocking'
             curses.flushinp()
             return self.__poll_waiting_blocking(0, flag, indent)
@@ -1569,11 +1569,11 @@ class UI:
             known = True
 
         if k == curses.KEY_RESIZE and self.uibuffer is not None and \
-            'procs' in self.uibuffer:
+                'procs' in self.uibuffer:
             do_refresh = True
 
         if do_refresh is True and self.uibuffer is not None and \
-            'procs' in self.uibuffer:
+                'procs' in self.uibuffer:
             self.check_window_size()
             self.refresh_window(
                 self.uibuffer['procs'],
@@ -1589,15 +1589,15 @@ class UI:
         curses.flushinp()
         t_end = time.time()
         if k > -1 and \
-            not known and \
-            (t_end - t_start) < (self.refresh_time * interval):
+                not known and \
+                (t_end - t_start) < (self.refresh_time * interval):
             return self.__poll_waiting_blocking(
-                    ((self.refresh_time * interval) -\
-                        (t_end - t_start))/self.refresh_time,
-                    flag,
-                    indent,
-                    process,
-                    disp_proc)
+                ((self.refresh_time * interval) -\
+                 (t_end - t_start))/self.refresh_time,
+                flag,
+                indent,
+                process,
+                disp_proc)
 
         # poll postgresql activity
         if self.mode == 'waiting':
@@ -1613,9 +1613,9 @@ class UI:
 
         # return processes sorted by query/transaction/backend duration
         disp_procs = sorted(
-                        queries,
-                        key=lambda q: q['duration'],
-                        reverse=True)
+            queries,
+            key=lambda q: q['duration'],
+            reverse=True)
 
         return (disp_procs, new_procs)
 
@@ -1647,7 +1647,7 @@ class UI:
         res = [0] * self.max_ncol
         for _, val in PGTOP_COLS[self.mode].items():
             if val['mandatory'] or \
-                (not val['mandatory'] and val['flag'] & flag):
+                    (not val['mandatory'] and val['flag'] & flag):
                 res[int(val['n'])] = val
         for val in res:
             if val is not 0:
@@ -1666,7 +1666,7 @@ class UI:
         color = self.__get_color(C_GREEN)
         for _, val in PGTOP_COLS[self.mode].items():
             if val['mandatory'] or \
-                (not val['mandatory'] and val['flag'] & flag):
+                    (not val['mandatory'] and val['flag'] & flag):
                 res[int(val['n'])] = val
         for val in res:
             if val is not 0:
@@ -1675,7 +1675,7 @@ class UI:
                     (val['name'] == "MEM%" and self.sort == 'm') or
                     (val['name'] == "READ/s" and self.sort == 'r') or
                     (val['name'] == "WRITE/s" and self.sort == 'w') or
-                    (val['name'] == "TIME+" and self.sort == 't')):
+                        (val['name'] == "TIME+" and self.sort == 't')):
                     color_highlight = self.__get_color(C_CYAN)
                 else:
                     color_highlight = color
@@ -1692,7 +1692,7 @@ class UI:
         self.lineno += 1
 
     def __print_header(self, pg_version, hostname, user, host, \
-        port, database, ios, tps, active_connections, size_ev, total_size):
+                       port, database, ios, tps, active_connections, size_ev, total_size):
         """
         Print window header
         """
@@ -1700,103 +1700,103 @@ class UI:
         colno = 0
         version = " %s" % (pg_version)
         colno = self.__print_string(
-                    self.lineno,
-                    colno,
-                    version)
+            self.lineno,
+            colno,
+            version)
         colno += self.__print_string(
-                    self.lineno,
-                    colno,
-                    " - ")
+            self.lineno,
+            colno,
+            " - ")
         colno += self.__print_string(
-                    self.lineno,
-                    colno,
-                    hostname,
-                    curses.A_BOLD)
+            self.lineno,
+            colno,
+            hostname,
+            curses.A_BOLD)
         colno += self.__print_string(
-                    self.lineno,
-                    colno,
-                    " - ")
+            self.lineno,
+            colno,
+            " - ")
         colno += self.__print_string(
-                    self.lineno,
-                    colno,
-                    user,
-                    self.__get_color(C_CYAN))
+            self.lineno,
+            colno,
+            user,
+            self.__get_color(C_CYAN))
         colno += self.__print_string(
-                    self.lineno,
-                    colno,
-                    "@")
+            self.lineno,
+            colno,
+            "@")
         colno += self.__print_string(
-                    self.lineno,
-                    colno,
-                    host,
-                    self.__get_color(C_CYAN))
+            self.lineno,
+            colno,
+            host,
+            self.__get_color(C_CYAN))
         colno += self.__print_string(
-                    self.lineno,
-                    colno,
-                    ":")
+            self.lineno,
+            colno,
+            ":")
         colno += self.__print_string(
-                    self.lineno,
-                    colno,
-                    port,
-                    self.__get_color(C_CYAN))
+            self.lineno,
+            colno,
+            port,
+            self.__get_color(C_CYAN))
         colno += self.__print_string(
-                    self.lineno,
-                    colno,
-                    "/")
+            self.lineno,
+            colno,
+            "/")
         colno += self.__print_string(
-                    self.lineno,
-                    colno,
-                    database,
-                    self.__get_color(C_CYAN))
+            self.lineno,
+            colno,
+            database,
+            self.__get_color(C_CYAN))
         colno += self.__print_string(
-                    self.lineno,
-                    colno,
-                    " - Ref.: %ss" % (self.refresh_time,))
+            self.lineno,
+            colno,
+            " - Ref.: %ss" % (self.refresh_time,))
         if self.options.minduration > 0:
             colno += self.__print_string(
-                        self.lineno,
-                        colno,
-                        " - Min. duration: %ss" % (self.options.minduration,))
+                self.lineno,
+                colno,
+                " - Min. duration: %ss" % (self.options.minduration,))
         colno = 0
         self.lineno += 1
         colno += self.__print_string(
-                    self.lineno,
-                    colno,
-                    "  Size: ")
+            self.lineno,
+            colno,
+            "  Size: ")
         colno += self.__print_string(
-                    self.lineno,
-                    colno,
-                    "%8s" % (bytes2human(total_size),),)
+            self.lineno,
+            colno,
+            "%8s" % (bytes2human(total_size),),)
         colno += self.__print_string(
-                    self.lineno,
-                    colno,
-                    " - %9s/s" % (bytes2human(size_ev),),)
+            self.lineno,
+            colno,
+            " - %9s/s" % (bytes2human(size_ev),),)
         colno += self.__print_string(
-                    self.lineno,
-                    colno,
-                    "        | TPS: ")
+            self.lineno,
+            colno,
+            "        | TPS: ")
         colno += self.__print_string(
-                    self.lineno,
-                    colno,
-                    "%11s" % (tps,),
+            self.lineno,
+            colno,
+            "%11s" % (tps,),
                     self.__get_color(C_GREEN)|curses.A_BOLD)
         colno += self.__print_string(
-                    self.lineno,
-                    colno,
-                    "        | Active Connections: ")
+            self.lineno,
+            colno,
+            "        | Active Connections: ")
         colno += self.__print_string(
-                    self.lineno,
-                    colno,
-                    "%11s" % (active_connections,),
+            self.lineno,
+            colno,
+            "%11s" % (active_connections,),
                     self.__get_color(C_GREEN)|curses.A_BOLD)
         colno += self.__print_string(
-                    self.lineno,
-                    colno,
-                    "        | Duration mode: ")
+            self.lineno,
+            colno,
+            "        | Duration mode: ")
         colno += self.__print_string(
-                    self.lineno,
-                    colno,
-                    "%11s" % (self.data.get_duration_mode_name(self.duration_mode),),
+            self.lineno,
+            colno,
+            "%11s" % (self.data.get_duration_mode_name(self.duration_mode),),
                     self.__get_color(C_GREEN)|curses.A_BOLD)
 
         # If not local connection, don't get and display system informations
@@ -1848,128 +1848,128 @@ class UI:
         text = "pg_activity %s - (c) 2012-2019 Julien Tachoires" % \
             (self.version)
         self.__print_string(
-                self.lineno,
-                0,
-                text,
-                self.__get_color(C_GREEN)|curses.A_BOLD)
+            self.lineno,
+            0,
+            text,
+            self.__get_color(C_GREEN)|curses.A_BOLD)
         self.lineno += 1
         text = "Released under PostgreSQL License."
         self.__print_string(
-                self.lineno,
-                0,
-                text)
+            self.lineno,
+            0,
+            text)
         self.lineno += 2
         self.__display_help_key(
-                self.lineno,
-                00,
-                "Up/Down",
+            self.lineno,
+            00,
+            "Up/Down",
                 "scroll process list")
         self.__display_help_key(
-                self.lineno,
-                45,
-                "      C",
+            self.lineno,
+            45,
+            "      C",
                 "activate/deactivate colors")
         self.lineno += 1
         self.__display_help_key(
-                self.lineno,
-                00,
-                "  Space",
+            self.lineno,
+            00,
+            "  Space",
                 "pause")
         self.__display_help_key(
-                self.lineno,
-                45,
-                "      r",
+            self.lineno,
+            45,
+            "      r",
                 "sort by READ/s desc. (activities)")
         self.lineno += 1
         self.__display_help_key(
-                self.lineno,
-                00,
-                "      v",
+            self.lineno,
+            00,
+            "      v",
                 "change display mode")
         self.__display_help_key(
-                self.lineno,
-                45,
-                "      w",
+            self.lineno,
+            45,
+            "      w",
                 "sort by WRITE/s desc. (activities)")
         self.lineno += 1
         self.__display_help_key(
-                self.lineno,
-                00,
-                "      q",
+            self.lineno,
+            00,
+            "      q",
                 "quit")
         self.__display_help_key(
-                self.lineno,
-                45,
-                "      c",
+            self.lineno,
+            45,
+            "      c",
                 "sort by CPU% desc. (activities)")
         self.lineno += 1
         self.__display_help_key(
-                self.lineno,
-                00,
-                "      +",
+            self.lineno,
+            00,
+            "      +",
                 "increase refresh time (max:5s)")
         self.__display_help_key(
-                self.lineno,
-                45,
-                "      m",
+            self.lineno,
+            45,
+            "      m",
                 "sort by MEM% desc. (activities)")
         self.lineno += 1
         self.__display_help_key(
-                self.lineno,
-                00,
-                "      -",
+            self.lineno,
+            00,
+            "      -",
                 "decrease refresh time (min:0.5s)")
         self.__display_help_key(
-                self.lineno,
-                45,
-                "      t",
+            self.lineno,
+            45,
+            "      t",
                 "sort by TIME+ desc. (activities)")
         self.lineno += 1
         self.__display_help_key(
-                self.lineno,
-                00,
-                "      R",
+            self.lineno,
+            00,
+            "      R",
                 "force refresh")
         self.__display_help_key(
-                self.lineno,
-                45,
-                "      T",
+            self.lineno,
+            45,
+            "      T",
                 "change duration mode")
         self.lineno += 1
         self.__display_help_key(
-                self.lineno,
-                00,
-                "      D",
+            self.lineno,
+            00,
+            "      D",
                 "force refresh database size")
         self.lineno += 1
         self.__print_string(
-                self.lineno,
-                0,
-                "Mode")
+            self.lineno,
+            0,
+            "Mode")
         self.lineno += 1
         self.__display_help_key(
-                self.lineno,
-                00,
-                "   F1/1",
+            self.lineno,
+            00,
+            "   F1/1",
                 "running queries")
         self.lineno += 1
         self.__display_help_key(
-                self.lineno,
-                00,
-                "   F2/2",
+            self.lineno,
+            00,
+            "   F2/2",
                 "waiting queries")
         self.lineno += 1
         self.__display_help_key(
-                self.lineno,
-                00,
-                "   F3/3",
+            self.lineno,
+            00,
+            "   F3/3",
                 "blocking queries")
 
         self.lineno += 2
         self.__print_string(
-                self.lineno,
-                0,
-                "Press any key to exit.")
+            self.lineno,
+            0,
+            "Press any key to exit.")
         self.win.timeout(-1)
         try:
             self.win.getch()
@@ -1981,18 +1981,18 @@ class UI:
         Display help key
         """
         pos1 = self.__print_string(
-                lineno,
-                colno,
-                key,
-                self.__get_color(C_CYAN)|curses.A_BOLD)
+            lineno,
+            colno,
+            key,
+            self.__get_color(C_CYAN)|curses.A_BOLD)
         pos2 = self.__print_string(
-                lineno,
-                colno + pos1,
-                ": %s" % (help_msg,))
+            lineno,
+            colno + pos1,
+            ": %s" % (help_msg,))
         return (colno + pos1 + pos2)
 
     def refresh_window(self, procs, extras, flag, indent, ios, \
-        tps, active_connections, size_ev, total_size):
+                       tps, active_connections, size_ev, total_size):
         """
         Refresh the window
         """
@@ -2041,7 +2041,7 @@ class UI:
             self.__print_string(line, 0, self.__add_blank(" "))
 
     def __refresh_line(self, process, flag, indent, \
-        typecolor = 'default', line = None):
+                       typecolor = 'default', line = None):
         """
         Refresh a line for activities mode
         """
@@ -2055,94 +2055,94 @@ class UI:
 
         colno = 0
         colno += self.__print_string(
-                    l_lineno,
-                    colno,
-                    "%-6s " % (process['pid'],),
+            l_lineno,
+            colno,
+            "%-6s " % (process['pid'],),
                     self.line_colors['pid'][typecolor])
         process['query'] = clean_str(process['query'])
         if flag & PGTOP_FLAG_DATABASE:
             colno += self.__print_string(
-                        l_lineno,
-                        colno,
-                        PGTOP_COLS[self.mode]['database']['template_h'] % \
-                            (str(process['database'])[:16],),
-                        self.line_colors['database'][typecolor])
+                l_lineno,
+                colno,
+                PGTOP_COLS[self.mode]['database']['template_h'] % \
+                (str(process['database'])[:16],),
+                self.line_colors['database'][typecolor])
         if self.mode == 'activities':
             if flag & PGTOP_FLAG_APPNAME:
                 colno += self.__print_string(
-                            l_lineno,
-                            colno,
-                            "%16s " % (str(process['appname'])[:16],),
+                    l_lineno,
+                    colno,
+                    "%16s " % (str(process['appname'])[:16],),
                             self.line_colors['appname'][typecolor])
             if flag & PGTOP_FLAG_USER:
                 colno += self.__print_string(
-                            l_lineno,
-                            colno,
-                            "%16s " % (str(process['user'])[:16],),
+                    l_lineno,
+                    colno,
+                    "%16s " % (str(process['user'])[:16],),
                             self.line_colors['user'][typecolor])
             if flag & PGTOP_FLAG_CLIENT:
                 colno += self.__print_string(
-                            l_lineno,
-                            colno,
-                            "%16s " % (str(process['client'])[:16],),
+                    l_lineno,
+                    colno,
+                    "%16s " % (str(process['client'])[:16],),
                             self.line_colors['client'][typecolor])
             if flag & PGTOP_FLAG_CPU:
                 colno += self.__print_string(
-                            l_lineno,
-                            colno,
-                            "%6s " % (process['cpu'],),
+                    l_lineno,
+                    colno,
+                    "%6s " % (process['cpu'],),
                             self.line_colors['cpu'][typecolor])
             if flag & PGTOP_FLAG_MEM:
                 colno += self.__print_string(
-                            l_lineno,
-                            colno,
-                            "%4s " % (round(process['mem'], 1),),
+                    l_lineno,
+                    colno,
+                    "%4s " % (round(process['mem'], 1),),
                             self.line_colors['mem'][typecolor])
             if flag & PGTOP_FLAG_READ:
                 colno += self.__print_string(
-                            l_lineno,
-                            colno,
-                            "%8s " % (bytes2human(process['read']),),
+                    l_lineno,
+                    colno,
+                    "%8s " % (bytes2human(process['read']),),
                             self.line_colors['read'][typecolor])
             if flag & PGTOP_FLAG_WRITE:
                 colno += self.__print_string(
-                            l_lineno,
-                            colno,
-                            "%8s " % (bytes2human(process['write']),),
+                    l_lineno,
+                    colno,
+                    "%8s " % (bytes2human(process['write']),),
                             self.line_colors['write'][typecolor])
         elif self.mode == 'waiting' or self.mode == 'blocking':
             if flag & PGTOP_FLAG_APPNAME:
                 colno += self.__print_string(
-                            l_lineno,
-                            colno,
-                            "%16s " % (str(process['appname'])[:16],),
+                    l_lineno,
+                    colno,
+                    "%16s " % (str(process['appname'])[:16],),
                             self.line_colors['appname'][typecolor])
             if flag & PGTOP_FLAG_RELATION:
                 colno += self.__print_string(
-                            l_lineno,
-                            colno,
-                            "%9s " % (str(process['relation'])[:9],),
+                    l_lineno,
+                    colno,
+                    "%9s " % (str(process['relation'])[:9],),
                             self.line_colors['relation'][typecolor])
             if flag & PGTOP_FLAG_TYPE:
                 colno += self.__print_string(
-                            l_lineno,
-                            colno,
-                            "%16s " % (str(process['type'])[:16],),
+                    l_lineno,
+                    colno,
+                    "%16s " % (str(process['type'])[:16],),
                             self.line_colors['type'][typecolor])
             if flag & PGTOP_FLAG_MODE:
                 if process['mode'] == 'ExclusiveLock' or \
-                    process['mode'] == 'RowExclusiveLock' or \
-                    process['mode'] == 'AccessExclusiveLock':
+                        process['mode'] == 'RowExclusiveLock' or \
+                        process['mode'] == 'AccessExclusiveLock':
                     colno += self.__print_string(
-                                l_lineno,
-                                colno,
-                                "%16s " % (str(process['mode'])[:16],),
+                        l_lineno,
+                        colno,
+                        "%16s " % (str(process['mode'])[:16],),
                                 self.line_colors['mode_red'][typecolor])
                 else:
                     colno += self.__print_string(
-                                l_lineno,
-                                colno,
-                                "%16s " % (str(process['mode'])[:16],),
+                        l_lineno,
+                        colno,
+                        "%16s " % (str(process['mode'])[:16],),
                                 self.line_colors['mode_yellow'][typecolor])
 
         if flag & PGTOP_FLAG_TIME:
@@ -2150,64 +2150,64 @@ class UI:
                 ctime = timedelta(seconds=float(process['duration']))
                 mic = '%.6d' % (ctime.microseconds)
                 ctime = "%s:%s.%s" % (str((ctime.seconds // 60)).zfill(2), \
-                            str((ctime.seconds % 60)).zfill(2), str(mic)[:2])
+                                      str((ctime.seconds % 60)).zfill(2), str(mic)[:2])
             elif process['duration'] >= 60000:
                 ctime = "%s h" % str(int(process['duration'] / 3600))
 
             if process['duration'] == None:
                 # When duration is not available
                 colno += self.__print_string(
-                            l_lineno,
-                            colno,
-                            "%9s" % "N/A",
+                    l_lineno,
+                    colno,
+                    "%9s" % "N/A",
                             self.line_colors['time_green'][typecolor])
             elif process['duration'] < 1:
                 if process['duration'] < 0:
                     # Set duration to 0 if < 0
                     process['duration'] = 0
                 colno += self.__print_string(
-                            l_lineno,
-                            colno,
-                            " %.6f " % (process['duration'],),
+                    l_lineno,
+                    colno,
+                    " %.6f " % (process['duration'],),
                             self.line_colors['time_green'][typecolor])
             elif process['duration'] >= 1 and process['duration'] < 3:
                 colno += self.__print_string(
-                            l_lineno,
-                            colno,
-                            "%9s " % (ctime,),
+                    l_lineno,
+                    colno,
+                    "%9s " % (ctime,),
                             self.line_colors['time_yellow'][typecolor])
             else:
                 colno += self.__print_string(
-                            l_lineno,
-                            colno,
-                            "%9s " % (ctime,),
+                    l_lineno,
+                    colno,
+                    "%9s " % (ctime,),
                             self.line_colors['time_red'][typecolor])
         if self.mode == 'activities' and flag & PGTOP_FLAG_WAIT:
             if process['wait']:
                 colno += self.__print_string(
-                            l_lineno,
-                            colno,
-                            "%2s " % ('Y',),
+                    l_lineno,
+                    colno,
+                    "%2s " % ('Y',),
                             self.line_colors['wait_red'][typecolor])
             else:
                 colno += self.__print_string(
-                            l_lineno,
-                            colno,
-                            "%2s " % ('N',),
+                    l_lineno,
+                    colno,
+                    "%2s " % ('N',),
                             self.line_colors['wait_green'][typecolor])
 
         if self.mode == 'activities' and flag & PGTOP_FLAG_IOWAIT:
             if process['io_wait'] == 'Y':
                 colno += self.__print_string(
-                            l_lineno,
-                            colno,
-                            "%4s " % ('Y',),
+                    l_lineno,
+                    colno,
+                    "%4s " % ('Y',),
                             self.line_colors['wait_red'][typecolor])
             else:
                 colno += self.__print_string(
-                            l_lineno,
-                            colno,
-                            "%4s " % ('N',),
+                    l_lineno,
+                    colno,
+                    "%4s " % ('N',),
                             self.line_colors['wait_green'][typecolor])
 
         state = MAP_STATES.get(process['state']) or process['state']
@@ -2221,9 +2221,9 @@ class UI:
             color_state = 'state_default'
 
         colno += self.__print_string(
-                    l_lineno,
-                    colno,
-                    " %17s  " % state,
+            l_lineno,
+            colno,
+            " %17s  " % state,
                     self.line_colors[color_state][typecolor])
 
         dif = self.maxx - len(indent) - 1
@@ -2235,12 +2235,12 @@ class UI:
         if self.verbose_mode == PGTOP_TRUNCATE:
             query += process['query'][:dif]
             colno += self.__print_string(
-                        l_lineno,
-                        colno,
-                        " %s" % (self.__add_blank(query, len(indent)+1),),
+                l_lineno,
+                colno,
+                " %s" % (self.__add_blank(query, len(indent)+1),),
                         self.line_colors['query'][typecolor])
         elif self.verbose_mode == PGTOP_WRAP or \
-            self.verbose_mode == PGTOP_WRAP_NOINDENT:
+                self.verbose_mode == PGTOP_WRAP_NOINDENT:
             query += process['query']
             query_wrote = ''
             offset = 0
@@ -2266,15 +2266,15 @@ class UI:
                         l_lineno,
                         0,
                         "%s" % (self.__add_blank(p_indent + " " + \
-                                    query_part, len(indent)+1)),
+                                                 query_part, len(indent)+1)),
                         self.line_colors['query'][typecolor])
                     query_wrote += query_part
                     offset = len(query_wrote)
             else:
                 colno += self.__print_string(
-                            l_lineno,
-                            colno,
-                            " %s" % (self.__add_blank(query, len(indent)),),
+                    l_lineno,
+                    colno,
+                    " %s" % (self.__add_blank(query, len(indent)),),
                             self.line_colors['query'][typecolor])
         self.lineno += 1
 
@@ -2314,4 +2314,4 @@ class UI:
                             state=p.get('state', 'N/A'),
                             query=self.__clean_str_csv(p.get('query', 'N/A'))
                         )
-                )
+                        )
