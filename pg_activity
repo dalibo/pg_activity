@@ -27,12 +27,8 @@ SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 from __future__ import print_function
 
-PGTOP_VERSION = "1.6.1"
-
 import os
 import sys
-if os.name != 'posix':
-    sys.exit("FATAL: Platform not supported.")
 import signal
 from optparse import OptionParser, OptionGroup
 import socket
@@ -44,6 +40,10 @@ import time
 from psycopg2 import errorcodes
 
 from pgactivity import UI
+
+
+PGTOP_VERSION = "1.6.1"
+
 
 # Customized OptionParser
 class ModifiedOptionParser(OptionParser):
@@ -465,5 +465,7 @@ def pg_connect(options, password=None, service=None, exit_on_failed=True):
 
 # Call the main function
 if __name__ == '__main__':
+    if os.name != 'posix':
+        sys.exit("FATAL: Platform not supported.")
     signal.signal(signal.SIGTERM, PGAUI.signal_handler)
     main()
