@@ -27,8 +27,6 @@ SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 import os
 import sys
-if os.name != 'posix':
-    sys.exit("FATAL: Platform not supported.")
 import signal
 from optparse import OptionParser, OptionGroup
 import socket
@@ -464,5 +462,7 @@ def pg_connect(options, password=None, service=None, exit_on_failed=True):
 
 # Call the main function
 if __name__ == '__main__':
+    if os.name != 'posix':
+        sys.exit("FATAL: Platform not supported.")
     signal.signal(signal.SIGTERM, PGAUI.signal_handler)
     main()
