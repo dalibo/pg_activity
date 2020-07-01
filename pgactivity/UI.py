@@ -23,7 +23,6 @@ BASIS, AND JULIEN TACHOIRES HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE,
 SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 """
 
-from __future__ import print_function
 from pprint import pprint
 import curses
 import re
