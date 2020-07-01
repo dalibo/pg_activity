@@ -829,7 +829,7 @@ class UI:
                         self.start_line,
                         0,
                         self.__get_pause_msg(),
-                        self.__get_color(C_RED_BLACK)|\
+                        self.__get_color(C_RED_BLACK)|
                             curses.A_REVERSE|curses.A_BOLD)
             curses.flushinp()
 
@@ -1093,7 +1093,7 @@ class UI:
             # terminate/cancel the backend attached to this PID
             if k == PGTOP_SIGNAL_TERMINATE_BACKEND or k == PGTOP_SIGNAL_CANCEL_BACKEND:
                 if len(self.pid_yank) == 0:
-                    self.__ask_terminate_or_cancel_backends( \
+                    self.__ask_terminate_or_cancel_backends(
                         k, [process[current_pos]['pid']],)
                 else:
                     self.__ask_terminate_or_cancel_backends(k, self.pid_yank,)
@@ -1197,7 +1197,7 @@ class UI:
                 process,
                 disp_proc)
 
-    def __poll_activities(self, interval, flag, indent, process = None, \
+    def __poll_activities(self, interval, flag, indent, process = None,
                           disp_proc = None):
         """
         Poll activities.
@@ -1323,7 +1323,7 @@ class UI:
         if key > -1 and not known and \
                 (t_end - t_start) < (self.refresh_time * interval):
             return self.__poll_activities(
-                ((self.refresh_time * interval) - \
+                ((self.refresh_time * interval) -
                  (t_end - t_start))/self.refresh_time,
                 flag,
                 indent,
@@ -1390,7 +1390,7 @@ class UI:
                         proc.get_extra('psutil_proc').memory_percent())
                     proc.set_extra(
                         'cpu_percent',
-                        proc.get_extra('psutil_proc').\
+                        proc.get_extra('psutil_proc').
                             cpu_percent(interval=0))
                     new_procs[pid] = proc
                     procs.append({
@@ -1489,7 +1489,7 @@ class UI:
         self.__check_pid_yank()
         return (disp_procs, new_procs)
 
-    def __poll_waiting_blocking(self, interval, flag, indent, \
+    def __poll_waiting_blocking(self, interval, flag, indent,
                                 process = None, disp_proc = None):
         """
         Poll waiting or blocking queries
@@ -1592,7 +1592,7 @@ class UI:
                 not known and \
                 (t_end - t_start) < (self.refresh_time * interval):
             return self.__poll_waiting_blocking(
-                ((self.refresh_time * interval) -\
+                ((self.refresh_time * interval) -
                  (t_end - t_start))/self.refresh_time,
                 flag,
                 indent,
@@ -1691,7 +1691,7 @@ class UI:
                 xpos += len(disp)
         self.lineno += 1
 
-    def __print_header(self, pg_version, hostname, user, host, \
+    def __print_header(self, pg_version, hostname, user, host,
                        port, database, ios, tps, active_connections, size_ev, total_size):
         """
         Print window header
@@ -1804,14 +1804,14 @@ class UI:
             return
 
         # Get memory & swap usage
-        (mem_used_per, mem_used, mem_total, swap_used_per, \
+        (mem_used_per, mem_used, mem_total, swap_used_per,
             swap_used, swap_total) = self.data.get_mem_swap()
         # Get load average
         (av1, av2, av3) = self.data.get_load_average()
 
         self.lineno += 1
         line = "  Mem.: %6s0%% - %9s/%-8s" % \
-            (mem_used_per, bytes2human(mem_used), \
+            (mem_used_per, bytes2human(mem_used),
                 bytes2human(mem_total))
         colno_io = self.__print_string(self.lineno, 0, line)
 
@@ -1823,7 +1823,7 @@ class UI:
 
         # swap usage
         line = "  Swap: %6s0%% - %9s/%-8s" % \
-            (swap_used_per, bytes2human(swap_used), \
+            (swap_used_per, bytes2human(swap_used),
                 bytes2human(swap_total))
         self.lineno += 1
         colno = self.__print_string(self.lineno, 0, line)
@@ -1991,7 +1991,7 @@ class UI:
             ": %s" % (help_msg,))
         return (colno + pos1 + pos2)
 
-    def refresh_window(self, procs, extras, flag, indent, ios, \
+    def refresh_window(self, procs, extras, flag, indent, ios,
                        tps, active_connections, size_ev, total_size):
         """
         Refresh the window
@@ -2040,7 +2040,7 @@ class UI:
         for line in range(self.lineno, (self.maxy-1)):
             self.__print_string(line, 0, self.__add_blank(" "))
 
-    def __refresh_line(self, process, flag, indent, \
+    def __refresh_line(self, process, flag, indent,
                        typecolor = 'default', line = None):
         """
         Refresh a line for activities mode
@@ -2064,7 +2064,7 @@ class UI:
             colno += self.__print_string(
                 l_lineno,
                 colno,
-                PGTOP_COLS[self.mode]['database']['template_h'] % \
+                PGTOP_COLS[self.mode]['database']['template_h'] %
                 (str(process['database'])[:16],),
                 self.line_colors['database'][typecolor])
         if self.mode == 'activities':
@@ -2149,7 +2149,7 @@ class UI:
             if process['duration'] >= 1 and process['duration'] < 60000:
                 ctime = timedelta(seconds=float(process['duration']))
                 mic = '%.6d' % (ctime.microseconds)
-                ctime = "%s:%s.%s" % (str((ctime.seconds // 60)).zfill(2), \
+                ctime = "%s:%s.%s" % (str((ctime.seconds // 60)).zfill(2),
                                       str((ctime.seconds % 60)).zfill(2), str(mic)[:2])
             elif process['duration'] >= 60000:
                 ctime = "%s h" % str(int(process['duration'] / 3600))
@@ -2265,7 +2265,7 @@ class UI:
                     self.__print_string(
                         l_lineno,
                         0,
-                        "%s" % (self.__add_blank(p_indent + " " + \
+                        "%s" % (self.__add_blank(p_indent + " " +
                                                  query_part, len(indent)+1)),
                         self.line_colors['query'][typecolor])
                     query_wrote += query_part
