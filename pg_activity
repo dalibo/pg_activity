@@ -50,12 +50,14 @@ class ModifiedOptionParser(OptionParser):
     def error(self, msg):
         raise OptionParsingError(msg)
 
+
 class OptionParsingError(RuntimeError):
     """
     OptionParsingError
     """
     def __init__(self, msg):
         self.msg = msg
+
 
 # Create the UI
 PGAUI = UI.UI(PGTOP_VERSION)
@@ -64,7 +66,7 @@ PGAUI = UI.UI(PGTOP_VERSION)
 def get_parser():
     parser = ModifiedOptionParser(
         add_help_option = False,
-        version = "%prog "+PGTOP_VERSION,
+        version = "%prog " + PGTOP_VERSION,
         description = "htop like application for PostgreSQL \
 server activity monitoring.")
     # -U / --username
@@ -73,8 +75,7 @@ server activity monitoring.")
         '--username',
         dest = 'username',
         default = os.environ.get('PGUSER') or getpass.getuser(),
-        help = "Database user name (default: \"%s\")."
-            % (getpass.getuser(),),
+        help = "Database user name (default: \"%s\")." % getpass.getuser(),
         metavar = 'USERNAME')
     # -p / --port
     parser.add_option(
@@ -304,7 +305,7 @@ def main():
         # top part
         interval = 0
         if PGAUI.get_mode() == 'activities':
-            queries =  PGAUI.data.pg_get_activities()
+            queries = PGAUI.data.pg_get_activities()
             procs = PGAUI.data.sys_get_proc(queries, PGAUI.get_is_local())
         elif PGAUI.get_mode() == 'waiting':
             procs = PGAUI.data.pg_get_waiting()
@@ -412,7 +413,7 @@ def main():
                 exc_traceback,
                 file=sys.stdout)
         sys.exit("FATAL: %s" % (str(err),))
-    except KeyboardInterrupt as err:
+    except KeyboardInterrupt:
         PGAUI.at_exit_curses()
         sys.exit(1)
     except Exception as err:
@@ -444,8 +445,9 @@ def pg_connect(options, password=None, service=None, exit_on_failed=True):
             )
             break
         except psycopg2.OperationalError as err:
-            if nb_try < 1 and (err.pgcode == errorcodes.INVALID_PASSWORD or
-                str(err).strip().startswith(
+            if nb_try < 1 and (
+                err.pgcode == errorcodes.INVALID_PASSWORD
+                or str(err).strip().startswith(
                     "FATAL:  password authentication failed for user")):
                 nb_try += 1
                 password = PGAUI.ask_password()
