@@ -1,0 +1,12 @@
+[flake8]
+max-line-length = 120
+ignore =
+  E131, # continuation line unaligned for hanging indent
+  E222, # multiple spaces after operator
+  E226, # missing whitespace around arithmetic operator
+  E227, # missing whitespace around bitwise or shift operator
+  E241, # multiple spaces after ':'
+  E251, # unexpected spaces around keyword / parameter equals
+  E302, # expected 2 blank lines, found 1
+  E305, # expected 2 blank lines after class or function definition, found 1
+  W503, # line break before binary operator
