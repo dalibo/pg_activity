@@ -28,6 +28,7 @@ setup(
     ],
     python_requires=">=3.6",
     install_requires = [
+        "blessed",
         "psutil >= 0.4.1",
     ],
     data_files = data_files,
