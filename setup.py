@@ -28,7 +28,9 @@ setup(
     ],
     python_requires=">=3.6",
     install_requires = [
+        "attrs",
         "blessed",
+        "humanize",
         "psutil >= 0.4.1",
     ],
     data_files = data_files,
