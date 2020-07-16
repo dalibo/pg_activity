@@ -3,3 +3,6 @@ include docs/man/pg_activity.1
 recursive-include docs *.png *.pod *.sh *.svg
 include *.md
 include *.txt
+include .flake8
+include mypy.ini
+include pyproject.toml

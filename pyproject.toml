@@ -1,0 +1,20 @@
+[tool.black]
+line-length = 88
+include = '\.pyi?$'
+exclude = '''
+(
+  /(
+      \.eggs
+    | \.git
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | dist
+  )/
+  | setup.py
+  | pg_activity
+  | pgactivity/Data.py
+  | pgactivity/Process.py
+  | pgactivity/UI.py
+)
+'''
