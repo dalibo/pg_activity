@@ -6,3 +6,4 @@ include *.txt
 include .flake8
 include mypy.ini
 include pyproject.toml
+include tox.ini
