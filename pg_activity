@@ -263,7 +263,7 @@ def main(options):
     try:
         debug = options.debug
 
-        password = pg_connect(options, password=os.environ.get('PGPASSWORD'),
+        password = pg_connect(PGAUI.data, options, password=os.environ.get('PGPASSWORD'),
                               service=os.environ.get('PGSERVICE'))
 
         pg_version = PGAUI.data.pg_get_version()
@@ -377,7 +377,7 @@ def main(options):
                     print("ERROR: Not connected to PostgreSQL, trying to open "
                           "a new connection")
                     try:
-                        pg_connect(options, password, os.environ.get('PGSERVICE'),
+                        pg_connect(PGAUI.data, options, password, os.environ.get('PGSERVICE'),
                                    exit_on_failed=False)
                         not_connected = False
                     except Exception:
@@ -419,11 +419,11 @@ def main(options):
         sys.exit("FATAL: %s" % (str(err),))
 
 
-def pg_connect(options, password=None, service=None, exit_on_failed=True):
+def pg_connect(data, options, password=None, service=None, exit_on_failed=True):
     nb_try = 0
     while nb_try < 2:
         try:
-            PGAUI.data.pg_connect(
+            data.pg_connect(
                 host=options.host,
                 port=options.port,
                 user=options.username,
