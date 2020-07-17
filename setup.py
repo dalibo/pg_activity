@@ -3,7 +3,7 @@ import sys
 data_files = None
 for opt in sys.argv:
     if opt == '--with-man':
-        data_files = [ ('/usr/share/man/man1', ['docs/man/pg_activity.1']) ]
+        data_files = [('/usr/share/man/man1', ['docs/man/pg_activity.1'])]
         sys.argv.remove(opt)
 
 from setuptools import setup
