@@ -80,7 +80,7 @@ class Data:
     refresh_dbsize = False
     min_duration = 0
 
-    def __init__(self,):
+    def __init__(self) -> None:
         """
         Constructor.
         """
@@ -96,7 +96,7 @@ class Data:
         self.refresh_dbsize = False
         self.min_duration = 0
 
-    def get_pg_version(self,):
+    def get_pg_version(self) -> str:
         """
         Get self.pg_version
         """
@@ -182,7 +182,7 @@ class Data:
         except Exception:
             return False
 
-    def pg_get_version(self,):
+    def pg_get_version(self) -> str:
         """
         Get PostgreSQL server version.
         """
@@ -215,10 +215,11 @@ class Data:
         ret = cur.fetchone()
         return ret['terminated']
 
-    def pg_get_num_version(self, text_version):
+    def pg_get_num_version(self, text_version: str) -> None:
         """
-        Get PostgreSQL short & numeric version from
-        a string (SELECT version()).
+        Fetch PostgreSQL short & numeric version from
+        a string (SELECT version()) and set pg_version and pg_num_version
+        attributes.
         """
         res = re.match(
                 r"^(PostgreSQL|EnterpriseDB) ([0-9]+)\.([0-9]+)(?:\.([0-9]+))?",
@@ -239,10 +240,11 @@ class Data:
             return
         self.pg_get_num_dev_version(text_version)
 
-    def pg_get_num_dev_version(self, text_version):
+    def pg_get_num_dev_version(self, text_version: str) -> None:
         """
-        Get PostgreSQL short & numeric devel. or beta version
-        from a string (SELECT version()).
+        Fetch PostgreSQL short & numeric devel. or beta version
+        from a string (SELECT version()) and set pg_version and pg_num_version
+        attributes.
         """
         res = re.match(
             r"^(PostgreSQL|EnterpriseDB) ([0-9]+)(?:\.([0-9]+))?(devel|beta[0-9]+|rc[0-9]+)",
