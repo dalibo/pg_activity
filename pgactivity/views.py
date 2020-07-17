@@ -65,7 +65,7 @@ def header(
     tps: int,
     active_connections: int,
     duration_mode: DurationMode,
-    refresh_time: int,
+    refresh_time: float,
     max_iops: int = 0,
     system_info: Optional[SystemInfo] = None,
 ) -> None:
