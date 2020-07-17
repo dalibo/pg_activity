@@ -2,6 +2,7 @@ from typing import List, Tuple
 
 
 EXIT = "q"
+HELP = "h"
 
 BINDINGS: List[Tuple[str, str]] = [
     ("Up/Down", "scroll process list"),
