@@ -26,6 +26,7 @@ SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 import os
 import re
 import time
+from typing import Dict, Optional, Union
 from warnings import catch_warnings, simplefilter
 
 import psutil
@@ -269,7 +270,14 @@ class Data:
             return
         raise Exception('Undefined PostgreSQL version.')
 
-    def pg_get_db_info(self, prev_db_infos, using_rds=False, skip_sizes=False):
+    DbInfoDict = Dict[str, Union[str, int]]
+
+    def pg_get_db_info(
+        self,
+        prev_db_infos: Optional[DbInfoDict],
+        using_rds: bool = False,
+        skip_sizes: bool = False,
+    ) -> DbInfoDict:
         """
         Get current sum of transactions, total size and  timestamp.
         """
