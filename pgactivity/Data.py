@@ -53,8 +53,8 @@ if psutil.version_info < (2, 0, 0):
         def memory_percent(self,):
             return self.get_memory_percent()
 
-        def cpu_percent(self, interval = 0):
-            return self.get_cpu_percent(interval = interval)
+        def cpu_percent(self, interval=0):
+            return self.get_cpu_percent(interval=interval)
 
         def cpu_times(self,):
             return self.get_cpu_times()
@@ -102,14 +102,16 @@ class Data:
         """
         return self.pg_version
 
-    def pg_connect(self,
-        host = None,
-        port = 5432,
-        user = 'postgres',
-        password = None,
-        database = 'postgres',
-        rds_mode = False,
-        service = None):
+    def pg_connect(
+        self,
+        host=None,
+        port=5432,
+        user='postgres',
+        password=None,
+        database='postgres',
+        rds_mode=False,
+        service=None,
+    ):
         """
         Connect to a PostgreSQL server and return
         cursor & connector.
@@ -120,42 +122,42 @@ class Data:
             try:
                 if service is not None:
                     self.pg_conn = psycopg2.connect(
-                        service = service,
-                        connection_factory = psycopg2.extras.DictConnection
+                        service=service,
+                        connection_factory=psycopg2.extras.DictConnection,
                     )
                 else:
                     self.pg_conn = psycopg2.connect(
-                        database = database,
-                        user = user,
-                        port = port,
-                        password = password,
-                        connection_factory = psycopg2.extras.DictConnection
+                        database=database,
+                        user=user,
+                        port=port,
+                        password=password,
+                        connection_factory=psycopg2.extras.DictConnection,
                     )
             except psycopg2.Error as psy_err:
                 if host is None:
                     raise psy_err
-        if self.pg_conn is None: # fallback on TCP/IP connection
+        if self.pg_conn is None:  # fallback on TCP/IP connection
             if service is not None:
                 self.pg_conn = psycopg2.connect(
-                    service = service,
-                    connection_factory = psycopg2.extras.DictConnection
+                    service=service,
+                    connection_factory=psycopg2.extras.DictConnection,
                 )
             else:
                 self.pg_conn = psycopg2.connect(
-                    database = database,
-                    host = host,
-                    port = port,
-                    user = user,
-                    password = password,
-                    connection_factory = psycopg2.extras.DictConnection
+                    database=database,
+                    host=host,
+                    port=port,
+                    user=user,
+                    password=password,
+                    connection_factory=psycopg2.extras.DictConnection,
                 )
         self.pg_conn.set_isolation_level(0)
-        if rds_mode != True: # Make sure we are using superuser if not on RDS
-          cur = self.pg_conn.cursor()
-          cur.execute("SELECT current_setting('is_superuser')")
-          ret = cur.fetchone()
-          if ret[0] != "on":
-              raise Exception("Must be run with database superuser privileges.")
+        if not rds_mode:  # Make sure we are using superuser if not on RDS
+            cur = self.pg_conn.cursor()
+            cur.execute("SELECT current_setting('is_superuser')")
+            ret = cur.fetchone()
+            if ret[0] != "on":
+                raise Exception("Must be run with database superuser privileges.")
 
     def pg_is_local_access(self,):
         """
@@ -222,8 +224,9 @@ class Data:
         attributes.
         """
         res = re.match(
-                r"^(PostgreSQL|EnterpriseDB) ([0-9]+)\.([0-9]+)(?:\.([0-9]+))?",
-                text_version)
+            r"^(PostgreSQL|EnterpriseDB) ([0-9]+)\.([0-9]+)(?:\.([0-9]+))?",
+            text_version,
+        )
         if res is not None:
             rmatch = res.group(2)
             if int(res.group(3)) < 10:
@@ -283,8 +286,8 @@ class Data:
         pg_database
         {no_rds}
         """.format(
-            db_size = prev_total_size if skip_dbsize else "SUM(pg_database_size(datname))",
-            no_rds = "WHERE datname <> 'rdsadmin'" if using_rds else ''
+            db_size=prev_total_size if skip_dbsize else "SUM(pg_database_size(datname))",
+            no_rds="WHERE datname <> 'rdsadmin'" if using_rds else ''
         )
         cur = self.pg_conn.cursor()
         cur.execute(query,)
@@ -293,10 +296,10 @@ class Data:
         size_ev = 0
         if prev_db_infos is not None:
             tps = int((ret['no_xact'] - prev_db_infos['no_xact'])
-                    / (ret['timestamp'] - prev_db_infos['timestamp']))
+                      / (ret['timestamp'] - prev_db_infos['timestamp']))
             size_ev = float(float(ret['total_size']
-                        - prev_db_infos['total_size'])
-                    / (ret['timestamp'] - prev_db_infos['timestamp']))
+                                  - prev_db_infos['total_size'])
+                            / (ret['timestamp'] - prev_db_infos['timestamp']))
         return {
             'timestamp': ret['timestamp'],
             'no_xact': ret['no_xact'],
@@ -827,12 +830,12 @@ class Data:
     def get_duration_column(self, duration_mode=1):
         if duration_mode not in (1, 2, 3):
             duration_mode = 1
-        return ['query_start', 'xact_start', 'backend_start'][duration_mode-1]
+        return ['query_start', 'xact_start', 'backend_start'][duration_mode - 1]
 
     def get_duration_mode_name(self, duration_mode=1):
         if duration_mode not in (1, 2, 3):
             duration_mode = 1
-        return ['query', 'transaction', 'backend'][duration_mode-1]
+        return ['query', 'transaction', 'backend'][duration_mode - 1]
 
     def get_duration(self, duration):
         """
@@ -864,34 +867,29 @@ class Data:
             try:
                 psproc = PSProcess(query['pid'])
                 process = Process(
-                    pid = query['pid'],
-                    database = query['database'],
-                    user = query['user'],
-                    client = query['client'],
-                    duration = query['duration'],
-                    wait = query['wait'],
-                    state = query['state'],
-                    query = query['query'],
-                    extras = {},
-                    appname = query['application_name']
-                    )
+                    pid=query['pid'],
+                    database=query['database'],
+                    user=query['user'],
+                    client=query['client'],
+                    duration=query['duration'],
+                    wait=query['wait'],
+                    state=query['state'],
+                    query=query['query'],
+                    extras={},
+                    appname=query['application_name'],
+                )
 
-                process.set_extra('meminfo',
-                    psproc.memory_info())
-                process.set_extra('io_counters',
-                    psproc.io_counters())
-                process.set_extra('io_time',
-                    time.time())
-                process.set_extra('mem_percent',
-                    psproc.memory_percent())
-                process.set_extra('cpu_percent',
-                    psproc.cpu_percent(interval=0))
-                process.set_extra('cpu_times',
-                    psproc.cpu_times())
+                process.set_extra('meminfo', psproc.memory_info())
+                process.set_extra('io_counters', psproc.io_counters())
+                process.set_extra('io_time', time.time())
+                process.set_extra('mem_percent', psproc.memory_percent())
+                process.set_extra('cpu_percent', psproc.cpu_percent(interval=0))
+                process.set_extra('cpu_times', psproc.cpu_times())
                 process.set_extra('read_delta', 0)
                 process.set_extra('write_delta', 0)
-                process.set_extra('io_wait',
-                    self.__sys_get_iow_status(psproc.status_iow()))
+                process.set_extra(
+                    'io_wait', self.__sys_get_iow_status(psproc.status_iow())
+                )
                 process.set_extra('psutil_proc', psproc)
                 process.set_extra('is_parallel_worker', query['is_parallel_worker'])
                 process.set_extra('appname', query['application_name'])
@@ -904,11 +902,13 @@ class Data:
                 pass
         return processes
 
-    def set_global_io_counters(self,
+    def set_global_io_counters(
+        self,
         read_bytes_delta,
         write_bytes_delta,
         read_count_delta,
-        write_count_delta):
+        write_count_delta,
+    ):
         """
         Set IO counters.
         """
