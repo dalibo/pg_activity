@@ -8,10 +8,11 @@ exclude =
   .mypy_cache,
   .tox,
   .venv,
-  pg_activity,
   pgactivity/Data.py,
   pgactivity/Process.py,
   pgactivity/UI.py,
   setup.py,
+per-file-ignores =
+  pg_activity:E251
 select = B,C,E,F,W,T4,B9
 mypy_config = mypy.ini
