@@ -23,14 +23,17 @@ BASIS, AND JULIEN TACHOIRES HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE,
 SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 """
 
+import os
+import re
+import time
+from warnings import catch_warnings, simplefilter
+
+import psutil
 import psycopg2
 import psycopg2.extras
-import re
-import psutil
-import time
+
 from pgactivity.Process import Process
-import os
-from warnings import catch_warnings, simplefilter
+
 
 if psutil.version_info < (2, 0, 0):
     class PSProcess(psutil.Process):
