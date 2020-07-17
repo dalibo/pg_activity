@@ -76,7 +76,7 @@ def header(
 
     Remote host:
 
-    >>> host = Host("9.6", "server", "pgadm", "server.prod.tld", 5433, "app")
+    >>> host = Host("PostgreSQL 9.6", "server", "pgadm", "server.prod.tld", 5433, "app")
     >>> dbinfo = DBInfo(10203040506070809, 9999)
 
     >>> header(term, host, dbinfo, 12, 0, DurationMode.backend, refresh_time=10)
@@ -85,7 +85,7 @@ def header(
 
     Local host, with priviledged access:
 
-    >>> host = Host("13.1", "localhost", "tester", "host", 5432, "postgres")
+    >>> host = Host("PostgreSQL 13.1", "localhost", "tester", "host", 5432, "postgres")
     >>> dbinfo = DBInfo(123456789, 12)
     >>> vmem = MemoryInfo(total=6175825920, percent=42.5, used=2007146496)
     >>> swap = MemoryInfo(total=6312423424, used=2340, percent=0.0)
@@ -105,7 +105,7 @@ def header(
     print(
         " - ".join(
             [
-                f"PostgreSQL {host.pg_version}",
+                host.pg_version,
                 f"{term.bold}{host.hostname}{term.normal}",
                 f"{term.cyan}{pg_host}{term.normal}",
                 f"Ref.: {refresh_time}s",
