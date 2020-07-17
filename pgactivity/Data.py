@@ -319,7 +319,7 @@ class Data:
             'tps': tps,
             'size_ev': size_ev}
 
-    def pg_get_active_connections(self,):
+    def pg_get_active_connections(self) -> int:
         """
         Get total of active connections.
         """
