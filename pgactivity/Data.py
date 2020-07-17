@@ -63,21 +63,6 @@ else:
         def status_iow(self,):
             return str(self.status())
 
-def clean_str(string):
-    r"""
-    Strip and replace some special characters.
-
-    >>> clean_str("\n")
-    ''
-    >>> clean_str("\n a a  b   b    c \n\t\n c\v\n")
-    'a a b b c c'
-    """
-    msg = str(string)
-    msg = msg.replace("\n", " ")
-    msg = re.sub(r"\s+", r" ", msg)
-    msg = re.sub(r"^\s", r"", msg)
-    msg = re.sub(r"\s$", r"", msg)
-    return msg
 
 class Data:
     """

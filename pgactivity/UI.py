@@ -29,7 +29,8 @@ import re
 import time
 import sys
 from datetime import timedelta, datetime as dt
-from pgactivity.Data import Data, clean_str
+from pgactivity.Data import Data
+from pgactivity.utils import clean_str
 import psutil
 
 # Define some color pairs
