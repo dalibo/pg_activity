@@ -35,7 +35,6 @@ import psutil
 import curses
 import psycopg2
 import time
-from psycopg2 import errorcodes
 
 from pgactivity import __version__, UI, utils
 
@@ -263,8 +262,10 @@ def main(options):
     try:
         debug = options.debug
 
-        password = pg_connect(PGAUI.data, options, password=os.environ.get('PGPASSWORD'),
-                              service=os.environ.get('PGSERVICE'))
+        password = utils.pg_connect(
+            PGAUI.data, options, password=os.environ.get('PGPASSWORD'),
+            service=os.environ.get('PGSERVICE')
+        )
 
         pg_version = PGAUI.data.pg_get_version()
         PGAUI.data.pg_get_num_version(pg_version)
@@ -377,8 +378,10 @@ def main(options):
                     print("ERROR: Not connected to PostgreSQL, trying to open "
                           "a new connection")
                     try:
-                        pg_connect(PGAUI.data, options, password, os.environ.get('PGSERVICE'),
-                                   exit_on_failed=False)
+                        utils.pg_connect(
+                            PGAUI.data, options, password, os.environ.get('PGSERVICE'),
+                            exit_on_failed=False,
+                        )
                         not_connected = False
                     except Exception:
                         print("ERROR: Connecton failed, retrying in 1 second...")
@@ -417,39 +420,6 @@ def main(options):
                 exc_traceback,
                 file=sys.stdout)
         sys.exit("FATAL: %s" % (str(err),))
-
-
-def pg_connect(data, options, password=None, service=None, exit_on_failed=True):
-    nb_try = 0
-    while nb_try < 2:
-        try:
-            data.pg_connect(
-                host=options.host,
-                port=options.port,
-                user=options.username,
-                password=password,
-                database=options.dbname,
-                rds_mode=options.rds,
-                service=service,
-            )
-            break
-        except psycopg2.OperationalError as err:
-            if nb_try < 1 and (
-                err.pgcode == errorcodes.INVALID_PASSWORD
-                or str(err).strip().startswith(
-                    "FATAL:  password authentication failed for user")):
-                nb_try += 1
-                password = getpass.getpass()
-            elif nb_try < 1 and str(err).strip() == "fe_sendauth: no password supplied":
-                nb_try += 1
-                password = getpass.getpass()
-            elif exit_on_failed:
-                msg = str(err).replace("FATAL:", "")
-                sys.exit("pg_activity: FATAL: %s" % utils.clean_str(msg))
-            else:
-                raise Exception("Could not connect to PostgreSQL")
-    # Return the password in case of reconnection
-    return password
 
 
 # Call the main function
