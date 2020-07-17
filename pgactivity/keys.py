@@ -5,6 +5,7 @@ from .types import QueryMode
 
 
 EXIT = "q"
+EXIT_DEBUG = "z"
 HELP = "h"
 REFRESH_TIME_INCREASE = "+"
 REFRESH_TIME_DECREASE = "-"

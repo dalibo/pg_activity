@@ -144,6 +144,13 @@ server activity monitoring.")
         action = 'store_true',
         help = "Enable debug mode for traceback tracking.",
         default = False)
+    # --ng
+    parser.add_option(
+        "--ng",
+        help="Use new UI (experimental)",
+        action="store_true",
+        default=False,
+    )
     # --no-db-size
     parser.add_option(
         '--no-db-size',
@@ -437,4 +444,8 @@ if __name__ == '__main__':
     if options.help:
         print(parser.format_help().strip())
         sys.exit(1)
-    main(options)
+    if options.ng:
+        from pgactivity import ui
+        ui.main(options)
+    else:
+        main(options)
