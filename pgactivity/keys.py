@@ -3,6 +3,8 @@ from typing import List, Tuple
 
 EXIT = "q"
 HELP = "h"
+REFRESH_TIME_INCREASE = "+"
+REFRESH_TIME_DECREASE = "-"
 
 BINDINGS: List[Tuple[str, str]] = [
     ("Up/Down", "scroll process list"),
@@ -12,9 +14,9 @@ BINDINGS: List[Tuple[str, str]] = [
     ("v", "change display mode"),
     ("w", "sort by WRITE/s desc. (activities)"),
     (EXIT, "quit"),
-    ("+", "increase refresh time (max:5s)"),
+    (REFRESH_TIME_INCREASE, "increase refresh time (max:5s)"),
     ("m", "sort by MEM% desc. (activities)"),
-    ("-", "decrease refresh time (min:0.5s)"),
+    (REFRESH_TIME_DECREASE, "decrease refresh time (min:0.5s)"),
     ("t", "sort by TIME+ desc. (activities)"),
     ("R", "force refresh"),
     ("T", "change duration mode"),
