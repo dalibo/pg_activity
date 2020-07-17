@@ -256,22 +256,11 @@ server activity monitoring.")
     return parser
 
 
-def main():
+def main(options):
     """
     Main function
     """
     try:
-        parser = get_parser()
-        (options, _) = parser.parse_args()
-    except OptionParsingError as err:
-        print('pg_activity: error: %s' % err.msg)
-        print('Try "pg_activity --help" for more information.')
-        sys.exit(1)
-    try:
-        if options.help:
-            print(parser.format_help().strip())
-            sys.exit(1)
-
         debug = options.debug
 
         password = pg_connect(options, password=os.environ.get('PGPASSWORD'),
@@ -467,4 +456,14 @@ if __name__ == '__main__':
     if os.name != 'posix':
         sys.exit("FATAL: Platform not supported.")
     signal.signal(signal.SIGTERM, PGAUI.signal_handler)
-    main()
+    try:
+        parser = get_parser()
+        (options, _) = parser.parse_args()
+    except OptionParsingError as err:
+        print('pg_activity: error: %s' % err.msg)
+        print('Try "pg_activity --help" for more information.')
+        sys.exit(1)
+    if options.help:
+        print(parser.format_help().strip())
+        sys.exit(1)
+    main(options)
