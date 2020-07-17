@@ -37,7 +37,7 @@ import psycopg2
 import time
 from psycopg2 import errorcodes
 
-from pgactivity import __version__, UI
+from pgactivity import __version__, UI, utils
 
 PGTOP_VERSION = __version__
 
@@ -444,7 +444,8 @@ def pg_connect(data, options, password=None, service=None, exit_on_failed=True):
                 nb_try += 1
                 password = getpass.getpass()
             elif exit_on_failed:
-                sys.exit("pg_activity: FATAL: %s" % (PGAUI.clean_str(str(err),)))
+                msg = str(err).replace("FATAL:", "")
+                sys.exit("pg_activity: FATAL: %s" % utils.clean_str(msg))
             else:
                 raise Exception("Could not connect to PostgreSQL")
     # Return the password in case of reconnection

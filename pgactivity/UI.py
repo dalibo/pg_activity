@@ -753,18 +753,6 @@ class UI:
         if self.data:
             self.data.min_duration = options.minduration
 
-    def clean_str(self, string):
-        """
-        Strip and replace some special characters.
-        """
-        msg = str(string)
-        msg = msg.replace("\n", " ")
-        msg = re.sub(r"\s+", r" ", msg)
-        msg = msg.replace("FATAL:", "")
-        msg = re.sub(r"^\s", r"", msg)
-        msg = re.sub(r"\s$", r"", msg)
-        return msg
-
     def check_window_size(self,):
         """
         Update window's size
