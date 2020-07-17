@@ -439,10 +439,10 @@ def pg_connect(options, password=None, service=None, exit_on_failed=True):
                 or str(err).strip().startswith(
                     "FATAL:  password authentication failed for user")):
                 nb_try += 1
-                password = PGAUI.ask_password()
+                password = getpass.getpass()
             elif nb_try < 1 and str(err).strip() == "fe_sendauth: no password supplied":
                 nb_try += 1
-                password = PGAUI.ask_password()
+                password = getpass.getpass()
             elif exit_on_failed:
                 sys.exit("pg_activity: FATAL: %s" % (PGAUI.clean_str(str(err),)))
             else:
