@@ -317,12 +317,22 @@ class Data:
         """
         Get total of active connections.
         """
-        query = """
-        SELECT
-            COUNT(*) as active_connections
-        FROM pg_stat_activity
-        WHERE state = 'active'
-        """
+
+        if self.pg_num_version <= 90100:
+            # prior to PostgreSQL 9.1, there was no state column
+            query = """
+    SELECT
+        COUNT(*) as active_connections
+    FROM pg_stat_activity
+    WHERE query NOT LIKE '<IDLE>%'
+            """
+        else:
+            query = """
+    SELECT
+        COUNT(*) as active_connections
+    FROM pg_stat_activity
+    WHERE state = 'active'
+            """
 
         cur = self.pg_conn.cursor()
         cur.execute(query,)
