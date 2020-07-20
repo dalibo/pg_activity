@@ -318,13 +318,13 @@ class Data:
         Get total of active connections.
         """
 
-        if self.pg_num_version <= 90100:
+        if self.pg_num_version < 90200:
             # prior to PostgreSQL 9.1, there was no state column
             query = """
     SELECT
         COUNT(*) as active_connections
     FROM pg_stat_activity
-    WHERE query NOT LIKE '<IDLE>%'
+    WHERE current_query NOT LIKE '<IDLE>%%'
             """
         else:
             query = """
@@ -498,7 +498,18 @@ class Data:
         EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
         pg_stat_activity.waiting AS wait,
         pg_stat_activity.usename AS user,
-        pg_stat_activity.current_query AS query,
+	CASE
+            WHEN pg_stat_activity.current_query = '<IDLE> in transaction (aborted)' THEN 'idle in transaction (aborted)'
+            WHEN pg_stat_activity.current_query = '<IDLE> in transaction' THEN 'idle in transaction'
+            WHEN pg_stat_activity.current_query = '<IDLE>' THEN 'idle'
+            ELSE 'active'
+            END
+        AS state,
+        CASE
+           WHEN pg_stat_activity.current_query LIKE '<IDLE>%%' THEN 'None'
+           ELSE pg_stat_activity.current_query
+           END
+        AS query,
         false AS is_parallel_worker
     FROM
         pg_stat_activity
@@ -570,8 +581,18 @@ class Data:
         pg_locks.locktype AS type,
         pg_locks.relation::regclass AS relation,
         EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
-        NULL AS state,
-        pg_stat_activity.current_query AS query
+        CASE
+           WHEN pg_stat_activity.current_query = '<IDLE> in transaction (aborted)' THEN 'idle in transaction (aborted)'
+           WHEN pg_stat_activity.current_query = '<IDLE> in transaction' THEN 'idle in transaction'
+           WHEN pg_stat_activity.current_query = '<IDLE>' THEN 'idle'
+           ELSE 'active'
+           END
+        AS state,
+        CASE
+           WHEN pg_stat_activity.current_query LIKE '<IDLE>%%' THEN 'None'
+           ELSE pg_stat_activity.current_query
+           END
+        AS query
     FROM
         pg_catalog.pg_locks
         JOIN pg_catalog.pg_stat_activity ON(pg_catalog.pg_locks.pid = pg_catalog.pg_stat_activity.procpid)
@@ -692,6 +713,7 @@ class Data:
             query = """
     SELECT
         pid,
+        appname,
         CASE
             WHEN LENGTH(datname) > 16
             THEN SUBSTRING(datname FROM 0 FOR 6)||'...'||SUBSTRING(datname FROM '........$')
@@ -703,8 +725,18 @@ class Data:
         mode,
         locktype AS type,
         duration,
-        state,
-        query
+        CASE
+           WHEN sq.query = '<IDLE> in transaction (aborted)' THEN 'idle in transaction (aborted)'
+           WHEN sq.query = '<IDLE> in transaction' THEN 'idle in transaction'
+           WHEN sq.query = '<IDLE>' THEN 'idle'
+           ELSE 'active'
+           END
+        AS state,
+        CASE
+           WHEN sq.query LIKE '<IDLE>%%' THEN 'None'
+           ELSE sq.query
+           END
+        AS query
     FROM
         (
         SELECT
