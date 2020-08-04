@@ -51,7 +51,7 @@ def help(term: Terminal, version: str) -> None:
         )
 
     footer = "\nPress any key to exit."
-    print(term.home + term.clear + intro)
+    print(intro)
     print(render_mapping(BINDINGS))
     print("Mode")
     print(render_mapping(MODES))
