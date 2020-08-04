@@ -19,6 +19,16 @@ class DBInfo:
     size_ev: int
 
 
+class QueryMode(enum.Enum):
+    activities = "running queries"
+    waiting = "waiting queries"
+    blocking = "blocking queries"
+
+    @classmethod
+    def default(cls) -> "QueryMode":
+        return cls.activities
+
+
 class DurationMode(enum.IntEnum):
     query = 1
     transaction = 2

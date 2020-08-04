@@ -5,7 +5,7 @@ from blessed import Terminal
 import humanize
 
 from .keys import BINDINGS, MODES
-from .types import DBInfo, DurationMode, Host, MemoryInfo, SystemInfo
+from .types import DBInfo, DurationMode, Host, MemoryInfo, QueryMode, SystemInfo
 
 
 def help(term: Terminal, version: str) -> None:
@@ -179,3 +179,15 @@ def header(
                 ),
             )
         )
+
+
+def query_mode(term: Terminal, mode: QueryMode) -> None:
+    """Display query mode title.
+
+    >>> from pgactivity.types import QueryMode
+
+    >>> term = Terminal()
+    >>> query_mode(term, QueryMode.blocking)  # doctest: +NORMALIZE_WHITESPACE
+                                    BLOCKING QUERIES
+    """
+    print(term.center(term.green_bold(mode.value.upper())))
