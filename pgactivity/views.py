@@ -1,22 +1,101 @@
 import enum
+from datetime import timedelta
 from textwrap import dedent
-from typing import Dict, Iterable, List, Optional, Tuple
+from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple
 
-from blessed import Terminal
 import humanize
+from blessed import Terminal
+from blessed.formatters import FormattingString
 
 from .keys import BINDINGS, MODES
 from .types import (
-    DBInfo,
+    ActivityProcess,
     ColumnTitle,
+    DBInfo,
     DurationMode,
     Flag,
     Host,
     MemoryInfo,
+    QueryDisplayMode,
     QueryMode,
     SortKey,
     SystemInfo,
 )
+from . import utils
+
+LINE_COLORS = {
+    "pid": {"default": "cyan", "cursor": "cyan_reverse", "yellow": "yellow_bold"},
+    "database": {
+        "default": "gray_bold",
+        "cursor": "cyan_reverse",
+        "yellow": "yellow_bold",
+    },
+    "appname": {
+        "default": "gray_bold",
+        "cursor": "cyan_reverse",
+        "yellow": "yellow_bold",
+    },
+    "user": {"default": "gray_bold", "cursor": "cyan_reverse", "yellow": "yellow_bold"},
+    "client": {"default": "cyan", "cursor": "cyan_reverse", "yellow": "yellow_bold"},
+    "cpu": {"default": "normal", "cursor": "cyan_reverse", "yellow": "yellow_bold"},
+    "mem": {"default": "normal", "cursor": "cyan_reverse", "yellow": "yellow_bold"},
+    "read": {"default": "normal", "cursor": "cyan_reverse", "yellow": "yellow_bold"},
+    "write": {"default": "normal", "cursor": "cyan_reverse", "yellow": "yellow_bold"},
+    "time_red": {
+        "default": "normal",
+        "cursor": "cyan_reverse",
+        "yellow": "yellow_bold",
+    },
+    "time_yellow": {
+        "default": "yellow",
+        "cursor": "cyan_reverse",
+        "yellow": "yellow_bold",
+    },
+    "time_green": {
+        "default": "green",
+        "cursor": "cyan_reverse",
+        "yellow": "yellow_bold",
+    },
+    "wait_green": {
+        "default": "green_bold",
+        "cursor": "cyan_reverse",
+        "yellow": "yellow_bold",
+    },
+    "wait_red": {
+        "default": "red_bold",
+        "cursor": "cyan_reverse",
+        "yellow": "yellow_bold",
+    },
+    "state_default": {
+        "default": "normal",
+        "cursor": "cyan_reverse",
+        "yellow": "yellow_bold",
+    },
+    "state_yellow": {
+        "default": "yellow",
+        "cursor": "cyan_reverse",
+        "yellow": "yellow_bold",
+    },
+    "state_green": {
+        "default": "green",
+        "cursor": "cyan_reverse",
+        "yellow": "yellow_bold",
+    },
+    "state_red": {"default": "red", "cursor": "cyan_reverse", "yellow": "yellow_bold"},
+    "query": {"default": "normal", "cursor": "cyan_reverse", "yellow": "yellow_bold"},
+    "relation": {"default": "cyan", "cursor": "cyan_reverse", "yellow": "yellow_bold"},
+    "type": {"default": "normal", "cursor": "cyan_reverse", "yellow": "yellow_bold"},
+    "mode_yellow": {
+        "default": "yellow_bold",
+        "cursor": "cyan_reverse",
+        "yellow": "yellow_bold",
+    },
+    "mode_red": {
+        "default": "red_bold",
+        "cursor": "cyan_reverse",
+        "yellow": "yellow_bold",
+    },
+}
 
 
 # Maximum number of columns
@@ -381,3 +460,299 @@ def get_indent(mode: QueryMode, flag: Flag, max_ncol: int = MAX_NCOL) -> str:
             if column.name != "Query":
                 indent += column.template_h % " "
     return indent
+
+
+def format_duration(duration: Optional[float]) -> Tuple[str, str]:
+    """Return a string from 'duration' value along with the color for rendering.
+
+    >>> format_duration(None)
+    ('N/A      ', 'time_green')
+    >>> format_duration(0.1)
+    ('0.000000', 'time_green')
+    >>> format_duration(1.2)
+    ('00:01.20', 'time_yellow')
+    >>> format_duration(12345)
+    ('205:45.00', 'time_red')
+    >>> format_duration(60001)
+    ('16 h', 'time_red')
+    """
+    if duration is None:
+        return "N/A".ljust(9), "time_green"
+
+    if duration < 1:
+        ctime = f"{0:.6f}"
+        color = "time_green"
+    elif duration < 60000:
+        if duration < 3:
+            color = "time_yellow"
+        else:
+            color = "time_red"
+        duration_d = timedelta(seconds=float(duration))
+        mic = "%.6d" % duration_d.microseconds
+        ctime = "%s:%s.%s" % (
+            str((duration_d.seconds // 60)).zfill(2),
+            str((duration_d.seconds % 60)).zfill(2),
+            mic[:2],
+        )
+    else:
+        ctime = "%s h" % str(int(duration / 3600))
+        color = "time_red"
+
+    return ctime, color
+
+
+def processes_rows(
+    term: Terminal,
+    processes: Iterable[ActivityProcess],
+    is_local: bool,
+    flag: Flag,
+    query_mode: QueryMode,
+    color_type: str = "default",
+    verbose_mode: QueryDisplayMode = QueryDisplayMode.default(),
+) -> None:
+    r"""Display table rows with processes information.
+
+    >>> term = Terminal(force_styling=None)
+    >>> processes = [
+    ...     ActivityProcess(
+    ...         pid="6239",
+    ...         appname="pgbench",
+    ...         database="pgbench",
+    ...         user="postgres",
+    ...         client="local",
+    ...         cpu=0.0,
+    ...         mem=0.993_254_939_413_836,
+    ...         read=0.0,
+    ...         write=0.282_725_318_098_656_75,
+    ...         state="idle in transaction",
+    ...         query="UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;",
+    ...         duration=0,
+    ...         wait=False,
+    ...         io_wait="N",
+    ...         is_parallel_worker=False,
+    ...     ),
+    ...     ActivityProcess(
+    ...         pid="6228",
+    ...         appname="pgbench",
+    ...         database="pgbench",
+    ...         user="postgres",
+    ...         client="local",
+    ...         cpu=0.0,
+    ...         mem=1.024_758_418_061_11,
+    ...         read=0.0,
+    ...         write=0.113_090_128_201_154_74,
+    ...         state="active",
+    ...         query="UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;",
+    ...         duration=0,
+    ...         wait=False,
+    ...         io_wait="N",
+    ...         is_parallel_worker=True,
+    ...     ),
+    ...     ActivityProcess(
+    ...         pid="1234",
+    ...         appname="accounting",
+    ...         database="business",
+    ...         user="bob",
+    ...         client="local",
+    ...         cpu=2.4,
+    ...         mem=1.031_191_760_016_45,
+    ...         read=0.0,
+    ...         write=0.245_028_606_206_652_82,
+    ...         state="active",
+    ...         query="SELECT product_id, p.name, (sum(s.units) * (p.price - p.cost)) AS profit FROM products p LEFT JOIN sales s USING (product_id) WHERE s.date > CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name, p.price, p.cost HAVING sum(p.price * s.units) > 5000;",
+    ...         duration=0,
+    ...         wait=False,
+    ...         io_wait="N",
+    ...         is_parallel_worker=False,
+    ...     ),
+    ... ]
+
+    >>> flag = Flag.CPU|Flag.MEM|Flag.DATABASE
+    >>> term.width
+    80
+
+    >>> processes_rows(term, processes, True, flag, QueryMode.activities)
+    6239   pgbench             0.0  1.0 idle in trans     UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
+    6228   pgbench             0.0  1.0 active            \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
+    1234   business            2.4  1.0 active            SELECT product_id, p.name, (sum(s.units) * (p.price - p.cost)) AS profit FROM
+    products p LEFT JOIN sales s USING (product_id) WHERE s.date > CURRENT_DATE -
+    INTERVAL '4 weeks' GROUP BY product_id, p.name, p.price, p.cost HAVING
+    sum(p.price * s.units) > 5000;
+
+    >>> processes_rows(term, processes, True, flag, QueryMode.activities, verbose_mode=QueryDisplayMode.truncate)
+    6239   pgbench             0.0  1.0 idle in trans     UPDATE pgbench_accounts
+    6228   pgbench             0.0  1.0 active            \_ UPDATE pgbench_accou
+    1234   business            2.4  1.0 active            SELECT product_id, p.na
+
+    >>> processes_rows(term, processes, True, flag, QueryMode.activities, verbose_mode=QueryDisplayMode.wrap)
+    6239   pgbench             0.0  1.0 idle in trans     UPDATE
+                                                            pgbench_accounts SET
+                                                            abalance = abalance +
+                                                            141 WHERE aid =
+                                                            1932841;
+    6228   pgbench             0.0  1.0 active            \_ UPDATE
+                                                            pgbench_accounts SET
+                                                            abalance = abalance +
+                                                            3062 WHERE aid =
+                                                            7289374;
+    1234   business            2.4  1.0 active            SELECT product_id,
+                                                            p.name, (sum(s.units) *
+                                                            (p.price - p.cost)) AS
+                                                            profit FROM products p
+                                                            LEFT JOIN sales s USING
+                                                            (product_id) WHERE
+                                                            s.date > CURRENT_DATE -
+                                                            INTERVAL '4 weeks'
+                                                            GROUP BY product_id,
+                                                            p.name, p.price, p.cost
+                                                            HAVING sum(p.price *
+                                                            s.units) > 5000;
+
+    >>> allflags = Flag.IOWAIT|Flag.MODE|Flag.TYPE|Flag.RELATION|Flag.WAIT|Flag.TIME|Flag.WRITE|Flag.READ|Flag.MEM|Flag.CPU|Flag.USER|Flag.CLIENT|Flag.APPNAME|Flag.DATABASE
+    >>> term.width
+    80
+
+    # terminal is too narrow given selected flags, we switch to wrap_noindent mode
+    >>> processes_rows(term, processes, True, allflags, QueryMode.activities, verbose_mode=QueryDisplayMode.wrap)
+    6239   pgbench                   pgbench         postgres            local    0.0  1.0  0 Bytes  0 Bytes 0.000000N Y   idle in trans     UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
+    6228   pgbench                   pgbench         postgres            local    0.0  1.0  0 Bytes  0 Bytes 0.000000N Y   active            \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
+    1234   business               accounting              bob            local    2.4  1.0  0 Bytes  0 Bytes 0.000000N Y   active            SELECT product_id, p.name, (sum(s.units) * (p.price - p.cost)) AS profit FROM
+    products p LEFT JOIN sales s USING (product_id) WHERE s.date > CURRENT_DATE -
+    INTERVAL '4 weeks' GROUP BY product_id, p.name, p.price, p.cost HAVING
+    sum(p.price * s.units) > 5000;
+
+    >>> oneflag = Flag.DATABASE
+    >>> processes_rows(term, processes, True, oneflag, QueryMode.activities, verbose_mode=QueryDisplayMode.truncate)
+    6239   pgbench          idle in trans     UPDATE pgbench_accounts SET abalanc
+    6228   pgbench          active            \_ UPDATE pgbench_accounts SET abal
+    1234   business         active            SELECT product_id, p.name, (sum(s.u
+
+    >>> processes_rows(term, processes, True, oneflag, QueryMode.activities, verbose_mode=QueryDisplayMode.wrap)
+    6239   pgbench          idle in trans     UPDATE pgbench_accounts SET
+                                                abalance = abalance + 141 WHERE aid
+                                                = 1932841;
+    6228   pgbench          active            \_ UPDATE pgbench_accounts SET
+                                                abalance = abalance + 3062 WHERE
+                                                aid = 7289374;
+    1234   business         active            SELECT product_id, p.name,
+                                                (sum(s.units) * (p.price - p.cost))
+                                                AS profit FROM products p LEFT JOIN
+                                                sales s USING (product_id) WHERE
+                                                s.date > CURRENT_DATE - INTERVAL '4
+                                                weeks' GROUP BY product_id, p.name,
+                                                p.price, p.cost HAVING sum(p.price
+                                                * s.units) > 5000;
+    """
+
+    # if color_type == 'default' and self.pid_yank.count(process['pid']) > 0:
+    # color_type = 'yellow'
+
+    def color_for(field: str) -> FormattingString:
+        return getattr(term, LINE_COLORS[field][color_type])
+
+    def lprint(value: str) -> None:
+        print(value, end="")
+
+    def print_row(
+        process: ActivityProcess,
+        key: str,
+        crop: Optional[int],
+        transform: Callable[[Any], str] = str,
+        color_key: Optional[str] = None,
+    ) -> None:
+        column_type = getattr(Column, key).value
+        column_value = transform(getattr(process, key))[:crop]
+        color_key = color_key or key
+        lprint(f"{color_for(color_key)}{column_type.template_h % column_value}")
+
+    for process in processes:
+        print_row(process, "pid", None)
+
+        if flag & Flag.DATABASE:
+            print_row(process, "database", 16)
+        if flag & Flag.APPNAME:
+            print_row(process, "appname", 16)
+        if query_mode == QueryMode.activities:
+            if flag & Flag.USER:
+                print_row(process, "user", 16)
+            if flag & Flag.CLIENT:
+                print_row(process, "client", 16)
+            if flag & Flag.CPU:
+                print_row(process, "cpu", None)
+            if flag & Flag.MEM:
+                print_row(process, "mem", None, lambda v: str(round(v, 1)))
+            if flag & Flag.READ:
+                print_row(process, "read", None, humanize.naturalsize)
+            if flag & Flag.WRITE:
+                print_row(process, "write", None, humanize.naturalsize)
+
+        elif query_mode in (QueryMode.waiting, QueryMode.blocking):
+            if flag & Flag.RELATION:
+                print_row(process, "relation", 9)
+            if flag & Flag.TYPE:
+                print_row(process, "type", 16)
+
+            # TODO: find out where process.mode comes from by looking at old UI/Data code.
+            # if flag & Flag.MODE:
+            #     if process.mode in (
+            #         "ExclusiveLock",
+            #         "RowExclusiveLock",
+            #         "AccessExclusiveLock",
+            #     ):
+            #         mode_color = "mode_red"
+            #     else:
+            #         mode_color = "mode_yellow"
+            #     print_row(process, "mode", 16, color_key=mode_color)
+
+        if flag & Flag.TIME:
+            ctime, color = format_duration(process.duration)
+            lprint(f"{color_for(color)}{ctime}")
+
+        if query_mode == QueryMode.activities and flag & Flag.WAIT:
+            if process.wait:
+                lprint(f"{color_for('wait_red')}{'Y'.ljust(2)}")
+            else:
+                lprint(f"{color_for('wait_green')}{'N'.ljust(2)}")
+
+        if query_mode == QueryMode.activities and flag & Flag.IOWAIT:
+            if process.io_wait:
+                lprint(f"{color_for('wait_red')}{'Y'.ljust(4)}")
+            else:
+                lprint(f"{color_for('wait_green')}{'N'.ljust(4)}")
+
+        state = utils.short_state(process.state)
+        if state == "active":
+            color_state = "state_green"
+        elif state == "idle in trans":
+            color_state = "state_yellow"
+        elif state == "idle in trans (a)":
+            color_state = "state_red"
+        else:
+            color_state = "state_default"
+        lprint(f"{color_for(color_state)}{state:17}")
+
+        indent = get_indent(query_mode, flag)
+        dif = term.width - len(indent) - 1
+
+        if dif < 0:
+            # Switch to wrap_noindent mode if terminal is too narrow.
+            verbose_mode = QueryDisplayMode.wrap_noindent
+
+        query = (r"\_ " if process.is_parallel_worker else "") + utils.clean_str(
+            process.query
+        )
+        if verbose_mode == QueryDisplayMode.truncate:
+            lprint(f"{color_for('query')} {query[:dif]}")
+        else:
+            if verbose_mode == QueryDisplayMode.wrap_noindent:
+                dif = term.width
+                p_indent = ""
+            else:
+                assert (
+                    verbose_mode == QueryDisplayMode.wrap
+                ), f"unexpected mode {verbose_mode}"
+                p_indent = indent
+            wrapped_lines = term.wrap(f"{color_for('query')} {query}", width=dif)
+            lprint(f"\n{p_indent}".join(wrapped_lines))
+
+        print(term.normal)
