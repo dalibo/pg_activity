@@ -824,7 +824,7 @@ class Data:
         ret = cur.fetchall()
         return ret
 
-    def pg_is_local(self,):
+    def pg_is_local(self,) -> bool:
         """
         Is pg_activity connected localy ?
         """
