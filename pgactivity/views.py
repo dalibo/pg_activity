@@ -1,11 +1,22 @@
+import enum
 from textwrap import dedent
-from typing import Iterable, Optional, Tuple
+from typing import Dict, Iterable, List, Optional, Tuple
 
 from blessed import Terminal
 import humanize
 
 from .keys import BINDINGS, MODES
-from .types import DBInfo, DurationMode, Host, MemoryInfo, QueryMode, SystemInfo
+from .types import (
+    DBInfo,
+    ColumnTitle,
+    DurationMode,
+    Flag,
+    Host,
+    MemoryInfo,
+    QueryMode,
+    SortKey,
+    SystemInfo,
+)
 
 
 def help(term: Terminal, version: str) -> None:
@@ -191,3 +202,160 @@ def query_mode(term: Terminal, mode: QueryMode) -> None:
                                     BLOCKING QUERIES
     """
     print(term.center(term.green_bold(mode.value.upper())))
+
+
+class Column(enum.Enum):
+    """Model for each column that may appear in the table."""
+
+    appname = ColumnTitle(
+        name="APP",
+        template_h="%16s ",
+        flag=Flag.APPNAME,
+        mandatory=False,
+        sort_key=None,
+    )
+    client = ColumnTitle(
+        name="CLIENT",
+        template_h="%16s ",
+        flag=Flag.CLIENT,
+        mandatory=False,
+        sort_key=None,
+    )
+    cpu = ColumnTitle(
+        name="CPU%",
+        template_h="%6s ",
+        flag=Flag.CPU,
+        mandatory=False,
+        sort_key=SortKey.cpu,
+    )
+    database = ColumnTitle(
+        name="DATABASE",
+        template_h="%-16s ",
+        flag=Flag.DATABASE,
+        mandatory=False,
+        sort_key=None,
+    )
+    iowait = ColumnTitle(
+        name="IOW", template_h="%4s ", flag=Flag.IOWAIT, mandatory=False, sort_key=None
+    )
+    mem = ColumnTitle(
+        name="MEM%",
+        template_h="%4s ",
+        flag=Flag.MEM,
+        mandatory=False,
+        sort_key=SortKey.mem,
+    )
+    mode = ColumnTitle(
+        name="MODE", template_h="%16s ", flag=Flag.MODE, mandatory=False, sort_key=None
+    )
+    pid = ColumnTitle(
+        name="PID", template_h="%-6s ", flag=None, mandatory=True, sort_key=None
+    )
+    query = ColumnTitle(
+        name="Query", template_h=" %2s", flag=None, mandatory=True, sort_key=None
+    )
+    read = ColumnTitle(
+        name="READ/s",
+        template_h="%8s ",
+        flag=Flag.READ,
+        mandatory=False,
+        sort_key=SortKey.read,
+    )
+    relation = ColumnTitle(
+        name="RELATION",
+        template_h="%9s ",
+        flag=Flag.RELATION,
+        mandatory=False,
+        sort_key=None,
+    )
+    state = ColumnTitle(
+        name="state", template_h=" %17s  ", flag=None, mandatory=True, sort_key=None
+    )
+    time = ColumnTitle(
+        name="TIME+",
+        template_h="%9s ",
+        flag=Flag.TIME,
+        mandatory=False,
+        sort_key=SortKey.time,
+    )
+    type = ColumnTitle(
+        name="TYPE", template_h="%16s ", flag=Flag.TYPE, mandatory=False, sort_key=None
+    )
+    user = ColumnTitle(
+        name="USER", template_h="%16s ", flag=Flag.USER, mandatory=False, sort_key=None
+    )
+    wait = ColumnTitle(
+        name="W", template_h="%2s ", flag=Flag.WAIT, mandatory=False, sort_key=None
+    )
+    write = ColumnTitle(
+        name="WRITE/s",
+        template_h="%8s ",
+        flag=Flag.WRITE,
+        mandatory=False,
+        sort_key=SortKey.write,
+    )
+
+
+COLUMNS_BY_QUERYMODE: Dict[QueryMode, List[Column]] = {
+    QueryMode.activities: [
+        Column.pid,
+        Column.database,
+        Column.appname,
+        Column.user,
+        Column.client,
+        Column.cpu,
+        Column.mem,
+        Column.read,
+        Column.write,
+        Column.time,
+        Column.wait,
+        Column.iowait,
+        Column.state,
+        Column.query,
+    ],
+    QueryMode.waiting: [
+        Column.pid,
+        Column.database,
+        Column.appname,
+        Column.relation,
+        Column.type,
+        Column.mode,
+        Column.time,
+        Column.state,
+        Column.query,
+    ],
+    QueryMode.blocking: [
+        Column.pid,
+        Column.database,
+        Column.appname,
+        Column.relation,
+        Column.type,
+        Column.mode,
+        Column.time,
+        Column.state,
+        Column.query,
+    ],
+}
+
+
+def columns_header(
+    term: Terminal, mode: QueryMode, flag: Flag, sort_by: SortKey
+) -> None:
+    """Display columns header.
+
+    >>> term = Terminal()
+    >>> columns_header(term, QueryMode.activities, Flag.DATABASE, SortKey.cpu)
+    PID    DATABASE                      state   Query
+    >>> columns_header(term, QueryMode.activities, Flag.CPU, SortKey.cpu)
+    PID      CPU%              state   Query
+    >>> columns_header(term, QueryMode.activities, Flag.MEM, SortKey.cpu)
+    PID    MEM%              state   Query
+    >>> flag = Flag.DATABASE | Flag.APPNAME | Flag.RELATION
+    >>> columns_header(term, QueryMode.blocking, flag, SortKey.time)
+    PID    DATABASE                      APP  RELATION              state   Query
+    """
+    columns = (c.value for c in COLUMNS_BY_QUERYMODE[mode])
+    for column in columns:
+        if column.mandatory or (column.flag & flag):
+            color = getattr(term, f"black_on_{column.color(sort_by)}")
+            print(f"{color}{column.render()}{term.normal}", end="")

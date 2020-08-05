@@ -1,5 +1,5 @@
 import enum
-from typing import Any
+from typing import Any, Optional
 
 import attr
 
@@ -121,6 +121,66 @@ class Flag(enum.IntFlag):
         if not is_local and (flag & cls.IOWAIT):
             flag ^= cls.IOWAIT
         return flag
+
+
+class SortKey(enum.Enum):
+    cpu = enum.auto()
+    mem = enum.auto()
+    read = enum.auto()
+    write = enum.auto()
+    time = enum.auto()
+
+    @classmethod
+    def default(cls) -> "SortKey":
+        return cls.time
+
+
+@attr.s(auto_attribs=True, frozen=True, slots=True)
+class ColumnTitle:
+    """Title of a column in stats table.
+
+    >>> c = ColumnTitle("PID", "%-6s", None, True, SortKey.cpu)
+    >>> c.render()
+    'PID   '
+    >>> c.color(SortKey.cpu)
+    'cyan'
+    >>> c.color(SortKey.time)
+    'green'
+    """
+
+    name: str
+    template_h: str = attr.ib()
+    flag: Optional[Flag]
+    mandatory: bool
+    sort_key: Optional[SortKey] = None
+
+    @template_h.validator
+    def _template_h_is_a_format_string_(self, attribute: Any, value: str) -> None:
+        """Validate template_h attribute.
+
+        >>> ColumnTitle("a", "b%%aa", Flag.DATABASE, False)
+        Traceback (most recent call last):
+            ...
+        ValueError: template_h must be a format string with one placeholder
+        >>> ColumnTitle("a", "baad", Flag.DATABASE, False)
+        Traceback (most recent call last):
+            ...
+        ValueError: template_h must be a format string with one placeholder
+        >>> ColumnTitle("a", "%s is good", Flag.DATABASE, False)  # doctest: +ELLIPSIS
+        ColumnTitle(name='a', template_h='%s is good', flag=<Flag.DATABASE: 1>, ...)
+        """
+        if value.count("%") != 1:
+            raise ValueError(
+                f"{attribute.name} must be a format string with one placeholder"
+            )
+
+    def render(self) -> str:
+        return self.template_h % self.name
+
+    def color(self, sort_by: SortKey) -> str:
+        if self.sort_key == sort_by:
+            return "cyan"  # TODO: define a Color enum
+        return "green"
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
