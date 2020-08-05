@@ -31,6 +31,7 @@ import sys
 from datetime import timedelta, datetime as dt
 from pgactivity.Data import Data
 from pgactivity.utils import clean_str
+from pgactivity.types import Flag
 import psutil
 
 # Define some color pairs
@@ -44,23 +45,6 @@ C_WHITE =       7
 C_BLACK_CYAN =  8
 C_RED_BLACK =   9
 C_GRAY =        10
-
-# Columns
-PGTOP_FLAG_DATABASE =   1
-PGTOP_FLAG_APPNAME =    2
-PGTOP_FLAG_CLIENT =     4
-PGTOP_FLAG_USER =       8
-PGTOP_FLAG_CPU =        16
-PGTOP_FLAG_MEM =        32
-PGTOP_FLAG_READ =       64
-PGTOP_FLAG_WRITE =      128
-PGTOP_FLAG_TIME =       256
-PGTOP_FLAG_WAIT =       512
-PGTOP_FLAG_RELATION =   1024
-PGTOP_FLAG_TYPE =       2048
-PGTOP_FLAG_MODE =       4096
-PGTOP_FLAG_IOWAIT =     8192
-PGTOP_FLAG_NONE =       None
 
 # Display query mode
 PGTOP_TRUNCATE =        1
@@ -96,98 +80,98 @@ PGTOP_COLS = {
             'n':  1,
             'name': 'PID',
             'template_h': '%-6s ',
-            'flag': PGTOP_FLAG_NONE,
+            'flag': None,
             'mandatory': True
         },
         'database': {
             'n':  2,
             'name': 'DATABASE',
             'template_h': '%-16s ',
-            'flag': PGTOP_FLAG_DATABASE,
+            'flag': Flag.DATABASE,
             'mandatory': False
         },
         'appname': {
             'n':  3,
             'name': 'APP',
             'template_h': '%16s ',
-            'flag': PGTOP_FLAG_APPNAME,
+            'flag': Flag.APPNAME,
             'mandatory': False
         },
         'user': {
             'n':  4,
             'name': 'USER',
             'template_h': '%16s ',
-            'flag': PGTOP_FLAG_USER,
+            'flag': Flag.USER,
             'mandatory': False
         },
         'client': {
             'n':  5,
             'name': 'CLIENT',
             'template_h': '%16s ',
-            'flag': PGTOP_FLAG_CLIENT,
+            'flag': Flag.CLIENT,
             'mandatory': False
         },
         'cpu': {
             'n':  6,
             'name': 'CPU%',
             'template_h': '%6s ',
-            'flag': PGTOP_FLAG_CPU,
+            'flag': Flag.CPU,
             'mandatory': False
         },
         'mem': {
             'n':  7,
             'name': 'MEM%',
             'template_h': '%4s ',
-            'flag': PGTOP_FLAG_MEM,
+            'flag': Flag.MEM,
             'mandatory': False
         },
         'read': {
             'n':  8,
             'name': 'READ/s',
             'template_h': '%8s ',
-            'flag': PGTOP_FLAG_READ,
+            'flag': Flag.READ,
             'mandatory': False
         },
         'write': {
             'n':  9,
             'name': 'WRITE/s',
             'template_h': '%8s ',
-            'flag': PGTOP_FLAG_WRITE,
+            'flag': Flag.WRITE,
             'mandatory': False
         },
         'time': {
             'n':  10,
             'name': 'TIME+',
             'template_h': '%9s ',
-            'flag': PGTOP_FLAG_TIME,
+            'flag': Flag.TIME,
             'mandatory': False
         },
         'wait': {
             'n': 11,
             'name': 'W',
             'template_h': '%2s ',
-            'flag': PGTOP_FLAG_WAIT,
+            'flag': Flag.WAIT,
             'mandatory': False
         },
         'iowait': {
             'n': 12,
             'name': 'IOW',
             'template_h': '%4s ',
-            'flag': PGTOP_FLAG_IOWAIT,
+            'flag': Flag.IOWAIT,
             'mandatory': False
         },
         'state': {
             'n': 13,
             'name': 'state',
             'template_h': ' %17s  ',
-            'flag': PGTOP_FLAG_NONE,
+            'flag': None,
             'mandatory': True
         },
         'query': {
             'n': 14,
             'name': 'Query',
             'template_h': ' %2s',
-            'flag': PGTOP_FLAG_NONE,
+            'flag': None,
             'mandatory': True
         },
     },
@@ -196,63 +180,63 @@ PGTOP_COLS = {
             'n': 1,
             'name': 'PID',
             'template_h': '%-6s ',
-            'flag': PGTOP_FLAG_NONE,
+            'flag': None,
             'mandatory': True
         },
         'database': {
             'n': 2,
             'name': 'DATABASE',
             'template_h': '%-16s ',
-            'flag': PGTOP_FLAG_DATABASE,
+            'flag': Flag.DATABASE,
             'mandatory': False
         },
         'appname': {
             'n':  3,
             'name': 'APP',
             'template_h': '%16s ',
-            'flag': PGTOP_FLAG_APPNAME,
+            'flag': Flag.APPNAME,
             'mandatory': False
         },
         'relation': {
             'n': 4,
             'name': 'RELATION',
             'template_h': '%9s ',
-            'flag': PGTOP_FLAG_RELATION,
+            'flag': Flag.RELATION,
             'mandatory': False
         },
         'type': {
             'n': 5,
             'name': 'TYPE',
             'template_h': '%16s ',
-            'flag': PGTOP_FLAG_TYPE,
+            'flag': Flag.TYPE,
             'mandatory': False
         },
         'mode': {
             'n': 6,
             'name': 'MODE',
             'template_h': '%16s ',
-            'flag': PGTOP_FLAG_MODE,
+            'flag': Flag.MODE,
             'mandatory': False
         },
         'time': {
             'n': 7,
             'name': 'TIME+',
             'template_h': '%9s ',
-            'flag': PGTOP_FLAG_TIME,
+            'flag': Flag.TIME,
             'mandatory': False
         },
         'state': {
             'n': 8,
             'name': 'state',
             'template_h': ' %17s  ',
-            'flag': PGTOP_FLAG_NONE,
+            'flag': None,
             'mandatory': True
         },
         'query': {
             'n': 9,
             'name': 'Query',
             'template_h': ' %2s',
-            'flag': PGTOP_FLAG_NONE,
+            'flag': None,
             'mandatory': True
         },
     },
@@ -261,63 +245,63 @@ PGTOP_COLS = {
             'n': 1,
             'name': 'PID',
             'template_h': '%-6s ',
-            'flag': PGTOP_FLAG_NONE,
+            'flag': None,
             'mandatory': True
         },
         'database': {
             'n': 2,
             'name': 'DATABASE',
             'template_h': '%-16s ',
-            'flag': PGTOP_FLAG_DATABASE,
+            'flag': Flag.DATABASE,
             'mandatory': False
         },
         'appname': {
             'n':  3,
             'name': 'APP',
             'template_h': '%16s ',
-            'flag': PGTOP_FLAG_APPNAME,
+            'flag': Flag.APPNAME,
             'mandatory': False
         },
         'relation': {
             'n': 4,
             'name': 'RELATION',
             'template_h': '%9s ',
-            'flag': PGTOP_FLAG_RELATION,
+            'flag': Flag.RELATION,
             'mandatory': False
         },
         'type': {
             'n': 5,
             'name': 'TYPE',
             'template_h': '%16s ',
-            'flag': PGTOP_FLAG_TYPE,
+            'flag': Flag.TYPE,
             'mandatory': False
         },
         'mode': {
             'n': 6,
             'name': 'MODE',
             'template_h': '%16s ',
-            'flag': PGTOP_FLAG_MODE,
+            'flag': Flag.MODE,
             'mandatory': False
         },
         'time': {
             'n': 7,
             'name': 'TIME+',
             'template_h': '%9s ',
-            'flag': PGTOP_FLAG_TIME,
+            'flag': Flag.TIME,
             'mandatory': False
         },
         'state': {
             'n': 8,
             'name': 'state',
             'template_h': ' %17s  ',
-            'flag': PGTOP_FLAG_NONE,
+            'flag': None,
             'mandatory': True
         },
         'query': {
             'n': 9,
             'name': 'Query',
             'template_h': ' %2s',
-            'flag': PGTOP_FLAG_NONE,
+            'flag': None,
             'mandatory': True
         },
     }
@@ -614,44 +598,7 @@ class UI:
         """
         Returns the flag depending on the options.
         """
-        flag = PGTOP_FLAG_DATABASE | PGTOP_FLAG_USER | PGTOP_FLAG_CLIENT
-        flag = flag | PGTOP_FLAG_CPU | PGTOP_FLAG_MEM | PGTOP_FLAG_READ
-        flag = flag | PGTOP_FLAG_WRITE | PGTOP_FLAG_TIME | PGTOP_FLAG_WAIT
-        flag = flag | PGTOP_FLAG_RELATION | PGTOP_FLAG_TYPE | PGTOP_FLAG_MODE
-        flag = flag | PGTOP_FLAG_IOWAIT | PGTOP_FLAG_APPNAME
-        if options.nodb:
-            flag -= PGTOP_FLAG_DATABASE
-        if options.nouser:
-            flag -= PGTOP_FLAG_USER
-        if options.nocpu:
-            flag -= PGTOP_FLAG_CPU
-        if options.noclient:
-            flag -= PGTOP_FLAG_CLIENT
-        if options.nomem:
-            flag -= PGTOP_FLAG_MEM
-        if options.noread:
-            flag -= PGTOP_FLAG_READ
-        if options.nowrite:
-            flag -= PGTOP_FLAG_WRITE
-        if options.notime:
-            flag -= PGTOP_FLAG_TIME
-        if options.nowait:
-            flag -= PGTOP_FLAG_WAIT
-        if options.noappname:
-            flag -= PGTOP_FLAG_APPNAME
-
-        # Remove some if no running against local pg server.
-        if not self.get_is_local() and (flag & PGTOP_FLAG_CPU):
-            flag -= PGTOP_FLAG_CPU
-        if not self.get_is_local() and (flag & PGTOP_FLAG_MEM):
-            flag -= PGTOP_FLAG_MEM
-        if not self.get_is_local() and (flag & PGTOP_FLAG_READ):
-            flag -= PGTOP_FLAG_READ
-        if not self.get_is_local() and (flag & PGTOP_FLAG_WRITE):
-            flag -= PGTOP_FLAG_WRITE
-        if not self.get_is_local() and (flag & PGTOP_FLAG_IOWAIT):
-            flag -= PGTOP_FLAG_IOWAIT
-        return flag
+        return Flag.from_options(is_local=self.get_is_local(), **vars(options))
 
     def __get_color(self, color):
         """
@@ -1236,16 +1183,16 @@ class UI:
                 self.set_color()
             do_refresh = True
         # sorts
-        if key == ord('c') and (flag & PGTOP_FLAG_CPU) and self.sort != 'c':
+        if key == ord('c') and (flag & Flag.CPU) and self.sort != 'c':
             self.sort = 'c'
             known = True
-        if key == ord('m') and (flag & PGTOP_FLAG_MEM) and self.sort != 'm':
+        if key == ord('m') and (flag & Flag.MEM) and self.sort != 'm':
             self.sort = 'm'
             known = True
-        if key == ord('r') and (flag & PGTOP_FLAG_READ) and self.sort != 'r':
+        if key == ord('r') and (flag & Flag.READ) and self.sort != 'r':
             self.sort = 'r'
             known = True
-        if key == ord('w') and (flag & PGTOP_FLAG_WRITE) and self.sort != 'w':
+        if key == ord('w') and (flag & Flag.WRITE) and self.sort != 'w':
             self.sort = 'w'
             known = True
         if key == ord('t') and self.sort != 't':
@@ -2046,7 +1993,7 @@ class UI:
                     "%-6s " % (process['pid'],),
                     self.line_colors['pid'][typecolor])
         process['query'] = clean_str(process['query'])
-        if flag & PGTOP_FLAG_DATABASE:
+        if flag & Flag.DATABASE:
             colno += self.__print_string(
                         l_lineno,
                         colno,
@@ -2054,68 +2001,68 @@ class UI:
                             (str(process['database'])[:16],),
                         self.line_colors['database'][typecolor])
         if self.mode == 'activities':
-            if flag & PGTOP_FLAG_APPNAME:
+            if flag & Flag.APPNAME:
                 colno += self.__print_string(
                             l_lineno,
                             colno,
                             "%16s " % (str(process['appname'])[:16],),
                             self.line_colors['appname'][typecolor])
-            if flag & PGTOP_FLAG_USER:
+            if flag & Flag.USER:
                 colno += self.__print_string(
                             l_lineno,
                             colno,
                             "%16s " % (str(process['user'])[:16],),
                             self.line_colors['user'][typecolor])
-            if flag & PGTOP_FLAG_CLIENT:
+            if flag & Flag.CLIENT:
                 colno += self.__print_string(
                             l_lineno,
                             colno,
                             "%16s " % (str(process['client'])[:16],),
                             self.line_colors['client'][typecolor])
-            if flag & PGTOP_FLAG_CPU:
+            if flag & Flag.CPU:
                 colno += self.__print_string(
                             l_lineno,
                             colno,
                             "%6s " % (process['cpu'],),
                             self.line_colors['cpu'][typecolor])
-            if flag & PGTOP_FLAG_MEM:
+            if flag & Flag.MEM:
                 colno += self.__print_string(
                             l_lineno,
                             colno,
                             "%4s " % (round(process['mem'], 1),),
                             self.line_colors['mem'][typecolor])
-            if flag & PGTOP_FLAG_READ:
+            if flag & Flag.READ:
                 colno += self.__print_string(
                             l_lineno,
                             colno,
                             "%8s " % (bytes2human(process['read']),),
                             self.line_colors['read'][typecolor])
-            if flag & PGTOP_FLAG_WRITE:
+            if flag & Flag.WRITE:
                 colno += self.__print_string(
                             l_lineno,
                             colno,
                             "%8s " % (bytes2human(process['write']),),
                             self.line_colors['write'][typecolor])
         elif self.mode == 'waiting' or self.mode == 'blocking':
-            if flag & PGTOP_FLAG_APPNAME:
+            if flag & Flag.APPNAME:
                 colno += self.__print_string(
                             l_lineno,
                             colno,
                             "%16s " % (str(process['appname'])[:16],),
                             self.line_colors['appname'][typecolor])
-            if flag & PGTOP_FLAG_RELATION:
+            if flag & Flag.RELATION:
                 colno += self.__print_string(
                             l_lineno,
                             colno,
                             "%9s " % (str(process['relation'])[:9],),
                             self.line_colors['relation'][typecolor])
-            if flag & PGTOP_FLAG_TYPE:
+            if flag & Flag.TYPE:
                 colno += self.__print_string(
                             l_lineno,
                             colno,
                             "%16s " % (str(process['type'])[:16],),
                             self.line_colors['type'][typecolor])
-            if flag & PGTOP_FLAG_MODE:
+            if flag & Flag.MODE:
                 if process['mode'] == 'ExclusiveLock' or \
                     process['mode'] == 'RowExclusiveLock' or \
                     process['mode'] == 'AccessExclusiveLock':
@@ -2131,7 +2078,7 @@ class UI:
                                 "%16s " % (str(process['mode'])[:16],),
                                 self.line_colors['mode_yellow'][typecolor])
 
-        if flag & PGTOP_FLAG_TIME:
+        if flag & Flag.TIME:
             if process['duration'] >= 1 and process['duration'] < 60000:
                 ctime = timedelta(seconds=float(process['duration']))
                 mic = '%.6d' % (ctime.microseconds)
@@ -2168,7 +2115,7 @@ class UI:
                             colno,
                             "%9s " % (ctime,),
                             self.line_colors['time_red'][typecolor])
-        if self.mode == 'activities' and flag & PGTOP_FLAG_WAIT:
+        if self.mode == 'activities' and flag & Flag.WAIT:
             if process['wait']:
                 colno += self.__print_string(
                             l_lineno,
@@ -2182,7 +2129,7 @@ class UI:
                             "%2s " % ('N',),
                             self.line_colors['wait_green'][typecolor])
 
-        if self.mode == 'activities' and flag & PGTOP_FLAG_IOWAIT:
+        if self.mode == 'activities' and flag & Flag.IOWAIT:
             if process['io_wait'] == 'Y':
                 colno += self.__print_string(
                             l_lineno,
