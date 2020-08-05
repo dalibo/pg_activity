@@ -760,7 +760,7 @@ class UI:
                             curses.A_REVERSE|curses.A_BOLD)
             curses.flushinp()
 
-    def __current_position(self,):
+    def __print_current_mode(self,):
         """
         Display current mode
         """
@@ -1947,7 +1947,7 @@ class UI:
             total_size)
         self.lineno += 2
         line_trunc = self.lineno
-        self.__current_position()
+        self.__print_current_mode()
         self.__print_cols_header(flag)
         for proc in procs:
             try:
