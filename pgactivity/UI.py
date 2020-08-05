@@ -1578,7 +1578,7 @@ class UI:
         """
         indent = ''
         res = [0] * self.max_ncol
-        for _, val in PGTOP_COLS[self.mode].items():
+        for val in PGTOP_COLS[self.mode].values():
             if val['mandatory'] or \
                 (not val['mandatory'] and val['flag'] & flag):
                 res[int(val['n'])] = val
@@ -1597,7 +1597,7 @@ class UI:
         xpos = 0
         res = [0] * self.max_ncol
         color = self.__get_color(C_GREEN)
-        for _, val in PGTOP_COLS[self.mode].items():
+        for val in PGTOP_COLS[self.mode].values():
             if val['mandatory'] or \
                 (not val['mandatory'] and val['flag'] & flag):
                 res[int(val['n'])] = val
