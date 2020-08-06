@@ -860,7 +860,9 @@ class Data:
         else:
             return 'N'
 
-    def sys_get_proc(self, queries, is_local):
+    def sys_get_proc(
+        self, queries: List[Activity], is_local: bool
+    ) -> Dict[int, Process]:
         """
         Get system informations (CPU, memory, IO read & write)
         for each process PID using psutil module.
