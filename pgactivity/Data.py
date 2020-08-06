@@ -34,7 +34,7 @@ import psycopg2
 import psycopg2.extras
 
 from .utils import return_as
-from .types import Activity, Process
+from .types import Activity, IOCounters, Process, ProcessExtras
 
 
 if psutil.version_info < (2, 0, 0):
@@ -881,24 +881,22 @@ class Data:
                     wait=query['wait'],
                     state=query['state'],
                     query=query['query'],
-                    extras={},
                     appname=query['application_name'],
+                    extras=ProcessExtras(
+                        meminfo=psproc.memory_info(),
+                        io_counters=IOCounters(*psproc.io_counters()),
+                        io_time=time.time(),
+                        mem_percent=psproc.memory_percent(),
+                        cpu_percent=psproc.cpu_percent(interval=0),
+                        cpu_times=psproc.cpu_times(),
+                        read_delta=0,
+                        write_delta=0,
+                        io_wait=self.__sys_get_iow_status(psproc.status_iow()),
+                        psutil_proc=psproc,
+                        is_parallel_worker=query['is_parallel_worker'],
+                        appname=query['application_name'],
+                    ),
                 )
-
-                process.set_extra('meminfo', psproc.memory_info())
-                process.set_extra('io_counters', psproc.io_counters())
-                process.set_extra('io_time', time.time())
-                process.set_extra('mem_percent', psproc.memory_percent())
-                process.set_extra('cpu_percent', psproc.cpu_percent(interval=0))
-                process.set_extra('cpu_times', psproc.cpu_times())
-                process.set_extra('read_delta', 0)
-                process.set_extra('write_delta', 0)
-                process.set_extra(
-                    'io_wait', self.__sys_get_iow_status(psproc.status_iow())
-                )
-                process.set_extra('psutil_proc', psproc)
-                process.set_extra('is_parallel_worker', query['is_parallel_worker'])
-                process.set_extra('appname', query['application_name'])
 
                 processes[process.pid] = process
 

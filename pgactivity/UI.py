@@ -30,9 +30,11 @@ import time
 import sys
 from datetime import timedelta, datetime as dt
 from pgactivity.Data import Data
+from pgactivity.activities import update_processes_local
 from pgactivity.utils import clean_str, get_duration
 from pgactivity.types import Flag
 import psutil
+import attr
 
 # Define some color pairs
 C_BLACK_GREEN = 1
@@ -1266,97 +1268,10 @@ class UI:
         if self.is_local:
             # get resource usage for each process
             new_procs = self.data.sys_get_proc(queries, self.is_local)
-
-            procs = []
-            read_bytes_delta = 0
-            write_bytes_delta = 0
-            read_count_delta = 0
-            write_count_delta = 0
-            for pid, new_proc in new_procs.items():
-                try:
-                    if pid in process:
-                        n_io_time = time.time()
-                        # Getting informations from the previous loop
-                        proc = process[pid]
-                        # Update old process with new informations
-                        proc.duration = new_proc.duration
-                        proc.state = new_proc.state
-                        proc.query = new_proc.query
-                        proc.appname = new_proc.appname
-                        proc.client = new_proc.client
-                        proc.wait = new_proc.wait
-                        proc.set_extra(
-                            'io_wait',
-                            new_proc.get_extra('io_wait'))
-                        proc.set_extra(
-                            'read_delta',
-                            (new_proc.get_extra('io_counters').read_bytes
-                            - proc.get_extra('io_counters').read_bytes)
-                            / (n_io_time - proc.get_extra('io_time')))
-                        proc.set_extra(
-                            'write_delta',
-                            (new_proc.get_extra('io_counters').write_bytes
-                            - proc.get_extra('io_counters').write_bytes)
-                            / (n_io_time - proc.get_extra('io_time')))
-                        proc.set_extra(
-                            'io_counters',
-                            new_proc.get_extra('io_counters'))
-                        proc.set_extra(
-                            'io_time',
-                            n_io_time)
-
-                        # Global io counters
-                        read_bytes_delta  += proc.get_extra('read_delta')
-                        write_bytes_delta += proc.get_extra('write_delta')
-                    else:
-                        # No previous information about this process
-                        proc = new_proc
-
-                    if not self.pid.count(pid):
-                        self.pid.append(pid)
-
-                    proc.set_extra(
-                        'mem_percent',
-                        proc.get_extra('psutil_proc').memory_percent())
-                    proc.set_extra(
-                        'cpu_percent',
-                        proc.get_extra('psutil_proc').\
-                            cpu_percent(interval=0))
-                    new_procs[pid] = proc
-                    procs.append({
-                        'pid': pid,
-                        'appname': proc.appname,
-                        'database': proc.database,
-                        'user':proc.user,
-                        'client': proc.client,
-                        'cpu': proc.get_extra('cpu_percent'),
-                        'mem': proc.get_extra('mem_percent'),
-                        'read': proc.get_extra('read_delta'),
-                        'write': proc.get_extra('write_delta'),
-                        'state': proc.state,
-                        'query': proc.query,
-                        'duration': get_duration(proc.duration),
-                        'wait': proc.wait,
-                        'io_wait': proc.get_extra('io_wait'),
-                        'is_parallel_worker': proc.get_extra('is_parallel_worker')
-                    })
-
-                except psutil.NoSuchProcess:
-                    pass
-                except psutil.AccessDenied:
-                    pass
-                except Exception as err:
-                    raise err
-            # store io counters
-            if read_bytes_delta > 0:
-                read_count_delta  += int(read_bytes_delta/self.fs_blocksize)
-            if write_bytes_delta > 0:
-                write_count_delta += int(write_bytes_delta/self.fs_blocksize)
-            self.data.set_global_io_counters(
-                read_bytes_delta,
-                write_bytes_delta,
-                read_count_delta,
-                write_count_delta)
+            io_counters, pids, procs = update_processes_local(process, new_procs, self.fs_blocksize)
+            self.data.set_global_io_counters(*io_counters)
+            self.pid = pids
+            procs = [attr.asdict(p) for p in procs]
         else:
             procs = []
             new_procs = None

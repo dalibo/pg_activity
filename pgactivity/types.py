@@ -1,7 +1,8 @@
 import enum
-from typing import Any, Dict, Optional, Union
+from typing import Any, Optional, Tuple, Union
 
 import attr
+import psutil
 
 
 class Flag(enum.IntFlag):
@@ -248,6 +249,22 @@ class SystemInfo:
 
 
 @attr.s(auto_attribs=True, slots=True)
+class ProcessExtras:
+    meminfo: Tuple[int, ...]
+    io_counters: IOCounters
+    io_time: float
+    mem_percent: float
+    cpu_percent: float
+    cpu_times: Tuple[float, ...]
+    read_delta: float
+    write_delta: float
+    io_wait: str
+    psutil_proc: psutil.Process
+    is_parallel_worker: bool
+    appname: str
+
+
+@attr.s(auto_attribs=True, slots=True)
 class Process:
     """Simple class for process management."""
 
@@ -260,17 +277,11 @@ class Process:
     query: str
     state: str
     appname: str  # TODO: rename as application_name
-    extras: Dict[str, Any]
+    extras: ProcessExtras
     cpu: Optional[float] = None
     mem: Optional[float] = None
     read: Optional[float] = None
     write: Optional[float] = None
-
-    def set_extra(self, key: str, value: Any) -> None:
-        self.extras[key] = value
-
-    def get_extra(self, key: str) -> Optional[Any]:
-        return self.extras.get(key)
 
 
 class DictSequenceProxy:
@@ -329,4 +340,23 @@ class Activity(DictSequenceProxy):
     user: str
     state: str
     query: str
+    is_parallel_worker: bool
+
+
+@attr.s(auto_attribs=True, frozen=True, slots=True)
+class ActivityProcess:
+    pid: int
+    appname: str
+    database: str
+    user: str
+    client: str
+    cpu: float
+    mem: float
+    read: float
+    write: float
+    state: str
+    query: str
+    duration: float
+    wait: bool
+    io_wait: str
     is_parallel_worker: bool
