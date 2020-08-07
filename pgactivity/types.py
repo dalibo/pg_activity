@@ -286,3 +286,19 @@ class DictSequenceProxy:
                 raise IndexError(key) from None
         else:
             raise TypeError("expecting a string or int key")
+
+
+@attr.s(auto_attribs=True, frozen=True, slots=True)
+class Activity(DictSequenceProxy):
+    """Result from pg_stat_activity view query."""
+
+    pid: int
+    application_name: str
+    database: str
+    client: str
+    duration: float
+    wait: bool
+    user: str
+    state: str
+    query: str
+    is_parallel_worker: bool

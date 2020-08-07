@@ -26,7 +26,7 @@ SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 import os
 import re
 import time
-from typing import Dict, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 from warnings import catch_warnings, simplefilter
 
 import psutil
@@ -34,6 +34,8 @@ import psycopg2
 import psycopg2.extras
 
 from pgactivity.Process import Process
+from .utils import return_as
+from .types import Activity
 
 
 if psutil.version_info < (2, 0, 0):
@@ -346,7 +348,8 @@ class Data:
         active_connections = int(ret['active_connections'])
         return active_connections
 
-    def pg_get_activities(self, duration_mode=1):
+    @return_as(Activity)
+    def pg_get_activities(self, duration_mode: int = 1) -> List[Any]:
         """
         Get activity from pg_stat_activity view.
         """
