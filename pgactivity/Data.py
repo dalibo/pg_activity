@@ -33,9 +33,8 @@ import psutil
 import psycopg2
 import psycopg2.extras
 
-from pgactivity.Process import Process
 from .utils import return_as
-from .types import Activity
+from .types import Activity, Process
 
 
 if psutil.version_info < (2, 0, 0):

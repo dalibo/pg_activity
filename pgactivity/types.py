@@ -1,5 +1,5 @@
 import enum
-from typing import Any, Optional, Union
+from typing import Any, Dict, Optional, Union
 
 import attr
 
@@ -243,6 +243,32 @@ class SystemInfo:
     swap: MemoryInfo
     load: LoadAverage
     ios: IOCounters
+
+
+@attr.s(auto_attribs=True, slots=True)
+class Process:
+    """Simple class for process management."""
+
+    pid: int
+    database: str
+    user: str
+    client: str
+    duration: float
+    wait: bool
+    query: str
+    state: str
+    appname: str  # TODO: rename as application_name
+    extras: Dict[str, Any]
+    cpu: Optional[float] = None
+    mem: Optional[float] = None
+    read: Optional[float] = None
+    write: Optional[float] = None
+
+    def set_extra(self, key: str, value: Any) -> None:
+        self.extras[key] = value
+
+    def get_extra(self, key: str) -> Optional[Any]:
+        return self.extras.get(key)
 
 
 class DictSequenceProxy:
