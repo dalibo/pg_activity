@@ -231,10 +231,12 @@ class LoadAverage:
 
 @attr.s(auto_attribs=True, slots=True)
 class IOCounters:
-    read_bytes: int
-    write_bytes: int
     read_count: int
     write_count: int
+    read_bytes: int
+    write_bytes: int
+    read_chars: int = 0
+    write_chars: int = 0
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
