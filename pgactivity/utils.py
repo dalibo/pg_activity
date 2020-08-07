@@ -25,6 +25,21 @@ def clean_str(string: str) -> str:
     return msg
 
 
+def get_duration(duration: Optional[float]) -> float:
+    """Return 0 if the given duration is negative else, return the duration.
+
+    >>> get_duration(None)
+    0
+    >>> get_duration(-10)
+    0
+    >>> get_duration(12)
+    12.0
+    """
+    if duration is None or float(duration) < 0:
+        return 0
+    return float(duration)
+
+
 def pg_connect(
     data: Any,
     options: optparse.Values,

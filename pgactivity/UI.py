@@ -30,7 +30,7 @@ import time
 import sys
 from datetime import timedelta, datetime as dt
 from pgactivity.Data import Data
-from pgactivity.utils import clean_str
+from pgactivity.utils import clean_str, get_duration
 from pgactivity.types import Flag
 import psutil
 
@@ -1335,7 +1335,7 @@ class UI:
                         'write': proc.get_extra('write_delta'),
                         'state': proc.state,
                         'query': proc.query,
-                        'duration': self.data.get_duration(proc.duration),
+                        'duration': get_duration(proc.duration),
                         'wait': proc.wait,
                         'io_wait': proc.get_extra('io_wait'),
                         'is_parallel_worker': proc.get_extra('is_parallel_worker')
@@ -1371,7 +1371,7 @@ class UI:
                     'client': query['client'],
                     'state': query['state'],
                     'query': query['query'],
-                    'duration': self.data.get_duration(query['duration']),
+                    'duration': get_duration(query['duration']),
                     'wait': query['wait']
                 })
 
@@ -1542,7 +1542,7 @@ class UI:
         for query in queries:
             new_procs[query['pid']] = query
             new_procs[query['pid']]['duration'] = \
-                self.data.get_duration(query['duration'])
+                get_duration(query['duration'])
 
         # return processes sorted by query/transaction/backend duration
         disp_procs = sorted(

@@ -848,15 +848,6 @@ class Data:
             duration_mode = 1
         return ['query', 'transaction', 'backend'][duration_mode - 1]
 
-    def get_duration(self, duration):
-        """
-        Returns 0 if the given duration is negative
-        else, returns the duration
-        """
-        if duration is None or float(duration) < 0:
-            return 0
-        return float(duration)
-
     def __sys_get_iow_status(self, status):
         """
         Returns 'Y' if status == 'disk sleep', else 'N'
