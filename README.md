@@ -8,7 +8,7 @@ Dependencies
 ------------
 
   - `python` &ge; **3.6**
-  - `psycopg2` &ge; **2.2.1**
+  - `psycopg2` &ge; **2.5**
   - `psutil` &ge;  **0.5.1**
 
 Installation from sources:

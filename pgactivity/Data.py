@@ -127,7 +127,7 @@ class Data:
                 if service is not None:
                     self.pg_conn = psycopg2.connect(
                         service=service,
-                        connection_factory=psycopg2.extras.DictConnection,
+                        cursor_factory=psycopg2.extras.DictCursor,
                     )
                 else:
                     self.pg_conn = psycopg2.connect(
@@ -135,7 +135,7 @@ class Data:
                         user=user,
                         port=port,
                         password=password,
-                        connection_factory=psycopg2.extras.DictConnection,
+                        cursor_factory=psycopg2.extras.DictCursor,
                     )
             except psycopg2.Error as psy_err:
                 if host is None:
@@ -144,7 +144,7 @@ class Data:
             if service is not None:
                 self.pg_conn = psycopg2.connect(
                     service=service,
-                    connection_factory=psycopg2.extras.DictConnection,
+                    cursor_factory=psycopg2.extras.DictCursor,
                 )
             else:
                 self.pg_conn = psycopg2.connect(
@@ -153,7 +153,7 @@ class Data:
                     port=port,
                     user=user,
                     password=password,
-                    connection_factory=psycopg2.extras.DictConnection,
+                    cursor_factory=psycopg2.extras.DictCursor,
                 )
         self.pg_conn.set_isolation_level(0)
         if not rds_mode:  # Make sure we are using superuser if not on RDS
