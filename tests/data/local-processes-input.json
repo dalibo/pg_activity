@@ -1,0 +1,1957 @@
+{
+   "new_processes" : {
+      "6229" : {
+         "database" : "pgbench",
+         "read" : null,
+         "duration" : -0.003353,
+         "mem" : null,
+         "query" : "END;",
+         "cpu" : null,
+         "pid" : 6229,
+         "appname" : "pgbench",
+         "wait" : true,
+         "client" : "local",
+         "state" : "active",
+         "user" : "postgres",
+         "write" : null,
+         "extras" : {
+            "is_parallel_worker" : false,
+            "read_delta" : 0.0,
+            "io_time" : 1596806345.17465,
+            "appname" : "pgbench",
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "io_counters" : {
+               "read_bytes" : 184320,
+               "read_chars" : 5928507,
+               "write_count" : 408,
+               "write_chars" : 4866103,
+               "write_bytes" : 4702208,
+               "read_count" : 805
+            },
+            "cpu_percent" : 0.0,
+            "mem_percent" : 1.03052852888703,
+            "meminfo" : [
+               63643648,
+               219631616,
+               61329408,
+               4608000,
+               0,
+               2908160,
+               0
+            ],
+            "write_delta" : 0.0,
+            "cpu_times" : [
+               0.25,
+               0.06,
+               0,
+               0,
+               0.04
+            ]
+         }
+      },
+      "6223" : {
+         "query" : "END;",
+         "wait" : true,
+         "appname" : "pgbench",
+         "cpu" : null,
+         "pid" : 6223,
+         "write" : null,
+         "user" : "postgres",
+         "extras" : {
+            "appname" : "pgbench",
+            "io_time" : 1596806345.17112,
+            "cpu_percent" : 0.0,
+            "io_counters" : {
+               "write_bytes" : 4186112,
+               "read_count" : 815,
+               "write_chars" : 4399155,
+               "read_chars" : 6043191,
+               "write_count" : 391,
+               "read_bytes" : 131072
+            },
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "read_delta" : 0.0,
+            "is_parallel_worker" : false,
+            "cpu_times" : [
+               0.27,
+               0.05,
+               0,
+               0,
+               0.03
+            ],
+            "write_delta" : 0.0,
+            "mem_percent" : 1.03470688500235,
+            "meminfo" : [
+               63901696,
+               219631616,
+               61587456,
+               4608000,
+               0,
+               2908160,
+               0
+            ]
+         },
+         "client" : "local",
+         "state" : "active",
+         "database" : "pgbench",
+         "mem" : null,
+         "duration" : -0.002385,
+         "read" : null
+      },
+      "6230" : {
+         "database" : "pgbench",
+         "read" : null,
+         "duration" : -0.003495,
+         "mem" : null,
+         "query" : "END;",
+         "cpu" : null,
+         "pid" : 6230,
+         "appname" : "pgbench",
+         "wait" : true,
+         "write" : null,
+         "user" : "postgres",
+         "extras" : {
+            "meminfo" : [
+               64995328,
+               219631616,
+               62681088,
+               4608000,
+               0,
+               2908160,
+               0
+            ],
+            "mem_percent" : 1.05241515615777,
+            "cpu_times" : [
+               0.26,
+               0.05,
+               0,
+               0,
+               0.08
+            ],
+            "write_delta" : 0.0,
+            "is_parallel_worker" : false,
+            "read_delta" : 0.0,
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "io_counters" : {
+               "write_count" : 376,
+               "read_chars" : 5666362,
+               "read_bytes" : 90112,
+               "read_count" : 772,
+               "write_bytes" : 4374528,
+               "write_chars" : 4489270
+            },
+            "cpu_percent" : 0.0,
+            "io_time" : 1596806345.17591,
+            "appname" : "pgbench"
+         },
+         "client" : "local",
+         "state" : "active"
+      },
+      "6233" : {
+         "extras" : {
+            "io_time" : 1596806345.17035,
+            "appname" : "pgbench",
+            "io_counters" : {
+               "read_bytes" : 212992,
+               "write_count" : 403,
+               "read_chars" : 5600824,
+               "write_bytes" : 4939776,
+               "read_count" : 762,
+               "write_chars" : 5029940
+            },
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "cpu_percent" : 0.0,
+            "is_parallel_worker" : false,
+            "read_delta" : 0.0,
+            "write_delta" : 0.0,
+            "cpu_times" : [
+               0.27,
+               0.05,
+               0,
+               0,
+               0.05
+            ],
+            "mem_percent" : 1.026018557207,
+            "meminfo" : [
+               63365120,
+               219631616,
+               61050880,
+               4608000,
+               0,
+               2908160,
+               0
+            ]
+         },
+         "user" : "postgres",
+         "write" : null,
+         "state" : "active",
+         "client" : "local",
+         "cpu" : null,
+         "pid" : 6233,
+         "wait" : true,
+         "appname" : "pgbench",
+         "query" : "END;",
+         "duration" : -0.002273,
+         "read" : null,
+         "mem" : null,
+         "database" : "pgbench"
+      },
+      "6239" : {
+         "database" : "pgbench",
+         "read" : null,
+         "duration" : -0.003428,
+         "mem" : null,
+         "query" : "UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;",
+         "cpu" : null,
+         "pid" : 6239,
+         "appname" : "pgbench",
+         "wait" : false,
+         "client" : "local",
+         "state" : "idle in transaction",
+         "write" : null,
+         "user" : "postgres",
+         "extras" : {
+            "write_delta" : 0.0,
+            "cpu_times" : [
+               0.24,
+               0.05,
+               0,
+               0,
+               0.06
+            ],
+            "mem_percent" : 0.993254939413836,
+            "meminfo" : [
+               61341696,
+               219631616,
+               59027456,
+               4608000,
+               0,
+               2908160,
+               0
+            ],
+            "io_time" : 1596806345.1753,
+            "appname" : "pgbench",
+            "io_counters" : {
+               "write_chars" : 4546614,
+               "write_bytes" : 4382720,
+               "read_count" : 747,
+               "read_bytes" : 86016,
+               "write_count" : 383,
+               "read_chars" : 5461562
+            },
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "cpu_percent" : 0.0,
+            "is_parallel_worker" : false,
+            "read_delta" : 0.0
+         }
+      },
+      "6228" : {
+         "duration" : -0.003339,
+         "read" : null,
+         "mem" : null,
+         "database" : "pgbench",
+         "state" : "active",
+         "client" : "local",
+         "extras" : {
+            "appname" : "pgbench",
+            "io_time" : 1596806345.17414,
+            "cpu_percent" : 0.0,
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "io_counters" : {
+               "write_chars" : 5496882,
+               "write_bytes" : 5259264,
+               "read_count" : 782,
+               "read_chars" : 5781046,
+               "write_count" : 444,
+               "read_bytes" : 98304
+            },
+            "read_delta" : 0.0,
+            "is_parallel_worker" : false,
+            "write_delta" : 0.0,
+            "cpu_times" : [
+               0.26,
+               0.06,
+               0,
+               0,
+               0.03
+            ],
+            "mem_percent" : 1.02475841806111,
+            "meminfo" : [
+               63287296,
+               219631616,
+               60973056,
+               4608000,
+               0,
+               2908160,
+               0
+            ]
+         },
+         "user" : "postgres",
+         "write" : null,
+         "pid" : 6228,
+         "cpu" : null,
+         "appname" : "pgbench",
+         "wait" : false,
+         "query" : "UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;"
+      },
+      "6231" : {
+         "extras" : {
+            "cpu_percent" : 0.0,
+            "io_counters" : {
+               "read_bytes" : 204800,
+               "read_chars" : 5658169,
+               "write_count" : 395,
+               "write_bytes" : 4481024,
+               "read_count" : 770,
+               "write_chars" : 4595765
+            },
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "appname" : "pgbench",
+            "io_time" : 1596806345.17499,
+            "read_delta" : 0.0,
+            "is_parallel_worker" : false,
+            "write_delta" : 0.0,
+            "cpu_times" : [
+               0.25,
+               0.05,
+               0,
+               0,
+               0.04
+            ],
+            "meminfo" : [
+               63684608,
+               219631616,
+               61370368,
+               4608000,
+               0,
+               2908160,
+               0
+            ],
+            "mem_percent" : 1.03119176001645
+         },
+         "write" : null,
+         "user" : "postgres",
+         "state" : "active",
+         "client" : "local",
+         "appname" : "pgbench",
+         "wait" : false,
+         "cpu" : null,
+         "pid" : 6231,
+         "query" : "UPDATE pgbench_accounts SET abalance = abalance + 157 WHERE aid = 4244124;",
+         "mem" : null,
+         "duration" : -0.003384,
+         "read" : null,
+         "database" : "pgbench"
+      },
+      "6221" : {
+         "state" : "active",
+         "client" : "local",
+         "extras" : {
+            "is_parallel_worker" : false,
+            "read_delta" : 0.0,
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "io_counters" : {
+               "read_count" : 830,
+               "write_bytes" : 4046848,
+               "write_chars" : 4251702,
+               "read_bytes" : 172032,
+               "read_chars" : 6141498,
+               "write_count" : 388
+            },
+            "cpu_percent" : 0.0,
+            "io_time" : 1596806345.17328,
+            "appname" : "pgbench",
+            "meminfo" : [
+               65454080,
+               219631616,
+               63139840,
+               4608000,
+               0,
+               2908160,
+               0
+            ],
+            "mem_percent" : 1.05984334480723,
+            "cpu_times" : [
+               0.29,
+               0.04,
+               0,
+               0,
+               0.06
+            ],
+            "write_delta" : 0.0
+         },
+         "user" : "postgres",
+         "write" : null,
+         "cpu" : null,
+         "pid" : 6221,
+         "appname" : "pgbench",
+         "wait" : false,
+         "query" : "END;",
+         "duration" : -0.002731,
+         "read" : null,
+         "mem" : null,
+         "database" : "pgbench"
+      },
+      "6240" : {
+         "query" : "END;",
+         "wait" : true,
+         "appname" : "pgbench",
+         "cpu" : null,
+         "pid" : 6240,
+         "user" : "postgres",
+         "write" : null,
+         "extras" : {
+            "is_parallel_worker" : false,
+            "read_delta" : 0.0,
+            "io_time" : 1596806345.16992,
+            "appname" : "pgbench",
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "io_counters" : {
+               "write_chars" : 4005915,
+               "read_count" : 726,
+               "write_bytes" : 3850240,
+               "read_bytes" : 253952,
+               "write_count" : 344,
+               "read_chars" : 5510687
+            },
+            "cpu_percent" : 0.0,
+            "mem_percent" : 1.02137593930109,
+            "meminfo" : [
+               63078400,
+               219631616,
+               60772352,
+               4608000,
+               0,
+               2908160,
+               0
+            ],
+            "cpu_times" : [
+               0.23,
+               0.05,
+               0,
+               0,
+               0.03
+            ],
+            "write_delta" : 0.0
+         },
+         "client" : "local",
+         "state" : "active",
+         "database" : "pgbench",
+         "mem" : null,
+         "read" : null,
+         "duration" : -0.002256
+      },
+      "6238" : {
+         "query" : "UPDATE pgbench_accounts SET abalance = abalance + -3113 WHERE aid = 8943851;",
+         "wait" : false,
+         "appname" : "pgbench",
+         "cpu" : null,
+         "pid" : 6238,
+         "client" : "local",
+         "state" : "active",
+         "write" : null,
+         "user" : "postgres",
+         "extras" : {
+            "mem_percent" : 1.02741134257878,
+            "meminfo" : [
+               63451136,
+               219631616,
+               61136896,
+               4608000,
+               0,
+               2908160,
+               0
+            ],
+            "write_delta" : 0.0,
+            "cpu_times" : [
+               0.25,
+               0.05,
+               0,
+               0,
+               0.06
+            ],
+            "read_delta" : 0.0,
+            "is_parallel_worker" : false,
+            "appname" : "pgbench",
+            "io_time" : 1596806345.17561,
+            "cpu_percent" : 0.0,
+            "io_counters" : {
+               "write_chars" : 5103656,
+               "write_bytes" : 4923392,
+               "read_count" : 753,
+               "read_chars" : 5625388,
+               "write_count" : 399,
+               "read_bytes" : 110592
+            },
+            "io_wait" : "N",
+            "psutil_proc" : null
+         },
+         "database" : "pgbench",
+         "mem" : null,
+         "duration" : -0.003481,
+         "read" : null
+      },
+      "6222" : {
+         "database" : "pgbench",
+         "duration" : -0.003539,
+         "read" : null,
+         "mem" : null,
+         "query" : "SELECT abalance FROM pgbench_accounts WHERE aid = 883793;",
+         "cpu" : null,
+         "pid" : 6222,
+         "wait" : false,
+         "appname" : "pgbench",
+         "client" : "local",
+         "state" : "active",
+         "write" : null,
+         "user" : "postgres",
+         "extras" : {
+            "write_delta" : 0.0,
+            "cpu_times" : [
+               0.26,
+               0.07,
+               0,
+               0,
+               0.05
+            ],
+            "meminfo" : [
+               65867776,
+               219631616,
+               63553536,
+               4608000,
+               0,
+               2908160,
+               0
+            ],
+            "mem_percent" : 1.06654197921434,
+            "cpu_percent" : 0.0,
+            "io_counters" : {
+               "read_count" : 810,
+               "write_bytes" : 5177344,
+               "write_chars" : 5357617,
+               "read_bytes" : 151552,
+               "write_count" : 422,
+               "read_chars" : 6018613
+            },
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "appname" : "pgbench",
+            "io_time" : 1596806345.17619,
+            "read_delta" : 0.0,
+            "is_parallel_worker" : false
+         }
+      },
+      "6234" : {
+         "appname" : "pgbench",
+         "wait" : true,
+         "cpu" : null,
+         "pid" : 6234,
+         "query" : "END;",
+         "extras" : {
+            "is_parallel_worker" : false,
+            "read_delta" : 0.0,
+            "io_time" : 1596806345.17153,
+            "appname" : "pgbench",
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "io_counters" : {
+               "read_count" : 768,
+               "write_bytes" : 4177920,
+               "write_chars" : 4358196,
+               "read_bytes" : 131072,
+               "write_count" : 389,
+               "read_chars" : 5649976
+            },
+            "cpu_percent" : 0.0,
+            "mem_percent" : 1.03702819395531,
+            "meminfo" : [
+               64045056,
+               219631616,
+               61730816,
+               4608000,
+               0,
+               2908160,
+               0
+            ],
+            "cpu_times" : [
+               0.24,
+               0.05,
+               0,
+               0,
+               0.03
+            ],
+            "write_delta" : 0.0
+         },
+         "user" : "postgres",
+         "write" : null,
+         "state" : "active",
+         "client" : "local",
+         "database" : "pgbench",
+         "mem" : null,
+         "read" : null,
+         "duration" : -0.002408
+      },
+      "6227" : {
+         "duration" : -0.002693,
+         "read" : null,
+         "mem" : null,
+         "database" : "pgbench",
+         "state" : "active",
+         "client" : "local",
+         "extras" : {
+            "mem_percent" : 1.04153816563534,
+            "meminfo" : [
+               64323584,
+               219631616,
+               62009344,
+               4608000,
+               0,
+               2908160,
+               0
+            ],
+            "cpu_times" : [
+               0.26,
+               0.06,
+               0,
+               0,
+               0.06
+            ],
+            "write_delta" : 0.0,
+            "is_parallel_worker" : false,
+            "read_delta" : 0.0,
+            "io_time" : 1596806345.17287,
+            "appname" : "pgbench",
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "io_counters" : {
+               "write_chars" : 5234725,
+               "read_count" : 770,
+               "write_bytes" : 5095424,
+               "read_bytes" : 131072,
+               "write_count" : 394,
+               "read_chars" : 5789225
+            },
+            "cpu_percent" : 0.0
+         },
+         "write" : null,
+         "user" : "postgres",
+         "cpu" : null,
+         "pid" : 6227,
+         "wait" : true,
+         "appname" : "pgbench",
+         "query" : "UPDATE pgbench_branches SET bbalance = bbalance + -1015 WHERE bid = 77;"
+      },
+      "6237" : {
+         "appname" : "pgbench",
+         "wait" : false,
+         "cpu" : null,
+         "pid" : 6237,
+         "query" : "UPDATE pgbench_tellers SET tbalance = tbalance + 566 WHERE tid = 733;",
+         "extras" : {
+            "is_parallel_worker" : false,
+            "read_delta" : 0.0,
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "io_counters" : {
+               "write_chars" : 4792367,
+               "read_count" : 745,
+               "write_bytes" : 4669440,
+               "read_bytes" : 159744,
+               "write_count" : 381,
+               "read_chars" : 5502515
+            },
+            "cpu_percent" : 0.0,
+            "io_time" : 1596806345.17644,
+            "appname" : "pgbench",
+            "meminfo" : [
+               61796352,
+               219631616,
+               59482112,
+               4608000,
+               0,
+               2908160,
+               0
+            ],
+            "mem_percent" : 1.00061680495036,
+            "write_delta" : 0.0,
+            "cpu_times" : [
+               0.24,
+               0.06,
+               0,
+               0,
+               0.04
+            ]
+         },
+         "user" : "postgres",
+         "write" : null,
+         "state" : "active",
+         "client" : "local",
+         "database" : "pgbench",
+         "mem" : null,
+         "read" : null,
+         "duration" : -0.003559
+      },
+      "6224" : {
+         "cpu" : null,
+         "pid" : 6224,
+         "appname" : "pgbench",
+         "wait" : true,
+         "query" : "END;",
+         "extras" : {
+            "io_counters" : {
+               "read_bytes" : 208896,
+               "read_chars" : 5846582,
+               "write_count" : 405,
+               "read_count" : 790,
+               "write_bytes" : 4792320,
+               "write_chars" : 4988978
+            },
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "cpu_percent" : 0.0,
+            "io_time" : 1596806345.17362,
+            "appname" : "pgbench",
+            "is_parallel_worker" : false,
+            "read_delta" : 0.0,
+            "cpu_times" : [
+               0.24,
+               0.08,
+               0,
+               0,
+               0.03
+            ],
+            "write_delta" : 0.0,
+            "meminfo" : [
+               65409024,
+               219631616,
+               63094784,
+               4608000,
+               0,
+               2908160,
+               0
+            ],
+            "mem_percent" : 1.05911379056487
+         },
+         "user" : "postgres",
+         "write" : null,
+         "state" : "active",
+         "client" : "local",
+         "database" : "pgbench",
+         "duration" : -0.00302,
+         "read" : null,
+         "mem" : null
+      },
+      "6226" : {
+         "user" : "postgres",
+         "write" : null,
+         "extras" : {
+            "write_delta" : 0.0,
+            "cpu_times" : [
+               0.24,
+               0.07,
+               0,
+               0,
+               0.06
+            ],
+            "mem_percent" : 1.05148663257659,
+            "meminfo" : [
+               64937984,
+               219631616,
+               62623744,
+               4608000,
+               0,
+               2908160,
+               0
+            ],
+            "appname" : "pgbench",
+            "io_time" : 1596806345.17196,
+            "cpu_percent" : 0.0,
+            "io_counters" : {
+               "write_count" : 390,
+               "read_chars" : 5715499,
+               "read_bytes" : 102400,
+               "write_bytes" : 4792320,
+               "read_count" : 763,
+               "write_chars" : 4964391
+            },
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "read_delta" : 0.0,
+            "is_parallel_worker" : false
+         },
+         "client" : "local",
+         "state" : "active",
+         "query" : "END;",
+         "cpu" : null,
+         "pid" : 6226,
+         "wait" : true,
+         "appname" : "pgbench",
+         "read" : null,
+         "duration" : -0.002623,
+         "mem" : null,
+         "database" : "pgbench"
+      },
+      "6232" : {
+         "mem" : null,
+         "read" : null,
+         "duration" : -0.002212,
+         "database" : "pgbench",
+         "client" : "local",
+         "state" : "active",
+         "write" : null,
+         "user" : "postgres",
+         "extras" : {
+            "mem_percent" : 1.05493543444955,
+            "meminfo" : [
+               65150976,
+               219631616,
+               62836736,
+               4608000,
+               0,
+               2908160,
+               0
+            ],
+            "write_delta" : 0.0,
+            "cpu_times" : [
+               0.27,
+               0.05,
+               0,
+               0,
+               0.04
+            ],
+            "is_parallel_worker" : false,
+            "read_delta" : 0.0,
+            "io_time" : 1596806345.16938,
+            "appname" : "pgbench",
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "io_counters" : {
+               "write_bytes" : 4718592,
+               "read_count" : 784,
+               "write_chars" : 4890669,
+               "read_bytes" : 114688,
+               "read_chars" : 5838385,
+               "write_count" : 423
+            },
+            "cpu_percent" : 0.0
+         },
+         "query" : "END;",
+         "wait" : true,
+         "appname" : "pgbench",
+         "cpu" : null,
+         "pid" : 6232
+      },
+      "6225" : {
+         "database" : "pgbench",
+         "read" : null,
+         "duration" : -0.002305,
+         "mem" : null,
+         "pid" : 6225,
+         "cpu" : null,
+         "wait" : true,
+         "appname" : "pgbench",
+         "query" : "END;",
+         "state" : "active",
+         "client" : "local",
+         "extras" : {
+            "is_parallel_worker" : false,
+            "read_delta" : 0.0,
+            "io_counters" : {
+               "write_chars" : 5603374,
+               "write_bytes" : 5439488,
+               "read_count" : 784,
+               "read_bytes" : 192512,
+               "read_chars" : 5830194,
+               "write_count" : 416
+            },
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "cpu_percent" : 0.0,
+            "io_time" : 1596806345.17073,
+            "appname" : "pgbench",
+            "meminfo" : [
+               64307200,
+               219631616,
+               61992960,
+               4608000,
+               0,
+               2908160,
+               0
+            ],
+            "mem_percent" : 1.04127287318358,
+            "cpu_times" : [
+               0.27,
+               0.05,
+               0,
+               0,
+               0.07
+            ],
+            "write_delta" : 0.0
+         },
+         "write" : null,
+         "user" : "postgres"
+      },
+      "6235" : {
+         "state" : "active",
+         "client" : "local",
+         "extras" : {
+            "io_time" : 1596806345.17238,
+            "appname" : "pgbench",
+            "io_counters" : {
+               "read_bytes" : 143360,
+               "write_count" : 422,
+               "read_chars" : 5576246,
+               "write_chars" : 4784178,
+               "read_count" : 757,
+               "write_bytes" : 4661248
+            },
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "cpu_percent" : 0.0,
+            "is_parallel_worker" : false,
+            "read_delta" : 0.0,
+            "write_delta" : 0.0,
+            "cpu_times" : [
+               0.23,
+               0.07,
+               0,
+               0,
+               0.07
+            ],
+            "mem_percent" : 1.02111064684932,
+            "meminfo" : [
+               63062016,
+               219631616,
+               60747776,
+               4608000,
+               0,
+               2908160,
+               0
+            ]
+         },
+         "user" : "postgres",
+         "write" : null,
+         "pid" : 6235,
+         "cpu" : null,
+         "wait" : true,
+         "appname" : "pgbench",
+         "query" : "END;",
+         "duration" : -0.002635,
+         "read" : null,
+         "mem" : null,
+         "database" : "pgbench"
+      }
+   },
+   "processes" : {
+      "6235" : {
+         "query" : "UPDATE pgbench_accounts SET abalance = abalance + -3841 WHERE aid = 1460066;",
+         "cpu" : null,
+         "pid" : 6235,
+         "wait" : false,
+         "appname" : "pgbench",
+         "client" : "local",
+         "state" : "idle in transaction",
+         "write" : null,
+         "user" : "postgres",
+         "extras" : {
+            "appname" : "pgbench",
+            "io_time" : 1596806345.14336,
+            "cpu_percent" : 0.0,
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "io_counters" : {
+               "read_count" : 747,
+               "write_bytes" : 4587520,
+               "write_chars" : 4710448,
+               "read_bytes" : 143360,
+               "write_count" : 414,
+               "read_chars" : 5510708
+            },
+            "read_delta" : 0.0,
+            "is_parallel_worker" : false,
+            "cpu_times" : [
+               0.23,
+               0.07,
+               0,
+               0,
+               0.07
+            ],
+            "write_delta" : 0.0,
+            "mem_percent" : 1.02111064684932,
+            "meminfo" : [
+               63062016,
+               219631616,
+               60747776,
+               4608000,
+               0,
+               2908160,
+               0
+            ]
+         },
+         "database" : "pgbench",
+         "duration" : -0.003405,
+         "read" : null,
+         "mem" : null
+      },
+      "6225" : {
+         "query" : "INSERT INTO pgbench_history (tid, bid, aid, delta, mtime) VALUES (297, 63, 5970520, -2396, CURRENT_TIMESTAMP);",
+         "cpu" : null,
+         "pid" : 6225,
+         "appname" : "pgbench",
+         "wait" : false,
+         "write" : null,
+         "user" : "postgres",
+         "extras" : {
+            "meminfo" : [
+               64307200,
+               219631616,
+               61992960,
+               4608000,
+               0,
+               2908160,
+               0
+            ],
+            "mem_percent" : 1.04127287318358,
+            "cpu_times" : [
+               0.27,
+               0.04,
+               0,
+               0,
+               0.07
+            ],
+            "write_delta" : 0.0,
+            "read_delta" : 0.0,
+            "is_parallel_worker" : false,
+            "cpu_percent" : 0.0,
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "io_counters" : {
+               "read_bytes" : 192512,
+               "write_count" : 408,
+               "read_chars" : 5748273,
+               "write_chars" : 5529645,
+               "read_count" : 773,
+               "write_bytes" : 5365760
+            },
+            "appname" : "pgbench",
+            "io_time" : 1596806345.14274
+         },
+         "client" : "local",
+         "state" : "idle in transaction",
+         "database" : "pgbench",
+         "duration" : -0.003286,
+         "read" : null,
+         "mem" : null
+      },
+      "6232" : {
+         "user" : "postgres",
+         "write" : null,
+         "extras" : {
+            "write_delta" : 0.0,
+            "cpu_times" : [
+               0.26,
+               0.05,
+               0,
+               0,
+               0.04
+            ],
+            "meminfo" : [
+               64094208,
+               219631616,
+               61779968,
+               4608000,
+               0,
+               2908160,
+               0
+            ],
+            "mem_percent" : 1.03782407131061,
+            "io_counters" : {
+               "read_count" : 776,
+               "write_bytes" : 4669440,
+               "write_chars" : 4841517,
+               "read_chars" : 5772849,
+               "write_count" : 417,
+               "read_bytes" : 114688
+            },
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "cpu_percent" : 0.0,
+            "io_time" : 1596806345.14397,
+            "appname" : "pgbench",
+            "is_parallel_worker" : false,
+            "read_delta" : 0.0
+         },
+         "client" : "local",
+         "state" : "active",
+         "query" : "END;",
+         "appname" : "pgbench",
+         "wait" : true,
+         "cpu" : null,
+         "pid" : 6232,
+         "mem" : null,
+         "read" : null,
+         "duration" : -0.003435,
+         "database" : "pgbench"
+      },
+      "6226" : {
+         "mem" : null,
+         "read" : null,
+         "duration" : -0.003431,
+         "database" : "pgbench",
+         "extras" : {
+            "io_time" : 1596806345.14365,
+            "appname" : "pgbench",
+            "io_counters" : {
+               "read_bytes" : 102400,
+               "write_count" : 385,
+               "read_chars" : 5658154,
+               "write_bytes" : 4759552,
+               "read_count" : 755,
+               "write_chars" : 4931622
+            },
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "cpu_percent" : 0.0,
+            "is_parallel_worker" : false,
+            "read_delta" : 0.0,
+            "cpu_times" : [
+               0.24,
+               0.07,
+               0,
+               0,
+               0.06
+            ],
+            "write_delta" : 0.0,
+            "mem_percent" : 1.05148663257659,
+            "meminfo" : [
+               64937984,
+               219631616,
+               62623744,
+               4608000,
+               0,
+               2908160,
+               0
+            ]
+         },
+         "user" : "postgres",
+         "write" : null,
+         "state" : "idle in transaction",
+         "client" : "local",
+         "appname" : "pgbench",
+         "wait" : false,
+         "pid" : 6226,
+         "cpu" : null,
+         "query" : "SELECT abalance FROM pgbench_accounts WHERE aid = 518562;"
+      },
+      "6224" : {
+         "user" : "postgres",
+         "write" : null,
+         "extras" : {
+            "io_time" : 1596806345.14246,
+            "appname" : "pgbench",
+            "io_counters" : {
+               "write_bytes" : 4661248,
+               "read_count" : 777,
+               "write_chars" : 4849713,
+               "read_chars" : 5748277,
+               "write_count" : 394,
+               "read_bytes" : 208896
+            },
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "cpu_percent" : 0.0,
+            "is_parallel_worker" : false,
+            "read_delta" : 0.0,
+            "cpu_times" : [
+               0.23,
+               0.08,
+               0,
+               0,
+               0.03
+            ],
+            "write_delta" : 0.0,
+            "mem_percent" : 1.05911379056487,
+            "meminfo" : [
+               65409024,
+               219631616,
+               63094784,
+               4608000,
+               0,
+               2908160,
+               0
+            ]
+         },
+         "client" : "local",
+         "state" : "idle in transaction",
+         "query" : "UPDATE pgbench_tellers SET tbalance = tbalance + -4335 WHERE tid = 682;",
+         "pid" : 6224,
+         "cpu" : null,
+         "appname" : "pgbench",
+         "wait" : false,
+         "duration" : -0.003245,
+         "read" : null,
+         "mem" : null,
+         "database" : "pgbench"
+      },
+      "6237" : {
+         "duration" : -0.002788,
+         "read" : null,
+         "mem" : null,
+         "database" : "pgbench",
+         "write" : null,
+         "user" : "postgres",
+         "extras" : {
+            "meminfo" : [
+               61796352,
+               219631616,
+               59482112,
+               4608000,
+               0,
+               2908160,
+               0
+            ],
+            "mem_percent" : 1.00061680495036,
+            "cpu_times" : [
+               0.23,
+               0.06,
+               0,
+               0,
+               0.04
+            ],
+            "write_delta" : 0.0,
+            "read_delta" : 0.0,
+            "is_parallel_worker" : false,
+            "cpu_percent" : 0.0,
+            "io_counters" : {
+               "read_bytes" : 159744,
+               "read_chars" : 5387826,
+               "write_count" : 367,
+               "read_count" : 730,
+               "write_bytes" : 4505600,
+               "write_chars" : 4612142
+            },
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "appname" : "pgbench",
+            "io_time" : 1596806345.13865
+         },
+         "client" : "local",
+         "state" : "active",
+         "query" : "END;",
+         "cpu" : null,
+         "pid" : 6237,
+         "appname" : "pgbench",
+         "wait" : true
+      },
+      "6227" : {
+         "write" : null,
+         "user" : "postgres",
+         "extras" : {
+            "write_delta" : 0.0,
+            "cpu_times" : [
+               0.25,
+               0.06,
+               0,
+               0,
+               0.04
+            ],
+            "mem_percent" : 1.01441201244222,
+            "meminfo" : [
+               62648320,
+               219631616,
+               60334080,
+               4608000,
+               0,
+               2908160,
+               0
+            ],
+            "io_time" : 1596806345.13715,
+            "appname" : "pgbench",
+            "io_counters" : {
+               "write_count" : 382,
+               "read_chars" : 5699111,
+               "read_bytes" : 131072,
+               "write_bytes" : 4915200,
+               "read_count" : 757,
+               "write_chars" : 5054499
+            },
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "cpu_percent" : 0.0,
+            "is_parallel_worker" : false,
+            "read_delta" : 0.0
+         },
+         "client" : "local",
+         "state" : "idle in transaction",
+         "query" : "UPDATE pgbench_branches SET bbalance = bbalance + 4427 WHERE bid = 28;",
+         "cpu" : null,
+         "pid" : 6227,
+         "wait" : false,
+         "appname" : "pgbench",
+         "read" : null,
+         "duration" : -0.002061,
+         "mem" : null,
+         "database" : "pgbench"
+      },
+      "6234" : {
+         "extras" : {
+            "write_delta" : 0.0,
+            "cpu_times" : [
+               0.24,
+               0.05,
+               0,
+               0,
+               0.03
+            ],
+            "mem_percent" : 1.0097693945363,
+            "meminfo" : [
+               62361600,
+               219631616,
+               60047360,
+               4608000,
+               0,
+               2908160,
+               0
+            ],
+            "io_time" : 1596806345.14158,
+            "appname" : "pgbench",
+            "io_counters" : {
+               "write_bytes" : 4046848,
+               "read_count" : 759,
+               "write_chars" : 4227123,
+               "read_chars" : 5584439,
+               "write_count" : 382,
+               "read_bytes" : 131072
+            },
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "cpu_percent" : 0.0,
+            "is_parallel_worker" : false,
+            "read_delta" : 0.0
+         },
+         "user" : "postgres",
+         "write" : null,
+         "state" : "idle in transaction",
+         "client" : "local",
+         "wait" : false,
+         "appname" : "pgbench",
+         "pid" : 6234,
+         "cpu" : null,
+         "query" : "SELECT abalance FROM pgbench_accounts WHERE aid = 4511601;",
+         "mem" : null,
+         "read" : null,
+         "duration" : -0.003179,
+         "database" : "pgbench"
+      },
+      "6236" : {
+         "database" : "pgbench",
+         "mem" : null,
+         "duration" : -0.002822,
+         "read" : null,
+         "appname" : "pgbench",
+         "wait" : true,
+         "cpu" : null,
+         "pid" : 6236,
+         "query" : "UPDATE pgbench_branches SET bbalance = bbalance + -1147 WHERE bid = 26;",
+         "state" : "active",
+         "client" : "local",
+         "extras" : {
+            "meminfo" : [
+               60411904,
+               219631616,
+               58097664,
+               4608000,
+               0,
+               2908160,
+               0
+            ],
+            "mem_percent" : 0.978199592776086,
+            "cpu_times" : [
+               0.25,
+               0.04,
+               0,
+               0,
+               0.05
+            ],
+            "write_delta" : 0.0,
+            "is_parallel_worker" : false,
+            "read_delta" : 0.0,
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "io_counters" : {
+               "read_bytes" : 147456,
+               "write_count" : 346,
+               "read_chars" : 5436966,
+               "read_count" : 724,
+               "write_bytes" : 4186112,
+               "write_chars" : 4358178
+            },
+            "cpu_percent" : 0.0,
+            "io_time" : 1596806345.14033,
+            "appname" : "pgbench"
+         },
+         "user" : "postgres",
+         "write" : null
+      },
+      "6222" : {
+         "appname" : "pgbench",
+         "wait" : false,
+         "pid" : 6222,
+         "cpu" : null,
+         "query" : "UPDATE pgbench_branches SET bbalance = bbalance + 1107 WHERE bid = 84;",
+         "extras" : {
+            "meminfo" : [
+               65867776,
+               219631616,
+               63553536,
+               4608000,
+               0,
+               2908160,
+               0
+            ],
+            "mem_percent" : 1.06654197921434,
+            "cpu_times" : [
+               0.26,
+               0.07,
+               0,
+               0,
+               0.05
+            ],
+            "write_delta" : 0.0,
+            "is_parallel_worker" : false,
+            "read_delta" : 0.0,
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "io_counters" : {
+               "write_bytes" : 5095424,
+               "read_count" : 799,
+               "write_chars" : 5275695,
+               "read_bytes" : 151552,
+               "read_chars" : 5944883,
+               "write_count" : 415
+            },
+            "cpu_percent" : 0.0,
+            "io_time" : 1596806345.14185,
+            "appname" : "pgbench"
+         },
+         "write" : null,
+         "user" : "postgres",
+         "state" : "idle in transaction",
+         "client" : "local",
+         "database" : "pgbench",
+         "mem" : null,
+         "read" : null,
+         "duration" : -0.003188
+      },
+      "6238" : {
+         "database" : "pgbench",
+         "duration" : -0.003436,
+         "read" : null,
+         "mem" : null,
+         "pid" : 6238,
+         "cpu" : null,
+         "appname" : "pgbench",
+         "wait" : true,
+         "query" : "END;",
+         "extras" : {
+            "write_delta" : 0.0,
+            "cpu_times" : [
+               0.25,
+               0.05,
+               0,
+               0,
+               0.06
+            ],
+            "meminfo" : [
+               63451136,
+               219631616,
+               61136896,
+               4608000,
+               0,
+               2908160,
+               0
+            ],
+            "mem_percent" : 1.02741134257878,
+            "cpu_percent" : 0.0,
+            "io_counters" : {
+               "write_chars" : 4988967,
+               "read_count" : 740,
+               "write_bytes" : 4825088,
+               "read_bytes" : 110592,
+               "read_chars" : 5527083,
+               "write_count" : 387
+            },
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "appname" : "pgbench",
+            "io_time" : 1596806345.1443,
+            "read_delta" : 0.0,
+            "is_parallel_worker" : false
+         },
+         "write" : null,
+         "user" : "postgres",
+         "state" : "active",
+         "client" : "local"
+      },
+      "6240" : {
+         "duration" : -0.003586,
+         "read" : null,
+         "mem" : null,
+         "database" : "pgbench",
+         "client" : "local",
+         "state" : "active",
+         "user" : "postgres",
+         "write" : null,
+         "extras" : {
+            "read_delta" : 0.0,
+            "is_parallel_worker" : false,
+            "cpu_percent" : 0.0,
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "io_counters" : {
+               "read_bytes" : 253952,
+               "read_chars" : 5436959,
+               "write_count" : 339,
+               "write_chars" : 3964955,
+               "write_bytes" : 3809280,
+               "read_count" : 717
+            },
+            "appname" : "pgbench",
+            "io_time" : 1596806345.14523,
+            "meminfo" : [
+               63078400,
+               219631616,
+               60772352,
+               4608000,
+               0,
+               2908160,
+               0
+            ],
+            "mem_percent" : 1.02137593930109,
+            "write_delta" : 0.0,
+            "cpu_times" : [
+               0.23,
+               0.05,
+               0,
+               0,
+               0.03
+            ]
+         },
+         "query" : "END;",
+         "pid" : 6240,
+         "cpu" : null,
+         "appname" : "pgbench",
+         "wait" : true
+      },
+      "6221" : {
+         "pid" : 6221,
+         "cpu" : null,
+         "wait" : false,
+         "appname" : "pgbench",
+         "query" : "END;",
+         "extras" : {
+            "read_delta" : 0.0,
+            "is_parallel_worker" : false,
+            "cpu_percent" : 0.0,
+            "io_counters" : {
+               "read_bytes" : 163840,
+               "write_count" : 379,
+               "read_chars" : 6035002,
+               "read_count" : 817,
+               "write_bytes" : 3915776,
+               "write_chars" : 4112438
+            },
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "appname" : "pgbench",
+            "io_time" : 1596806345.13955,
+            "meminfo" : [
+               63885312,
+               219631616,
+               61571072,
+               4608000,
+               0,
+               2908160,
+               0
+            ],
+            "mem_percent" : 1.03444159255059,
+            "cpu_times" : [
+               0.29,
+               0.04,
+               0,
+               0,
+               0.06
+            ],
+            "write_delta" : 0.0
+         },
+         "user" : "postgres",
+         "write" : null,
+         "state" : "active",
+         "client" : "local",
+         "database" : "pgbench",
+         "duration" : -0.002794,
+         "read" : null,
+         "mem" : null
+      },
+      "6231" : {
+         "read" : null,
+         "duration" : -0.001462,
+         "mem" : null,
+         "database" : "pgbench",
+         "user" : "postgres",
+         "write" : null,
+         "extras" : {
+            "meminfo" : [
+               63684608,
+               219631616,
+               61370368,
+               4608000,
+               0,
+               2908160,
+               0
+            ],
+            "mem_percent" : 1.03119176001645,
+            "write_delta" : 0.0,
+            "cpu_times" : [
+               0.24,
+               0.05,
+               0,
+               0,
+               0.04
+            ],
+            "is_parallel_worker" : false,
+            "read_delta" : 0.0,
+            "io_counters" : {
+               "read_bytes" : 204800,
+               "read_chars" : 5576248,
+               "write_count" : 385,
+               "read_count" : 759,
+               "write_bytes" : 4374528,
+               "write_chars" : 4489268
+            },
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "cpu_percent" : 0.0,
+            "io_time" : 1596806345.13624,
+            "appname" : "pgbench"
+         },
+         "client" : "local",
+         "state" : "idle in transaction",
+         "query" : "UPDATE pgbench_branches SET bbalance = bbalance + 3357 WHERE bid = 6;",
+         "cpu" : null,
+         "pid" : 6231,
+         "appname" : "pgbench",
+         "wait" : false
+      },
+      "6228" : {
+         "duration" : -0.003475,
+         "read" : null,
+         "mem" : null,
+         "database" : "pgbench",
+         "extras" : {
+            "cpu_times" : [
+               0.26,
+               0.05,
+               0,
+               0,
+               0.03
+            ],
+            "write_delta" : 0.0,
+            "mem_percent" : 1.02475841806111,
+            "meminfo" : [
+               63287296,
+               219631616,
+               60973056,
+               4608000,
+               0,
+               2908160,
+               0
+            ],
+            "io_time" : 1596806345.14492,
+            "appname" : "pgbench",
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "io_counters" : {
+               "write_chars" : 5439538,
+               "write_bytes" : 5210112,
+               "read_count" : 775,
+               "write_count" : 438,
+               "read_chars" : 5723702,
+               "read_bytes" : 98304
+            },
+            "cpu_percent" : 0.0,
+            "is_parallel_worker" : false,
+            "read_delta" : 0.0
+         },
+         "write" : null,
+         "user" : "postgres",
+         "state" : "active",
+         "client" : "local",
+         "pid" : 6228,
+         "cpu" : null,
+         "wait" : false,
+         "appname" : "pgbench",
+         "query" : "SELECT abalance FROM pgbench_accounts WHERE aid = 2514784;"
+      },
+      "6239" : {
+         "extras" : {
+            "is_parallel_worker" : false,
+            "read_delta" : 0.0,
+            "io_time" : 1596806345.14122,
+            "appname" : "pgbench",
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "io_counters" : {
+               "read_count" : 733,
+               "write_bytes" : 4259840,
+               "write_chars" : 4423733,
+               "write_count" : 374,
+               "read_chars" : 5355065,
+               "read_bytes" : 86016
+            },
+            "cpu_percent" : 0.0,
+            "mem_percent" : 0.993254939413836,
+            "meminfo" : [
+               61341696,
+               219631616,
+               59027456,
+               4608000,
+               0,
+               2908160,
+               0
+            ],
+            "cpu_times" : [
+               0.23,
+               0.05,
+               0,
+               0,
+               0.06
+            ],
+            "write_delta" : 0.0
+         },
+         "user" : "postgres",
+         "write" : null,
+         "state" : "active",
+         "client" : "local",
+         "cpu" : null,
+         "pid" : 6239,
+         "wait" : true,
+         "appname" : "pgbench",
+         "query" : "END;",
+         "read" : null,
+         "duration" : -0.00305,
+         "mem" : null,
+         "database" : "pgbench"
+      },
+      "6233" : {
+         "query" : "UPDATE pgbench_accounts SET abalance = abalance + -1917 WHERE aid = 9235835;",
+         "pid" : 6233,
+         "cpu" : null,
+         "appname" : "pgbench",
+         "wait" : false,
+         "client" : "local",
+         "state" : "active",
+         "user" : "postgres",
+         "write" : null,
+         "extras" : {
+            "write_delta" : 0.0,
+            "cpu_times" : [
+               0.26,
+               0.05,
+               0,
+               0,
+               0.05
+            ],
+            "meminfo" : [
+               63365120,
+               219631616,
+               61050880,
+               4608000,
+               0,
+               2908160,
+               0
+            ],
+            "mem_percent" : 1.026018557207,
+            "cpu_percent" : 0.0,
+            "io_counters" : {
+               "read_chars" : 5535288,
+               "write_count" : 398,
+               "read_bytes" : 212992,
+               "write_chars" : 4948020,
+               "read_count" : 754,
+               "write_bytes" : 4857856
+            },
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "appname" : "pgbench",
+            "io_time" : 1596806345.14303,
+            "read_delta" : 0.0,
+            "is_parallel_worker" : false
+         },
+         "database" : "pgbench",
+         "duration" : -0.00339,
+         "read" : null,
+         "mem" : null
+      },
+      "6230" : {
+         "query" : "END;",
+         "cpu" : null,
+         "pid" : 6230,
+         "wait" : true,
+         "appname" : "pgbench",
+         "user" : "postgres",
+         "write" : null,
+         "extras" : {
+            "appname" : "pgbench",
+            "io_time" : 1596806345.13785,
+            "cpu_percent" : 0.0,
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "io_counters" : {
+               "read_count" : 752,
+               "write_bytes" : 4161536,
+               "write_chars" : 4276275,
+               "read_bytes" : 90112,
+               "read_chars" : 5527095,
+               "write_count" : 366
+            },
+            "read_delta" : 0.0,
+            "is_parallel_worker" : false,
+            "cpu_times" : [
+               0.25,
+               0.04,
+               0,
+               0,
+               0.08
+            ],
+            "write_delta" : 0.0,
+            "mem_percent" : 1.05241515615777,
+            "meminfo" : [
+               64995328,
+               219631616,
+               62681088,
+               4608000,
+               0,
+               2908160,
+               0
+            ]
+         },
+         "client" : "local",
+         "state" : "active",
+         "database" : "pgbench",
+         "duration" : -0.002711,
+         "read" : null,
+         "mem" : null
+      },
+      "6223" : {
+         "duration" : -0.00347,
+         "read" : null,
+         "mem" : null,
+         "database" : "pgbench",
+         "write" : null,
+         "user" : "postgres",
+         "extras" : {
+            "read_delta" : 0.0,
+            "is_parallel_worker" : false,
+            "cpu_percent" : 0.0,
+            "io_counters" : {
+               "read_bytes" : 131072,
+               "write_count" : 386,
+               "read_chars" : 5961271,
+               "write_chars" : 4358195,
+               "write_bytes" : 4145152,
+               "read_count" : 805
+            },
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "appname" : "pgbench",
+            "io_time" : 1596806345.1446,
+            "meminfo" : [
+               63901696,
+               219631616,
+               61587456,
+               4608000,
+               0,
+               2908160,
+               0
+            ],
+            "mem_percent" : 1.03470688500235,
+            "write_delta" : 0.0,
+            "cpu_times" : [
+               0.27,
+               0.05,
+               0,
+               0,
+               0.03
+            ]
+         },
+         "client" : "local",
+         "state" : "active",
+         "query" : "END;",
+         "cpu" : null,
+         "pid" : 6223,
+         "appname" : "pgbench",
+         "wait" : true
+      },
+      "6229" : {
+         "database" : "pgbench",
+         "mem" : null,
+         "read" : null,
+         "duration" : -0.003226,
+         "appname" : "pgbench",
+         "wait" : true,
+         "cpu" : null,
+         "pid" : 6229,
+         "query" : "END;",
+         "state" : "active",
+         "client" : "local",
+         "extras" : {
+            "meminfo" : [
+               63643648,
+               219631616,
+               61329408,
+               4608000,
+               0,
+               2908160,
+               0
+            ],
+            "mem_percent" : 1.03052852888703,
+            "cpu_times" : [
+               0.25,
+               0.06,
+               0,
+               0,
+               0.04
+            ],
+            "write_delta" : 0.0,
+            "read_delta" : 0.0,
+            "is_parallel_worker" : false,
+            "cpu_percent" : 0.0,
+            "io_counters" : {
+               "write_chars" : 4808758,
+               "write_bytes" : 4653056,
+               "read_count" : 791,
+               "read_bytes" : 184320,
+               "read_chars" : 5822010,
+               "write_count" : 400
+            },
+            "io_wait" : "N",
+            "psutil_proc" : null,
+            "appname" : "pgbench",
+            "io_time" : 1596806345.14214
+         },
+         "write" : null,
+         "user" : "postgres"
+      }
+   },
+   "fs_blocksize" : 4096
+}

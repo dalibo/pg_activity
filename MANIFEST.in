@@ -1,6 +1,7 @@
 recursive-include *.py
 include docs/man/pg_activity.1
 recursive-include docs *.png *.pod *.sh *.svg
+recursive-include tests *.py *.json
 include *.md
 include *.txt
 include .flake8
