@@ -317,7 +317,7 @@ class LoadAverage:
 
 
 @attr.s(auto_attribs=True, slots=True)
-class IOCounters:
+class IOCounters(Deserializable):
     read_count: int
     write_count: int
     read_bytes: int
@@ -335,7 +335,7 @@ class SystemInfo:
 
 
 @attr.s(auto_attribs=True, slots=True)
-class ProcessExtras:
+class ProcessExtras(Deserializable):
     meminfo: Tuple[int, ...]
     io_counters: IOCounters
     io_time: float
@@ -345,14 +345,68 @@ class ProcessExtras:
     read_delta: float
     write_delta: float
     io_wait: str
-    psutil_proc: psutil.Process
+    psutil_proc: Optional[psutil.Process]
     is_parallel_worker: bool
     appname: str
 
 
 @attr.s(auto_attribs=True, slots=True)
-class Process:
-    """Simple class for process management."""
+class Process(Deserializable):
+    """Simple class for process management.
+
+    >>> data = {
+    ...     "database" : "pgbench",
+    ...     "read" : None,
+    ...     "duration" : -0.003353,
+    ...     "mem" : None,
+    ...     "query" : "END;",
+    ...     "cpu" : None,
+    ...     "pid" : 6229,
+    ...     "appname" : "pgbench",
+    ...     "wait" : True,
+    ...     "client" : "local",
+    ...     "state" : "active",
+    ...     "user" : "postgres",
+    ...     "write" : None,
+    ...     "extras" : {
+    ...        "is_parallel_worker" : False,
+    ...        "read_delta" : 0.0,
+    ...        "io_time" : 1596806345.17465,
+    ...        "appname" : "pgbench",
+    ...        "psutil_proc" : None,
+    ...        "io_wait" : "N",
+    ...        "io_counters" : {
+    ...           "read_bytes" : 184320,
+    ...           "read_chars" : 5928507,
+    ...           "write_count" : 408,
+    ...           "write_chars" : 4866103,
+    ...           "write_bytes" : 4702208,
+    ...           "read_count" : 805
+    ...        },
+    ...        "cpu_percent" : 0.0,
+    ...        "mem_percent" : 1.03052852888703,
+    ...        "meminfo" : [
+    ...           63643648,
+    ...           219631616,
+    ...           61329408,
+    ...           4608000,
+    ...           0,
+    ...           2908160,
+    ...           0
+    ...        ],
+    ...        "write_delta" : 0.0,
+    ...        "cpu_times" : [
+    ...           0.25,
+    ...           0.06,
+    ...           0,
+    ...           0,
+    ...           0.04
+    ...        ]
+    ...     }
+    ... }
+    >>> Process.deserialize(data)  # doctest: +ELLIPSIS
+    Process(pid=6229, database='pgbench', user='postgres', client='local', duration=-0.003353, wait=True, ...)
+    """
 
     pid: int
     database: str

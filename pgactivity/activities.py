@@ -52,8 +52,11 @@ def update_processes_local(
             if pid not in pids:
                 pids.append(pid)
 
-            proc.extras.mem_percent = proc.extras.psutil_proc.memory_percent()
-            proc.extras.cpu_percent = proc.extras.psutil_proc.cpu_percent(interval=0)
+            if proc.extras.psutil_proc is not None:
+                proc.extras.mem_percent = proc.extras.psutil_proc.memory_percent()
+                proc.extras.cpu_percent = proc.extras.psutil_proc.cpu_percent(
+                    interval=0
+                )
             new_processes[pid] = proc
             procs.append(
                 ActivityProcess(
