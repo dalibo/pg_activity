@@ -32,7 +32,7 @@ from datetime import timedelta, datetime as dt
 from pgactivity.Data import Data
 from pgactivity.activities import update_processes_local
 from pgactivity.utils import clean_str, get_duration
-from pgactivity.types import Flag
+from pgactivity.types import Flag, QueryDisplayMode
 import psutil
 import attr
 
@@ -49,9 +49,9 @@ C_RED_BLACK =   9
 C_GRAY =        10
 
 # Display query mode
-PGTOP_TRUNCATE =        1
-PGTOP_WRAP_NOINDENT =   2
-PGTOP_WRAP =            3
+PGTOP_TRUNCATE =        QueryDisplayMode.truncate
+PGTOP_WRAP_NOINDENT =   QueryDisplayMode.wrap_noindent
+PGTOP_WRAP =            QueryDisplayMode.wrap
 
 # Duration mode
 PGTOP_DURATION_QUERY =          1

@@ -286,6 +286,16 @@ class DBInfo:
     size_ev: int
 
 
+class QueryDisplayMode(enum.IntEnum):
+    truncate = 1
+    wrap_noindent = 2
+    wrap = 3
+
+    @classmethod
+    def default(cls) -> "QueryDisplayMode":
+        return cls.wrap_noindent
+
+
 class QueryMode(enum.Enum):
     activities = "running queries"
     waiting = "waiting queries"
