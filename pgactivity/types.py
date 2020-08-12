@@ -1,8 +1,94 @@
 import enum
-from typing import Any, Optional, Tuple, Union
+from typing import Any, Mapping, Optional, Tuple, Type, TypeVar, Union
 
 import attr
 import psutil
+
+
+T = TypeVar("T")
+
+
+class Deserializable:
+    """Mixin class adding deserialization support.
+
+    >>> @attr.s(auto_attribs=True)
+    ... class Point(Deserializable):
+    ...     x: int
+    ...     y: int
+    ...     label: Optional[str] = None
+
+    >>> data = {"x": 1, "y": 1, "label": "a"}
+    >>> Point.deserialize(data)
+    Point(x=1, y=1, label='a')
+
+    >>> @attr.s(auto_attribs=True)
+    ... class Line(Deserializable):
+    ...     start: Point
+    ...     end: Point
+    ...     color: str = "black"
+    ...     label: Optional[str] = None
+
+    >>> data = {"start": {"x": 1, "y": 1}, "end": {"x": 2, "y": 2, "label": "p2"}}
+    >>> Line.deserialize(data)
+    Line(start=Point(x=1, y=1, label=None), end=Point(x=2, y=2, label='p2'), color='black', label=None)
+
+    >>> data = {"start": {"x": 1, "y": 1}, "end": {"x": 2, "y": 2}, "colour": "red"}
+    >>> Line.deserialize(data)
+    Traceback (most recent call last):
+        ...
+    ValueError: unknown field(s): colour
+
+    >>> data = {"start": {"x": 1, "y": 1}}
+    >>> Line.deserialize(data)
+    Traceback (most recent call last):
+        ...
+    ValueError: missing required field 'end'
+
+    >>> data = {"start": {"x": 1, "y": 1}, "end": {"x": 2, "y": 2}, "color": (255, 5, 2)}
+    >>> Line.deserialize(data)
+    Traceback (most recent call last):
+        ...
+    TypeError: invalid type for field 'color', expecting <class 'str'>
+    """
+
+    @classmethod
+    def deserialize(cls: Type[T], data: Mapping[str, Any]) -> T:
+        args = {}
+        for field in attr.fields(cls):
+            name = field.name
+            try:
+                value = data[name]
+            except KeyError:
+                if field.default != attr.NOTHING:
+                    continue
+                raise ValueError(f"missing required field '{name}'")
+            else:
+                try:
+                    deserializer = getattr(field.type, "deserialize")
+                except AttributeError:
+                    assert field.type is not None, "fields should be typed"
+                    try:
+                        is_subtype = isinstance(value, field.type)
+                    except TypeError:
+                        # This might happen for Union types (e.g.
+                        # Optional[X]), we assume the type is okay waiting for
+                        # a better strategy.
+                        pass
+                    else:
+                        if not is_subtype:
+                            raise TypeError(
+                                f"invalid type for field '{name}', expecting {field.type}"
+                            )
+                else:
+                    value = deserializer(value)
+
+                args[name] = value
+
+        unknown = set(data) - set(args)
+        if unknown:
+            raise ValueError(f"unknown field(s): {', '.join(sorted(unknown))}")
+
+        return cls(**args)  # type: ignore
 
 
 class Flag(enum.IntFlag):
