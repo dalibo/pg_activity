@@ -19,6 +19,10 @@ from .types import (
 )
 
 
+# Maximum number of columns
+MAX_NCOL = 15
+
+
 def help(term: Terminal, version: str) -> None:
     """Render help menu.
 
@@ -359,3 +363,21 @@ def columns_header(
         if column.mandatory or (column.flag & flag):
             color = getattr(term, f"black_on_{column.color(sort_by)}")
             print(f"{color}{column.render()}{term.normal}", end="")
+
+
+def get_indent(mode: QueryMode, flag: Flag, max_ncol: int = MAX_NCOL) -> str:
+    """Return identation for Query column.
+
+    >>> get_indent(QueryMode.activities, Flag.CPU)
+    '                                  '
+    >>> flag = Flag.DATABASE | Flag.APPNAME | Flag.RELATION
+    >>> get_indent(QueryMode.activities, flag)
+    '                                                             '
+    """
+    indent = ""
+    columns = (c.value for c in COLUMNS_BY_QUERYMODE[mode])
+    for idx, column in enumerate(columns):
+        if column.mandatory or column.flag & flag:
+            if column.name != "Query":
+                indent += column.template_h % " "
+    return indent
