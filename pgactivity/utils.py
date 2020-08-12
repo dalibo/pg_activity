@@ -41,6 +41,22 @@ def get_duration(duration: Optional[float]) -> float:
     return float(duration)
 
 
+def short_state(state: str) -> str:
+    """Return a short version of query state.
+
+    >>> short_state("active")
+    'active'
+    >>> short_state("idle in transaction")
+    'idle in trans'
+    >>> short_state("idle in transaction (aborted)")
+    'idle in trans (a)'
+    """
+    return {
+        "idle in transaction": "idle in trans",
+        "idle in transaction (aborted)": "idle in trans (a)",
+    }.get(state, state)
+
+
 R = TypeVar("R")
 
 
