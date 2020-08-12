@@ -345,8 +345,6 @@ class UI:
         self.sys_color = True
         self.lineno = 0
         self.lines = []
-        # Maximum number of columns
-        self.max_ncol = 13
         # Default
         self.verbose_mode = PGTOP_WRAP_NOINDENT
         # Max IOPS
