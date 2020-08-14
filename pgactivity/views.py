@@ -692,7 +692,7 @@ def processes_rows(
             if flag & Flag.TYPE:
                 print_row(process, "type", 16)
 
-            # TODO: find out where process.mode comes from by looking at old UI/Data code.
+            # TODO: this is specific to blocking/waiting queries
             # if flag & Flag.MODE:
             #     if process.mode in (
             #         "ExclusiveLock",

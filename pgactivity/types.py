@@ -494,6 +494,22 @@ class Activity(DictSequenceProxy):
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
+class ActivityBW(DictSequenceProxy):
+    """Result from pg_stat_activity view query for blocking/waiting queries."""
+
+    pid: int
+    appname: str
+    database: str
+    user: str
+    mode: str  # TODO: enum
+    type: str  # TODO: enum
+    relation: str
+    duration: float
+    state: str
+    query: str
+
+
+@attr.s(auto_attribs=True, frozen=True, slots=True)
 class ActivityProcess:
     pid: int
     appname: str

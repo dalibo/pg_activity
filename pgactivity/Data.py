@@ -34,7 +34,7 @@ import psycopg2
 import psycopg2.extras
 
 from .utils import return_as
-from .types import Activity, IOCounters, Process, ProcessExtras
+from .types import Activity, ActivityBW, IOCounters, Process, ProcessExtras
 
 
 if psutil.version_info < (2, 0, 0):
@@ -540,7 +540,8 @@ class Data:
 
         return ret
 
-    def pg_get_waiting(self, duration_mode=1):
+    @return_as(ActivityBW)
+    def pg_get_waiting(self, duration_mode: int = 1) -> List[Any]:
         """
         Get waiting queries.
         """
@@ -622,7 +623,8 @@ class Data:
         ret = cur.fetchall()
         return ret
 
-    def pg_get_blocking(self, duration_mode=1):
+    @return_as(ActivityBW)
+    def pg_get_blocking(self, duration_mode: int = 1) -> List[Any]:
         """
         Get blocking queries
         """
