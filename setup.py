@@ -16,7 +16,7 @@ with open('README.md') as fo:
 
 setup(
     name = 'pg_activity',
-    version = '1.6.1',
+    version = '1.6.2',
     author = 'Julien Tachoires',
     author_email = 'julmon@gmail.com',
     scripts = ['pg_activity'],
