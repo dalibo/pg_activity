@@ -359,7 +359,7 @@ class Column(enum.Enum):
         template_h="%9s ",
         flag=Flag.TIME,
         mandatory=False,
-        sort_key=SortKey.time,
+        sort_key=SortKey.duration,
     )
     type = ColumnTitle(
         name="TYPE", template_h="%16s ", flag=Flag.TYPE, mandatory=False, sort_key=None
@@ -434,7 +434,7 @@ def columns_header(
     >>> columns_header(term, QueryMode.activities, Flag.MEM, SortKey.cpu)
     PID    MEM%              state   Query
     >>> flag = Flag.DATABASE | Flag.APPNAME | Flag.RELATION
-    >>> columns_header(term, QueryMode.blocking, flag, SortKey.time)
+    >>> columns_header(term, QueryMode.blocking, flag, SortKey.duration)
     PID    DATABASE                      APP  RELATION              state   Query
     """
     columns = (c.value for c in COLUMNS_BY_QUERYMODE[mode])

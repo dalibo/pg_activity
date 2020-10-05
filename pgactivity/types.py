@@ -215,11 +215,11 @@ class SortKey(enum.Enum):
     mem = enum.auto()
     read = enum.auto()
     write = enum.auto()
-    time = enum.auto()
+    duration = enum.auto()
 
     @classmethod
     def default(cls) -> "SortKey":
-        return cls.time
+        return cls.duration
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
@@ -231,7 +231,7 @@ class ColumnTitle:
     'PID   '
     >>> c.color(SortKey.cpu)
     'cyan'
-    >>> c.color(SortKey.time)
+    >>> c.color(SortKey.duration)
     'green'
     """
 

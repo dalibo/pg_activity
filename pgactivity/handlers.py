@@ -62,15 +62,15 @@ def sort_key_for(key: Keystroke, query_mode: QueryMode) -> Optional[SortKey]:
     >>> sort_key_for(k("m"), QueryMode.activities)
     <SortKey.mem: 2>
     >>> sort_key_for(k("t"), QueryMode.activities)
-    <SortKey.time: 5>
+    <SortKey.duration: 5>
     >>> sort_key_for(k("m"), QueryMode.waiting)
-    <SortKey.time: 5>
+    <SortKey.duration: 5>
     """
     if query_mode != QueryMode.activities:
         return SortKey.default()
     return {
         keys.SORTBY_MEM: SortKey.mem,
         keys.SORTBY_READ: SortKey.read,
-        keys.SORTBY_TIME: SortKey.time,
+        keys.SORTBY_TIME: SortKey.duration,
         keys.SORTBY_WRITE: SortKey.write,
     }.get(key)
