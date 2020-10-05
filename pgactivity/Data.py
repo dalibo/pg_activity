@@ -498,7 +498,7 @@ class Data:
         EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
         pg_stat_activity.waiting AS wait,
         pg_stat_activity.usename AS user,
-	CASE
+        CASE
             WHEN pg_stat_activity.current_query = '<IDLE> in transaction (aborted)' THEN 'idle in transaction (aborted)'
             WHEN pg_stat_activity.current_query = '<IDLE> in transaction' THEN 'idle in transaction'
             WHEN pg_stat_activity.current_query = '<IDLE>' THEN 'idle'
