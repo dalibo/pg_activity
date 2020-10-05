@@ -65,10 +65,13 @@ def sort_key_for(key: Keystroke, query_mode: QueryMode) -> Optional[SortKey]:
     <SortKey.duration: 5>
     >>> sort_key_for(k("m"), QueryMode.waiting)
     <SortKey.duration: 5>
+    >>> sort_key_for(k("c"), QueryMode.activities)
+    <SortKey.cpu: 1>
     """
     if query_mode != QueryMode.activities:
         return SortKey.default()
     return {
+        keys.SORTBY_CPU: SortKey.cpu,
         keys.SORTBY_MEM: SortKey.mem,
         keys.SORTBY_READ: SortKey.read,
         keys.SORTBY_TIME: SortKey.duration,

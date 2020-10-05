@@ -118,6 +118,7 @@ def help(term: Terminal, version: str) -> None:
              w: sort by WRITE/s desc. (activities)
              q: quit
              +: increase refresh time (max:5s)
+             c: sort by CPU% desc. (activities)
              m: sort by MEM% desc. (activities)
              -: decrease refresh time (min:0.5s)
              t: sort by TIME+ desc. (activities)

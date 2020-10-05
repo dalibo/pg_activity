@@ -12,6 +12,7 @@ SORTBY_READ = "r"
 SORTBY_WRITE = "w"
 SORTBY_MEM = "m"
 SORTBY_TIME = "t"
+SORTBY_CPU = "c"
 
 BINDINGS: List[Tuple[str, str]] = [
     ("Up/Down", "scroll process list"),
@@ -22,6 +23,7 @@ BINDINGS: List[Tuple[str, str]] = [
     (SORTBY_WRITE, "sort by WRITE/s desc. (activities)"),
     (EXIT, "quit"),
     (REFRESH_TIME_INCREASE, "increase refresh time (max:5s)"),
+    (SORTBY_CPU, "sort by CPU% desc. (activities)"),
     (SORTBY_MEM, "sort by MEM% desc. (activities)"),
     (REFRESH_TIME_DECREASE, "decrease refresh time (min:0.5s)"),
     (SORTBY_TIME, "sort by TIME+ desc. (activities)"),
