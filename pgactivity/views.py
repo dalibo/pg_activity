@@ -102,11 +102,11 @@ LINE_COLORS = {
 MAX_NCOL = 15
 
 
-def help(term: Terminal, version: str) -> None:
+def help(term: Terminal, version: str, is_local: bool) -> None:
     """Render help menu.
 
     >>> term = Terminal()
-    >>> help(term, "2.1")
+    >>> help(term, "2.1", True)
     pg_activity 2.1 - https://github.com/dalibo/pg_activity
     Released under PostgreSQL License.
     <BLANKLINE>
@@ -122,6 +122,26 @@ def help(term: Terminal, version: str) -> None:
              m: sort by MEM% desc. (activities)
              -: decrease refresh time (min:0.5s)
              t: sort by TIME+ desc. (activities)
+             R: force refresh
+             T: change duration mode
+             D: force refresh database size
+    Mode
+          F1/1: running queries
+          F2/2: waiting queries
+          F3/3: blocking queries
+    <BLANKLINE>
+    Press any key to exit.
+    >>> help(term, "5.0", False)
+    pg_activity 5.0 - https://github.com/dalibo/pg_activity
+    Released under PostgreSQL License.
+    <BLANKLINE>
+       Up/Down: scroll process list
+             C: activate/deactivate colors
+         Space: pause
+             v: change display mode
+             q: quit
+             +: increase refresh time (max:5s)
+             -: decrease refresh time (min:0.5s)
              R: force refresh
              T: change duration mode
              D: force refresh database size
@@ -147,7 +167,11 @@ def help(term: Terminal, version: str) -> None:
 
     footer = "\nPress any key to exit."
     print(intro)
-    print(render_mapping(BINDINGS))
+    # TODO: find a better filter logic than string comparison
+    bindings = BINDINGS
+    if not is_local:
+        bindings = [b for b in bindings if not b[1].startswith("sort by ")]
+    print(render_mapping(bindings))
     print("Mode")
     print(render_mapping(MODES))
     print(footer)

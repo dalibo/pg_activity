@@ -52,23 +52,29 @@ def query_mode(key: Keystroke) -> Optional[QueryMode]:
     return keys.QUERYMODE_FROM_KEYS.get(key)
 
 
-def sort_key_for(key: Keystroke, query_mode: QueryMode) -> Optional[SortKey]:
+def sort_key_for(
+    key: Keystroke, query_mode: QueryMode, is_local: bool
+) -> Optional[SortKey]:
     """Return the sort key matching input key or None.
 
     >>> from blessed.keyboard import Keystroke as k
     >>> from pgactivity.types import QueryMode
 
-    >>> sort_key_for(k("1"), QueryMode.activities)
-    >>> sort_key_for(k("m"), QueryMode.activities)
+    >>> sort_key_for(k("1"), QueryMode.activities, True)
+    >>> sort_key_for(k("m"), QueryMode.activities, True)
     <SortKey.mem: 2>
-    >>> sort_key_for(k("t"), QueryMode.activities)
+    >>> sort_key_for(k("t"), QueryMode.activities, True)
     <SortKey.duration: 5>
-    >>> sort_key_for(k("m"), QueryMode.waiting)
+    >>> sort_key_for(k("m"), QueryMode.waiting, True)
     <SortKey.duration: 5>
-    >>> sort_key_for(k("c"), QueryMode.activities)
+    >>> sort_key_for(k("c"), QueryMode.activities, True)
     <SortKey.cpu: 1>
+    >>> sort_key_for(k("c"), QueryMode.activities, False)
+    <SortKey.duration: 5>
+    >>> sort_key_for(k("m"), QueryMode.blocking, False)
+    <SortKey.duration: 5>
     """
-    if query_mode != QueryMode.activities:
+    if not is_local or query_mode != QueryMode.activities:
         return SortKey.default()
     return {
         keys.SORTBY_CPU: SortKey.cpu,
