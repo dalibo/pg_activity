@@ -118,6 +118,7 @@ def main(options: optparse.Values, refresh_time: float = 2.0) -> None:
                 # DEBUG PRINTS
                 print(term.move_y(30))
                 print(term.center("  DEBUG  ", fillchar="*"))
+                print(f"local: {is_local}{term.clear_eol}")
                 print(f"flag: {flag!r}{term.clear_eol}")
                 print(f"query mode: {query_mode}{term.clear_eol}")
                 print(f"sort key: {sort_key}{term.clear_eol}")
