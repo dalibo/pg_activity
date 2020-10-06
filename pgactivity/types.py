@@ -1,5 +1,16 @@
 import enum
-from typing import Any, Iterator, List, Mapping, Optional, Tuple, Type, TypeVar, Union
+from typing import (
+    Any,
+    Generic,
+    Iterator,
+    List,
+    Mapping,
+    Optional,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+)
 
 import attr
 import psutil
@@ -492,6 +503,10 @@ class Activity(DictSequenceProxy):
     query: str
     is_parallel_worker: bool
 
+    @property
+    def appname(self) -> str:
+        return self.application_name
+
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
 class ActivityBW(DictSequenceProxy):
@@ -528,8 +543,11 @@ class ActivityProcess:
     is_parallel_worker: bool
 
 
+ActivityT = TypeVar("ActivityT", Activity, ActivityProcess)
+
+
 @attr.s(auto_attribs=True, frozen=True, slots=True)
-class ActivitySet:
+class ActivitySet(Generic[ActivityT]):
     """A set of activities's process.
 
     >>> aset = ActivitySet([
@@ -584,9 +602,9 @@ class ActivitySet:
     ['6239', '6228']
     """
 
-    activities: List[ActivityProcess]
+    activities: List[ActivityT]
 
-    def __iter__(self) -> Iterator[ActivityProcess]:
+    def __iter__(self) -> Iterator[ActivityT]:
         return iter(self.activities)
 
     def sort(self, *, key: SortKey, reverse: bool = False) -> None:

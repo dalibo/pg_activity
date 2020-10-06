@@ -103,7 +103,9 @@ def main(options: optparse.Values, refresh_time: float = 2.0) -> None:
                         )
                         # TODO: see UI.__poll_activities()
                         # data.set_global_io_counters(*io_counters)
-                    activityset = types.ActivitySet(activity_procs)
+                        activityset = types.ActivitySet(activity_procs)
+                    else:
+                        activityset = types.ActivitySet(queries)  # type: ignore
                     activityset.sort(key=sort_key, reverse=True)
                     print()
                     views.processes_rows(

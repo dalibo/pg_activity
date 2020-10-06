@@ -10,6 +10,7 @@ from blessed.formatters import FormattingString
 from .keys import BINDINGS, MODES
 from .types import (
     ActivityProcess,
+    ActivityT,
     ColumnTitle,
     DBInfo,
     DurationMode,
@@ -528,7 +529,7 @@ def format_duration(duration: Optional[float]) -> Tuple[str, str]:
 
 def processes_rows(
     term: Terminal,
-    processes: Iterable[ActivityProcess],
+    processes: Iterable[ActivityT],
     *,
     is_local: bool,
     flag: Flag,
@@ -686,7 +687,7 @@ def processes_rows(
         print(value, end="")
 
     def print_row(
-        process: ActivityProcess,
+        process: ActivityT,
         key: str,
         crop: Optional[int],
         transform: Callable[[Any], str] = str,
@@ -746,7 +747,11 @@ def processes_rows(
             else:
                 lprint(f"{color_for('wait_green')}{'N'.ljust(2)}")
 
-        if query_mode == QueryMode.activities and flag & Flag.IOWAIT:
+        if (
+            isinstance(process, ActivityProcess)
+            and query_mode == QueryMode.activities
+            and flag & Flag.IOWAIT
+        ):
             if process.io_wait:
                 lprint(f"{color_for('wait_red')}{'Y'.ljust(4)}")
             else:
