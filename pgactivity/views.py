@@ -459,9 +459,11 @@ def columns_header(
     PID      CPU%              state   Query
     >>> columns_header(term, QueryMode.activities, Flag.MEM, SortKey.cpu)
     PID    MEM%              state   Query
-    >>> flag = Flag.DATABASE | Flag.APPNAME | Flag.RELATION
+    >>> flag = Flag.DATABASE | Flag.APPNAME | Flag.RELATION | Flag.CLIENT | Flag.WAIT
     >>> columns_header(term, QueryMode.blocking, flag, SortKey.duration)
     PID    DATABASE                      APP  RELATION              state   Query
+    >>> columns_header(term, QueryMode.activities, flag, SortKey.duration)
+    PID    DATABASE                      APP           CLIENT  W              state   Query
     """
     columns = (c.value for c in COLUMNS_BY_QUERYMODE[mode])
     for column in columns:
