@@ -602,33 +602,33 @@ def processes_rows(
 
     >>> processes_rows(term, processes, is_local=True, flag=flag,
     ...                query_mode=QueryMode.activities)
-    6239   pgbench             0.1  1.0 idle in trans     UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
-    6228   pgbench             0.2  1.0 active            \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
-    1234   business            2.4  1.0 active            SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id)
+    6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
+    6228   pgbench             0.2  1.0             active   \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
+    1234   business            2.4  1.0             active   SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id)
     WHERE s.date > CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name,
     p.price, p.cost HAVING sum(p.price * s.units) > 5000;
 
     >>> processes_rows(term, processes, is_local=True, flag=flag,
     ...                query_mode=QueryMode.activities,
     ...                verbose_mode=QueryDisplayMode.truncate)
-    6239   pgbench             0.1  1.0 idle in trans     UPDATE pgbench_accounts
-    6228   pgbench             0.2  1.0 active            \_ UPDATE pgbench_accou
-    1234   business            2.4  1.0 active            SELECT product_id, p.na
+    6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts
+    6228   pgbench             0.2  1.0             active   \_ UPDATE pgbench_accou
+    1234   business            2.4  1.0             active   SELECT product_id, p.na
 
     >>> processes_rows(term, processes, is_local=True, flag=flag,
     ...                query_mode=QueryMode.activities,
     ...                verbose_mode=QueryDisplayMode.wrap)
-    6239   pgbench             0.1  1.0 idle in trans     UPDATE
+    6239   pgbench             0.1  1.0      idle in trans   UPDATE
                                                             pgbench_accounts SET
                                                             abalance = abalance +
                                                             141 WHERE aid =
                                                             1932841;
-    6228   pgbench             0.2  1.0 active            \_ UPDATE
+    6228   pgbench             0.2  1.0             active   \_ UPDATE
                                                             pgbench_accounts SET
                                                             abalance = abalance +
                                                             3062 WHERE aid =
                                                             7289374;
-    1234   business            2.4  1.0 active            SELECT product_id,
+    1234   business            2.4  1.0             active   SELECT product_id,
                                                             p.name FROM products p
                                                             LEFT JOIN sales s USING
                                                             (product_id) WHERE
@@ -647,9 +647,9 @@ def processes_rows(
     >>> processes_rows(term, processes, is_local=True, flag=allflags,
     ...                query_mode=QueryMode.activities,
     ...                verbose_mode=QueryDisplayMode.wrap)
-    6239   pgbench                   pgbench         postgres            local    0.1  1.0  0 Bytes  0 Bytes  0.000000  N    N idle in trans     UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
-    6228   pgbench                   pgbench         postgres            local    0.2  1.0  0 Bytes  0 Bytes  0.000000  N    Y active            \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
-    1234   business               accounting              bob            local    2.4  1.0  0 Bytes  0 Bytes  0.000000  Y    N active            SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id)
+    6239   pgbench                   pgbench         postgres            local    0.1  1.0  0 Bytes  0 Bytes  0.000000  N    N      idle in trans   UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
+    6228   pgbench                   pgbench         postgres            local    0.2  1.0  0 Bytes  0 Bytes  0.000000  N    Y             active   \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
+    1234   business               accounting              bob            local    2.4  1.0  0 Bytes  0 Bytes  0.000000  Y    N             active   SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id)
     WHERE s.date > CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name,
     p.price, p.cost HAVING sum(p.price * s.units) > 5000;
 
@@ -657,20 +657,20 @@ def processes_rows(
     >>> processes_rows(term, processes, is_local=True, flag=oneflag,
     ...                query_mode=QueryMode.activities,
     ...                verbose_mode=QueryDisplayMode.truncate)
-    6239   pgbench          idle in trans     UPDATE pgbench_accounts SET abalanc
-    6228   pgbench          active            \_ UPDATE pgbench_accounts SET abal
-    1234   business         active            SELECT product_id, p.name FROM prod
+    6239   pgbench               idle in trans   UPDATE pgbench_accounts SET abalanc
+    6228   pgbench                      active   \_ UPDATE pgbench_accounts SET abal
+    1234   business                     active   SELECT product_id, p.name FROM prod
 
     >>> processes_rows(term, processes, is_local=True, flag=oneflag,
     ...                query_mode=QueryMode.activities,
     ...                verbose_mode=QueryDisplayMode.wrap)
-    6239   pgbench          idle in trans     UPDATE pgbench_accounts SET
+    6239   pgbench               idle in trans   UPDATE pgbench_accounts SET
                                                 abalance = abalance + 141 WHERE aid
                                                 = 1932841;
-    6228   pgbench          active            \_ UPDATE pgbench_accounts SET
+    6228   pgbench                      active   \_ UPDATE pgbench_accounts SET
                                                 abalance = abalance + 3062 WHERE
                                                 aid = 7289374;
-    1234   business         active            SELECT product_id, p.name FROM
+    1234   business                     active   SELECT product_id, p.name FROM
                                                 products p LEFT JOIN sales s USING
                                                 (product_id) WHERE s.date >
                                                 CURRENT_DATE - INTERVAL '4 weeks'
@@ -771,7 +771,7 @@ def processes_rows(
             color_state = "state_red"
         else:
             color_state = "state_default"
-        lprint(f"{color_for(color_state)}{state:17}")
+        lprint(f"{color_for(color_state)}{template_for('state') % state}")
 
         indent = get_indent(query_mode, flag)
         dif = term.width - len(indent) - 1
