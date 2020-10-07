@@ -65,7 +65,7 @@ def main(options: optparse.Values, refresh_time: float = 2.0) -> None:
 
             if key == keys.HELP:
                 in_help = True
-                print(term.clear + term.home)
+                print(term.clear + term.home, end="")
                 views.help(term, __version__, is_local)
             elif in_help and key == "q":
                 in_help, key = False, None
@@ -75,7 +75,7 @@ def main(options: optparse.Values, refresh_time: float = 2.0) -> None:
                 query_mode = handlers.query_mode(key) or query_mode
                 sort_key = handlers.sort_key_for(key, query_mode, is_local) or sort_key
             if not in_help:
-                print(term.clear + term.home)
+                print(term.clear + term.home, end="")
                 views.header(
                     term,
                     host,
