@@ -1,7 +1,7 @@
 import enum
 from datetime import timedelta
 from textwrap import dedent
-from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
 
 import humanize
 from blessed import Terminal
@@ -9,8 +9,8 @@ from blessed.formatters import FormattingString
 
 from .keys import BINDINGS, MODES
 from .types import (
+    Activity,
     ActivityProcess,
-    ActivityT,
     ColumnTitle,
     DBInfo,
     DurationMode,
@@ -535,7 +535,7 @@ def format_duration(duration: Optional[float]) -> Tuple[str, str]:
 
 def processes_rows(
     term: Terminal,
-    processes: Iterable[ActivityT],
+    processes: Union[Iterable[Activity], Iterable[ActivityProcess]],
     *,
     is_local: bool,
     flag: Flag,
@@ -696,7 +696,7 @@ def processes_rows(
         print(value, end="")
 
     def print_row(
-        process: ActivityT,
+        process: Union[Activity, ActivityProcess],
         key: str,
         crop: Optional[int],
         transform: Callable[[Any], str] = str,

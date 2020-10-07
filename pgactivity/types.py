@@ -1,9 +1,6 @@
 import enum
 from typing import (
     Any,
-    Generic,
-    Iterator,
-    List,
     Mapping,
     Optional,
     Tuple,
@@ -541,72 +538,3 @@ class ActivityProcess:
     wait: bool
     io_wait: str
     is_parallel_worker: bool
-
-
-ActivityT = TypeVar("ActivityT", Activity, ActivityProcess)
-
-
-@attr.s(auto_attribs=True, frozen=True, slots=True)
-class ActivitySet(Generic[ActivityT]):
-    """A set of activities's process.
-
-    >>> aset = ActivitySet([
-    ...     ActivityProcess(
-    ...         pid="6239",
-    ...         appname="pgbench",
-    ...         database="pgbench",
-    ...         user="postgres",
-    ...         client="local",
-    ...         cpu=0.1,
-    ...         mem=0.993_254_939_413_836,
-    ...         read=0.1,
-    ...         write=0.282_725_318_098_656_75,
-    ...         state="idle in transaction",
-    ...         query="UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;",
-    ...         duration=0,
-    ...         wait=False,
-    ...         io_wait="N",
-    ...         is_parallel_worker=False,
-    ...     ),
-    ...     ActivityProcess(
-    ...         pid="6228",
-    ...         appname="pgbench",
-    ...         database="pgbench",
-    ...         user="postgres",
-    ...         client="local",
-    ...         cpu=0.2,
-    ...         mem=1.024_758_418_061_11,
-    ...         read=0.2,
-    ...         write=0.113_090_128_201_154_74,
-    ...         state="active",
-    ...         query="UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;",
-    ...         duration=0,
-    ...         wait=False,
-    ...         io_wait="N",
-    ...         is_parallel_worker=True,
-    ...     ),
-    ... ])
-
-    Can be iterated over:
-
-    >>> [a.pid for a in aset]
-    ['6239', '6228']
-
-    Support sorting according to underlying collection:
-
-    >>> aset.sort(key=SortKey.cpu, reverse=True)
-    >>> [a.pid for a in aset]
-    ['6228', '6239']
-    >>> aset.sort(key=SortKey.mem)
-    >>> [a.pid for a in aset]
-    ['6239', '6228']
-    """
-
-    activities: List[ActivityT]
-
-    def __iter__(self) -> Iterator[ActivityT]:
-        return iter(self.activities)
-
-    def sort(self, *, key: SortKey, reverse: bool = False) -> None:
-        """In-place sort."""
-        self.activities.sort(key=lambda p: getattr(p, key.name), reverse=reverse)

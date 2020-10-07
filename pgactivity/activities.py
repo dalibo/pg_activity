@@ -1,10 +1,11 @@
+import builtins
 import time
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, TypeVar
 
 import psutil
 
 from . import utils
-from .types import ActivityProcess, Process
+from .types import Activity, ActivityProcess, Process, SortKey
 
 
 def update_processes_local(
@@ -95,3 +96,58 @@ def update_processes_local(
     )
 
     return io_counters, pids, procs
+
+
+T = TypeVar("T", Activity, ActivityProcess)
+
+
+def sorted(activities: List[T], *, key: SortKey, reverse: bool = False) -> List[T]:
+    """Return activities sorted.
+
+    >>> activities = [
+    ...     ActivityProcess(
+    ...         pid="6239",
+    ...         appname="pgbench",
+    ...         database="pgbench",
+    ...         user="postgres",
+    ...         client="local",
+    ...         cpu=0.1,
+    ...         mem=0.993_254_939_413_836,
+    ...         read=0.1,
+    ...         write=0.282_725_318_098_656_75,
+    ...         state="idle in transaction",
+    ...         query="UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;",
+    ...         duration=0,
+    ...         wait=False,
+    ...         io_wait="N",
+    ...         is_parallel_worker=False,
+    ...     ),
+    ...     ActivityProcess(
+    ...         pid="6228",
+    ...         appname="pgbench",
+    ...         database="pgbench",
+    ...         user="postgres",
+    ...         client="local",
+    ...         cpu=0.2,
+    ...         mem=1.024_758_418_061_11,
+    ...         read=0.2,
+    ...         write=0.113_090_128_201_154_74,
+    ...         state="active",
+    ...         query="UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;",
+    ...         duration=0,
+    ...         wait=False,
+    ...         io_wait="N",
+    ...         is_parallel_worker=True,
+    ...     ),
+    ... ]
+
+    >>> activities = sorted(activities, key=SortKey.cpu, reverse=True)
+    >>> [a.pid for a in activities]
+    ['6228', '6239']
+    >>> activities = sorted(activities, key=SortKey.mem)
+    >>> [a.pid for a in activities]
+    ['6239', '6228']
+    """
+    return builtins.sorted(
+        activities, key=lambda p: getattr(p, key.name), reverse=reverse
+    )
