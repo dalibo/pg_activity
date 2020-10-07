@@ -107,7 +107,6 @@ def main(options: optparse.Values, refresh_time: float = 2.0) -> None:
                     else:
                         acts = queries  # type: ignore # XXX
                     acts = activities.sorted(acts, key=sort_key, reverse=True)
-                    print()
                     views.processes_rows(
                         term,
                         acts,
