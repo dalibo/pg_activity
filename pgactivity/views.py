@@ -494,9 +494,9 @@ def format_duration(duration: Optional[float]) -> Tuple[str, str]:
     """Return a string from 'duration' value along with the color for rendering.
 
     >>> format_duration(None)
-    ('N/A      ', 'time_green')
+    ('N/A     ', 'time_green')
     >>> format_duration(0.1)
-    ('0.000000', 'time_green')
+    ('0.100000', 'time_green')
     >>> format_duration(1.2)
     ('00:01.20', 'time_yellow')
     >>> format_duration(12345)
@@ -505,10 +505,10 @@ def format_duration(duration: Optional[float]) -> Tuple[str, str]:
     ('16 h', 'time_red')
     """
     if duration is None:
-        return "N/A".ljust(9), "time_green"
+        return "N/A".ljust(8), "time_green"
 
     if duration < 1:
-        ctime = f"{0:.6f}"
+        ctime = f"{duration:.6f}"
         color = "time_green"
     elif duration < 60000:
         if duration < 3:
@@ -555,7 +555,7 @@ def processes_rows(
     ...         write=0.282_725_318_098_656_75,
     ...         state="idle in transaction",
     ...         query="UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;",
-    ...         duration=0,
+    ...         duration=None,
     ...         wait=False,
     ...         io_wait="N",
     ...         is_parallel_worker=False,
@@ -572,7 +572,7 @@ def processes_rows(
     ...         write=0.113_090_128_201_154_74,
     ...         state="active",
     ...         query="UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;",
-    ...         duration=0,
+    ...         duration=0.000413,
     ...         wait=False,
     ...         io_wait="Y",
     ...         is_parallel_worker=True,
@@ -589,7 +589,7 @@ def processes_rows(
     ...         write=0.245_028_606_206_652_82,
     ...         state="active",
     ...         query="SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id) WHERE s.date > CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name, p.price, p.cost HAVING sum(p.price * s.units) > 5000;",
-    ...         duration=0,
+    ...         duration=1234,
     ...         wait=True,
     ...         io_wait="N",
     ...         is_parallel_worker=False,
@@ -647,9 +647,9 @@ def processes_rows(
     >>> processes_rows(term, processes, is_local=True, flag=allflags,
     ...                query_mode=QueryMode.activities,
     ...                verbose_mode=QueryDisplayMode.wrap)
-    6239   pgbench                   pgbench         postgres            local    0.1  1.0  0 Bytes  0 Bytes  0.000000  N    N      idle in trans   UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
-    6228   pgbench                   pgbench         postgres            local    0.2  1.0  0 Bytes  0 Bytes  0.000000  N    Y             active   \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
-    1234   business               accounting              bob            local    2.4  1.0  0 Bytes  0 Bytes  0.000000  Y    N             active   SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id)
+    6239   pgbench                   pgbench         postgres            local    0.1  1.0  0 Bytes  0 Bytes  N/A       N    N      idle in trans   UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
+    6228   pgbench                   pgbench         postgres            local    0.2  1.0  0 Bytes  0 Bytes  0.000413  N    Y             active   \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
+    1234   business               accounting              bob            local    2.4  1.0  0 Bytes  0 Bytes  20:34.00  Y    N             active   SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id)
     WHERE s.date > CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name,
     p.price, p.cost HAVING sum(p.price * s.units) > 5000;
 
