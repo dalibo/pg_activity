@@ -647,9 +647,9 @@ def processes_rows(
     >>> processes_rows(term, processes, is_local=True, flag=allflags,
     ...                query_mode=QueryMode.activities,
     ...                verbose_mode=QueryDisplayMode.wrap)
-    6239   pgbench                   pgbench         postgres            local    0.1  1.0  0 Bytes  0 Bytes 0.000000N Y   idle in trans     UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
-    6228   pgbench                   pgbench         postgres            local    0.2  1.0  0 Bytes  0 Bytes 0.000000N Y   active            \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
-    1234   business               accounting              bob            local    2.4  1.0  0 Bytes  0 Bytes 0.000000Y Y   active            SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id)
+    6239   pgbench                   pgbench         postgres            local    0.1  1.0  0 Bytes  0 Bytes  0.000000  N Y   idle in trans     UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
+    6228   pgbench                   pgbench         postgres            local    0.2  1.0  0 Bytes  0 Bytes  0.000000  N Y   active            \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
+    1234   business               accounting              bob            local    2.4  1.0  0 Bytes  0 Bytes  0.000000  Y Y   active            SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id)
     WHERE s.date > CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name,
     p.price, p.cost HAVING sum(p.price * s.units) > 5000;
 
@@ -685,6 +685,9 @@ def processes_rows(
     def color_for(field: str) -> FormattingString:
         return getattr(term, LINE_COLORS[field][color_type])
 
+    def template_for(column_name: str) -> str:
+        return getattr(Column, column_name).value.template_h  # type: ignore
+
     def lprint(value: str) -> None:
         print(value, end="")
 
@@ -695,10 +698,9 @@ def processes_rows(
         transform: Callable[[Any], str] = str,
         color_key: Optional[str] = None,
     ) -> None:
-        column_type = getattr(Column, key).value
         column_value = transform(getattr(process, key))[:crop]
         color_key = color_key or key
-        lprint(f"{color_for(color_key)}{column_type.template_h % column_value}")
+        lprint(f"{color_for(color_key)}{template_for(key) % column_value}")
 
     for process in processes:
         print_row(process, "pid", None)
@@ -741,13 +743,13 @@ def processes_rows(
 
         if flag & Flag.TIME:
             ctime, color = format_duration(process.duration)
-            lprint(f"{color_for(color)}{ctime}")
+            lprint(f"{color_for(color)}{template_for('time') % ctime}")
 
         if query_mode == QueryMode.activities and flag & Flag.WAIT:
             if process.wait:
-                lprint(f"{color_for('wait_red')}{'Y'.ljust(2)}")
+                lprint(f"{color_for('wait_red')}{template_for('wait') % 'Y'}")
             else:
-                lprint(f"{color_for('wait_green')}{'N'.ljust(2)}")
+                lprint(f"{color_for('wait_green')}{template_for('wait') % 'N'}")
 
         if (
             isinstance(process, ActivityProcess)
