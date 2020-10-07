@@ -495,6 +495,8 @@ def format_duration(duration: Optional[float]) -> Tuple[str, str]:
 
     >>> format_duration(None)
     ('N/A     ', 'time_green')
+    >>> format_duration(-0.000062)
+    ('0.000000', 'time_green')
     >>> format_duration(0.1)
     ('0.100000', 'time_green')
     >>> format_duration(1.2)
@@ -508,6 +510,8 @@ def format_duration(duration: Optional[float]) -> Tuple[str, str]:
         return "N/A".ljust(8), "time_green"
 
     if duration < 1:
+        if duration < 0:
+            duration = 0
         ctime = f"{duration:.6f}"
         color = "time_green"
     elif duration < 60000:
