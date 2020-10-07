@@ -42,11 +42,7 @@ LINE_COLORS = {
     "mem": {"default": "normal", "cursor": "cyan_reverse", "yellow": "yellow_bold"},
     "read": {"default": "normal", "cursor": "cyan_reverse", "yellow": "yellow_bold"},
     "write": {"default": "normal", "cursor": "cyan_reverse", "yellow": "yellow_bold"},
-    "time_red": {
-        "default": "normal",
-        "cursor": "cyan_reverse",
-        "yellow": "yellow_bold",
-    },
+    "time_red": {"default": "red", "cursor": "cyan_reverse", "yellow": "yellow_bold"},
     "time_yellow": {
         "default": "yellow",
         "cursor": "cyan_reverse",
