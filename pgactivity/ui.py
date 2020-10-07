@@ -1,10 +1,33 @@
 import optparse
 import os
 import socket
+from typing import Iterable
 
 from blessed import Terminal
 
 from . import __version__, Data, activities, handlers, keys, types, utils, views
+
+
+def consume(lines: Iterable[str], limit: int) -> int:
+    """Consume lines and return count.
+
+    >>> count = consume(("a", "b"), 10)
+    a
+    b
+    >>> count
+    2
+    >>> count = consume(("a", "b"), 1)
+    a
+    >>> count
+    1
+    >>> count = consume((), 1)
+    >>> count
+    0
+    """
+    lines = list(lines)[:limit]
+    if lines:
+        print("\n".join(lines), end="")
+    return len(lines)
 
 
 def main(options: optparse.Values, refresh_time: float = 2.0) -> None:
@@ -76,19 +99,30 @@ def main(options: optparse.Values, refresh_time: float = 2.0) -> None:
                 sort_key = handlers.sort_key_for(key, query_mode, is_local) or sort_key
             if not in_help:
                 print(term.clear + term.home, end="")
-                views.header(
-                    term,
-                    host,
-                    dbinfo,
-                    tps,
-                    active_connections,
-                    duration_mode,
-                    refresh_time,
-                    max_iops,
-                    system_info,
+                limit_height = term.height
+                if options.debug:
+                    limit_height -= 10
+                limit_height -= consume(
+                    views.header(
+                        term,
+                        host,
+                        dbinfo,
+                        tps,
+                        active_connections,
+                        duration_mode,
+                        refresh_time,
+                        max_iops,
+                        system_info,
+                    ),
+                    limit_height,
                 )
-                views.query_mode(term, query_mode)
-                views.columns_header(term, query_mode, flag, sort_key)
+
+                limit_height -= consume(
+                    views.query_mode(term, query_mode), limit_height
+                )
+                limit_height -= consume(
+                    views.columns_header(term, query_mode, flag, sort_key), limit_height
+                )
 
                 if query_mode == types.QueryMode.activities:
                     queries = data.pg_get_activities(duration_mode)
@@ -107,14 +141,18 @@ def main(options: optparse.Values, refresh_time: float = 2.0) -> None:
                     else:
                         acts = queries  # type: ignore # XXX
                     acts = activities.sorted(acts, key=sort_key, reverse=True)
-                    views.processes_rows(
-                        term,
-                        acts,
-                        is_local=is_local,
-                        flag=flag,
-                        query_mode=query_mode,
-                        verbose_mode=verbose_mode,
+                    limit_height -= consume(
+                        views.processes_rows(
+                            term,
+                            acts,
+                            is_local=is_local,
+                            flag=flag,
+                            query_mode=query_mode,
+                            verbose_mode=verbose_mode,
+                        ),
+                        limit_height,
                     )
+                    assert limit_height >= 0, limit_height
                 else:
                     print(f"{term.red}   UNHANDLED MODE{term.normal}{term.clear_eol}")
 

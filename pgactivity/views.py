@@ -1,7 +1,7 @@
 import enum
 from datetime import timedelta
 from textwrap import dedent
-from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple, Union
 
 import humanize
 from blessed import Terminal
@@ -184,8 +184,8 @@ def header(
     refresh_time: float,
     max_iops: int = 0,
     system_info: Optional[SystemInfo] = None,
-) -> None:
-    """Display window header.
+) -> Iterator[str]:
+    r"""Return window header lines.
 
     >>> from pgactivity.types import IOCounters, LoadAverage
     >>> term = Terminal()
@@ -195,9 +195,10 @@ def header(
     >>> host = Host("PostgreSQL 9.6", "server", "pgadm", "server.prod.tld", 5433, "app")
     >>> dbinfo = DBInfo(10203040506070809, 9999)
 
-    >>> header(term, host, dbinfo, 12, 0, DurationMode.backend, refresh_time=10)
+    >>> print("\n".join(header(term, host, dbinfo, 12, 0, DurationMode.backend, refresh_time=10)))
     PostgreSQL 9.6 - server - pgadm@server.prod.tld:5433/app - Ref.: 10s
      Size:      10.2 PB -   10.0 kB/s     | TPS:              12      | Active connections:               0      | Duration mode:     backend
+    <BLANKLINE>
 
     Local host, with priviledged access:
 
@@ -209,16 +210,17 @@ def header(
     >>> load = LoadAverage(0.25, 0.19, 0.39)
     >>> sysinfo = SystemInfo(vmem, swap, load, ios)
 
-    >>> header(term, host, dbinfo, 1, 79, DurationMode.query, refresh_time=2,
-    ...        max_iops=12, system_info=sysinfo)
+    >>> print("\n".join(header(term, host, dbinfo, 1, 79, DurationMode.query, refresh_time=2,
+    ...                        max_iops=12, system_info=sysinfo)))
     PostgreSQL 13.1 - localhost - tester@host:5432/postgres - Ref.: 2s
      Size:     123.5 MB -  12 Bytes/s     | TPS:               1      | Active connections:              79      | Duration mode:       query
      Mem.:     42.5% -    2.0 GB/6.2 GB   | IO Max:                 12/s
      Swap:      0.0% -    2.3 kB/6.3 GB   | Read:     128 Bytes/s -      6/s
      Load:         0.25 0.19 0.39         | Write:       8 Bytes/s -      9/s
+    <BLANKLINE>
     """
     pg_host = f"{host.user}@{host.host}:{host.port}/{host.dbname}"
-    print(
+    yield (
         " - ".join(
             [
                 host.pg_version,
@@ -234,12 +236,12 @@ def header(
             f"{title}: {value.center(width)}" for title, value, width in columns
         ).rstrip()
 
-    def iprint(text: str, indent: int = 1) -> None:
-        print(" " * indent + text)
+    def indent(text: str, indent: int = 1) -> str:
+        return " " * indent + text
 
     total_size = humanize.naturalsize(dbinfo.total_size)
     size_ev = humanize.naturalsize(dbinfo.size_ev)
-    iprint(
+    yield indent(
         row(
             ("Size", f"{total_size.rjust(8)} - {size_ev.rjust(9)}/s", 30),
             ("TPS", f"{term.bold_green}{str(tps).rjust(11)}{term.normal}", 20),
@@ -266,13 +268,13 @@ def header(
 
     if system_info is not None:
         col_width = 30  # TODO: use screen size
-        iprint(
+        yield indent(
             row(
                 ("Mem.", render_meminfo(system_info.memory), col_width),
                 ("IO Max", f"{max_iops:8}/s", col_width),
             )
         )
-        iprint(
+        yield indent(
             row(
                 ("Swap", render_meminfo(system_info.swap), col_width),
                 (
@@ -283,7 +285,7 @@ def header(
             )
         )
         load = system_info.load
-        iprint(
+        yield indent(
             row(
                 ("Load", f"{load.avg1:.2} {load.avg5:.2} {load.avg15:.2}", col_width),
                 (
@@ -295,18 +297,19 @@ def header(
                 ),
             )
         )
+    yield ""
 
 
-def query_mode(term: Terminal, mode: QueryMode) -> None:
-    """Display query mode title.
+def query_mode(term: Terminal, mode: QueryMode) -> Iterator[str]:
+    r"""Display query mode title.
 
     >>> from pgactivity.types import QueryMode
 
     >>> term = Terminal()
-    >>> query_mode(term, QueryMode.blocking)  # doctest: +NORMALIZE_WHITESPACE
+    >>> print("\n".join(query_mode(term, QueryMode.blocking)))  # doctest: +NORMALIZE_WHITESPACE
                                     BLOCKING QUERIES
     """
-    print(term.center(term.green_bold(mode.value.upper())))
+    yield term.center(term.green_bold(mode.value.upper()))
 
 
 class Column(enum.Enum):
@@ -445,27 +448,39 @@ COLUMNS_BY_QUERYMODE: Dict[QueryMode, List[Column]] = {
 
 def columns_header(
     term: Terminal, mode: QueryMode, flag: Flag, sort_by: SortKey
-) -> None:
-    """Display columns header.
+) -> Iterator[str]:
+    r"""Yield columns header lines.
 
     >>> term = Terminal()
-    >>> columns_header(term, QueryMode.activities, Flag.DATABASE, SortKey.cpu)
+    >>> print("\n".join(columns_header(term, QueryMode.activities,
+    ...                                Flag.DATABASE, SortKey.cpu)))
     PID    DATABASE                      state   Query
-    >>> columns_header(term, QueryMode.activities, Flag.CPU, SortKey.cpu)
+    <BLANKLINE>
+    >>> print("\n".join(columns_header(term, QueryMode.activities, Flag.CPU,
+    ...                                SortKey.cpu)))
     PID      CPU%              state   Query
-    >>> columns_header(term, QueryMode.activities, Flag.MEM, SortKey.cpu)
+    <BLANKLINE>
+    >>> print("\n".join(columns_header(term, QueryMode.activities, Flag.MEM,
+    ...                                SortKey.cpu)))
     PID    MEM%              state   Query
+    <BLANKLINE>
     >>> flag = Flag.DATABASE | Flag.APPNAME | Flag.RELATION | Flag.CLIENT | Flag.WAIT
-    >>> columns_header(term, QueryMode.blocking, flag, SortKey.duration)
+    >>> print("\n".join(columns_header(term, QueryMode.blocking, flag,
+    ...                                SortKey.duration)))
     PID    DATABASE                      APP  RELATION              state   Query
-    >>> columns_header(term, QueryMode.activities, flag, SortKey.duration)
+    <BLANKLINE>
+    >>> print("\n".join(columns_header(term, QueryMode.activities, flag,
+    ...                                SortKey.duration)))
     PID    DATABASE                      APP           CLIENT  W              state   Query
+    <BLANKLINE>
     """
     columns = (c.value for c in COLUMNS_BY_QUERYMODE[mode])
+    htitles = []
     for column in columns:
         if column.mandatory or (column.flag & flag):
             color = getattr(term, f"black_on_{column.color(sort_by)}")
-            print(f"{color}{column.render()}{term.normal}", end="")
+            htitles.append(f"{color}{column.render()}{term.normal}")
+    yield "".join(htitles) + "\n"
 
 
 def get_indent(mode: QueryMode, flag: Flag, max_ncol: int = MAX_NCOL) -> str:
@@ -538,7 +553,7 @@ def processes_rows(
     query_mode: QueryMode,
     color_type: str = "default",
     verbose_mode: QueryDisplayMode = QueryDisplayMode.default(),
-) -> None:
+) -> Iterator[str]:
     r"""Display table rows with processes information.
 
     >>> term = Terminal(force_styling=None)
@@ -600,24 +615,27 @@ def processes_rows(
     >>> term.width
     80
 
-    >>> processes_rows(term, processes, is_local=True, flag=flag,
-    ...                query_mode=QueryMode.activities)
+    >>> def p(lines):
+    ...     print("\n".join(lines))
+
+    >>> p(processes_rows(term, processes, is_local=True, flag=flag,
+    ...                  query_mode=QueryMode.activities))
     6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
     6228   pgbench             0.2  1.0             active   \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
     1234   business            2.4  1.0             active   SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id)
     WHERE s.date > CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name,
     p.price, p.cost HAVING sum(p.price * s.units) > 5000;
 
-    >>> processes_rows(term, processes, is_local=True, flag=flag,
-    ...                query_mode=QueryMode.activities,
-    ...                verbose_mode=QueryDisplayMode.truncate)
+    >>> p(processes_rows(term, processes, is_local=True, flag=flag,
+    ...                  query_mode=QueryMode.activities,
+    ...                  verbose_mode=QueryDisplayMode.truncate))
     6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts
     6228   pgbench             0.2  1.0             active   \_ UPDATE pgbench_accou
     1234   business            2.4  1.0             active   SELECT product_id, p.na
 
-    >>> processes_rows(term, processes, is_local=True, flag=flag,
-    ...                query_mode=QueryMode.activities,
-    ...                verbose_mode=QueryDisplayMode.wrap)
+    >>> p(processes_rows(term, processes, is_local=True, flag=flag,
+    ...                  query_mode=QueryMode.activities,
+    ...                  verbose_mode=QueryDisplayMode.wrap))
     6239   pgbench             0.1  1.0      idle in trans   UPDATE
                                                             pgbench_accounts SET
                                                             abalance = abalance +
@@ -644,9 +662,9 @@ def processes_rows(
     80
 
     # terminal is too narrow given selected flags, we switch to wrap_noindent mode
-    >>> processes_rows(term, processes, is_local=True, flag=allflags,
-    ...                query_mode=QueryMode.activities,
-    ...                verbose_mode=QueryDisplayMode.wrap)
+    >>> p(processes_rows(term, processes, is_local=True, flag=allflags,
+    ...                  query_mode=QueryMode.activities,
+    ...                  verbose_mode=QueryDisplayMode.wrap))
     6239   pgbench                   pgbench         postgres            local    0.1  1.0  0 Bytes  0 Bytes  N/A       N    N      idle in trans   UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
     6228   pgbench                   pgbench         postgres            local    0.2  1.0  0 Bytes  0 Bytes  0.000413  N    Y             active   \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
     1234   business               accounting              bob            local    2.4  1.0  0 Bytes  0 Bytes  20:34.00  Y    N             active   SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id)
@@ -654,16 +672,16 @@ def processes_rows(
     p.price, p.cost HAVING sum(p.price * s.units) > 5000;
 
     >>> oneflag = Flag.DATABASE
-    >>> processes_rows(term, processes, is_local=True, flag=oneflag,
-    ...                query_mode=QueryMode.activities,
-    ...                verbose_mode=QueryDisplayMode.truncate)
+    >>> p(processes_rows(term, processes, is_local=True, flag=oneflag,
+    ...                  query_mode=QueryMode.activities,
+    ...                  verbose_mode=QueryDisplayMode.truncate))
     6239   pgbench               idle in trans   UPDATE pgbench_accounts SET abalanc
     6228   pgbench                      active   \_ UPDATE pgbench_accounts SET abal
     1234   business                     active   SELECT product_id, p.name FROM prod
 
-    >>> processes_rows(term, processes, is_local=True, flag=oneflag,
-    ...                query_mode=QueryMode.activities,
-    ...                verbose_mode=QueryDisplayMode.wrap)
+    >>> p(processes_rows(term, processes, is_local=True, flag=oneflag,
+    ...                  query_mode=QueryMode.activities,
+    ...                  verbose_mode=QueryDisplayMode.wrap))
     6239   pgbench               idle in trans   UPDATE pgbench_accounts SET
                                                 abalance = abalance + 141 WHERE aid
                                                 = 1932841;
@@ -688,8 +706,8 @@ def processes_rows(
     def template_for(column_name: str) -> str:
         return getattr(Column, column_name).value.template_h  # type: ignore
 
-    def lprint(value: str) -> None:
-        print(value, end="")
+    def text_append(value: str) -> None:
+        text.append(value)
 
     def print_row(
         process: Union[Activity, ActivityProcess],
@@ -700,9 +718,10 @@ def processes_rows(
     ) -> None:
         column_value = transform(getattr(process, key))[:crop]
         color_key = color_key or key
-        lprint(f"{color_for(color_key)}{template_for(key) % column_value}")
+        text_append(f"{color_for(color_key)}{template_for(key) % column_value}")
 
     for process in processes:
+        text: List[str] = []
         print_row(process, "pid", None)
 
         if flag & Flag.DATABASE:
@@ -743,13 +762,13 @@ def processes_rows(
 
         if flag & Flag.TIME:
             ctime, color = format_duration(process.duration)
-            lprint(f"{color_for(color)}{template_for('time') % ctime}")
+            text_append(f"{color_for(color)}{template_for('time') % ctime}")
 
         if query_mode == QueryMode.activities and flag & Flag.WAIT:
             if process.wait:
-                lprint(f"{color_for('wait_red')}{template_for('wait') % 'Y'}")
+                text_append(f"{color_for('wait_red')}{template_for('wait') % 'Y'}")
             else:
-                lprint(f"{color_for('wait_green')}{template_for('wait') % 'N'}")
+                text_append(f"{color_for('wait_green')}{template_for('wait') % 'N'}")
 
         if (
             isinstance(process, ActivityProcess)
@@ -758,9 +777,9 @@ def processes_rows(
         ):
             assert process.io_wait in "YN", process.io_wait
             if process.io_wait == "Y":
-                lprint(f"{color_for('wait_red')}{template_for('iowait') % 'Y'}")
+                text_append(f"{color_for('wait_red')}{template_for('iowait') % 'Y'}")
             else:
-                lprint(f"{color_for('wait_green')}{template_for('iowait') % 'N'}")
+                text_append(f"{color_for('wait_green')}{template_for('iowait') % 'N'}")
 
         state = utils.short_state(process.state)
         if state == "active":
@@ -771,7 +790,7 @@ def processes_rows(
             color_state = "state_red"
         else:
             color_state = "state_default"
-        lprint(f"{color_for(color_state)}{template_for('state') % state}")
+        text_append(f"{color_for(color_state)}{template_for('state') % state}")
 
         indent = get_indent(query_mode, flag)
         dif = term.width - len(indent) - 1
@@ -784,7 +803,7 @@ def processes_rows(
             process.query
         )
         if verbose_mode == QueryDisplayMode.truncate:
-            lprint(f"{color_for('query')} {query[:dif]}")
+            text_append(f"{color_for('query')} {query[:dif]}")
         else:
             if verbose_mode == QueryDisplayMode.wrap_noindent:
                 dif = term.width
@@ -795,6 +814,7 @@ def processes_rows(
                 ), f"unexpected mode {verbose_mode}"
                 p_indent = indent
             wrapped_lines = term.wrap(f"{color_for('query')} {query}", width=dif)
-            lprint(f"\n{p_indent}".join(wrapped_lines))
+            text_append(f"\n{p_indent}".join(wrapped_lines))
 
-        print(term.normal)
+        for line in ("".join(text) + term.normal).splitlines():
+            yield line
