@@ -574,7 +574,7 @@ def processes_rows(
     ...         query="UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;",
     ...         duration=0,
     ...         wait=False,
-    ...         io_wait="N",
+    ...         io_wait="Y",
     ...         is_parallel_worker=True,
     ...     ),
     ...     ActivityProcess(
@@ -647,9 +647,9 @@ def processes_rows(
     >>> processes_rows(term, processes, is_local=True, flag=allflags,
     ...                query_mode=QueryMode.activities,
     ...                verbose_mode=QueryDisplayMode.wrap)
-    6239   pgbench                   pgbench         postgres            local    0.1  1.0  0 Bytes  0 Bytes  0.000000  N Y   idle in trans     UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
-    6228   pgbench                   pgbench         postgres            local    0.2  1.0  0 Bytes  0 Bytes  0.000000  N Y   active            \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
-    1234   business               accounting              bob            local    2.4  1.0  0 Bytes  0 Bytes  0.000000  Y Y   active            SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id)
+    6239   pgbench                   pgbench         postgres            local    0.1  1.0  0 Bytes  0 Bytes  0.000000  N    N idle in trans     UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
+    6228   pgbench                   pgbench         postgres            local    0.2  1.0  0 Bytes  0 Bytes  0.000000  N    Y active            \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
+    1234   business               accounting              bob            local    2.4  1.0  0 Bytes  0 Bytes  0.000000  Y    N active            SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id)
     WHERE s.date > CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name,
     p.price, p.cost HAVING sum(p.price * s.units) > 5000;
 
@@ -756,10 +756,11 @@ def processes_rows(
             and query_mode == QueryMode.activities
             and flag & Flag.IOWAIT
         ):
-            if process.io_wait:
-                lprint(f"{color_for('wait_red')}{'Y'.ljust(4)}")
+            assert process.io_wait in "YN", process.io_wait
+            if process.io_wait == "Y":
+                lprint(f"{color_for('wait_red')}{template_for('iowait') % 'Y'}")
             else:
-                lprint(f"{color_for('wait_green')}{'N'.ljust(4)}")
+                lprint(f"{color_for('wait_green')}{template_for('iowait') % 'N'}")
 
         state = utils.short_state(process.state)
         if state == "active":
