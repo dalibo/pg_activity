@@ -590,7 +590,7 @@ def processes_rows(
     ...         state="active",
     ...         query="SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id) WHERE s.date > CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name, p.price, p.cost HAVING sum(p.price * s.units) > 5000;",
     ...         duration=0,
-    ...         wait=False,
+    ...         wait=True,
     ...         io_wait="N",
     ...         is_parallel_worker=False,
     ...     ),
@@ -649,7 +649,7 @@ def processes_rows(
     ...                verbose_mode=QueryDisplayMode.wrap)
     6239   pgbench                   pgbench         postgres            local    0.1  1.0  0 Bytes  0 Bytes 0.000000N Y   idle in trans     UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
     6228   pgbench                   pgbench         postgres            local    0.2  1.0  0 Bytes  0 Bytes 0.000000N Y   active            \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
-    1234   business               accounting              bob            local    2.4  1.0  0 Bytes  0 Bytes 0.000000N Y   active            SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id)
+    1234   business               accounting              bob            local    2.4  1.0  0 Bytes  0 Bytes 0.000000Y Y   active            SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id)
     WHERE s.date > CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name,
     p.price, p.cost HAVING sum(p.price * s.units) > 5000;
 
