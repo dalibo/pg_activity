@@ -153,9 +153,10 @@ def help(term: Terminal, version: str, is_local: bool) -> None:
     <BLANKLINE>
     Press any key to exit.
     """
+    project_url = "https://github.com/dalibo/pg_activity"
     intro = dedent(
         f"""\
-    {term.bold_green}pg_activity {version} - https://github.com/dalibo/pg_activity
+    {term.bold_green}pg_activity {version} - {term.link(project_url, project_url)}
     {term.normal}Released under PostgreSQL License.
     """
     )
