@@ -1,6 +1,7 @@
 import optparse
 import os
 import socket
+from typing import List, Union
 
 from blessed import Terminal
 
@@ -40,13 +41,14 @@ def main(options: optparse.Values, refresh_time: float = 2.0) -> None:
     query_mode = types.QueryMode.default()
     sort_key = types.SortKey.default()
     debugger = False
+    queries: Union[List[types.Activity], List[types.ActivityBW]]
     if query_mode == types.QueryMode.activities:
         queries = data.pg_get_activities()
         procs = data.sys_get_proc(queries, is_local)
-    # elif query_mode == types.QueryMode.waiting:
-    #     procs = data.pg_get_waiting()
-    # elif query_mode == types.QueryMode.blocking:
-    #     procs = data.pg_get_blocking()
+    elif query_mode == types.QueryMode.blocking:
+        queries = data.pg_get_blocking()
+    elif query_mode == types.QueryMode.waiting:
+        queries = data.pg_get_waiting()
     with term.fullscreen(), term.cbreak():
         pg_db_info = None
         while True:
@@ -115,19 +117,26 @@ def main(options: optparse.Values, refresh_time: float = 2.0) -> None:
                         acts = activity_procs
                     else:
                         acts = queries  # type: ignore # XXX
-                    acts = activities.sorted(acts, key=sort_key, reverse=True)
-                    limit_height -= views.processes_rows(
-                        term,
-                        acts,
-                        is_local=is_local,
-                        flag=flag,
-                        query_mode=query_mode,
-                        verbose_mode=verbose_mode,
-                        limit_height=limit_height,
-                    )
-                    assert limit_height >= 0, limit_height
-                else:
-                    print(f"{term.red}   UNHANDLED MODE{term.normal}{term.clear_eol}")
+
+                elif query_mode == types.QueryMode.blocking:
+                    queries = data.pg_get_blocking(duration_mode)
+                    acts = queries  # type: ignore # XXX
+
+                elif query_mode == types.QueryMode.waiting:
+                    queries = data.pg_get_waiting(duration_mode)
+                    acts = queries  # type: ignore # XXX
+
+                acts = activities.sorted(acts, key=sort_key, reverse=True)
+                limit_height -= views.processes_rows(
+                    term,
+                    acts,
+                    is_local=is_local,
+                    flag=flag,
+                    query_mode=query_mode,
+                    verbose_mode=verbose_mode,
+                    limit_height=limit_height,
+                )
+                assert limit_height >= 0, limit_height
 
                 if options.debug:
                     # DEBUG PRINTS

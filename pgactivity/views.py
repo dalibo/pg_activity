@@ -11,6 +11,7 @@ from blessed.formatters import FormattingString
 from .keys import BINDINGS, MODES
 from .types import (
     Activity,
+    ActivityBW,
     ActivityProcess,
     ColumnTitle,
     DBInfo,
@@ -745,6 +746,46 @@ def processes_rows(
                                                  GROUP BY product_id, p.name,
                                                  p.price, p.cost HAVING sum(p.price
                                                  * s.units) > 5000;
+
+    >>> processes = [
+    ...     ActivityBW(
+    ...         pid="6239",
+    ...         appname="pgbench",
+    ...         database="pgbench",
+    ...         user="postgres",
+    ...         mode="ExclusiveLock",
+    ...         type="transactionid",
+    ...         relation="None",
+    ...         duration=666,
+    ...         state="active",
+    ...         query="END;"
+    ...     ),
+    ...     ActivityBW(
+    ...         pid="6228",
+    ...         appname="pgbench",
+    ...         database="pgbench",
+    ...         user="postgres",
+    ...         mode="RowExclusiveLock",
+    ...         type="tuple",
+    ...         relation="ahah",
+    ...         duration=0.000413,
+    ...         state="idle in transaction",
+    ...         query="UPDATE pgbench_branches SET bbalance = bbalance + 1788 WHERE bid = 68;",
+    ...     ),
+    ... ]
+    >>> __ = processes_rows(term, processes, is_local=True, flag=oneflag,
+    ...                     query_mode=QueryMode.waiting,
+    ...                     verbose_mode=QueryDisplayMode.wrap)
+    6239   pgbench                      active   END;
+    6228   pgbench               idle in trans   UPDATE pgbench_branches SET
+                                                 bbalance = bbalance + 1788 WHERE
+                                                 bid = 68;
+    >>> __ = processes_rows(term, processes, is_local=False, flag=allflags,
+    ...                     query_mode=QueryMode.blocking)  # doctest: +NORMALIZE_WHITESPACE
+    6239   pgbench                   pgbench      None    transactionid    ExclusiveLock  11:06.00             active
+    END;
+    6228   pgbench                   pgbench      ahah            tuple RowExclusiveLock  0.000413      idle in trans
+    UPDATE pgbench_branches SET bbalance = bbalance + 1788 WHERE bid = 68;
     """
 
     # if color_type == 'default' and self.pid_yank.count(process['pid']) > 0:
@@ -802,17 +843,17 @@ def processes_rows(
             if flag & Flag.TYPE:
                 cell(process, "type", 16)
 
-            # TODO: this is specific to blocking/waiting queries
-            # if flag & Flag.MODE:
-            #     if process.mode in (
-            #         "ExclusiveLock",
-            #         "RowExclusiveLock",
-            #         "AccessExclusiveLock",
-            #     ):
-            #         mode_color = "mode_red"
-            #     else:
-            #         mode_color = "mode_yellow"
-            #     cell(process, "mode", 16, color_key=mode_color)
+            if flag & Flag.MODE:
+                assert isinstance(process, ActivityBW)
+                if process.mode in (
+                    "ExclusiveLock",
+                    "RowExclusiveLock",
+                    "AccessExclusiveLock",
+                ):
+                    mode_color = "mode_red"
+                else:
+                    mode_color = "mode_yellow"
+                cell(process, "mode", 16, color_key=mode_color)
 
         if flag & Flag.TIME:
             ctime, color = format_duration(process.duration)

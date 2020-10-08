@@ -520,6 +520,11 @@ class ActivityBW(DictSequenceProxy):
     state: str
     query: str
 
+    @property
+    def is_parallel_worker(self) -> bool:
+        # TODO: update queries to select/compute this column.
+        return False
+
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
 class ActivityProcess:
