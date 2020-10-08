@@ -723,7 +723,9 @@ def processes_rows(
         return getattr(Column, column_name).value.template_h  # type: ignore
 
     def text_append(value: str) -> None:
-        text.append(value)
+        # We also restore 'normal' style so that the next item does not
+        # inherit previous one's style.
+        text.append(value + term.normal)
 
     def print_row(
         process: Union[Activity, ActivityProcess],
