@@ -654,25 +654,25 @@ def processes_rows(
     ...                  query_mode=QueryMode.activities,
     ...                  verbose_mode=QueryDisplayMode.wrap))
     6239   pgbench             0.1  1.0      idle in trans   UPDATE
-                                                            pgbench_accounts SET
-                                                            abalance = abalance +
-                                                            141 WHERE aid =
-                                                            1932841;
+                                                             pgbench_accounts SET
+                                                             abalance = abalance +
+                                                             141 WHERE aid =
+                                                             1932841;
     6228   pgbench             0.2  1.0             active   \_ UPDATE
-                                                            pgbench_accounts SET
-                                                            abalance = abalance +
-                                                            3062 WHERE aid =
-                                                            7289374;
+                                                             pgbench_accounts SET
+                                                             abalance = abalance +
+                                                             3062 WHERE aid =
+                                                             7289374;
     1234   business            2.4  1.0             active   SELECT product_id,
-                                                            p.name FROM products p
-                                                            LEFT JOIN sales s USING
-                                                            (product_id) WHERE
-                                                            s.date > CURRENT_DATE -
-                                                            INTERVAL '4 weeks'
-                                                            GROUP BY product_id,
-                                                            p.name, p.price, p.cost
-                                                            HAVING sum(p.price *
-                                                            s.units) > 5000;
+                                                             p.name FROM products p
+                                                             LEFT JOIN sales s USING
+                                                             (product_id) WHERE
+                                                             s.date > CURRENT_DATE -
+                                                             INTERVAL '4 weeks'
+                                                             GROUP BY product_id,
+                                                             p.name, p.price, p.cost
+                                                             HAVING sum(p.price *
+                                                             s.units) > 5000;
 
     >>> allflags = Flag.IOWAIT|Flag.MODE|Flag.TYPE|Flag.RELATION|Flag.WAIT|Flag.TIME|Flag.WRITE|Flag.READ|Flag.MEM|Flag.CPU|Flag.USER|Flag.CLIENT|Flag.APPNAME|Flag.DATABASE
     >>> term.width
@@ -700,18 +700,18 @@ def processes_rows(
     ...                  query_mode=QueryMode.activities,
     ...                  verbose_mode=QueryDisplayMode.wrap))
     6239   pgbench               idle in trans   UPDATE pgbench_accounts SET
-                                                abalance = abalance + 141 WHERE aid
-                                                = 1932841;
+                                                 abalance = abalance + 141 WHERE aid
+                                                 = 1932841;
     6228   pgbench                      active   \_ UPDATE pgbench_accounts SET
-                                                abalance = abalance + 3062 WHERE
-                                                aid = 7289374;
+                                                 abalance = abalance + 3062 WHERE
+                                                 aid = 7289374;
     1234   business                     active   SELECT product_id, p.name FROM
-                                                products p LEFT JOIN sales s USING
-                                                (product_id) WHERE s.date >
-                                                CURRENT_DATE - INTERVAL '4 weeks'
-                                                GROUP BY product_id, p.name,
-                                                p.price, p.cost HAVING sum(p.price
-                                                * s.units) > 5000;
+                                                 products p LEFT JOIN sales s USING
+                                                 (product_id) WHERE s.date >
+                                                 CURRENT_DATE - INTERVAL '4 weeks'
+                                                 GROUP BY product_id, p.name,
+                                                 p.price, p.cost HAVING sum(p.price
+                                                 * s.units) > 5000;
     """
 
     # if color_type == 'default' and self.pid_yank.count(process['pid']) > 0:
@@ -811,8 +811,8 @@ def processes_rows(
             color_state = "state_default"
         text_append(f"{color_for(color_state)}{template_for('state') % state}")
 
-        indent = get_indent(query_mode, flag)
-        dif = term.width - len(indent) - 1
+        indent = get_indent(query_mode, flag) + " "
+        dif = term.width - len(indent)
 
         if dif < 0:
             # Switch to wrap_noindent mode if terminal is too narrow.
