@@ -761,7 +761,7 @@ def processes_rows(
         # inherit previous one's style.
         text.append(value + term.normal)
 
-    def print_row(
+    def cell(
         process: Union[Activity, ActivityProcess],
         key: str,
         crop: Optional[int],
@@ -774,31 +774,31 @@ def processes_rows(
 
     for process in processes:
         text: List[str] = []
-        print_row(process, "pid", None)
+        cell(process, "pid", None)
 
         if flag & Flag.DATABASE:
-            print_row(process, "database", 16)
+            cell(process, "database", 16)
         if flag & Flag.APPNAME:
-            print_row(process, "appname", 16)
+            cell(process, "appname", 16)
         if query_mode == QueryMode.activities:
             if flag & Flag.USER:
-                print_row(process, "user", 16)
+                cell(process, "user", 16)
             if flag & Flag.CLIENT:
-                print_row(process, "client", 16)
+                cell(process, "client", 16)
             if flag & Flag.CPU:
-                print_row(process, "cpu", None)
+                cell(process, "cpu", None)
             if flag & Flag.MEM:
-                print_row(process, "mem", None, lambda v: str(round(v, 1)))
+                cell(process, "mem", None, lambda v: str(round(v, 1)))
             if flag & Flag.READ:
-                print_row(process, "read", None, humanize.naturalsize)
+                cell(process, "read", None, humanize.naturalsize)
             if flag & Flag.WRITE:
-                print_row(process, "write", None, humanize.naturalsize)
+                cell(process, "write", None, humanize.naturalsize)
 
         elif query_mode in (QueryMode.waiting, QueryMode.blocking):
             if flag & Flag.RELATION:
-                print_row(process, "relation", 9)
+                cell(process, "relation", 9)
             if flag & Flag.TYPE:
-                print_row(process, "type", 16)
+                cell(process, "type", 16)
 
             # TODO: this is specific to blocking/waiting queries
             # if flag & Flag.MODE:
@@ -810,7 +810,7 @@ def processes_rows(
             #         mode_color = "mode_red"
             #     else:
             #         mode_color = "mode_yellow"
-            #     print_row(process, "mode", 16, color_key=mode_color)
+            #     cell(process, "mode", 16, color_key=mode_color)
 
         if flag & Flag.TIME:
             ctime, color = format_duration(process.duration)
