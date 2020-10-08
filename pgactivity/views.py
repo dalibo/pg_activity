@@ -501,6 +501,18 @@ def get_indent(mode: QueryMode, flag: Flag, max_ncol: int = MAX_NCOL) -> str:
     return indent
 
 
+def format_query(query: str, is_parallel_worker: bool) -> str:
+    r"""Return the query string formatted.
+
+    >>> print(format_query("SELECT 1", True))
+    \_ SELECT 1
+    >>> format_query("SELECT   1", False)
+    'SELECT 1'
+    """
+    prefix = r"\_ " if is_parallel_worker else ""
+    return prefix + utils.clean_str(query)
+
+
 def format_duration(duration: Optional[float]) -> Tuple[str, str]:
     """Return a string from 'duration' value along with the color for rendering.
 
@@ -799,9 +811,8 @@ def processes_rows(
             # Switch to wrap_noindent mode if terminal is too narrow.
             verbose_mode = QueryDisplayMode.wrap_noindent
 
-        query = (r"\_ " if process.is_parallel_worker else "") + utils.clean_str(
-            process.query
-        )
+        query = format_query(process.query, process.is_parallel_worker)
+
         if verbose_mode == QueryDisplayMode.truncate:
             text_append(f"{color_for('query')} {query[:dif]}")
         else:
