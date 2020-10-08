@@ -712,11 +712,11 @@ def processes_rows(
     >>> __ = processes_rows(term, processes, is_local=True, flag=allflags,
     ...                     query_mode=QueryMode.activities,
     ...                     verbose_mode=QueryDisplayMode.wrap)  # doctest: +NORMALIZE_WHITESPACE
-    6239   pgbench                   pgbench         postgres            local    0.1  1.0  0 Bytes  0 Bytes  N/A       N    N      idle in trans
+    6239   pgbench                   pgbench         postgres            local    0.1  1.0       0B       0B  N/A       N    N      idle in trans
     UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
-    6228   pgbench                   pgbench         postgres            local    0.2  1.0  0 Bytes  0 Bytes  0.000413  N    Y             active
+    6228   pgbench                   pgbench         postgres            local    0.2  1.0       0B       0B  0.000413  N    Y             active
     \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
-    1234   business               accounting              bob            local    2.4  1.0  0 Bytes  0 Bytes  20:34.00  Y    N             active
+    1234   business               accounting              bob            local    2.4  1.0       0B       0B  20:34.00  Y    N             active
     SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id)
     WHERE s.date > CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name,
     p.price, p.cost HAVING sum(p.price * s.units) > 5000;
@@ -772,6 +772,8 @@ def processes_rows(
         color_key = color_key or key
         text_append(f"{color_for(color_key)}{template_for(key) % column_value}")
 
+    naturalsize = functools.partial(humanize.naturalsize, gnu=True, format="%.2f")
+
     for process in processes:
         text: List[str] = []
         cell(process, "pid", None)
@@ -790,9 +792,9 @@ def processes_rows(
             if flag & Flag.MEM:
                 cell(process, "mem", None, lambda v: str(round(v, 1)))
             if flag & Flag.READ:
-                cell(process, "read", None, humanize.naturalsize)
+                cell(process, "read", None, naturalsize)
             if flag & Flag.WRITE:
-                cell(process, "write", None, humanize.naturalsize)
+                cell(process, "write", None, naturalsize)
 
         elif query_mode in (QueryMode.waiting, QueryMode.blocking):
             if flag & Flag.RELATION:
