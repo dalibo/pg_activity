@@ -1,4 +1,5 @@
 import enum
+import functools
 from datetime import timedelta
 from textwrap import dedent
 from typing import Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple, Union
@@ -103,11 +104,45 @@ LINE_COLORS = {
 MAX_NCOL = 15
 
 
-def help(term: Terminal, version: str, is_local: bool) -> None:
+def limit(func: Callable[..., Iterable[str]]) -> Callable[..., int]:
+    """View decorator handling screen height limit.
+
+    >>> term = Terminal()
+
+    >>> def view(term, n, *, prefix="line"):
+    ...     for i in range(n):
+    ...         yield f"{prefix} #{i}"
+
+    >>> count = limit(view)(term, 4, limit_height=2)
+    line #0
+    line #1
+    >>> count
+    2
+    >>> count = limit(view)(term, 3, prefix="row")
+    row #0
+    row #1
+    row #2
+    >>> count
+    3
+    """
+
+    @functools.wraps(func)
+    def wrapper(term: Terminal, *args: Any, **kwargs: Any) -> int:
+        limit_height = kwargs.pop("limit_height", None)
+        lines = list(func(term, *args, **kwargs))[:limit_height]
+        if lines:
+            print("\n".join(lines), end="")
+        return len(lines)
+
+    return wrapper
+
+
+@limit
+def help(term: Terminal, version: str, is_local: bool) -> Iterable[str]:
     """Render help menu.
 
     >>> term = Terminal()
-    >>> help(term, "2.1", True)
+    >>> __ = help(term, "2.1", True)
     pg_activity 2.1 - https://github.com/dalibo/pg_activity
     Released under PostgreSQL License.
     <BLANKLINE>
@@ -132,7 +167,7 @@ def help(term: Terminal, version: str, is_local: bool) -> None:
           F3/3: blocking queries
     <BLANKLINE>
     Press any key to exit.
-    >>> help(term, "5.0", False)
+    >>> __ = help(term, "5.0", False)
     pg_activity 5.0 - https://github.com/dalibo/pg_activity
     Released under PostgreSQL License.
     <BLANKLINE>
@@ -161,24 +196,27 @@ def help(term: Terminal, version: str, is_local: bool) -> None:
     """
     )
 
-    def render_mapping(keys: Iterable[Tuple[str, str]]) -> str:
-        return "\n".join(
-            f"{term.bright_cyan}{key.rjust(10)}{term.normal}: {text}"
-            for key, text in keys
-        )
+    def key_mappings(keys: Iterable[Tuple[str, str]]) -> Iterable[str]:
+        for key, text in keys:
+            yield f"{term.bright_cyan}{key.rjust(10)}{term.normal}: {text}"
 
-    footer = "\nPress any key to exit."
-    print(intro)
+    footer = "Press any key to exit."
+    for line in intro.splitlines():
+        yield line
+    yield ""
+
     # TODO: find a better filter logic than string comparison
     bindings = BINDINGS
     if not is_local:
         bindings = [b for b in bindings if not b[1].startswith("sort by ")]
-    print(render_mapping(bindings))
-    print("Mode")
-    print(render_mapping(MODES))
-    print(footer)
+    yield from key_mappings(bindings)
+    yield "Mode"
+    yield from key_mappings(MODES)
+    yield ""
+    yield footer
 
 
+@limit
 def header(
     term: Terminal,
     host: Host,
@@ -200,10 +238,9 @@ def header(
     >>> host = Host("PostgreSQL 9.6", "server", "pgadm", "server.prod.tld", 5433, "app")
     >>> dbinfo = DBInfo(10203040506070809, 9999)
 
-    >>> print("\n".join(header(term, host, dbinfo, 12, 0, DurationMode.backend, refresh_time=10)))
+    >>> __ = header(term, host, dbinfo, 12, 0, DurationMode.backend, refresh_time=10)
     PostgreSQL 9.6 - server - pgadm@server.prod.tld:5433/app - Ref.: 10s
      Size:      10.2 PB -   10.0 kB/s     | TPS:              12      | Active connections:               0      | Duration mode:     backend
-    <BLANKLINE>
 
     Local host, with priviledged access:
 
@@ -215,14 +252,13 @@ def header(
     >>> load = LoadAverage(0.25, 0.19, 0.39)
     >>> sysinfo = SystemInfo(vmem, swap, load, ios)
 
-    >>> print("\n".join(header(term, host, dbinfo, 1, 79, DurationMode.query, refresh_time=2,
-    ...                        max_iops=12, system_info=sysinfo)))
+    >>> __ = header(term, host, dbinfo, 1, 79, DurationMode.query, refresh_time=2,
+    ...             max_iops=12, system_info=sysinfo)
     PostgreSQL 13.1 - localhost - tester@host:5432/postgres - Ref.: 2s
      Size:     123.5 MB -  12 Bytes/s     | TPS:               1      | Active connections:              79      | Duration mode:       query
      Mem.:     42.5% -    2.0 GB/6.2 GB   | IO Max:                 12/s
      Swap:      0.0% -    2.3 kB/6.3 GB   | Read:     128 Bytes/s -      6/s
      Load:         0.25 0.19 0.39         | Write:       8 Bytes/s -      9/s
-    <BLANKLINE>
     """
     pg_host = f"{host.user}@{host.host}:{host.port}/{host.dbname}"
     yield (
@@ -305,13 +341,14 @@ def header(
     yield ""
 
 
+@limit
 def query_mode(term: Terminal, mode: QueryMode) -> Iterator[str]:
     r"""Display query mode title.
 
     >>> from pgactivity.types import QueryMode
 
     >>> term = Terminal()
-    >>> print("\n".join(query_mode(term, QueryMode.blocking)))  # doctest: +NORMALIZE_WHITESPACE
+    >>> __ = query_mode(term, QueryMode.blocking)  # doctest: +NORMALIZE_WHITESPACE
                                     BLOCKING QUERIES
     """
     yield term.center(term.green_bold(mode.value.upper()))
@@ -451,33 +488,24 @@ COLUMNS_BY_QUERYMODE: Dict[QueryMode, List[Column]] = {
 }
 
 
+@limit
 def columns_header(
     term: Terminal, mode: QueryMode, flag: Flag, sort_by: SortKey
 ) -> Iterator[str]:
     r"""Yield columns header lines.
 
     >>> term = Terminal()
-    >>> print("\n".join(columns_header(term, QueryMode.activities,
-    ...                                Flag.DATABASE, SortKey.cpu)))
+    >>> __ = columns_header(term, QueryMode.activities, Flag.DATABASE, SortKey.cpu)
     PID    DATABASE                      state   Query
-    <BLANKLINE>
-    >>> print("\n".join(columns_header(term, QueryMode.activities, Flag.CPU,
-    ...                                SortKey.cpu)))
+    >>> __ = columns_header(term, QueryMode.activities, Flag.CPU, SortKey.cpu)
     PID      CPU%              state   Query
-    <BLANKLINE>
-    >>> print("\n".join(columns_header(term, QueryMode.activities, Flag.MEM,
-    ...                                SortKey.cpu)))
+    >>> __ = columns_header(term, QueryMode.activities, Flag.MEM, SortKey.cpu)
     PID    MEM%              state   Query
-    <BLANKLINE>
     >>> flag = Flag.DATABASE | Flag.APPNAME | Flag.RELATION | Flag.CLIENT | Flag.WAIT
-    >>> print("\n".join(columns_header(term, QueryMode.blocking, flag,
-    ...                                SortKey.duration)))
+    >>> __ = columns_header(term, QueryMode.blocking, flag, SortKey.duration)
     PID    DATABASE                      APP  RELATION              state   Query
-    <BLANKLINE>
-    >>> print("\n".join(columns_header(term, QueryMode.activities, flag,
-    ...                                SortKey.duration)))
+    >>> __ = columns_header(term, QueryMode.activities, flag, SortKey.duration)
     PID    DATABASE                      APP           CLIENT  W              state   Query
-    <BLANKLINE>
     """
     columns = (c.value for c in COLUMNS_BY_QUERYMODE[mode])
     htitles = []
@@ -562,6 +590,7 @@ def format_duration(duration: Optional[float]) -> Tuple[str, str]:
     return ctime, color
 
 
+@limit
 def processes_rows(
     term: Terminal,
     processes: Union[Iterable[Activity], Iterable[ActivityProcess]],
@@ -633,27 +662,24 @@ def processes_rows(
     >>> term.width
     80
 
-    >>> def p(lines):
-    ...     print("\n".join(lines))
-
-    >>> p(processes_rows(term, processes, is_local=True, flag=flag,
-    ...                  query_mode=QueryMode.activities))
+    >>> __ = processes_rows(term, processes, is_local=True, flag=flag,
+    ...                     query_mode=QueryMode.activities)
     6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
     6228   pgbench             0.2  1.0             active   \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
     1234   business            2.4  1.0             active   SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id)
     WHERE s.date > CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name,
     p.price, p.cost HAVING sum(p.price * s.units) > 5000;
 
-    >>> p(processes_rows(term, processes, is_local=True, flag=flag,
-    ...                  query_mode=QueryMode.activities,
-    ...                  verbose_mode=QueryDisplayMode.truncate))
+    >>> __ = processes_rows(term, processes, is_local=True, flag=flag,
+    ...                     query_mode=QueryMode.activities,
+    ...                     verbose_mode=QueryDisplayMode.truncate)
     6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts
     6228   pgbench             0.2  1.0             active   \_ UPDATE pgbench_accou
     1234   business            2.4  1.0             active   SELECT product_id, p.na
 
-    >>> p(processes_rows(term, processes, is_local=True, flag=flag,
-    ...                  query_mode=QueryMode.activities,
-    ...                  verbose_mode=QueryDisplayMode.wrap))
+    >>> __ = processes_rows(term, processes, is_local=True, flag=flag,
+    ...                     query_mode=QueryMode.activities,
+    ...                     verbose_mode=QueryDisplayMode.wrap)
     6239   pgbench             0.1  1.0      idle in trans   UPDATE
                                                              pgbench_accounts SET
                                                              abalance = abalance +
@@ -680,9 +706,9 @@ def processes_rows(
     80
 
     # terminal is too narrow given selected flags, we switch to wrap_noindent mode
-    >>> p(processes_rows(term, processes, is_local=True, flag=allflags,
-    ...                  query_mode=QueryMode.activities,
-    ...                  verbose_mode=QueryDisplayMode.wrap))
+    >>> __ = processes_rows(term, processes, is_local=True, flag=allflags,
+    ...                     query_mode=QueryMode.activities,
+    ...                     verbose_mode=QueryDisplayMode.wrap)
     6239   pgbench                   pgbench         postgres            local    0.1  1.0  0 Bytes  0 Bytes  N/A       N    N      idle in trans   UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
     6228   pgbench                   pgbench         postgres            local    0.2  1.0  0 Bytes  0 Bytes  0.000413  N    Y             active   \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
     1234   business               accounting              bob            local    2.4  1.0  0 Bytes  0 Bytes  20:34.00  Y    N             active   SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id)
@@ -690,16 +716,16 @@ def processes_rows(
     p.price, p.cost HAVING sum(p.price * s.units) > 5000;
 
     >>> oneflag = Flag.DATABASE
-    >>> p(processes_rows(term, processes, is_local=True, flag=oneflag,
-    ...                  query_mode=QueryMode.activities,
-    ...                  verbose_mode=QueryDisplayMode.truncate))
+    >>> __ = processes_rows(term, processes, is_local=True, flag=oneflag,
+    ...                     query_mode=QueryMode.activities,
+    ...                     verbose_mode=QueryDisplayMode.truncate)
     6239   pgbench               idle in trans   UPDATE pgbench_accounts SET abalanc
     6228   pgbench                      active   \_ UPDATE pgbench_accounts SET abal
     1234   business                     active   SELECT product_id, p.name FROM prod
 
-    >>> p(processes_rows(term, processes, is_local=True, flag=oneflag,
-    ...                  query_mode=QueryMode.activities,
-    ...                  verbose_mode=QueryDisplayMode.wrap))
+    >>> __ = processes_rows(term, processes, is_local=True, flag=oneflag,
+    ...                     query_mode=QueryMode.activities,
+    ...                     verbose_mode=QueryDisplayMode.wrap)
     6239   pgbench               idle in trans   UPDATE pgbench_accounts SET
                                                  abalance = abalance + 141 WHERE aid
                                                  = 1932841;
