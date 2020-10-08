@@ -664,11 +664,14 @@ def processes_rows(
 
     >>> __ = processes_rows(term, processes, is_local=True, flag=flag,
     ...                     query_mode=QueryMode.activities)
-    6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
-    6228   pgbench             0.2  1.0             active   \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
-    1234   business            2.4  1.0             active   SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id)
-    WHERE s.date > CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name,
-    p.price, p.cost HAVING sum(p.price * s.units) > 5000;
+    6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts
+    SET abalance = abalance + 141 WHERE aid = 1932841;
+    6228   pgbench             0.2  1.0             active   \_ UPDATE
+    pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
+    1234   business            2.4  1.0             active   SELECT product_id,
+    p.name FROM products p LEFT JOIN sales s USING (product_id) WHERE s.date >
+    CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name, p.price, p.cost
+    HAVING sum(p.price * s.units) > 5000;
 
     >>> __ = processes_rows(term, processes, is_local=True, flag=flag,
     ...                     query_mode=QueryMode.activities,
@@ -708,10 +711,13 @@ def processes_rows(
     # terminal is too narrow given selected flags, we switch to wrap_noindent mode
     >>> __ = processes_rows(term, processes, is_local=True, flag=allflags,
     ...                     query_mode=QueryMode.activities,
-    ...                     verbose_mode=QueryDisplayMode.wrap)
-    6239   pgbench                   pgbench         postgres            local    0.1  1.0  0 Bytes  0 Bytes  N/A       N    N      idle in trans   UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
-    6228   pgbench                   pgbench         postgres            local    0.2  1.0  0 Bytes  0 Bytes  0.000413  N    Y             active   \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
-    1234   business               accounting              bob            local    2.4  1.0  0 Bytes  0 Bytes  20:34.00  Y    N             active   SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id)
+    ...                     verbose_mode=QueryDisplayMode.wrap)  # doctest: +NORMALIZE_WHITESPACE
+    6239   pgbench                   pgbench         postgres            local    0.1  1.0  0 Bytes  0 Bytes  N/A       N    N      idle in trans
+    UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
+    6228   pgbench                   pgbench         postgres            local    0.2  1.0  0 Bytes  0 Bytes  0.000413  N    Y             active
+    \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
+    1234   business               accounting              bob            local    2.4  1.0  0 Bytes  0 Bytes  20:34.00  Y    N             active
+    SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id)
     WHERE s.date > CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name,
     p.price, p.cost HAVING sum(p.price * s.units) > 5000;
 
@@ -848,18 +854,27 @@ def processes_rows(
         query = format_query(process.query, process.is_parallel_worker)
 
         if verbose_mode == QueryDisplayMode.truncate:
-            text_append(f"{color_for('query')} {query[:dif]}")
+            text_append(" " + f"{color_for('query')}{query[:dif]}")
         else:
+            query_r = f"{color_for('query')}{query}"
             if verbose_mode == QueryDisplayMode.wrap_noindent:
-                dif = term.width
-                p_indent = ""
+                if term.length(query_r.split(" ", 1)[0]) >= dif:
+                    # Query too long to even start on the first line, wrap all
+                    # lines.
+                    query_lines = [""] + term.wrap(query_r, width=term.width)
+                else:
+                    # Only wrap subsequent lines.
+                    wrapped_lines = term.wrap(query_r, width=dif)
+                    query_lines = [" " + wrapped_lines[0]] + term.wrap(
+                        " ".join(wrapped_lines[1:]), width=term.width
+                    )
+                text_append("\n".join(query_lines))
             else:
                 assert (
                     verbose_mode == QueryDisplayMode.wrap
                 ), f"unexpected mode {verbose_mode}"
-                p_indent = indent
-            wrapped_lines = term.wrap(f"{color_for('query')} {query}", width=dif)
-            text_append(f"\n{p_indent}".join(wrapped_lines))
+                wrapped_lines = term.wrap(" " + query_r, width=dif)
+                text_append(f"\n{indent}".join(wrapped_lines))
 
         for line in ("".join(text) + term.normal).splitlines():
             yield line
