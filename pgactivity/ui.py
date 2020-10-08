@@ -30,7 +30,7 @@ def main(options: optparse.Values, refresh_time: float = 2.0) -> None:
         options.dbname,
     )
 
-    is_local = data.pg_is_local()
+    is_local = data.pg_is_local() and data.pg_is_local_access()
     duration_mode = types.DurationMode(int(options.durationmode))
     verbose_mode = types.QueryDisplayMode(int(options.verbosemode))
     flag = types.Flag.from_options(is_local=is_local, **vars(options))

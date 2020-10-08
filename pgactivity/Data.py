@@ -164,7 +164,7 @@ class Data:
             if ret[0] != "on":
                 raise Exception("Must be run with database superuser privileges.")
 
-    def pg_is_local_access(self,):
+    def pg_is_local_access(self,) -> bool:
         """
         Verify if the user running pg_activity can acces
         system informations for the postmaster process.
