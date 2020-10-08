@@ -317,6 +317,17 @@ MAP_STATES = {
 def bytes2human(num):
     """
     Convert a size into a human readable format.
+
+    >>> bytes2human(0.007)
+    '0.01B'
+    >>> bytes2human(0.3)
+    '0.30B'
+    >>> bytes2human(2)
+    '2.00B'
+    >>> bytes2human(2345)
+    '2.29K'
+    >>> bytes2human(12345678)
+    '11.77M'
     """
     symbols = ('K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y')
     prefix = {}
