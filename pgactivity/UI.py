@@ -1461,6 +1461,7 @@ class UI:
             queries =  self.data.pg_get_waiting(self.duration_mode)
         else:
             queries =  self.data.pg_get_blocking(self.duration_mode)
+        queries = [attr.asdict(q) for q in queries]
 
         new_procs = {}
         for query in queries:
