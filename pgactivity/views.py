@@ -485,6 +485,7 @@ def columns_header(
         if column.mandatory or (column.flag & flag):
             color = getattr(term, f"black_on_{column.color(sort_by)}")
             htitles.append(f"{color}{column.render()}{term.normal}")
+    # TODO: last column should span right to end of screen
     yield "".join(htitles) + "\n"
 
 
