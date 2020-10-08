@@ -613,8 +613,8 @@ def processes_rows(
     ...         client="local",
     ...         cpu=0.1,
     ...         mem=0.993_254_939_413_836,
-    ...         read=0.1,
-    ...         write=0.282_725_318_098_656_75,
+    ...         read=7,
+    ...         write=12.3,
     ...         state="idle in transaction",
     ...         query="UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;",
     ...         duration=None,
@@ -631,7 +631,7 @@ def processes_rows(
     ...         cpu=0.2,
     ...         mem=1.024_758_418_061_11,
     ...         read=0.2,
-    ...         write=0.113_090_128_201_154_74,
+    ...         write=1_128_201,
     ...         state="active",
     ...         query="UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;",
     ...         duration=0.000413,
@@ -647,8 +647,8 @@ def processes_rows(
     ...         client="local",
     ...         cpu=2.4,
     ...         mem=1.031_191_760_016_45,
-    ...         read=0.3,
-    ...         write=0.245_028_606_206_652_82,
+    ...         read=9_876_543.21,
+    ...         write=1_234,
     ...         state="active",
     ...         query="SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id) WHERE s.date > CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name, p.price, p.cost HAVING sum(p.price * s.units) > 5000;",
     ...         duration=1234,
@@ -712,11 +712,11 @@ def processes_rows(
     >>> __ = processes_rows(term, processes, is_local=True, flag=allflags,
     ...                     query_mode=QueryMode.activities,
     ...                     verbose_mode=QueryDisplayMode.wrap)  # doctest: +NORMALIZE_WHITESPACE
-    6239   pgbench                   pgbench         postgres            local    0.1  1.0       0B       0B  N/A       N    N      idle in trans
+    6239   pgbench                   pgbench         postgres            local    0.1  1.0       7B      12B  N/A       N    N      idle in trans
     UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
-    6228   pgbench                   pgbench         postgres            local    0.2  1.0       0B       0B  0.000413  N    Y             active
+    6228   pgbench                   pgbench         postgres            local    0.2  1.0       0B    1.08M  0.000413  N    Y             active
     \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
-    1234   business               accounting              bob            local    2.4  1.0       0B       0B  20:34.00  Y    N             active
+    1234   business               accounting              bob            local    2.4  1.0    9.42M    1.21K  20:34.00  Y    N             active
     SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id)
     WHERE s.date > CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name,
     p.price, p.cost HAVING sum(p.price * s.units) > 5000;
