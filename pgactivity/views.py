@@ -27,16 +27,20 @@ from . import utils
 LINE_COLORS = {
     "pid": {"default": "cyan", "cursor": "cyan_reverse", "yellow": "yellow_bold"},
     "database": {
-        "default": "gray_bold",
+        "default": "black_bold",
         "cursor": "cyan_reverse",
         "yellow": "yellow_bold",
     },
     "appname": {
-        "default": "gray_bold",
+        "default": "black_bold",
         "cursor": "cyan_reverse",
         "yellow": "yellow_bold",
     },
-    "user": {"default": "gray_bold", "cursor": "cyan_reverse", "yellow": "yellow_bold"},
+    "user": {
+        "default": "black_bold",
+        "cursor": "cyan_reverse",
+        "yellow": "yellow_bold",
+    },
     "client": {"default": "cyan", "cursor": "cyan_reverse", "yellow": "yellow_bold"},
     "cpu": {"default": "normal", "cursor": "cyan_reverse", "yellow": "yellow_bold"},
     "mem": {"default": "normal", "cursor": "cyan_reverse", "yellow": "yellow_bold"},
