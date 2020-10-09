@@ -921,3 +921,53 @@ def processes_rows(
 
         for line in ("".join(text) + term.normal).splitlines():
             yield line
+
+
+def screen(
+    term: Terminal,
+    *,
+    host: Host,
+    dbinfo: DBInfo,
+    tps: int,
+    active_connections: int,
+    duration_mode: DurationMode,
+    refresh_time: float,
+    max_iops: int = 0,
+    system_info: Optional[SystemInfo] = None,
+    querymode: QueryMode,
+    flag: Flag,
+    sort_key: SortKey,
+    activities: Union[Iterable[Activity], Iterable[ActivityProcess]],
+    is_local: bool,
+    verbose_mode: QueryDisplayMode,
+) -> None:
+    """Display the screen."""
+    print(term.clear + term.home, end="")
+    limit_height = term.height
+    limit_height -= header(
+        term,
+        host,
+        dbinfo,
+        tps,
+        active_connections,
+        duration_mode,
+        refresh_time,
+        max_iops,
+        system_info,
+        limit_height=limit_height,
+    )
+
+    limit_height -= query_mode(term, querymode, limit_height=limit_height)
+    limit_height -= columns_header(
+        term, querymode, flag, sort_key, limit_height=limit_height
+    )
+    limit_height -= processes_rows(
+        term,
+        activities,
+        is_local=is_local,
+        flag=flag,
+        query_mode=querymode,
+        verbose_mode=verbose_mode,
+        limit_height=limit_height,
+    )
+    assert limit_height >= 0, limit_height

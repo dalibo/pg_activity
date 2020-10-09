@@ -104,39 +104,23 @@ def main(options: optparse.Values, refresh_time: float = 2.0) -> None:
 
                 acts = activities.sorted(acts, key=sort_key, reverse=True)
 
-                print(term.clear + term.home, end="")
-                limit_height = term.height
-                if options.debug:
-                    limit_height -= 10
-                limit_height -= views.header(
+                views.screen(
                     term,
-                    host,
-                    dbinfo,
-                    tps,
-                    active_connections,
-                    duration_mode,
-                    refresh_time,
-                    max_iops,
-                    system_info,
-                    limit_height=limit_height,
-                )
-
-                limit_height -= views.query_mode(
-                    term, query_mode, limit_height=limit_height
-                )
-                limit_height -= views.columns_header(
-                    term, query_mode, flag, sort_key, limit_height=limit_height
-                )
-                limit_height -= views.processes_rows(
-                    term,
-                    acts,
-                    is_local=is_local,
+                    host=host,
+                    dbinfo=dbinfo,
+                    tps=tps,
+                    active_connections=active_connections,
+                    duration_mode=duration_mode,
+                    refresh_time=refresh_time,
+                    max_iops=max_iops,
+                    system_info=system_info,
+                    querymode=query_mode,
                     flag=flag,
-                    query_mode=query_mode,
+                    sort_key=sort_key,
+                    activities=acts,
+                    is_local=is_local,
                     verbose_mode=verbose_mode,
-                    limit_height=limit_height,
                 )
-                assert limit_height >= 0, limit_height
 
                 if options.debug:
                     # DEBUG PRINTS
