@@ -496,16 +496,16 @@ def columns_header(
     r"""Yield columns header lines.
 
     >>> term = Terminal()
-    >>> columns_header(term, QueryMode.activities, Flag.DATABASE, SortKey.cpu)
+    >>> columns_header(term, QueryMode.activities, Flag.DATABASE, SortKey.cpu)  # doctest: +NORMALIZE_WHITESPACE
     PID    DATABASE                      state   Query
-    >>> columns_header(term, QueryMode.activities, Flag.CPU, SortKey.cpu)
+    >>> columns_header(term, QueryMode.activities, Flag.CPU, SortKey.cpu)  # doctest: +NORMALIZE_WHITESPACE
     PID      CPU%              state   Query
-    >>> columns_header(term, QueryMode.activities, Flag.MEM, SortKey.cpu)
+    >>> columns_header(term, QueryMode.activities, Flag.MEM, SortKey.cpu)  # doctest: +NORMALIZE_WHITESPACE
     PID    MEM%              state   Query
     >>> flag = Flag.DATABASE | Flag.APPNAME | Flag.RELATION | Flag.CLIENT | Flag.WAIT
-    >>> columns_header(term, QueryMode.blocking, flag, SortKey.duration)
+    >>> columns_header(term, QueryMode.blocking, flag, SortKey.duration)  # doctest: +NORMALIZE_WHITESPACE
     PID    DATABASE                      APP  RELATION              state   Query
-    >>> columns_header(term, QueryMode.activities, flag, SortKey.duration)
+    >>> columns_header(term, QueryMode.activities, flag, SortKey.duration)  # doctest: +NORMALIZE_WHITESPACE
     PID    DATABASE                      APP           CLIENT  W              state   Query
     """
     columns = (c.value for c in COLUMNS_BY_QUERYMODE[mode])
@@ -513,9 +513,8 @@ def columns_header(
     for column in columns:
         if column.mandatory or (column.flag & flag):
             color = getattr(term, f"black_on_{column.color(sort_by)}")
-            htitles.append(f"{color}{column.render()}{term.normal}")
-    # TODO: last column should span right to end of screen
-    yield "".join(htitles) + "\n"
+            htitles.append(f"{color}{column.render()}")
+    yield term.ljust("".join(htitles), fillchar=" ") + term.normal + "\n"
 
 
 def get_indent(mode: QueryMode, flag: Flag, max_ncol: int = MAX_NCOL) -> str:
