@@ -212,10 +212,9 @@ def help(term: Terminal, version: str, is_local: bool) -> Iterable[str]:
         yield line
     yield ""
 
-    # TODO: find a better filter logic than string comparison
     bindings = BINDINGS
     if not is_local:
-        bindings = [b for b in bindings if not b.description.startswith("sort by ")]
+        bindings = [b for b in bindings if not b.local_only]
     yield from key_mappings(bindings)
     yield "Mode"
     yield from key_mappings(MODES)

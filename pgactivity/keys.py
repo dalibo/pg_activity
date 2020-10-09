@@ -24,6 +24,7 @@ class Key:
     value: str
     description: str
     name: Optional[str] = None
+    local_only: bool = False
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, str):
@@ -35,15 +36,15 @@ BINDINGS: List[Key] = [
     Key("Up/Down", "scroll process list"),
     Key("C", "activate/deactivate colors"),
     Key(PAUSE, "pause", "Space"),
-    Key(SORTBY_READ, "sort by READ/s desc. (activities)"),
+    Key(SORTBY_READ, "sort by READ/s desc. (activities)", local_only=True),
     Key("v", "change display mode"),
-    Key(SORTBY_WRITE, "sort by WRITE/s desc. (activities)"),
+    Key(SORTBY_WRITE, "sort by WRITE/s desc. (activities)", local_only=True),
     Key(EXIT, "quit"),
     Key(REFRESH_TIME_INCREASE, "increase refresh time (max:5s)"),
-    Key(SORTBY_CPU, "sort by CPU% desc. (activities)"),
-    Key(SORTBY_MEM, "sort by MEM% desc. (activities)"),
+    Key(SORTBY_CPU, "sort by CPU% desc. (activities)", local_only=True),
+    Key(SORTBY_MEM, "sort by MEM% desc. (activities)", local_only=True),
     Key(REFRESH_TIME_DECREASE, "decrease refresh time (min:0.5s)"),
-    Key(SORTBY_TIME, "sort by TIME+ desc. (activities)"),
+    Key(SORTBY_TIME, "sort by TIME+ desc. (activities)", local_only=True),
     Key("R", "force refresh"),
     Key("T", "change duration mode"),
     Key("D", "force refresh database size"),
