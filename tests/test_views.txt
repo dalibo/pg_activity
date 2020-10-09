@@ -1,0 +1,77 @@
+>>> from blessed import Terminal
+>>> from pgactivity.types import *
+>>> from pgactivity.views import *
+
+>>> term = Terminal(force_styling=None)
+>>> processes = [
+...     ActivityProcess(
+...         pid="6239",
+...         appname="pgbench",
+...         database="pgbench",
+...         user="postgres",
+...         client="local",
+...         cpu=0.1,
+...         mem=0.993_254_939_413_836,
+...         read=7,
+...         write=12.3,
+...         state="idle in transaction",
+...         query="UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;",
+...         duration=None,
+...         wait=False,
+...         io_wait="N",
+...         is_parallel_worker=False,
+...     ),
+...     ActivityProcess(
+...         pid="1234",
+...         appname="accounting",
+...         database="business",
+...         user="bob",
+...         client="local",
+...         cpu=2.4,
+...         mem=1.031_191_760_016_45,
+...         read=9_876_543.21,
+...         write=1_234,
+...         state="active",
+...         query="SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id) WHERE s.date > CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name, p.price, p.cost HAVING sum(p.price * s.units) > 5000;",
+...         duration=1234,
+...         wait=True,
+...         io_wait="N",
+...         is_parallel_worker=False,
+...     ),
+... ]
+
+>>> term.width
+80
+
+>>> vmem = MemoryInfo(total=4_220_876_001, percent=2.5, used=1_001_232_608)
+>>> swap = MemoryInfo(total=6_312_423_424, used=2_340, percent=1.0)
+>>> ios = IOCounters(read_bytes=128, write_bytes=8, read_count=6, write_count=9)
+>>> load = LoadAverage(0.5, 1.9, 0.93)
+>>> sysinfo = SystemInfo(vmem, swap, load, ios)
+>>> screen(
+...     term,
+...     host=Host("PostgreSQL 13", "testhost", "pgadm", "server.prod.tld", 5433, "app"),
+...     dbinfo=DBInfo(10203040506070809, 9999),
+...     tps=5,
+...     active_connections=7,
+...     duration_mode=DurationMode.backend,
+...     refresh_time=10,
+...     max_iops=76,
+...     system_info=sysinfo,
+...     querymode=QueryMode.activities,
+...     flag=Flag.CPU|Flag.MEM|Flag.DATABASE,
+...     sort_key=SortKey.cpu,
+...     activities=processes,
+...     is_local=True,
+...     verbose_mode=QueryDisplayMode.truncate,
+...     in_pause=False,
+... )  # doctest: +NORMALIZE_WHITESPACE
+PostgreSQL 13 - testhost - pgadm@server.prod.tld:5433/app - Ref.: 10s
+ Size:      10.2 PB -   10.0 kB/s     | TPS:               5      | Active connections:               7      | Duration mode:     backend
+ Mem.:      2.5% -    1.0 GB/4.2 GB   | IO Max:                 76/s
+ Swap:      1.0% -    2.3 kB/6.3 GB   | Read:     128 Bytes/s -      6/s
+ Load:         0.5 1.9 0.93         | Write:       8 Bytes/s -      9/s
+                                RUNNING QUERIES
+PID    DATABASE           CPU% MEM%              state   Query
+6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts
+1234   business            2.4  1.0             active   SELECT product_id, p.na
