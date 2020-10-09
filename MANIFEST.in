@@ -4,6 +4,7 @@ recursive-include docs *.png *.pod *.sh *.svg
 recursive-include tests *.py *.json
 include *.md
 include *.txt
+include .coveragerc
 include .flake8
 include .travis.yml
 include mypy.ini
