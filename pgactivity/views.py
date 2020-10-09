@@ -123,6 +123,11 @@ def limit(func: Callable[..., Iterable[str]]) -> Callable[..., int]:
     row #0
     row #1
     row #2
+
+    A single line is displayed with an EOL as well:
+    >>> limit(view)(term, 1, limit_height=10)
+    line #0
+    1
     """
 
     @functools.wraps(func)
@@ -130,7 +135,7 @@ def limit(func: Callable[..., Iterable[str]]) -> Callable[..., int]:
         limit_height = kwargs.pop("limit_height", None)
         lines = list(func(term, *args, **kwargs))[:limit_height]
         if lines:
-            print("\n".join(lines), end="")
+            print("\n".join(lines), end="\n")
         if limit_height is not None:
             return len(lines)
         return None
@@ -340,7 +345,6 @@ def header(
                 ),
             )
         )
-    yield ""
 
 
 @limit
@@ -522,7 +526,7 @@ def columns_header(
         if column.mandatory or (column.flag & flag):
             color = getattr(term, f"black_on_{column.color(sort_by)}")
             htitles.append(f"{color}{column.render()}")
-    yield term.ljust("".join(htitles), fillchar=" ") + term.normal + "\n"
+    yield term.ljust("".join(htitles), fillchar=" ") + term.normal
 
 
 def get_indent(mode: QueryMode, flag: Flag, max_ncol: int = MAX_NCOL) -> str:
@@ -951,7 +955,7 @@ def screen(
 ) -> None:
     """Display the screen."""
     print(term.clear + term.home, end="")
-    limit_height = term.height
+    limit_height = term.height - 1
     limit_height -= header(
         term,
         host,
