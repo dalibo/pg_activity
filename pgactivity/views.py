@@ -119,21 +119,21 @@ def limit(func: Callable[..., Iterable[str]]) -> Callable[..., int]:
     line #1
     >>> count
     2
-    >>> count = limit(view)(term, 3, prefix="row")
+    >>> limit(view)(term, 3, prefix="row")
     row #0
     row #1
     row #2
-    >>> count
-    3
     """
 
     @functools.wraps(func)
-    def wrapper(term: Terminal, *args: Any, **kwargs: Any) -> int:
+    def wrapper(term: Terminal, *args: Any, **kwargs: Any) -> Optional[int]:
         limit_height = kwargs.pop("limit_height", None)
         lines = list(func(term, *args, **kwargs))[:limit_height]
         if lines:
             print("\n".join(lines), end="")
-        return len(lines)
+        if limit_height is not None:
+            return len(lines)
+        return None
 
     return wrapper
 
@@ -143,7 +143,7 @@ def help(term: Terminal, version: str, is_local: bool) -> Iterable[str]:
     """Render help menu.
 
     >>> term = Terminal()
-    >>> __ = help(term, "2.1", True)
+    >>> help(term, "2.1", True)
     pg_activity 2.1 - https://github.com/dalibo/pg_activity
     Released under PostgreSQL License.
     <BLANKLINE>
@@ -168,7 +168,7 @@ def help(term: Terminal, version: str, is_local: bool) -> Iterable[str]:
           F3/3: blocking queries
     <BLANKLINE>
     Press any key to exit.
-    >>> __ = help(term, "5.0", False)
+    >>> help(term, "5.0", False)
     pg_activity 5.0 - https://github.com/dalibo/pg_activity
     Released under PostgreSQL License.
     <BLANKLINE>
@@ -239,7 +239,7 @@ def header(
     >>> host = Host("PostgreSQL 9.6", "server", "pgadm", "server.prod.tld", 5433, "app")
     >>> dbinfo = DBInfo(10203040506070809, 9999)
 
-    >>> __ = header(term, host, dbinfo, 12, 0, DurationMode.backend, refresh_time=10)
+    >>> header(term, host, dbinfo, 12, 0, DurationMode.backend, refresh_time=10)
     PostgreSQL 9.6 - server - pgadm@server.prod.tld:5433/app - Ref.: 10s
      Size:      10.2 PB -   10.0 kB/s     | TPS:              12      | Active connections:               0      | Duration mode:     backend
 
@@ -253,7 +253,7 @@ def header(
     >>> load = LoadAverage(0.25, 0.19, 0.39)
     >>> sysinfo = SystemInfo(vmem, swap, load, ios)
 
-    >>> __ = header(term, host, dbinfo, 1, 79, DurationMode.query, refresh_time=2,
+    >>> header(term, host, dbinfo, 1, 79, DurationMode.query, refresh_time=2,
     ...             max_iops=12, system_info=sysinfo)
     PostgreSQL 13.1 - localhost - tester@host:5432/postgres - Ref.: 2s
      Size:     123.5 MB -  12 Bytes/s     | TPS:               1      | Active connections:              79      | Duration mode:       query
@@ -349,7 +349,7 @@ def query_mode(term: Terminal, mode: QueryMode) -> Iterator[str]:
     >>> from pgactivity.types import QueryMode
 
     >>> term = Terminal()
-    >>> __ = query_mode(term, QueryMode.blocking)  # doctest: +NORMALIZE_WHITESPACE
+    >>> query_mode(term, QueryMode.blocking)  # doctest: +NORMALIZE_WHITESPACE
                                     BLOCKING QUERIES
     """
     yield term.center(term.green_bold(mode.value.upper()))
@@ -496,16 +496,16 @@ def columns_header(
     r"""Yield columns header lines.
 
     >>> term = Terminal()
-    >>> __ = columns_header(term, QueryMode.activities, Flag.DATABASE, SortKey.cpu)
+    >>> columns_header(term, QueryMode.activities, Flag.DATABASE, SortKey.cpu)
     PID    DATABASE                      state   Query
-    >>> __ = columns_header(term, QueryMode.activities, Flag.CPU, SortKey.cpu)
+    >>> columns_header(term, QueryMode.activities, Flag.CPU, SortKey.cpu)
     PID      CPU%              state   Query
-    >>> __ = columns_header(term, QueryMode.activities, Flag.MEM, SortKey.cpu)
+    >>> columns_header(term, QueryMode.activities, Flag.MEM, SortKey.cpu)
     PID    MEM%              state   Query
     >>> flag = Flag.DATABASE | Flag.APPNAME | Flag.RELATION | Flag.CLIENT | Flag.WAIT
-    >>> __ = columns_header(term, QueryMode.blocking, flag, SortKey.duration)
+    >>> columns_header(term, QueryMode.blocking, flag, SortKey.duration)
     PID    DATABASE                      APP  RELATION              state   Query
-    >>> __ = columns_header(term, QueryMode.activities, flag, SortKey.duration)
+    >>> columns_header(term, QueryMode.activities, flag, SortKey.duration)
     PID    DATABASE                      APP           CLIENT  W              state   Query
     """
     columns = (c.value for c in COLUMNS_BY_QUERYMODE[mode])
@@ -663,8 +663,8 @@ def processes_rows(
     >>> term.width
     80
 
-    >>> __ = processes_rows(term, processes, is_local=True, flag=flag,
-    ...                     query_mode=QueryMode.activities)
+    >>> processes_rows(term, processes, is_local=True, flag=flag,
+    ...                query_mode=QueryMode.activities)
     6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts
     SET abalance = abalance + 141 WHERE aid = 1932841;
     6228   pgbench             0.2  1.0             active   \_ UPDATE
@@ -674,16 +674,16 @@ def processes_rows(
     CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name, p.price, p.cost
     HAVING sum(p.price * s.units) > 5000;
 
-    >>> __ = processes_rows(term, processes, is_local=True, flag=flag,
-    ...                     query_mode=QueryMode.activities,
-    ...                     verbose_mode=QueryDisplayMode.truncate)
+    >>> processes_rows(term, processes, is_local=True, flag=flag,
+    ...                query_mode=QueryMode.activities,
+    ...                verbose_mode=QueryDisplayMode.truncate)
     6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts
     6228   pgbench             0.2  1.0             active   \_ UPDATE pgbench_accou
     1234   business            2.4  1.0             active   SELECT product_id, p.na
 
-    >>> __ = processes_rows(term, processes, is_local=True, flag=flag,
-    ...                     query_mode=QueryMode.activities,
-    ...                     verbose_mode=QueryDisplayMode.wrap)
+    >>> processes_rows(term, processes, is_local=True, flag=flag,
+    ...                query_mode=QueryMode.activities,
+    ...                verbose_mode=QueryDisplayMode.wrap)
     6239   pgbench             0.1  1.0      idle in trans   UPDATE
                                                              pgbench_accounts SET
                                                              abalance = abalance +
@@ -710,9 +710,9 @@ def processes_rows(
     80
 
     # terminal is too narrow given selected flags, we switch to wrap_noindent mode
-    >>> __ = processes_rows(term, processes, is_local=True, flag=allflags,
-    ...                     query_mode=QueryMode.activities,
-    ...                     verbose_mode=QueryDisplayMode.wrap)  # doctest: +NORMALIZE_WHITESPACE
+    >>> processes_rows(term, processes, is_local=True, flag=allflags,
+    ...                query_mode=QueryMode.activities,
+    ...                verbose_mode=QueryDisplayMode.wrap)  # doctest: +NORMALIZE_WHITESPACE
     6239   pgbench                   pgbench         postgres            local    0.1  1.0       7B      12B  N/A       N    N      idle in trans
     UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
     6228   pgbench                   pgbench         postgres            local    0.2  1.0       0B    1.08M  0.000413  N    Y             active
@@ -723,16 +723,16 @@ def processes_rows(
     p.price, p.cost HAVING sum(p.price * s.units) > 5000;
 
     >>> oneflag = Flag.DATABASE
-    >>> __ = processes_rows(term, processes, is_local=True, flag=oneflag,
-    ...                     query_mode=QueryMode.activities,
-    ...                     verbose_mode=QueryDisplayMode.truncate)
+    >>> processes_rows(term, processes, is_local=True, flag=oneflag,
+    ...                query_mode=QueryMode.activities,
+    ...                verbose_mode=QueryDisplayMode.truncate)
     6239   pgbench               idle in trans   UPDATE pgbench_accounts SET abalanc
     6228   pgbench                      active   \_ UPDATE pgbench_accounts SET abal
     1234   business                     active   SELECT product_id, p.name FROM prod
 
-    >>> __ = processes_rows(term, processes, is_local=True, flag=oneflag,
-    ...                     query_mode=QueryMode.activities,
-    ...                     verbose_mode=QueryDisplayMode.wrap)
+    >>> processes_rows(term, processes, is_local=True, flag=oneflag,
+    ...                query_mode=QueryMode.activities,
+    ...                verbose_mode=QueryDisplayMode.wrap)
     6239   pgbench               idle in trans   UPDATE pgbench_accounts SET
                                                  abalance = abalance + 141 WHERE aid
                                                  = 1932841;
@@ -773,15 +773,15 @@ def processes_rows(
     ...         query="UPDATE pgbench_branches SET bbalance = bbalance + 1788 WHERE bid = 68;",
     ...     ),
     ... ]
-    >>> __ = processes_rows(term, processes, is_local=True, flag=oneflag,
-    ...                     query_mode=QueryMode.waiting,
-    ...                     verbose_mode=QueryDisplayMode.wrap)
+    >>> processes_rows(term, processes, is_local=True, flag=oneflag,
+    ...                query_mode=QueryMode.waiting,
+    ...                verbose_mode=QueryDisplayMode.wrap)
     6239   pgbench                      active   END;
     6228   pgbench               idle in trans   UPDATE pgbench_branches SET
                                                  bbalance = bbalance + 1788 WHERE
                                                  bid = 68;
-    >>> __ = processes_rows(term, processes, is_local=False, flag=allflags,
-    ...                     query_mode=QueryMode.blocking)  # doctest: +NORMALIZE_WHITESPACE
+    >>> processes_rows(term, processes, is_local=False, flag=allflags,
+    ...                query_mode=QueryMode.blocking)  # doctest: +NORMALIZE_WHITESPACE
     6239   pgbench                   pgbench      None    transactionid    ExclusiveLock  11:06.00             active
     END;
     6228   pgbench                   pgbench      ahah            tuple RowExclusiveLock  0.000413      idle in trans
