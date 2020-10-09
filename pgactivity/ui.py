@@ -77,30 +77,6 @@ def main(options: optparse.Values, refresh_time: float = 2.0) -> None:
                 query_mode = handlers.query_mode(key) or query_mode
                 sort_key = handlers.sort_key_for(key, query_mode, is_local) or sort_key
             if not in_help:
-                print(term.clear + term.home, end="")
-                limit_height = term.height
-                if options.debug:
-                    limit_height -= 10
-                limit_height -= views.header(
-                    term,
-                    host,
-                    dbinfo,
-                    tps,
-                    active_connections,
-                    duration_mode,
-                    refresh_time,
-                    max_iops,
-                    system_info,
-                    limit_height=limit_height,
-                )
-
-                limit_height -= views.query_mode(
-                    term, query_mode, limit_height=limit_height
-                )
-                limit_height -= views.columns_header(
-                    term, query_mode, flag, sort_key, limit_height=limit_height
-                )
-
                 if query_mode == types.QueryMode.activities:
                     queries = data.pg_get_activities(duration_mode)
                     if is_local:
@@ -127,6 +103,30 @@ def main(options: optparse.Values, refresh_time: float = 2.0) -> None:
                     acts = queries  # type: ignore # XXX
 
                 acts = activities.sorted(acts, key=sort_key, reverse=True)
+
+                print(term.clear + term.home, end="")
+                limit_height = term.height
+                if options.debug:
+                    limit_height -= 10
+                limit_height -= views.header(
+                    term,
+                    host,
+                    dbinfo,
+                    tps,
+                    active_connections,
+                    duration_mode,
+                    refresh_time,
+                    max_iops,
+                    system_info,
+                    limit_height=limit_height,
+                )
+
+                limit_height -= views.query_mode(
+                    term, query_mode, limit_height=limit_height
+                )
+                limit_height -= views.columns_header(
+                    term, query_mode, flag, sort_key, limit_height=limit_height
+                )
                 limit_height -= views.processes_rows(
                     term,
                     acts,
