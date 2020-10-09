@@ -8,7 +8,7 @@ import humanize
 from blessed import Terminal
 from blessed.formatters import FormattingString
 
-from .keys import BINDINGS, MODES
+from .keys import BINDINGS, Key, MODES
 from .types import (
     Activity,
     ActivityBW,
@@ -197,9 +197,10 @@ def help(term: Terminal, version: str, is_local: bool) -> Iterable[str]:
     """
     )
 
-    def key_mappings(keys: Iterable[Tuple[str, str]]) -> Iterable[str]:
-        for key, text in keys:
-            yield f"{term.bright_cyan}{key.rjust(10)}{term.normal}: {text}"
+    def key_mappings(keys: Iterable[Key]) -> Iterable[str]:
+        for key in keys:
+            key_name = key.name or key.value
+            yield f"{term.bright_cyan}{key_name.rjust(10)}{term.normal}: {key.description}"
 
     footer = "Press any key to exit."
     for line in intro.splitlines():
@@ -209,7 +210,7 @@ def help(term: Terminal, version: str, is_local: bool) -> Iterable[str]:
     # TODO: find a better filter logic than string comparison
     bindings = BINDINGS
     if not is_local:
-        bindings = [b for b in bindings if not b[1].startswith("sort by ")]
+        bindings = [b for b in bindings if not b.description.startswith("sort by ")]
     yield from key_mappings(bindings)
     yield "Mode"
     yield from key_mappings(MODES)
@@ -343,7 +344,9 @@ def header(
 
 
 @limit
-def query_mode(term: Terminal, mode: QueryMode) -> Iterator[str]:
+def query_mode(
+    term: Terminal, mode: QueryMode, *, in_pause: bool = False
+) -> Iterator[str]:
     r"""Display query mode title.
 
     >>> from pgactivity.types import QueryMode
@@ -351,8 +354,13 @@ def query_mode(term: Terminal, mode: QueryMode) -> Iterator[str]:
     >>> term = Terminal()
     >>> query_mode(term, QueryMode.blocking)  # doctest: +NORMALIZE_WHITESPACE
                                     BLOCKING QUERIES
+    >>> query_mode(term, QueryMode.activities, in_pause=True)  # doctest: +NORMALIZE_WHITESPACE
+                                    PAUSE
     """
-    yield term.center(term.green_bold(mode.value.upper()))
+    if in_pause:
+        yield term.black_bold_on_orange(term.center("PAUSE", fillchar=" "))
+    else:
+        yield term.center(term.green_bold(mode.value.upper()))
 
 
 class Column(enum.Enum):
@@ -939,6 +947,7 @@ def screen(
     activities: Union[Iterable[Activity], Iterable[ActivityProcess]],
     is_local: bool,
     verbose_mode: QueryDisplayMode,
+    in_pause: bool,
 ) -> None:
     """Display the screen."""
     print(term.clear + term.home, end="")
@@ -956,7 +965,9 @@ def screen(
         limit_height=limit_height,
     )
 
-    limit_height -= query_mode(term, querymode, limit_height=limit_height)
+    limit_height -= query_mode(
+        term, querymode, in_pause=in_pause, limit_height=limit_height
+    )
     limit_height -= columns_header(
         term, querymode, flag, sort_key, limit_height=limit_height
     )
