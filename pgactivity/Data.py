@@ -310,27 +310,12 @@ class Data:
         """
         Get total of active connections.
         """
-<<<<<<< HEAD
-
         if self.pg_num_version < 90200:
             # prior to PostgreSQL 9.1, there was no state column
-            query = """
-    SELECT
-        COUNT(*) as active_connections
-    FROM pg_stat_activity
-    WHERE current_query NOT LIKE '<IDLE>%%'
-            """
+            ret = self.queries.get_active_connections(self.pg_conn)
         else:
-            query = """
-    SELECT
-        COUNT(*) as active_connections
-    FROM pg_stat_activity
-    WHERE state = 'active'
-            """
-=======
->>>>>>> Initial commit
+            ret = self.queries.get_active_connections_90200(self.pg_conn)
 
-        ret = self.queries.get_active_connections(self.pg_conn)
         if not ret:
             raise Exception('Failed to ' + self.queries.get_active_connections.__doc__)
 
@@ -381,57 +366,6 @@ class Data:
                 raise Exception('Failed to ' + self.queries.get_active_connections.__doc__)
         elif self.pg_num_version < 90200:
             # PostgreSQL prior to 9.2.0
-<<<<<<< HEAD
-            query = """
-    SELECT
-        pg_stat_activity.procpid AS pid,
-        '<unknown>' AS application_name,
-        CASE
-            WHEN LENGTH(pg_stat_activity.datname) > 16
-            THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
-            ELSE pg_stat_activity.datname
-            END
-        AS database,
-        CASE WHEN pg_stat_activity.client_addr IS NULL
-            THEN 'local'
-            ELSE pg_stat_activity.client_addr::TEXT
-            END
-        AS client,
-        EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
-        pg_stat_activity.waiting AS wait,
-        pg_stat_activity.usename AS user,
-	CASE
-            WHEN pg_stat_activity.current_query = '<IDLE> in transaction (aborted)' THEN 'idle in transaction (aborted)'
-            WHEN pg_stat_activity.current_query = '<IDLE> in transaction' THEN 'idle in transaction'
-            WHEN pg_stat_activity.current_query = '<IDLE>' THEN 'idle'
-            ELSE 'active'
-            END
-        AS state,
-        CASE
-           WHEN pg_stat_activity.current_query LIKE '<IDLE>%%' THEN 'None'
-           ELSE pg_stat_activity.current_query
-           END
-        AS query,
-        false AS is_parallel_worker
-    FROM
-        pg_stat_activity
-    WHERE
-        current_query <> '<IDLE>'
-        AND procpid <> pg_backend_pid()
-        AND CASE WHEN %(min_duration)s = 0 THEN true
-            ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
-            END
-    ORDER BY
-        EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) DESC
-            """
-
-        duration_column = self.get_duration_column(duration_mode)
-        query = query.format(duration_column=duration_column)
-
-        cur = self.pg_conn.cursor()
-        cur.execute(query, {'min_duration': self.min_duration})
-        ret = cur.fetchall()
-=======
             ret = self.queries.get_pg_activity_90200(
                 self.pg_conn,
                 duration_column=self.get_duration_column(duration_mode),
@@ -439,7 +373,6 @@ class Data:
             )
             if not ret:
                 raise Exception('Failed to ' + self.queries.get_active_connections.__doc__)
->>>>>>> Initial commit
 
         return ret
 
