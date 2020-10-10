@@ -283,7 +283,7 @@ class Data:
         skip_db_size = skip_sizes and (not self.refresh_dbsize)
 
         ret = self.queries.get_db_info(
-            self.pg_conn, 
+            self.pg_conn,
             using_rds=using_rds,
             skip_db_size=skip_db_size,
             prev_total_size=prev_total_size)
@@ -344,7 +344,7 @@ class Data:
         if self.pg_num_version >= 110000:
             # PostgreSQL 11 and more
             ret = self.queries.get_pg_activity_110000(
-                self.pg_conn, 
+                self.pg_conn,
                 duration_column=self.get_duration_column(duration_mode),
                 min_duration=self.min_duration
             )
@@ -354,7 +354,7 @@ class Data:
             # PostgreSQL 10
             # We assume a background_worker with a not null query is a parallel worker.
             ret = self.queries.get_pg_activity_100000(
-                self.pg_conn, 
+                self.pg_conn,
                 duration_column=self.get_duration_column(duration_mode),
                 min_duration=self.min_duration
             )
@@ -364,7 +364,7 @@ class Data:
             # PostgreSQL prior to 10.0 and >= 9.6.0
             # There is no way to see parallel workers
             ret = self.queries.get_pg_activity_90600(
-                self.pg_conn, 
+                self.pg_conn,
                 duration_column=self.get_duration_column(duration_mode),
                 min_duration=self.min_duration
             )
@@ -373,7 +373,7 @@ class Data:
         elif self.pg_num_version >= 90200:
             # PostgreSQL prior to 9.6.0 and >= 9.2.0
             ret = self.queries.get_pg_activity_90200_90500(
-                self.pg_conn, 
+                self.pg_conn,
                 duration_column=self.get_duration_column(duration_mode),
                 min_duration=self.min_duration
             )
@@ -433,7 +433,7 @@ class Data:
         ret = cur.fetchall()
 =======
             ret = self.queries.get_pg_activity_90200(
-                self.pg_conn, 
+                self.pg_conn,
                 duration_column=self.get_duration_column(duration_mode),
                 min_duration=self.min_duration
             )
@@ -733,12 +733,10 @@ class Data:
         """
         Is pg_activity connected localy ?
         """
-        query = """
-        SELECT inet_server_addr() AS inet_server_addr, inet_client_addr() AS inet_client_addr
-        """
-        cur = self.pg_conn.cursor()
-        cur.execute(query)
-        ret = cur.fetchone()
+        ret = self.queries.get_pga_inet_addresses(self.pg_conn)
+        if not ret:
+            raise Exception('Failed to ' + self.queries.get_pga_inet_address.__doc__)
+
         if ret['inet_server_addr'] == ret['inet_client_addr']:
             return True
         return False
