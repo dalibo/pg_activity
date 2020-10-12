@@ -149,5 +149,7 @@ def sorted(activities: List[T], *, key: SortKey, reverse: bool = False) -> List[
     ['6239', '6228']
     """
     return builtins.sorted(
-        activities, key=lambda p: getattr(p, key.name), reverse=reverse
+        activities,
+        key=lambda p: getattr(p, key.name),  # type: ignore  # TODO: avoid getattr()
+        reverse=reverse,
     )
