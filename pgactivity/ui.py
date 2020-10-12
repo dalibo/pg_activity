@@ -3,6 +3,7 @@ import os
 import socket
 from typing import List, Union
 
+import attr
 from blessed import Terminal
 
 from . import __version__, Data, activities, handlers, keys, types, utils, views
@@ -106,6 +107,10 @@ def main(options: optparse.Values, refresh_time: float = 2.0) -> None:
                         acts = queries  # type: ignore # XXX
 
                     acts = activities.sorted(acts, key=sort_key, reverse=True)
+
+                if options.output is not None:
+                    with open(options.output, "a") as f:
+                        utils.csv_write(f, map(attr.asdict, acts))
 
                 views.screen(
                     term,
