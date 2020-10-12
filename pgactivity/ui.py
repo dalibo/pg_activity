@@ -65,7 +65,8 @@ def main(options: optparse.Values, refresh_time: float = 2.0) -> None:
             tps = int(pg_db_info["tps"])
             active_connections = data.pg_get_active_connections()
             max_iops = 0
-            system_info = None  # TODO: fetch from data
+            memory, swap, load = activities.mem_swap_load(data)
+            system_info = types.SystemInfo.default(memory=memory, swap=swap, load=load)
 
             if key == keys.HELP:
                 in_help = True
@@ -102,6 +103,19 @@ def main(options: optparse.Values, refresh_time: float = 2.0) -> None:
                             ) = io_counters
                             max_iops = activities.update_max_iops(
                                 max_iops, read_count_delta, write_count_delta
+                            )
+                            memory, swap, load = activities.mem_swap_load(data)
+                            system_info = attr.evolve(
+                                system_info,
+                                memory=memory,
+                                swap=swap,
+                                load=load,
+                                ios=types.IOCounters(
+                                    read_count_delta,
+                                    write_count_delta,
+                                    int(read_bytes_delta),
+                                    int(write_count_delta),
+                                ),
                             )
                             # TODO: see UI.__poll_activities()
                             # data.set_global_io_counters(*io_counters)

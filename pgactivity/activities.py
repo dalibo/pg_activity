@@ -5,7 +5,8 @@ from typing import Dict, List, Tuple, TypeVar
 import psutil
 
 from . import utils
-from .types import Activity, ActivityProcess, Process, SortKey
+from .Data import Data
+from .types import Activity, ActivityProcess, LoadAverage, MemoryInfo, Process, SortKey
 
 
 def update_processes_local(
@@ -164,3 +165,12 @@ def update_max_iops(max_iops: int, read_count: float, write_count: float) -> int
     1011
     """
     return max(int(read_count + write_count), max_iops)
+
+
+def mem_swap_load(data: Data) -> Tuple[MemoryInfo, MemoryInfo, LoadAverage]:
+    """Read memory, swap and load average from Data object."""
+    mem_swap = data.get_mem_swap()
+    memory = MemoryInfo(*mem_swap[:3])
+    swap = MemoryInfo(*mem_swap[3:])
+    load = LoadAverage(*data.get_load_average())
+    return memory, swap, load

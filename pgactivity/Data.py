@@ -26,7 +26,7 @@ SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 import os
 import re
 import time
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 from warnings import catch_warnings, simplefilter
 
 import psutil
@@ -933,7 +933,7 @@ class Data:
             'read_count': self.read_count_delta,
             'write_count': self.write_count_delta}
 
-    def get_mem_swap(self,):
+    def get_mem_swap(self,) -> Tuple[float, int, int, float, int, int]:
         """
         Get memory and swap usage
         """
@@ -961,7 +961,7 @@ class Data:
             vmem.used,
             vmem.total)
 
-    def get_load_average(self,):
+    def get_load_average(self,) -> Tuple[float, float, float]:
         """
         Get load average
         """

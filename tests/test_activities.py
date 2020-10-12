@@ -1,7 +1,8 @@
 import json
+from unittest.mock import patch
 
 from pgactivity import activities
-from pgactivity.types import Process
+from pgactivity.types import LoadAverage, MemoryInfo, Process
 
 
 def test_update_processes_local(shared_datadir):
@@ -49,3 +50,15 @@ def test_update_processes_local(shared_datadir):
         "6235",
     ]
     assert set(pids) == {a.pid for a in procs}
+
+
+def test_mem_swap_load() -> None:
+    with patch("pgactivity.Data.Data") as data:
+        data.get_mem_swap.return_value = (12.3, 34, 45, 6.7, 8, 90)
+        data.get_load_average.return_value = (0.14, 0.27, 0.44)
+        memory, swap, load = activities.mem_swap_load(data)
+    data.get_mem_swap.assert_called_once_with()
+    data.get_load_average.assert_called_once_with()
+    assert memory == MemoryInfo(percent=12.3, used=34, total=45)
+    assert swap == MemoryInfo(percent=6.7, used=8, total=90)
+    assert load == LoadAverage(0.14, 0.27, 0.44)

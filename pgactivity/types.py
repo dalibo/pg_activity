@@ -364,7 +364,13 @@ class SystemInfo:
     ios: IOCounters
 
     @classmethod
-    def default(cls) -> "SystemInfo":
+    def default(
+        cls,
+        *,
+        memory: Optional[MemoryInfo] = None,
+        swap: Optional[MemoryInfo] = None,
+        load: Optional[LoadAverage] = None,
+    ) -> "SystemInfo":
         """Zero-value builder.
 
         >>> SystemInfo.default()  # doctest: +NORMALIZE_WHITESPACE
@@ -375,9 +381,9 @@ class SystemInfo:
                                   write_bytes=0, read_chars=0, write_chars=0))
         """
         return cls(
-            MemoryInfo.default(),
-            MemoryInfo.default(),
-            LoadAverage.default(),
+            memory or MemoryInfo.default(),
+            swap or MemoryInfo.default(),
+            load or LoadAverage.default(),
             IOCounters.default(),
         )
 
