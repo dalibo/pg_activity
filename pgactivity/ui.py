@@ -20,7 +20,7 @@ def main(options: optparse.Values, refresh_time: float = 2.0) -> None:
     pg_version = data.pg_get_version()
     data.pg_get_num_version(pg_version)
     hostname = socket.gethostname()
-    fs_blocksize = 4096  # TODO: update from actual value
+    fs_blocksize = options.blocksize
 
     host = types.Host(
         data.get_pg_version(),
