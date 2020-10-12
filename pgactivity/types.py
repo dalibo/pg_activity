@@ -490,7 +490,8 @@ class Activity(DictSequenceProxy):
     """Result from pg_stat_activity view query."""
 
     pid: int
-    application_name: str
+    application_name: str  # TODO: change queries to return 'appname' directly
+    appname: str = attr.ib(init=False)
     database: str
     client: str
     duration: float
@@ -500,9 +501,9 @@ class Activity(DictSequenceProxy):
     query: str
     is_parallel_worker: bool
 
-    @property
-    def appname(self) -> str:
-        return self.application_name
+    def __attrs_post_init__(self) -> None:
+        # Work around instance being frozen, per attrs documentation.
+        object.__setattr__(self, "appname", self.application_name)
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
