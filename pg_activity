@@ -446,6 +446,9 @@ if __name__ == '__main__':
         sys.exit(1)
     if options.ng:
         from pgactivity import ui
+        if options.nocolor:
+            # Use super class to by-pass custom error() method of ModifiedOptionParser.
+            super(type(parser), parser).error("--no-color is not supported in new UI")
         ui.main(options)
     else:
         main(options)
