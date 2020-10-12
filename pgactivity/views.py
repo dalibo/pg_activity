@@ -1,5 +1,6 @@
 import enum
 import functools
+import itertools
 from datetime import timedelta
 from textwrap import dedent
 from typing import Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple, Union
@@ -105,6 +106,9 @@ LINE_COLORS = {
 MAX_NCOL = 15
 
 
+line_counter = functools.partial(itertools.count, step=-1)
+
+
 def limit(func: Callable[..., Iterable[str]]) -> Callable[..., int]:
     """View decorator handling screen height limit.
 
@@ -114,31 +118,39 @@ def limit(func: Callable[..., Iterable[str]]) -> Callable[..., int]:
     ...     for i in range(n):
     ...         yield f"{prefix} #{i}"
 
-    >>> count = limit(view)(term, 4, limit_height=2)
+    >>> count = line_counter(2)
+    >>> limit(view)(term, 3, lines_counter=count)
     line #0
     line #1
     >>> count
-    2
+    count(0, -1)
+    >>> count = line_counter(3)
+    >>> limit(view)(term, 2, lines_counter=count)
+    line #0
+    line #1
+    >>> count
+    count(1, -1)
     >>> limit(view)(term, 3, prefix="row")
     row #0
     row #1
     row #2
 
     A single line is displayed with an EOL as well:
-    >>> limit(view)(term, 1, limit_height=10)
+    >>> count = line_counter(10)
+    >>> limit(view)(term, 1, lines_counter=count) or print("<--", end="")
     line #0
-    1
+    <--
+    >>> count
+    count(9, -1)
     """
 
     @functools.wraps(func)
-    def wrapper(term: Terminal, *args: Any, **kwargs: Any) -> Optional[int]:
-        limit_height = kwargs.pop("limit_height", None)
-        lines = list(func(term, *args, **kwargs))[:limit_height]
-        if lines:
-            print("\n".join(lines), end="\n")
-        if limit_height is not None:
-            return len(lines)
-        return None
+    def wrapper(term: Terminal, *args: Any, **kwargs: Any) -> None:
+        counter = kwargs.pop("lines_counter", None)
+        for line in func(term, *args, **kwargs):
+            print(line)
+            if counter is not None and next(counter) == 1:
+                break
 
     return wrapper
 
@@ -954,8 +966,8 @@ def screen(
 ) -> None:
     """Display the screen."""
     print(term.clear + term.home, end="")
-    limit_height = term.height - 1
-    limit_height -= header(
+    lines_counter = line_counter(term.height - 1)
+    header(
         term,
         host,
         dbinfo,
@@ -965,22 +977,17 @@ def screen(
         refresh_time,
         max_iops,
         system_info,
-        limit_height=limit_height,
+        lines_counter=lines_counter,
     )
 
-    limit_height -= query_mode(
-        term, querymode, in_pause=in_pause, limit_height=limit_height
-    )
-    limit_height -= columns_header(
-        term, querymode, flag, sort_key, limit_height=limit_height
-    )
-    limit_height -= processes_rows(
+    query_mode(term, querymode, in_pause=in_pause, lines_counter=lines_counter)
+    columns_header(term, querymode, flag, sort_key, lines_counter=lines_counter)
+    processes_rows(
         term,
         activities,
         is_local=is_local,
         flag=flag,
         query_mode=querymode,
         verbose_mode=verbose_mode,
-        limit_height=limit_height,
+        lines_counter=lines_counter,
     )
-    assert limit_height >= 0, limit_height
