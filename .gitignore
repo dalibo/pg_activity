@@ -1,4 +1,6 @@
+htmlcov/
 pg_activity.egg-info
 pgactivity/__pycache__/
+.coverage
 .vscode
 .tox
