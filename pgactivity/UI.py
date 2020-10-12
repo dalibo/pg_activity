@@ -31,7 +31,7 @@ import sys
 from datetime import timedelta, datetime as dt
 from pgactivity.Data import Data
 from pgactivity.activities import update_processes_local
-from pgactivity.utils import clean_str, get_duration
+from pgactivity.utils import clean_str, get_duration, csv_write
 from pgactivity.types import Flag, QueryDisplayMode
 import psutil
 import attr
@@ -2145,31 +2145,4 @@ class UI:
     def __store_procs(self, procs):
         # Store process list into CSV file
         with open(self.output, 'a') as f:
-            if f.tell() == 0:
-                # First line then write CSV header
-                f.write("datetimeutc;pid;database;appname;user;client;cpu;"
-                        "memory;read;write;duration;wait;io_wait;state;"
-                        "query\n")
-
-            for p in procs:
-                f.write("\"{dt}\";\"{pid}\";\"{database}\";\"{appname}\";"
-                        "\"{user}\";\"{client}\";\"{cpu}\";\"{mem}\";"
-                        "\"{read}\";\"{write}\";\"{duration}\";\"{wait}\";"
-                        "\"{io_wait}\";\"{state}\";\"{query}\"\n".format(
-                            dt=dt.utcnow().strftime("%Y-%m-%dT%H:%m:%SZ"),
-                            pid=p.get('pid', 'N/A'),
-                            database=p.get('database', 'N/A'),
-                            appname=p.get('appname', 'N/A'),
-                            user=p.get('user', 'N/A'),
-                            client=p.get('client', 'N/A'),
-                            cpu=p.get('cpu', 'N/A'),
-                            mem=p.get('mem', 'N/A'),
-                            read=p.get('read', 'N/A'),
-                            write=p.get('write', 'N/A'),
-                            duration=p.get('duration', 'N/A'),
-                            wait=p.get('wait', 'N/A'),
-                            io_wait=p.get('io_wait', 'N/A'),
-                            state=p.get('state', 'N/A'),
-                            query=self.__clean_str_csv(p.get('query', 'N/A'))
-                        )
-                )
+            csv_write(f, procs)
