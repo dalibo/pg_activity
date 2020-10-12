@@ -326,12 +326,20 @@ class MemoryInfo:
     used: int
     total: int
 
+    @classmethod
+    def default(cls) -> "MemoryInfo":
+        return cls(0.0, 0, 0)
+
 
 @attr.s(auto_attribs=True, slots=True)
 class LoadAverage:
     avg1: float
     avg5: float
     avg15: float
+
+    @classmethod
+    def default(cls) -> "LoadAverage":
+        return cls(0.0, 0.0, 0.0)
 
 
 @attr.s(auto_attribs=True, slots=True)
@@ -343,6 +351,10 @@ class IOCounters(Deserializable):
     read_chars: int = 0
     write_chars: int = 0
 
+    @classmethod
+    def default(cls) -> "IOCounters":
+        return cls(0, 0, 0, 0)
+
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
 class SystemInfo:
@@ -350,6 +362,24 @@ class SystemInfo:
     swap: MemoryInfo
     load: LoadAverage
     ios: IOCounters
+
+    @classmethod
+    def default(cls) -> "SystemInfo":
+        """Zero-value builder.
+
+        >>> SystemInfo.default()  # doctest: +NORMALIZE_WHITESPACE
+        SystemInfo(memory=MemoryInfo(percent=0.0, used=0, total=0),
+                   swap=MemoryInfo(percent=0.0, used=0, total=0),
+                   load=LoadAverage(avg1=0.0, avg5=0.0, avg15=0.0),
+                   ios=IOCounters(read_count=0, write_count=0, read_bytes=0,
+                                  write_bytes=0, read_chars=0, write_chars=0))
+        """
+        return cls(
+            MemoryInfo.default(),
+            MemoryInfo.default(),
+            LoadAverage.default(),
+            IOCounters.default(),
+        )
 
 
 @attr.s(auto_attribs=True, slots=True)
