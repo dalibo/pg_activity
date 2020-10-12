@@ -243,6 +243,8 @@ def header(
     active_connections: int,
     duration_mode: DurationMode,
     refresh_time: float,
+    *,
+    min_duration: float = 0,
     max_iops: int = 0,
     system_info: Optional[SystemInfo] = None,
 ) -> Iterator[str]:
@@ -271,8 +273,8 @@ def header(
     >>> sysinfo = SystemInfo(vmem, swap, load, ios)
 
     >>> header(term, host, dbinfo, 1, 79, DurationMode.query, refresh_time=2,
-    ...             max_iops=12, system_info=sysinfo)
-    PostgreSQL 13.1 - localhost - tester@host:5432/postgres - Ref.: 2s
+    ...        min_duration=1.2, max_iops=12, system_info=sysinfo)
+    PostgreSQL 13.1 - localhost - tester@host:5432/postgres - Ref.: 2s - Min. duration: 1.2s
      Size:     123.5 MB -  12 Bytes/s     | TPS:               1      | Active connections:              79      | Duration mode:       query
      Mem.:     42.5% -    2.0 GB/6.2 GB   | IO Max:                 12/s
      Swap:      0.0% -    2.3 kB/6.3 GB   | Read:     128 Bytes/s -      6/s
@@ -287,6 +289,7 @@ def header(
                 f"{term.cyan}{pg_host}{term.normal}",
                 f"Ref.: {refresh_time}s",
             ]
+            + ([f"Min. duration: {min_duration}s"] if min_duration else [])
         )
     )
 
@@ -954,6 +957,7 @@ def screen(
     active_connections: int,
     duration_mode: DurationMode,
     refresh_time: float,
+    min_duration: float = 0,
     max_iops: int = 0,
     system_info: Optional[SystemInfo] = None,
     querymode: QueryMode,
@@ -975,8 +979,9 @@ def screen(
         active_connections,
         duration_mode,
         refresh_time,
-        max_iops,
-        system_info,
+        min_duration=min_duration,
+        max_iops=max_iops,
+        system_info=system_info,
         lines_counter=lines_counter,
     )
 

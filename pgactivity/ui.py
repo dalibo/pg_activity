@@ -11,6 +11,7 @@ from . import __version__, Data, activities, handlers, keys, types, utils, views
 
 def main(options: optparse.Values, refresh_time: float = 2.0) -> None:
     data = Data.Data()
+    min_duration = data.min_duration = options.minduration
     utils.pg_connect(
         data,
         options,
@@ -120,6 +121,7 @@ def main(options: optparse.Values, refresh_time: float = 2.0) -> None:
                     active_connections=active_connections,
                     duration_mode=duration_mode,
                     refresh_time=refresh_time,
+                    min_duration=min_duration,
                     max_iops=max_iops,
                     system_info=system_info,
                     querymode=query_mode,
