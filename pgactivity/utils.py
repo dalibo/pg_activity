@@ -58,7 +58,12 @@ def short_state(state: str) -> str:
     }.get(state, state)
 
 
-def csv_write(fobj: IO[str], procs: Iterable[Mapping[str, Any]]) -> None:
+def csv_write(
+    fobj: IO[str],
+    procs: Iterable[Mapping[str, Any]],
+    *,
+    delimiter: str = ";",
+) -> None:
     """Store process list into CSV file.
 
     >>> processes = [
@@ -103,9 +108,26 @@ def csv_write(fobj: IO[str], procs: Iterable[Mapping[str, Any]]) -> None:
     if fobj.tell() == 0:
         # First line then write CSV header
         fobj.write(
-            "datetimeutc;pid;database;appname;user;client;cpu;"
-            "memory;read;write;duration;wait;io_wait;state;"
-            "query\n"
+            delimiter.join(
+                [
+                    "datetimeutc",
+                    "pid",
+                    "database",
+                    "appname",
+                    "user",
+                    "client",
+                    "cpu",
+                    "memory",
+                    "read",
+                    "write",
+                    "duration",
+                    "wait",
+                    "io_wait",
+                    "state",
+                    "query",
+                ]
+            )
+            + "\n"
         )
 
     for p in procs:
@@ -125,8 +147,26 @@ def csv_write(fobj: IO[str], procs: Iterable[Mapping[str, Any]]) -> None:
         state = p.get("state", "N/A")
         query = clean_str_csv(p.get("query", "N/A"))
         fobj.write(
-            f'"{dt}";"{pid}";"{database}";"{appname}";"{user}";"{client}";"{cpu}";"{mem}";'
-            f'"{read}";"{write}";"{duration}";"{wait}";"{io_wait}";"{state}";"{query}"\n'
+            delimiter.join(
+                [
+                    f'"{dt}"',
+                    f'"{pid}"',
+                    f'"{database}"',
+                    f'"{appname}"',
+                    f'"{user}"',
+                    f'"{client}"',
+                    f'"{cpu}"',
+                    f'"{mem}"',
+                    f'"{read}"',
+                    f'"{write}"',
+                    f'"{duration}"',
+                    f'"{wait}"',
+                    f'"{io_wait}"',
+                    f'"{state}"',
+                    f'"{query}"',
+                ]
+            )
+            + "\n"
         )
 
 
