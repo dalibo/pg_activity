@@ -319,6 +319,9 @@ class DurationMode(enum.IntEnum):
     transaction = 2
     backend = 3
 
+    def next(self) -> "DurationMode":
+        return self.__class__((self.value % max(self.__class__)) + 1)
+
 
 @attr.s(auto_attribs=True, slots=True)
 class MemoryInfo:

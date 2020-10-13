@@ -6,6 +6,7 @@ import attr
 from .types import QueryMode
 
 
+CHANGE_DURATION_MODE = "T"
 EXIT = "q"
 EXIT_DEBUG = "z"
 HELP = "h"
@@ -46,7 +47,7 @@ BINDINGS: List[Key] = [
     Key(REFRESH_TIME_DECREASE, "decrease refresh time (min:0.5s)"),
     Key(SORTBY_TIME, "sort by TIME+ desc. (activities)", local_only=True),
     Key("R", "force refresh"),
-    Key("T", "change duration mode"),
+    Key(CHANGE_DURATION_MODE, "change duration mode"),
     Key("D", "force refresh database size"),
 ]
 

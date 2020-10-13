@@ -86,6 +86,7 @@ def main(options: optparse.Values, refresh_time: float = 2.0) -> None:
             elif key is not None:
                 query_mode = handlers.query_mode(key) or query_mode
                 sort_key = handlers.sort_key_for(key, query_mode, is_local) or sort_key
+                duration_mode = handlers.duration_mode(key, duration_mode)
             if not in_help:
                 if not in_pause:
                     if query_mode == types.QueryMode.activities:
