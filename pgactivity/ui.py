@@ -9,8 +9,9 @@ from blessed import Terminal
 from . import __version__, Data, activities, handlers, keys, types, utils, views
 
 
-def main(options: optparse.Values, refresh_time: float = 2.0) -> None:
+def main(options: optparse.Values) -> None:
     data = Data.Data()
+    refresh_time = 2.0
     min_duration = data.min_duration = options.minduration
     utils.pg_connect(
         data,
