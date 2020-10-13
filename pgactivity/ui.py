@@ -93,6 +93,7 @@ def main(options: optparse.Values, refresh_time: float = 2.0) -> None:
                             ) = activities.update_processes_local(
                                 procs, new_procs, fs_blocksize
                             )
+                            procs = new_procs
                             # TODO: see UI.__poll_activities()
                             # data.set_global_io_counters(*io_counters)
                             acts = activity_procs
