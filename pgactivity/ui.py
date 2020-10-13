@@ -71,7 +71,12 @@ def main(options: optparse.Values, refresh_time: float = 2.0) -> None:
             if key == keys.HELP:
                 in_help = True
                 print(term.clear + term.home, end="")
-                views.help(term, __version__, is_local, limit_height=term.height)
+                views.help(
+                    term,
+                    __version__,
+                    is_local,
+                    lines_counter=views.line_counter(term.height),
+                )
             elif in_help and key == "q":
                 in_help, key = False, None
             elif key == keys.PAUSE:
