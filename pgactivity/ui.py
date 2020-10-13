@@ -1,7 +1,7 @@
 import optparse
 import os
 import socket
-from typing import List, Union
+from typing import List, Optional, Union
 
 import attr
 from blessed import Terminal
@@ -9,7 +9,12 @@ from blessed import Terminal
 from . import __version__, Data, activities, handlers, keys, types, utils, views
 
 
-def main(options: optparse.Values) -> None:
+def main(
+    options: optparse.Values,
+    *,
+    term: Optional[Terminal] = None,
+    screen_delimiter: Optional[str] = None,
+) -> None:
     data = Data.Data()
     refresh_time = 2.0
     min_duration = data.min_duration = options.minduration
@@ -39,7 +44,9 @@ def main(options: optparse.Values) -> None:
     verbose_mode = types.QueryDisplayMode(int(options.verbosemode))
     flag = types.Flag.from_options(is_local=is_local, **vars(options))
 
-    term = Terminal()
+    if term is None:
+        # Used in tests.
+        term = Terminal()
     key, in_help, in_pause = None, False, False
     query_mode = types.QueryMode.activities
     sort_key = types.SortKey.default()
@@ -161,3 +168,7 @@ def main(options: optparse.Values) -> None:
                 )
 
             key = term.inkey(timeout=refresh_time) or None
+
+            if screen_delimiter is not None:
+                # Used in tests.
+                print(term.center(f" Received key '{key}' ", fillchar=screen_delimiter))
