@@ -107,6 +107,7 @@ MAX_NCOL = 15
 
 
 line_counter = functools.partial(itertools.count, step=-1)
+naturalsize = functools.partial(humanize.naturalsize, gnu=True, format="%.2f")
 
 
 def limit(func: Callable[..., Iterable[str]]) -> Callable[..., int]:
@@ -260,7 +261,7 @@ def header(
 
     >>> header(term, host, dbinfo, 12, 0, DurationMode.backend, refresh_time=10)
     PostgreSQL 9.6 - server - pgadm@server.prod.tld:5433/app - Ref.: 10s
-     Size:      10.2 PB -   10.0 kB/s     | TPS:              12      | Active connections:               0      | Duration mode:     backend
+     Size:        9.06P -     9.76K/s     | TPS:              12      | Active connections:               0      | Duration mode:     backend
 
     Local host, with priviledged access:
 
@@ -275,10 +276,10 @@ def header(
     >>> header(term, host, dbinfo, 1, 79, DurationMode.query, refresh_time=2,
     ...        min_duration=1.2, max_iops=12, system_info=sysinfo)
     PostgreSQL 13.1 - localhost - tester@host:5432/postgres - Ref.: 2s - Min. duration: 1.2s
-     Size:     123.5 MB -  12 Bytes/s     | TPS:               1      | Active connections:              79      | Duration mode:       query
-     Mem.:     42.5% -    2.0 GB/6.2 GB   | IO Max:                 12/s
-     Swap:      0.0% -    2.3 kB/6.3 GB   | Read:     128 Bytes/s -      6/s
-     Load:         0.25 0.19 0.39         | Write:       8 Bytes/s -      9/s
+     Size:      117.74M -       12B/s     | TPS:               1      | Active connections:              79      | Duration mode:       query
+     Mem.:     42.5% -     1.87G/5.75G    | IO Max:                 12/s
+     Swap:      0.0% -     2.29K/5.88G    | Read:          128B/s -      6/s
+     Load:         0.25 0.19 0.39         | Write:            8B/s -      9/s
     """
     pg_host = f"{host.user}@{host.host}:{host.port}/{host.dbname}"
     yield (
@@ -301,8 +302,8 @@ def header(
     def indent(text: str, indent: int = 1) -> str:
         return " " * indent + text
 
-    total_size = humanize.naturalsize(dbinfo.total_size)
-    size_ev = humanize.naturalsize(dbinfo.size_ev)
+    total_size = naturalsize(dbinfo.total_size)
+    size_ev = naturalsize(dbinfo.size_ev)
     yield indent(
         row(
             ("Size", f"{total_size.rjust(8)} - {size_ev.rjust(9)}/s", 30),
@@ -321,11 +322,11 @@ def header(
     )
 
     def render_meminfo(m: MemoryInfo) -> str:
-        used, total = humanize.naturalsize(m.used), humanize.naturalsize(m.total)
+        used, total = naturalsize(m.used), naturalsize(m.total)
         return f"{m.percent:6}% - {used.rjust(9)}/{total}"
 
     def render_ios(nbytes: int, count: int) -> str:
-        hbytes = humanize.naturalsize(nbytes)
+        hbytes = naturalsize(nbytes)
         return f"{hbytes.rjust(10)}/s - {count:6}/s"
 
     if system_info is not None:
@@ -837,8 +838,6 @@ def processes_rows(
         column_value = transform(getattr(process, key))[:crop]
         color_key = color_key or key
         text_append(f"{color_for(color_key)}{template_for(key) % column_value}")
-
-    naturalsize = functools.partial(humanize.naturalsize, gnu=True, format="%.2f")
 
     for process in processes:
         text: List[str] = []

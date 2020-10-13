@@ -68,10 +68,10 @@
 ...     in_pause=False,
 ... )
 PostgreSQL 13 - testhost - pgadm@server.prod.tld:5433/app - Ref.: 10s - Min. duration: 1s
- Size:      10.2 PB -   10.0 kB/s     | TPS:               5      | Active connections:               7      | Duration mode:     backend
- Mem.:      2.5% -    1.0 GB/4.2 GB   | IO Max:                 76/s
- Swap:      1.0% -    2.3 kB/6.3 GB   | Read:     128 Bytes/s -      6/s
- Load:          0.5 1.9 0.93          | Write:       8 Bytes/s -      9/s
+ Size:        9.06P -     9.76K/s     | TPS:               5      | Active connections:               7      | Duration mode:     backend
+ Mem.:      2.5% -   954.85M/3.93G    | IO Max:                 76/s
+ Swap:      1.0% -     2.29K/5.88G    | Read:          128B/s -      6/s
+ Load:          0.5 1.9 0.93          | Write:            8B/s -      9/s
                                 RUNNING QUERIES                                 
 PID    DATABASE           CPU% MEM%              state   Query                  
 6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts
