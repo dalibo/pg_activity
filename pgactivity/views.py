@@ -277,7 +277,7 @@ def header(
     ...        min_duration=1.2, max_iops=12, system_info=sysinfo)
     PostgreSQL 13.1 - localhost - tester@host:5432/postgres - Ref.: 2s - Min. duration: 1.2s
      Size:      117.74M -       12B/s     | TPS:               1      | Active connections:              79      | Duration mode:       query
-     Mem.:     42.5% -     1.87G/5.75G    | IO Max:                 12/s
+     Mem.:     42.5% -     1.87G/5.75G    | IO Max:       12/s
      Swap:      0.0% -     2.29K/5.88G    | Read:          128B/s -      6/s
      Load:         0.25 0.19 0.39         | Write:            8B/s -      9/s
     """
@@ -334,7 +334,7 @@ def header(
         yield indent(
             row(
                 ("Mem.", render_meminfo(system_info.memory), col_width),
-                ("IO Max", f"{max_iops:8}/s", col_width),
+                ("IO Max", f"{max_iops:8}/s", 8),
             )
         )
         yield indent(
