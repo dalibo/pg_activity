@@ -64,7 +64,7 @@ def main(options: optparse.Values, refresh_time: float = 2.0) -> None:
             )
             tps = int(pg_db_info["tps"])
             active_connections = data.pg_get_active_connections()
-            max_iops = 0  # TODO: fetch from data
+            max_iops = 0
             system_info = None  # TODO: fetch from data
 
             if key == keys.HELP:
@@ -94,6 +94,15 @@ def main(options: optparse.Values, refresh_time: float = 2.0) -> None:
                                 procs, new_procs, fs_blocksize
                             )
                             procs = new_procs
+                            (
+                                read_bytes_delta,
+                                write_bytes_delta,
+                                read_count_delta,
+                                write_count_delta,
+                            ) = io_counters
+                            max_iops = activities.update_max_iops(
+                                max_iops, read_count_delta, write_count_delta
+                            )
                             # TODO: see UI.__poll_activities()
                             # data.set_global_io_counters(*io_counters)
                             acts = activity_procs

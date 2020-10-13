@@ -153,3 +153,14 @@ def sorted(activities: List[T], *, key: SortKey, reverse: bool = False) -> List[
         key=lambda p: getattr(p, key.name),  # type: ignore  # TODO: avoid getattr()
         reverse=reverse,
     )
+
+
+def update_max_iops(max_iops: int, read_count: float, write_count: float) -> int:
+    """Update 'max_iops' value from read_count/write_count.
+
+    >>> update_max_iops(45657, 123, 888)
+    45657
+    >>> update_max_iops(3, 123, 888)
+    1011
+    """
+    return max(int(read_count + write_count), max_iops)
