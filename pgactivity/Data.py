@@ -835,7 +835,19 @@ class Data:
             return True
         return False
 
-    def get_duration_column(self, duration_mode=1):
+    @staticmethod
+    def get_duration_column(duration_mode: int = 1) -> str:
+        """Return the duration column depending on duration_mode.
+
+        >>> Data.get_duration_column(1)
+        'query_start'
+        >>> Data.get_duration_column(2)
+        'xact_start'
+        >>> Data.get_duration_column(3)
+        'backend_start'
+        >>> Data.get_duration_column(9)
+        'query_start'
+        """
         if duration_mode not in (1, 2, 3):
             duration_mode = 1
         return ['query_start', 'xact_start', 'backend_start'][duration_mode - 1]
