@@ -32,9 +32,76 @@ from warnings import catch_warnings, simplefilter
 import psutil
 import psycopg2
 import psycopg2.extras
+from psycopg2.extensions import connection
 
 from .utils import return_as
 from .types import Activity, ActivityBW, IOCounter, Process, ProcessExtras
+
+
+def pg_get_version(pg_conn: connection) -> str:
+    """Get PostgreSQL server version."""
+    query = "SELECT version() AS pg_version"
+    cur = pg_conn.cursor()
+    cur.execute(query)
+    ret = cur.fetchone()
+    return ret['pg_version']
+
+
+def pg_get_num_version(text_version: str) -> Tuple[str, int]:
+    """Return PostgreSQL short & numeric version from a string (SELECT
+    version()).
+
+    >>> pg_get_num_version('PostgreSQL 11.9')
+    ('PostgreSQL 11.9', 110900)
+    >>> pg_get_num_version('EnterpriseDB 11.9 (Debian 11.9-0+deb10u1)')
+    ('EnterpriseDB 11.9', 110900)
+    >>> pg_get_num_version("PostgreSQL 13.0beta2")
+    ('PostgreSQL 13.0', 130000)
+    """
+    res = re.match(
+        r"^(PostgreSQL|EnterpriseDB) ([0-9]+)\.([0-9]+)(?:\.([0-9]+))?",
+        text_version,
+    )
+    if res is not None:
+        rmatch = res.group(2)
+        if int(res.group(3)) < 10:
+            rmatch += '0'
+        rmatch += res.group(3)
+        if res.group(4) is not None:
+            if int(res.group(4)) < 10:
+                rmatch += '0'
+            rmatch += res.group(4)
+        else:
+            rmatch += '00'
+        pg_version = str(res.group(0))
+        pg_num_version = int(rmatch)
+        return pg_version, pg_num_version
+    return pg_get_num_dev_version(text_version)
+
+
+def pg_get_num_dev_version(text_version: str) -> Tuple[str, int]:
+    """Return PostgreSQL short & numeric devel. or beta version from a string
+    (SELECT version()).
+
+    >>> pg_get_num_dev_version("PostgreSQL 11.9devel0")
+    ('PostgreSQL 11.9devel', 110900)
+    """
+    res = re.match(
+        r"^(PostgreSQL|EnterpriseDB) ([0-9]+)(?:\.([0-9]+))?(devel|beta[0-9]+|rc[0-9]+)",
+        text_version)
+    if not res:
+        raise Exception(f"Undefined PostgreSQL version: {text_version}")
+    rmatch = res.group(2)
+    if res.group(3) is not None:
+        if int(res.group(3)) < 10:
+            rmatch += '0'
+        rmatch += res.group(3)
+    else:
+        rmatch += '00'
+    rmatch += '00'
+    pg_version = str(res.group(0))
+    pg_num_version = int(rmatch)
+    return pg_version, pg_num_version
 
 
 class Data:
@@ -161,11 +228,8 @@ class Data:
         """
         Get PostgreSQL server version.
         """
-        query = "SELECT version() AS pg_version"
-        cur = self.pg_conn.cursor()
-        cur.execute(query)
-        ret = cur.fetchone()
-        return ret['pg_version']
+        assert self.pg_conn is not None
+        return pg_get_version(self.pg_conn)
 
     def pg_cancel_backend(self, pid,):
         """
@@ -196,48 +260,9 @@ class Data:
         a string (SELECT version()) and set pg_version and pg_num_version
         attributes.
         """
-        res = re.match(
-            r"^(PostgreSQL|EnterpriseDB) ([0-9]+)\.([0-9]+)(?:\.([0-9]+))?",
-            text_version,
-        )
-        if res is not None:
-            rmatch = res.group(2)
-            if int(res.group(3)) < 10:
-                rmatch += '0'
-            rmatch += res.group(3)
-            if res.group(4) is not None:
-                if int(res.group(4)) < 10:
-                    rmatch += '0'
-                rmatch += res.group(4)
-            else:
-                rmatch += '00'
-            self.pg_version = str(res.group(0))
-            self.pg_num_version = int(rmatch)
-            return
-        self.pg_get_num_dev_version(text_version)
-
-    def pg_get_num_dev_version(self, text_version: str) -> None:
-        """
-        Fetch PostgreSQL short & numeric devel. or beta version
-        from a string (SELECT version()) and set pg_version and pg_num_version
-        attributes.
-        """
-        res = re.match(
-            r"^(PostgreSQL|EnterpriseDB) ([0-9]+)(?:\.([0-9]+))?(devel|beta[0-9]+|rc[0-9]+)",
-            text_version)
-        if res is not None:
-            rmatch = res.group(2)
-            if res.group(3) is not None:
-                if int(res.group(3)) < 10:
-                    rmatch += '0'
-                rmatch += res.group(3)
-            else:
-                rmatch += '00'
-            rmatch += '00'
-            self.pg_version = str(res.group(0))
-            self.pg_num_version = int(rmatch)
-            return
-        raise Exception('Undefined PostgreSQL version.')
+        pg_version, pg_num_version = pg_get_num_version(text_version)
+        self.pg_version = pg_version
+        self.pg_num_version = pg_num_version
 
     DbInfoDict = Dict[str, Union[str, int]]
 
