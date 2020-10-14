@@ -43,7 +43,6 @@ def main(options: optparse.Values) -> None:
     key, in_help, in_pause = None, False, False
     query_mode = types.QueryMode.activities
     sort_key = types.SortKey.default()
-    debugger = False
     queries: Union[List[types.Activity], List[types.ActivityBW]]
     queries = data.pg_get_activities()
     procs = data.sys_get_proc(queries, is_local)
@@ -76,9 +75,6 @@ def main(options: optparse.Values) -> None:
             elif in_help and key == "q":
                 in_help, key = False, None
             elif key == keys.EXIT:
-                break
-            elif key == keys.EXIT_DEBUG:
-                debugger = True
                 break
             elif key == keys.PAUSE:
                 in_pause = not in_pause
@@ -164,20 +160,4 @@ def main(options: optparse.Values) -> None:
                     in_pause=in_pause,
                 )
 
-            if options.debug:
-                # DEBUG PRINTS
-                print(term.move_y(30))
-                print(term.center("  DEBUG  ", fillchar="*"))
-                print(f"local: {is_local}{term.clear_eol}")
-                print(f"flag: {flag!r}{term.clear_eol}")
-                print(f"query mode: {query_mode}{term.clear_eol}")
-                print(f"sort key: {sort_key}{term.clear_eol}")
-                print(f"last key: {key!r}{term.clear_eol}")
-                print("*" * term.width)
-
             key = term.inkey(timeout=refresh_time) or None
-
-    if debugger:
-        import pdb
-
-        pdb.set_trace()

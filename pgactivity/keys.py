@@ -8,7 +8,6 @@ from .types import QueryMode
 
 CHANGE_DURATION_MODE = "T"
 EXIT = "q"
-EXIT_DEBUG = "z"
 HELP = "h"
 PAUSE = " "
 REFRESH_TIME_INCREASE = "+"
