@@ -41,17 +41,12 @@ def main(options: optparse.Values) -> None:
 
     term = Terminal()
     key, in_help, in_pause = None, False, False
-    query_mode = types.QueryMode.default()
+    query_mode = types.QueryMode.activities
     sort_key = types.SortKey.default()
     debugger = False
     queries: Union[List[types.Activity], List[types.ActivityBW]]
-    if query_mode == types.QueryMode.activities:
-        queries = data.pg_get_activities()
-        procs = data.sys_get_proc(queries, is_local)
-    elif query_mode == types.QueryMode.blocking:
-        queries = data.pg_get_blocking()
-    elif query_mode == types.QueryMode.waiting:
-        queries = data.pg_get_waiting()
+    queries = data.pg_get_activities()
+    procs = data.sys_get_proc(queries, is_local)
     with term.fullscreen(), term.cbreak():
         pg_db_info = None
         while True:
