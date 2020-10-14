@@ -9,7 +9,6 @@ exclude =
   .tox,
   .venv,
   pgactivity/Process.py,
-  pgactivity/UI.py,
 per-file-ignores =
   pg_activity:E251
   pgactivity/Data.py:E128,E251

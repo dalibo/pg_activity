@@ -34,10 +34,6 @@ CPU, MEM, READ or WRITE columns and other system informations.
 
     Database name to connect to (default: "postgres").
 
-=item B<-C>, B<--no-color>
-
-	Disable color usage.
-
 =item B<--blocksize=BLOCKSIZE>
 
 	Filesystem blocksize (default: 4096).

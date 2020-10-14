@@ -31,9 +31,9 @@ import psycopg2
 import psycopg2.extras
 from psycopg2.extensions import connection
 
-from .activities import get_load_average, get_mem_swap, sys_get_proc
+from .activities import get_load_average, get_mem_swap
 from .utils import return_as
-from .types import BWProcess, LegacyProcess as Process, RunningProcess
+from .types import BWProcess, RunningProcess
 
 
 def pg_get_version(pg_conn: connection) -> str:
@@ -888,38 +888,6 @@ class Data:
         if duration_mode not in (1, 2, 3):
             duration_mode = 1
         return ['query', 'transaction', 'backend'][duration_mode - 1]
-
-    def sys_get_proc(
-        self, queries: List[RunningProcess], is_local: bool
-    ) -> Dict[int, Process]:
-        """
-        Get system informations (CPU, memory, IO read & write)
-        for each process PID using psutil module.
-        """
-        processes = {}
-        if not is_local:
-            return processes
-        for query in queries:
-            pid = query['pid']
-            process_extra = sys_get_proc(pid)
-            if process_extra is None:
-                continue
-
-            processes[pid] = Process(
-                pid=pid,
-                database=query['database'],
-                user=query['user'],
-                client=query['client'],
-                duration=query['duration'],
-                wait=query['wait'],
-                state=query['state'],
-                query=query['query'],
-                appname=query['appname'],
-                is_parallel_worker=query['is_parallel_worker'],
-                extras=process_extra,
-            )
-
-        return processes
 
     def set_global_io_counters(
         self,

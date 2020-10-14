@@ -27,18 +27,10 @@ SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 import os
 import sys
-import signal
 from optparse import OptionParser, OptionGroup
-import socket
 import getpass
-import psutil
-import curses
-import psycopg2
-import time
 
-from pgactivity import __version__, UI, utils
-
-PGTOP_VERSION = __version__
+from pgactivity import __version__, ui
 
 
 # Customized OptionParser
@@ -61,7 +53,7 @@ class OptionParsingError(RuntimeError):
 def get_parser():
     parser = ModifiedOptionParser(
         add_help_option = False,
-        version = "%prog " + PGTOP_VERSION,
+        version = "%prog " + __version__,
         description = "htop like application for PostgreSQL \
 server activity monitoring.")
     # -U / --username
@@ -97,14 +89,6 @@ server activity monitoring.")
         help = "Database name to connect to (default: \"postgres\").",
         metavar = 'DBNAME',
         default = 'postgres')
-    # -C / --no-color
-    parser.add_option(
-        '-C',
-        '--no-color',
-        dest = 'nocolor',
-        action = 'store_true',
-        help = "Disable color usage.",
-        default = False)
     # --blocksize
     parser.add_option(
         '--blocksize',
@@ -140,13 +124,6 @@ server activity monitoring.")
         action = 'store_true',
         help = "Enable debug mode for traceback tracking.",
         default = False)
-    # --ng
-    parser.add_option(
-        "--ng",
-        help="Use new UI (experimental)",
-        action="store_true",
-        default=False,
-    )
     # --no-db-size
     parser.add_option(
         '--no-db-size',
@@ -265,173 +242,6 @@ server activity monitoring.")
     return parser
 
 
-def main(options, PGAUI):
-    """
-    Main function
-    """
-    try:
-        debug = options.debug
-
-        password = utils.pg_connect(
-            PGAUI.data, options, password=os.environ.get('PGPASSWORD'),
-            service=os.environ.get('PGSERVICE')
-        )
-
-        pg_version = PGAUI.data.pg_get_version()
-        PGAUI.data.pg_get_num_version(pg_version)
-        hostname = socket.gethostname()
-        # reduce DATABASE column length
-        PGAUI.set_max_db_length(16)
-        # blocksize
-        PGAUI.set_blocksize(int(options.blocksize))
-        # verbose mode
-        PGAUI.set_verbose_mode(int(options.verbosemode))
-        # duration mode
-        PGAUI.set_duration_mode(int(options.durationmode))
-        # output
-        PGAUI.set_output(options.output)
-        # make cmdline flags easily accesible
-        PGAUI.set_options(options)
-        # does pg_activity runing against local PG instance
-        if not PGAUI.data.pg_is_local():
-            PGAUI.set_is_local(False)
-            PGAUI.set_start_line(2)
-            hostname = options.host
-        # if not connected to a local pg server, then go to degraded mode
-        elif not PGAUI.data.pg_is_local_access():
-            PGAUI.set_is_local(False)
-            PGAUI.set_start_line(2)
-            hostname = options.host
-        # top part
-        interval = 0
-        if PGAUI.get_mode() == 'activities':
-            queries = PGAUI.data.pg_get_activities()
-            procs = PGAUI.data.sys_get_proc(queries, PGAUI.get_is_local())
-        elif PGAUI.get_mode() == 'waiting':
-            procs = PGAUI.data.pg_get_waiting()
-        elif PGAUI.get_mode() == 'blocking':
-            procs = PGAUI.data.pg_get_blocking()
-        # draw the flag
-        flag = PGAUI.get_flag_from_options(options)
-        # main loop
-        disp_procs = None
-        delta_disk_io = None
-        # get DB informations
-        db_info = PGAUI.data.pg_get_db_info(None, using_rds=options.rds, skip_sizes=options.nodbsize)
-        PGAUI.set_max_db_length(db_info['max_length'])
-        # indentation
-        indent = PGAUI.get_indent(flag)
-        # Init curses
-        PGAUI.init_curses()
-        # color ?
-        if options.nocolor:
-            PGAUI.set_nocolor()
-        else:
-            PGAUI.set_color()
-        while 1:
-            try:
-                PGAUI.check_window_size()
-                old_pgtop_mode = PGAUI.get_mode()
-                # poll process
-                (disp_procs, new_procs) = PGAUI.poll(interval, flag, indent,
-                                                     procs, disp_procs)
-                if PGAUI.get_mode() != old_pgtop_mode:
-                    indent = PGAUI.get_indent(flag)
-                if PGAUI.get_is_local():
-                    delta_disk_io = PGAUI.data.get_global_io_counters()
-                procs = new_procs
-                # refresh the window
-                db_info = PGAUI.data.pg_get_db_info(
-                    db_info,
-                    using_rds=options.rds,
-                    skip_sizes=options.nodbsize
-                )
-                PGAUI.data.set_refresh_dbsize(False)
-                PGAUI.set_max_db_length(db_info['max_length'])
-                # get active connections
-                active_connections = PGAUI.data.pg_get_active_connections()
-                # bufferize
-                PGAUI.set_buffer({
-                    'procs': disp_procs,
-                    'extras': (PGAUI.data.get_pg_version(), hostname,
-                               options.username, options.host,
-                               options.port, options.dbname),
-                    'flag': flag,
-                    'indent': indent,
-                    'io': delta_disk_io,
-                    'tps': db_info['tps'],
-                    'active_connections': active_connections,
-                    'size_ev': db_info['size_ev'],
-                    'total_size': db_info['total_size']
-                })
-                # refresh
-                PGAUI.refresh_window(
-                    disp_procs,
-                    (PGAUI.data.get_pg_version(), hostname, options.username,
-                     options.host, options.port, options.dbname),
-                    flag,
-                    indent,
-                    delta_disk_io,
-                    db_info['tps'],
-                    active_connections,
-                    db_info['size_ev'],
-                    db_info['total_size']
-                )
-                interval = 1
-
-            except psycopg2.OperationalError:
-                # PostgreSQL connection has been lost, trying to reconnect
-                # Clean curses
-                PGAUI.at_exit_curses()
-                not_connected = True
-                while not_connected:
-                    print("ERROR: Not connected to PostgreSQL, trying to open "
-                          "a new connection")
-                    try:
-                        utils.pg_connect(
-                            PGAUI.data, options, password, os.environ.get('PGSERVICE'),
-                            exit_on_failed=False,
-                        )
-                        not_connected = False
-                    except Exception:
-                        print("ERROR: Connecton failed, retrying in 1 second...")
-                        time.sleep(1)
-                # Reinit curses env. when the connection is back
-                PGAUI.init_curses()
-
-    except psutil.AccessDenied as err:
-        PGAUI.at_exit_curses()
-        sys.exit(
-            "FATAL: Access denied, can't access system informations for PID %s"
-            % (str(err),))
-    except curses.error as err:
-        PGAUI.at_exit_curses()
-        if debug:
-            import traceback
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            traceback.print_exception(
-                exc_type,
-                exc_value,
-                exc_traceback,
-                file=sys.stdout)
-        sys.exit("FATAL: %s" % (str(err),))
-    except KeyboardInterrupt:
-        PGAUI.at_exit_curses()
-        sys.exit(1)
-    except Exception as err:
-        PGAUI.at_exit_curses()
-        # DEBUG
-        if debug:
-            import traceback
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            traceback.print_exception(
-                exc_type,
-                exc_value,
-                exc_traceback,
-                file=sys.stdout)
-        sys.exit("FATAL: %s" % (str(err),))
-
-
 # Call the main function
 if __name__ == '__main__':
     if os.name != 'posix':
@@ -446,15 +256,5 @@ if __name__ == '__main__':
     if options.help:
         print(parser.format_help().strip())
         sys.exit(1)
-    if options.ng:
-        from pgactivity import ui
-        if options.nocolor:
-            # Use super class to by-pass custom error() method of ModifiedOptionParser.
-            super(type(parser), parser).error("--no-color is not supported in new UI")
-        ui.main(options)
-    else:
-        from pgactivity import UI
 
-        PGAUI = UI.UI(PGTOP_VERSION)
-        signal.signal(signal.SIGTERM, PGAUI.signal_handler)
-        main(options, PGAUI)
+    ui.main(options)

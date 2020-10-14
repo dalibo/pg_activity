@@ -4,4 +4,3 @@ include =
   pgactivity/*
 omit =
   pgactivity/Data.py
-  pgactivity/UI.py

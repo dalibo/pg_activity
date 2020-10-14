@@ -7,11 +7,9 @@ from warnings import catch_warnings, simplefilter
 import attr
 import psutil
 
-from . import utils
 from .types import (
     BWProcess,
     IOCounter,
-    LegacyProcess,
     LoadAverage,
     LocalRunningProcess,
     MemoryInfo,
@@ -135,97 +133,6 @@ def update_processes_local2(
     io_write = IOCounter(count=write_count_delta, bytes=int(write_bytes_delta))
 
     return io_read, io_write, local_procs
-
-
-def update_processes_local(
-    processes: Dict[int, LegacyProcess],
-    new_processes: Dict[int, LegacyProcess],
-    fs_blocksize: int,
-) -> Tuple[Tuple[float, float, int, int], List[int], List[LocalRunningProcess]]:
-    """Update resource usage for each process in *local* mode."""
-    pids = []
-    procs = []
-    read_bytes_delta = 0.0
-    write_bytes_delta = 0.0
-    read_count_delta = 0
-    write_count_delta = 0
-    for pid, new_proc in new_processes.items():
-        try:
-            if pid in processes:
-                n_io_time = time.time()
-                # Getting informations from the previous loop
-                proc = processes[pid]
-                # Update old process with new informations
-                proc.duration = new_proc.duration
-                proc.state = new_proc.state
-                proc.query = new_proc.query
-                proc.appname = new_proc.appname
-                proc.client = new_proc.client
-                proc.wait = new_proc.wait
-                proc.extras.io_wait = new_proc.extras.io_wait
-                proc.extras.read_delta = (
-                    new_proc.extras.io_read.bytes - proc.extras.io_read.bytes
-                ) / (n_io_time - proc.extras.io_time)
-                proc.extras.write_delta = (
-                    new_proc.extras.io_write.bytes - proc.extras.io_write.bytes
-                ) / (n_io_time - proc.extras.io_time)
-                proc.extras.io_read = new_proc.extras.io_read
-                proc.extras.io_write = new_proc.extras.io_write
-                proc.extras.io_time = n_io_time
-
-                # Global io counters
-                read_bytes_delta += proc.extras.read_delta
-                write_bytes_delta += proc.extras.write_delta
-            else:
-                # No previous information about this process
-                proc = new_proc
-
-            if pid not in pids:
-                pids.append(pid)
-
-            if proc.extras.psutil_proc is not None:
-                proc.extras.mem_percent = proc.extras.psutil_proc.memory_percent()
-                proc.extras.cpu_percent = proc.extras.psutil_proc.cpu_percent(
-                    interval=0
-                )
-            new_processes[pid] = proc
-            procs.append(
-                LocalRunningProcess(
-                    pid=pid,
-                    appname=proc.appname,
-                    database=proc.database,
-                    user=proc.user,
-                    client=proc.client,
-                    cpu=proc.extras.cpu_percent,
-                    mem=proc.extras.mem_percent,
-                    read=proc.extras.read_delta,
-                    write=proc.extras.write_delta,
-                    state=proc.state,
-                    query=proc.query,
-                    duration=utils.get_duration(proc.duration),
-                    wait=proc.wait,
-                    io_wait=proc.extras.io_wait,
-                    is_parallel_worker=proc.is_parallel_worker,
-                )
-            )
-
-        except (psutil.NoSuchProcess, psutil.AccessDenied):
-            pass
-
-    # store io counters
-    if read_bytes_delta > 0:
-        read_count_delta += int(read_bytes_delta / fs_blocksize)
-    if write_bytes_delta > 0:
-        write_count_delta += int(write_bytes_delta / fs_blocksize)
-
-    io_counters = (
-        read_bytes_delta,
-        write_bytes_delta,
-        read_count_delta,
-        write_count_delta,
-    )
-
-    return io_counters, pids, procs
 
 
 T = TypeVar("T", RunningProcess, BWProcess, LocalRunningProcess)

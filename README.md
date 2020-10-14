@@ -49,7 +49,6 @@ Options
                               "localhost").
         -d DBNAME, --dbname=DBNAME
                               Database name to connect to (default: "postgres").
-        -C, --no-color        Disable color usage.
         --blocksize=BLOCKSIZE Filesystem blocksize (default: 4096).
         --rds                 Enable support for AWS RDS.
         --output=FILEPATH     Store running queries as CSV.

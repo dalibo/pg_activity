@@ -102,49 +102,6 @@ class Deserializable:
         return cls(**args)  # type: ignore
 
 
-class DictSequenceProxy:
-    """Proxy class for Dict and Sequence protocols.
-
-    >>> @attr.s(auto_attribs=True)
-    ... class A(DictSequenceProxy):
-    ...     x: str
-
-    >>> a = A("x")
-    >>> a[0]
-    'x'
-    >>> a["x"]
-    'x'
-
-    >>> a["y"]
-    Traceback (most recent call last):
-        ...
-    KeyError: 'y'
-    >>> a[42]
-    Traceback (most recent call last):
-        ...
-    IndexError: 42
-    >>> a[[]]
-    Traceback (most recent call last):
-        ...
-    TypeError: expecting a string or int key
-    """
-
-    def __getitem__(self, key: Union[int, str]) -> Any:
-        if isinstance(key, str):
-            try:
-                return getattr(self, key)
-            except AttributeError:
-                raise KeyError(key) from None
-        elif isinstance(key, int):
-            seq = attr.astuple(self)
-            try:
-                return seq[key]
-            except IndexError:
-                raise IndexError(key) from None
-        else:
-            raise TypeError("expecting a string or int key")
-
-
 E = TypeVar("E", bound=enum.IntEnum)
 
 
@@ -511,7 +468,7 @@ class BaseProcess:
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
-class RunningProcess(BaseProcess, DictSequenceProxy):
+class RunningProcess(BaseProcess, Deserializable):
     """Process for a running query."""
 
     wait: bool
@@ -519,7 +476,7 @@ class RunningProcess(BaseProcess, DictSequenceProxy):
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
-class BWProcess(BaseProcess, DictSequenceProxy):
+class BWProcess(BaseProcess):
     """Process for a blocking or waiting query."""
 
     # Lock information from pg_locks view
@@ -532,7 +489,7 @@ class BWProcess(BaseProcess, DictSequenceProxy):
     is_parallel_worker: bool = attr.ib(default=False, init=False)
 
 
-@attr.s(auto_attribs=True, frozen=False, slots=True)  # TODO: frozen=True
+@attr.s(auto_attribs=True, frozen=True, slots=True)
 class SystemProcess(Deserializable):
     meminfo: Tuple[int, ...]
     io_read: IOCounter
@@ -566,79 +523,3 @@ LocalProcesses = Tuple[Union[List[BWProcess], List[LocalRunningProcess]], System
 ActivityStats = Union[List[RunningProcess], List[BWProcess], LocalProcesses]
 
 ProcessSet = Union[List[LocalRunningProcess], List[RunningProcess], List[BWProcess]]
-
-
-@attr.s(auto_attribs=True, frozen=False, slots=True)
-class LegacyProcess(Deserializable):
-    """Legacy model for a running process in local mode.
-
-    >>> data = {
-    ...     "database" : "pgbench",
-    ...     "read" : None,
-    ...     "duration" : -0.003353,
-    ...     "mem" : None,
-    ...     "query" : "END;",
-    ...     "cpu" : None,
-    ...     "pid" : 6229,
-    ...     "appname" : "pgbench",
-    ...     "wait" : True,
-    ...     "client" : "local",
-    ...     "state" : "active",
-    ...     "user" : "postgres",
-    ...     "write" : None,
-    ...     "is_parallel_worker" : False,
-    ...     "extras" : {
-    ...        "read_delta" : 0.0,
-    ...        "io_time" : 1596806345.17465,
-    ...        "psutil_proc" : None,
-    ...        "io_wait" : "N",
-    ...        "io_read" : {
-    ...           "count" : 805,
-    ...           "bytes" : 184320,
-    ...           "chars" : 5928507,
-    ...        },
-    ...        "io_write" : {
-    ...           "count" : 408,
-    ...           "bytes" : 4702208,
-    ...           "chars" : 4866103,
-    ...        },
-    ...        "cpu_percent" : 0.0,
-    ...        "mem_percent" : 1.03052852888703,
-    ...        "meminfo" : [
-    ...           63643648,
-    ...           219631616,
-    ...           61329408,
-    ...           4608000,
-    ...           0,
-    ...           2908160,
-    ...           0
-    ...        ],
-    ...        "write_delta" : 0.0,
-    ...        "cpu_times" : [
-    ...           0.25,
-    ...           0.06,
-    ...           0,
-    ...           0,
-    ...           0.04
-    ...        ]
-    ...     }
-    ... }
-    >>> LegacyProcess.deserialize(data)  # doctest: +ELLIPSIS
-    LegacyProcess(pid=6229, appname='pgbench', database='pgbench', user='postgres', client='local', duration=-0.003353, ...)
-    """
-
-    pid: int
-    appname: str
-    database: str
-    user: str
-    client: str
-    duration: float
-    state: str
-    query: str
-    wait: bool
-    is_parallel_worker: bool
-    extras: SystemProcess
-    cpu: Optional[float] = None
-    mem: Optional[float] = None
-    read: Optional[float] = None
-    write: Optional[float] = None

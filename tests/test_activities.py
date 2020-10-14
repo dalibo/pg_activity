@@ -8,85 +8,40 @@ import pytest
 from pgactivity import activities
 from pgactivity.types import (
     IOCounter,
-    LegacyProcess,
     LoadAverage,
     MemoryInfo,
     RunningProcess,
+    SystemProcess,
 )
 
 
 @pytest.fixture
-def processes(shared_datadir):
+def system_processes(shared_datadir):
     with (shared_datadir / "local-processes-input.json").open() as f:
         input_data = json.load(f)
 
-    processes = {
-        k: LegacyProcess.deserialize(p) for k, p in input_data["processes"].items()
-    }
-    new_processes = {
-        k: LegacyProcess.deserialize(p) for k, p in input_data["new_processes"].items()
-    }
     fs_blocksize = input_data["fs_blocksize"]
-    return processes, new_processes, fs_blocksize
 
-
-def test_update_processes_local(processes):
-    processes, new_processes, fs_blocksize = processes
-
-    iocounters_delta, pids, procs = activities.update_processes_local(
-        processes, new_processes, fs_blocksize
-    )
-    (
-        read_bytes_delta,
-        write_bytes_delta,
-        read_count_delta,
-        write_count_delta,
-    ) = iocounters_delta
-    assert int(read_bytes_delta) == 0
-    assert int(write_bytes_delta) == 0
-    assert read_count_delta == 0
-    assert write_count_delta == 0
-    assert pids == [
-        "6221",
-        "6222",
-        "6223",
-        "6224",
-        "6225",
-        "6226",
-        "6227",
-        "6228",
-        "6229",
-        "6230",
-        "6231",
-        "6232",
-        "6233",
-        "6234",
-        "6235",
-        "6237",
-        "6238",
-        "6239",
-        "6240",
-    ]
-    assert set(pids) == {a.pid for a in procs}
-
-
-@pytest.fixture
-def system_processes(processes):
-    processes, new_processes, fs_blocksize = processes
     pg_processes = []
     new_system_procs = {}
     system_procs = {}
 
-    def running_process_fields(attribute, value):
-        return attribute in attr.fields(RunningProcess)
+    running_process_fields = {a.name for a in attr.fields(RunningProcess)}
 
-    for new_proc in new_processes.values():
-        new_system_procs[new_proc.pid] = new_proc.extras
+    for new_proc in input_data["new_processes"].values():
+        new_system_procs[new_proc["pid"]] = SystemProcess.deserialize(
+            new_proc["extras"]
+        )
         pg_processes.append(
-            RunningProcess(**attr.asdict(new_proc, filter=running_process_fields))
+            RunningProcess.deserialize(
+                {k: v for k, v in new_proc.items() if k in running_process_fields}
+            )
         )
 
-    system_procs = {proc.pid: proc.extras for proc in processes.values()}
+    system_procs = {
+        proc["pid"]: SystemProcess.deserialize(proc["extras"])
+        for proc in input_data["processes"].values()
+    }
 
     return pg_processes, system_procs, new_system_procs, fs_blocksize
 
@@ -110,6 +65,27 @@ def test_update_processes_local2(system_processes):
     assert io_write == IOCounter.default()
     assert len(procs) == len(pg_processes)
     assert len(system_procs) == n_system_procs
+    assert {p.pid for p in procs} == {
+        6221,
+        6222,
+        6223,
+        6224,
+        6225,
+        6226,
+        6227,
+        6228,
+        6229,
+        6230,
+        6231,
+        6232,
+        6233,
+        6234,
+        6235,
+        6237,
+        6238,
+        6239,
+        6240,
+    }
 
 
 def test_update_processes_local2_empty_procs(system_processes):

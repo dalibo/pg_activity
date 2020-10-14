@@ -14,6 +14,5 @@ exclude = '''
   | setup.py
   | pg_activity
   | pgactivity/Data.py
-  | pgactivity/UI.py
 )
 '''
