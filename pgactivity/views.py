@@ -928,7 +928,7 @@ def processes_rows(
                 if term.length(query_r.split(" ", 1)[0]) >= dif:
                     # Query too long to even start on the first line, wrap all
                     # lines.
-                    query_lines = [""] + term.wrap(query_r, width=term.width)
+                    query_lines = term.wrap(query_r, width=term.width)
                 else:
                     # Only wrap subsequent lines.
                     wrapped_lines = term.wrap(query_r, width=dif)

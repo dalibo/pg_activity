@@ -137,8 +137,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2.0s
  Load:         0.12 0.14 0.1          | Write:            0B/s -      0/s
                                 RUNNING QUERIES
 PID    DATABASE                     USER           CLIENT  IOW              state   Query
-...    tests                    postgres     127.0.0.1/32    N      idle in trans
-SELECT pg_sleep(0)
+...    tests                    postgres     127.0.0.1/32    N      idle in trans   SELECT pg_sleep(0)
 ------------------------------- Received key '-' -------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1.0s
  Size:      106.07M -        0B/s     | TPS:               0      | Active connections:               1      | Duration mode:       query
@@ -147,8 +146,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1.0s
  Load:         0.12 0.14 0.1          | Write:            0B/s -      0/s
                                 RUNNING QUERIES
 PID    DATABASE                     USER           CLIENT  IOW              state   Query
-...    tests                    postgres     127.0.0.1/32    N      idle in trans
-SELECT pg_sleep(0)
+...    tests                    postgres     127.0.0.1/32    N      idle in trans   SELECT pg_sleep(0)
 ------------------------------- Received key '-' -------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 0.5s
  Size:      106.07M -        0B/s     | TPS:               0      | Active connections:               1      | Duration mode:       query
@@ -157,8 +155,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 0.5s
  Load:         0.12 0.14 0.1          | Write:            0B/s -      0/s
                                 RUNNING QUERIES
 PID    DATABASE                     USER           CLIENT  IOW              state   Query
-...    tests                    postgres     127.0.0.1/32    N      idle in trans
-SELECT pg_sleep(0)
+...    tests                    postgres     127.0.0.1/32    N      idle in trans   SELECT pg_sleep(0)
 ------------------------------- Received key '+' -------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size:      106.07M -        0B/s     | TPS:               0      | Active connections:               1      | Duration mode:       query
@@ -167,8 +164,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Load:         0.12 0.14 0.1          | Write:            0B/s -      0/s
                                 RUNNING QUERIES
 PID    DATABASE                     USER           CLIENT  IOW              state   Query
-...    tests                    postgres     127.0.0.1/32    N      idle in trans
-SELECT pg_sleep(0)
+...    tests                    postgres     127.0.0.1/32    N      idle in trans   SELECT pg_sleep(0)
 ------------------------------- Received key ' ' -------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size:      106.07M -        0B/s     | TPS:               0      | Active connections:               1      | Duration mode:       query
@@ -177,8 +173,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Load:         0.12 0.14 0.1          | Write:            0B/s -      0/s
                                      PAUSE                                      
 PID    DATABASE                     USER           CLIENT  IOW              state   Query
-...    tests                    postgres     127.0.0.1/32    N      idle in trans
-SELECT pg_sleep(0)
+...    tests                    postgres     127.0.0.1/32    N      idle in trans   SELECT pg_sleep(0)
 ------------------------------- Received key 'T' -------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size:      106.07M -        0B/s     | TPS:               0      | Active connections:               1      | Duration mode: transaction
@@ -187,8 +182,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Load:         0.12 0.14 0.1          | Write:            0B/s -      0/s
                                      PAUSE                                      
 PID    DATABASE                     USER           CLIENT  IOW              state   Query
-...    tests                    postgres     127.0.0.1/32    N      idle in trans
-SELECT pg_sleep(0)
+...    tests                    postgres     127.0.0.1/32    N      idle in trans   SELECT pg_sleep(0)
 ------------------------------- Received key 'c' -------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size:      106.07M -        0B/s     | TPS:               0      | Active connections:               1      | Duration mode: transaction
@@ -197,8 +191,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Load:         0.12 0.14 0.1          | Write:            0B/s -      0/s
                                      PAUSE                                      
 PID    DATABASE                     USER           CLIENT  IOW              state   Query
-...    tests                    postgres     127.0.0.1/32    N      idle in trans
-SELECT pg_sleep(0)
+...    tests                    postgres     127.0.0.1/32    N      idle in trans   SELECT pg_sleep(0)
 ------------------------------- Received key ' ' -------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size:      106.07M -        0B/s     | TPS:               0      | Active connections:               1      | Duration mode: transaction
@@ -207,8 +200,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Load:         0.12 0.14 0.1          | Write:            0B/s -      0/s
                                 RUNNING QUERIES
 PID    DATABASE                     USER           CLIENT  IOW              state   Query
-...    tests                    postgres     127.0.0.1/32    N      idle in trans
-SELECT pg_sleep(0)
+...    tests                    postgres     127.0.0.1/32    N      idle in trans   SELECT pg_sleep(0)
 ------------------------------- Received key '2' -------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size:      106.07M -        0B/s     | TPS:               0      | Active connections:               1      | Duration mode: transaction
@@ -233,8 +225,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Load:         0.12 0.14 0.1          | Write:            0B/s -      0/s
                                 RUNNING QUERIES
 PID    DATABASE                     USER           CLIENT  IOW              state   Query
-...    tests                    postgres     127.0.0.1/32    N      idle in trans
-SELECT pg_sleep(0)
+...    tests                    postgres     127.0.0.1/32    N      idle in trans   SELECT pg_sleep(0)
 ------------------------------- Received key 'q' -------------------------------
 
 >>> [kwargs["timeout"] for args, kwargs in inkey.call_args_list]
