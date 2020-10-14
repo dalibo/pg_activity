@@ -58,10 +58,6 @@ class OptionParsingError(RuntimeError):
         self.msg = msg
 
 
-# Create the UI
-PGAUI = UI.UI(PGTOP_VERSION)
-
-
 def get_parser():
     parser = ModifiedOptionParser(
         add_help_option = False,
@@ -262,7 +258,7 @@ server activity monitoring.")
     return parser
 
 
-def main(options):
+def main(options, PGAUI):
     """
     Main function
     """
@@ -433,7 +429,6 @@ def main(options):
 if __name__ == '__main__':
     if os.name != 'posix':
         sys.exit("FATAL: Platform not supported.")
-    signal.signal(signal.SIGTERM, PGAUI.signal_handler)
     try:
         parser = get_parser()
         (options, _) = parser.parse_args()
@@ -451,4 +446,8 @@ if __name__ == '__main__':
             super(type(parser), parser).error("--no-color is not supported in new UI")
         ui.main(options)
     else:
-        main(options)
+        from pgactivity import UI
+
+        PGAUI = UI.UI(PGTOP_VERSION)
+        signal.signal(signal.SIGTERM, PGAUI.signal_handler)
+        main(options, PGAUI)
