@@ -76,3 +76,4 @@ PostgreSQL 13 - testhost - pgadm@server.prod.tld:5433/app - Ref.: 10s - Min. dur
 PID    DATABASE           CPU% MEM%              state   Query                  
 6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts
 1234   business            2.4  1.0             active   SELECT product_id, p.na
+F1/1 Running queries  F2/2 Waiting queries  F3/3 Blocking queries Space Pause            q Quit             h Help            

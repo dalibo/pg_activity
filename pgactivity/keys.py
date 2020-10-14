@@ -32,14 +32,17 @@ class Key:
         return self.value == other
 
 
+EXIT_KEY = Key(EXIT, "quit")
+PAUSE_KEY = Key(PAUSE, "pause", "Space")
+
 BINDINGS: List[Key] = [
     Key("Up/Down", "scroll process list"),
     Key("C", "activate/deactivate colors"),
-    Key(PAUSE, "pause", "Space"),
+    PAUSE_KEY,
     Key(SORTBY_READ, "sort by READ/s desc. (activities)", local_only=True),
     Key("v", "change display mode"),
     Key(SORTBY_WRITE, "sort by WRITE/s desc. (activities)", local_only=True),
-    Key(EXIT, "quit"),
+    EXIT_KEY,
     Key(REFRESH_TIME_INCREASE, "increase refresh time (max:5s)"),
     Key(SORTBY_CPU, "sort by CPU% desc. (activities)", local_only=True),
     Key(SORTBY_MEM, "sort by MEM% desc. (activities)", local_only=True),

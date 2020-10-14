@@ -9,7 +9,15 @@ import humanize
 from blessed import Terminal
 from blessed.formatters import FormattingString
 
-from .keys import BINDINGS, Key, MODES
+from .keys import (
+    BINDINGS,
+    EXIT_KEY,
+    HELP as HELP_KEY,
+    KEYS_BY_QUERYMODE,
+    Key,
+    MODES,
+    PAUSE_KEY,
+)
 from .types import (
     Activity,
     ActivityBW,
@@ -947,6 +955,38 @@ def processes_rows(
             yield line
 
 
+def footer(term: Terminal) -> None:
+    """Yield footer line.
+
+    >>> term = Terminal(force_styling=None)
+    >>> footer(term)  # doctest: +NORMALIZE_WHITESPACE
+    F1/1 Running queries  F2/2 Waiting queries  F3/3 Blocking queries Space Pause            q Quit             h Help
+    """
+    query_modes_help = [
+        ("/".join(keys[:-1]), qm.value) for qm, keys in KEYS_BY_QUERYMODE.items()
+    ]
+    assert PAUSE_KEY.name is not None
+    footer_values = query_modes_help + [
+        (PAUSE_KEY.name, PAUSE_KEY.description),
+        (EXIT_KEY.value, EXIT_KEY.description),
+        (HELP_KEY, "help"),
+    ]
+    width = max(len(desc) for _, desc in footer_values)
+    print(
+        term.ljust(
+            " ".join(
+                [
+                    f"{key} {term.cyan_reverse(term.ljust(desc.capitalize(), width=width, fillchar=' '))}"
+                    for key, desc in footer_values
+                ]
+            ),
+            fillchar=" ",
+        )
+        + term.normal,
+        end="",
+    )
+
+
 def screen(
     term: Terminal,
     *,
@@ -966,10 +1006,12 @@ def screen(
     is_local: bool,
     verbose_mode: QueryDisplayMode,
     in_pause: bool,
+    render_footer: bool = True,
 ) -> None:
     """Display the screen."""
     print(term.clear + term.home, end="")
-    lines_counter = line_counter(term.height - 1)
+    top_height = term.height - 1
+    lines_counter = line_counter(top_height)
     header(
         term,
         host,
@@ -995,3 +1037,6 @@ def screen(
         verbose_mode=verbose_mode,
         lines_counter=lines_counter,
     )
+    if render_footer:
+        with term.location(x=0, y=top_height):
+            footer(term)

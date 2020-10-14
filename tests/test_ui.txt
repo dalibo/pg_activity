@@ -1,3 +1,4 @@
+>>> import functools
 >>> import optparse
 >>> from unittest.mock import patch
 
@@ -48,6 +49,7 @@ Default CLI options, passed to ui.main():
 >>> term = blessed.Terminal(force_styling=None)
 >>> term.width, term.height
 (80, 25)
+>>> ui_main = functools.partial(ui.main, term=term, screen_delimiter="-", render_footer=False)
 
 Mock system statistics
 >>> get_mem_swap = patch(
@@ -72,7 +74,7 @@ Mock system statistics
 No activity, first screen followed by help screen:
 
 >>> with patch.object(term, "inkey", new=mk_inkey(["h", "z", "q"])) as inkey:
-...      ui.main(options, term=term, screen_delimiter="-")  # doctest: +ELLIPSIS,+NORMALIZE_WHITESPACE
+...      ui_main(options)  # doctest: +ELLIPSIS,+NORMALIZE_WHITESPACE
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2.0s
  Size:      106.07M -        0B/s     | TPS:               0      | Active connections:               1      | Duration mode:       query
  Mem.:      1.2% -     2.86M/3.73G    | IO Max:        0/s
@@ -129,7 +131,7 @@ change query mode then quit:
 
 >>> keys = ["-", "-", "+", " ", "T", "c", " ", "2", "3", "1", "q"]
 >>> with patch.object(term, "inkey", new=mk_inkey(keys)) as inkey:
-...      ui.main(options, term=term, screen_delimiter="-")  # doctest: +ELLIPSIS,+NORMALIZE_WHITESPACE
+...      ui_main(options)  # doctest: +ELLIPSIS,+NORMALIZE_WHITESPACE
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2.0s
  Size:      106.07M -        0B/s     | TPS:               0      | Active connections:               1      | Duration mode:       query
  Mem.:      1.2% -     2.86M/3.73G    | IO Max:        0/s
@@ -250,7 +252,7 @@ Use another set of options:
 ...     ),
 ... )
 >>> with patch.object(term, "inkey", mk_inkey(["q"])):
-...     ui.main(options, term=term, screen_delimiter="-")  # doctest: +ELLIPSIS,+NORMALIZE_WHITESPACE
+...     ui_main(options)  # doctest: +ELLIPSIS,+NORMALIZE_WHITESPACE
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2.0s
  Size:      106.07M -        0B/s     | TPS:               0      | Active connections:               1      | Duration mode: transaction
  Mem.:      1.2% -     2.86M/3.73G    | IO Max:        0/s

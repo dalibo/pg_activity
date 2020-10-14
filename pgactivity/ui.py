@@ -14,6 +14,7 @@ def main(
     *,
     term: Optional[Terminal] = None,
     screen_delimiter: Optional[str] = None,
+    render_footer: bool = True,
 ) -> None:
     data = Data.Data()
     refresh_time = 2.0
@@ -165,6 +166,7 @@ def main(
                     is_local=is_local,
                     verbose_mode=verbose_mode,
                     in_pause=in_pause,
+                    render_footer=render_footer,
                 )
 
             key = term.inkey(timeout=refresh_time) or None
