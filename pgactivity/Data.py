@@ -40,7 +40,7 @@ def pg_get_version(pg_conn: connection) -> str:
     query = "SELECT version() AS pg_version"
     cur = pg_conn.cursor()
     cur.execute(query)
-    ret = cur.fetchone()
+    ret: Dict[str, str] = cur.fetchone()
     return ret['pg_version']
 
 
@@ -111,15 +111,15 @@ class Data:
     @classmethod
     def pg_connect(
         cls,
-        min_duration,
+        min_duration: float,
         *,
-        host=None,
-        port=5432,
-        user='postgres',
-        password=None,
-        database='postgres',
-        rds_mode=False,
-        service=None,
+        host: Optional[str] = None,
+        port: int = 5432,
+        user: str = 'postgres',
+        password: Optional[str] = None,
+        database: str = 'postgres',
+        rds_mode: bool = False,
+        service: Optional[str] = None,
     ) -> "Data":
         """Create an instance by connecting to a PostgreSQL server."""
         pg_conn = None
@@ -192,17 +192,17 @@ class Data:
         except Exception:
             return False
 
-    def pg_cancel_backend(self, pid,):
+    def pg_cancel_backend(self, pid: int) -> bool:
         """
         Cancel a backend
         """
         query = "SELECT pg_cancel_backend(%s) AS cancelled"
         cur = self.pg_conn.cursor()
         cur.execute(query, (pid,))
-        ret = cur.fetchone()
+        ret: Dict[str, bool] = cur.fetchone()
         return ret['cancelled']
 
-    def pg_terminate_backend(self, pid,):
+    def pg_terminate_backend(self, pid: int) -> bool:
         """
         Terminate a backend
         """
@@ -212,10 +212,10 @@ class Data:
             query = "SELECT pg_cancel_backend(%s) AS terminated"
         cur = self.pg_conn.cursor()
         cur.execute(query, (pid,))
-        ret = cur.fetchone()
+        ret: Dict[str, bool] = cur.fetchone()
         return ret['terminated']
 
-    DbInfoDict = Dict[str, Union[str, int]]
+    DbInfoDict = Dict[str, Union[str, int, float]]
 
     def pg_get_db_info(
         self,
@@ -228,7 +228,7 @@ class Data:
         """
         prev_total_size = "0"
         if prev_db_infos is not None:
-            prev_total_size = prev_db_infos['total_size']
+            prev_total_size = prev_db_infos['total_size']  # type: ignore
 
         skip_dbsize = skip_sizes
 
@@ -249,7 +249,7 @@ class Data:
         cur.execute(query,)
         ret = cur.fetchone()
         tps = 0
-        size_ev = 0
+        size_ev = 0.0
         if prev_db_infos is not None:
             tps = int((ret['no_xact'] - prev_db_infos['no_xact'])
                       / (ret['timestamp'] - prev_db_infos['timestamp']))
