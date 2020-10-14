@@ -72,7 +72,7 @@ PostgreSQL 13 - testhost - pgadm@server.prod.tld:5433/app - Ref.: 10s - Min. dur
  Mem.:      2.5% -   954.85M/3.93G    | IO Max:       76/s
  Swap:      1.0% -     2.29K/5.88G    | Read:          128B/s -      6/s
  Load:          0.5 1.9 0.93          | Write:            8B/s -      9/s
-                                RUNNING QUERIES                                 
+                                RUNNING QUERIES
 PID    DATABASE           CPU% MEM%              state   Query                  
 6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts
 1234   business            2.4  1.0             active   SELECT product_id, p.na

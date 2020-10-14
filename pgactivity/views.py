@@ -371,7 +371,7 @@ def query_mode(
     >>> from pgactivity.types import QueryMode
 
     >>> term = Terminal()
-    >>> query_mode(term, QueryMode.blocking)  # doctest: +NORMALIZE_WHITESPACE
+    >>> query_mode(term, QueryMode.blocking)
                                     BLOCKING QUERIES
     >>> query_mode(term, QueryMode.activities, in_pause=True)  # doctest: +NORMALIZE_WHITESPACE
                                     PAUSE
@@ -379,7 +379,7 @@ def query_mode(
     if in_pause:
         yield term.black_bold_on_orange(term.center("PAUSE", fillchar=" "))
     else:
-        yield term.center(term.green_bold(mode.value.upper()))
+        yield term.green_bold(term.center(mode.value.upper(), fillchar=" ").rstrip())
 
 
 class Column(enum.Enum):
