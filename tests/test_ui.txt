@@ -81,7 +81,7 @@ Mock system statistics
 ...     return_value=(0.12, 0.14, 0.1),
 ... )
 >>> pg_get_db_info = patch(
-...     "pgactivity.Data.Data.pg_get_db_info",
+...     "pgactivity.data.Data.pg_get_db_info",
 ...     return_value={"total_size": 111_222_333, "size_ev": 0, "tps": 0},
 ... )
 >>> get_mem_swap.start()

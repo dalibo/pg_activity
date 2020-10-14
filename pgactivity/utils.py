@@ -7,7 +7,7 @@ from typing import Any, IO, Iterable, Mapping, Optional
 import psycopg2
 from psycopg2 import errorcodes
 
-from .Data import Data
+from .data import Data
 
 
 def clean_str(string: str) -> str:
