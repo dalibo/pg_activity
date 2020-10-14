@@ -128,8 +128,6 @@ def main(
                                     int(write_count_delta),
                                 ),
                             )
-                            # TODO: see UI.__poll_activities()
-                            # data.set_global_io_counters(*io_counters)
                             acts = activity_procs
                         else:
                             acts = queries  # type: ignore # XXX
