@@ -2,8 +2,7 @@ import getpass
 import optparse
 import re
 from datetime import datetime
-from functools import wraps
-from typing import Any, Callable, IO, Iterable, List, Mapping, Optional, TypeVar, Union
+from typing import Any, IO, Iterable, Mapping, Optional
 
 import psycopg2
 from psycopg2 import errorcodes
@@ -167,42 +166,6 @@ def csv_write(
             )
             + "\n"
         )
-
-
-R = TypeVar("R")
-
-
-def return_as(
-    c: Callable[..., R]
-) -> Callable[[Callable[..., Any]], Callable[..., List[R]]]:
-    """Decorator casting the result of wrapped function with 'c'. The 'result'
-    should be a list.
-
-    >>> from typing import Any, Dict, List
-
-    >>> def to_lowercase(**kwargs: Any) -> Dict[str, Any]:
-    ...     return {k.lower():v  for k, v in kwargs.items()}
-    >>> to_lowercase(A=1, b=2)
-    {'a': 1, 'b': 2}
-
-    >>> @return_as(to_lowercase)
-    ... def query() -> List[Dict[str, int]]:
-    ...     return [{'A': 1}, {'b': 2}]
-
-    >>> query()
-    [{'a': 1}, {'b': 2}]
-    """
-
-    def decorator(func: Callable[..., Any]) -> Callable[..., List[R]]:
-        @wraps(func)
-        def wrapper(*args: Any, **kwargs: Any) -> Union[List[R], R]:
-            result = func(*args, **kwargs)
-            assert isinstance(result, list), f"{func} must return a list value"
-            return [c(**item) for item in result]
-
-        return wrapper
-
-    return decorator
 
 
 def pg_connect(

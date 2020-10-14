@@ -24,7 +24,7 @@ SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 """
 
 import re
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import psutil
 import psycopg2
@@ -32,7 +32,6 @@ import psycopg2.extras
 from psycopg2.extensions import connection
 
 from .activities import get_load_average, get_mem_swap
-from .utils import return_as
 from .types import BWProcess, RunningProcess
 
 
@@ -338,8 +337,7 @@ class Data:
         active_connections = int(ret['active_connections'])
         return active_connections
 
-    @return_as(RunningProcess)
-    def pg_get_activities(self, duration_mode: int = 1) -> List[Any]:
+    def pg_get_activities(self, duration_mode: int = 1) -> List[RunningProcess]:
         """
         Get activity from pg_stat_activity view.
         """
@@ -529,10 +527,9 @@ class Data:
         cur.execute(query, {'min_duration': self.min_duration})
         ret = cur.fetchall()
 
-        return ret
+        return [RunningProcess(**row) for row in ret]
 
-    @return_as(BWProcess)
-    def pg_get_waiting(self, duration_mode: int = 1) -> List[Any]:
+    def pg_get_waiting(self, duration_mode: int = 1) -> List[BWProcess]:
         """
         Get waiting queries.
         """
@@ -622,10 +619,9 @@ class Data:
         cur = self.pg_conn.cursor()
         cur.execute(query, {'min_duration': self.min_duration})
         ret = cur.fetchall()
-        return ret
+        return [BWProcess(**row) for row in ret]
 
-    @return_as(BWProcess)
-    def pg_get_blocking(self, duration_mode: int = 1) -> List[Any]:
+    def pg_get_blocking(self, duration_mode: int = 1) -> List[BWProcess]:
         """
         Get blocking queries
         """
@@ -851,7 +847,7 @@ class Data:
         cur = self.pg_conn.cursor()
         cur.execute(query, {'min_duration': self.min_duration})
         ret = cur.fetchall()
-        return ret
+        return [BWProcess(**row) for row in ret]
 
     def pg_is_local(self,) -> bool:
         """
