@@ -72,7 +72,7 @@ def main(options: optparse.Values) -> None:
                     is_local,
                     lines_counter=views.line_counter(term.height),
                 )
-            elif in_help and key == "q":
+            elif in_help and key is not None:
                 in_help, key = False, None
             elif key == keys.EXIT:
                 break
