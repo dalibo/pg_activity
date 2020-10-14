@@ -2,5 +2,3 @@
 include =
   pg_activity
   pgactivity/*
-omit =
-  pgactivity/Data.py
