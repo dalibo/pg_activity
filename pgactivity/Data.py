@@ -857,15 +857,6 @@ class Data:
             duration_mode = 1
         return ['query', 'transaction', 'backend'][duration_mode - 1]
 
-    def __sys_get_iow_status(self, status):
-        """
-        Returns 'Y' if status == 'disk sleep', else 'N'
-        """
-        if status == 'disk sleep':
-            return 'Y'
-        else:
-            return 'N'
-
     def sys_get_proc(
         self, queries: List[Activity], is_local: bool
     ) -> Dict[int, Process]:
@@ -916,7 +907,7 @@ class Data:
                     cpu_times=cpu_times,
                     read_delta=0,
                     write_delta=0,
-                    io_wait=self.__sys_get_iow_status(status_iow),
+                    io_wait='Y' if status_iow == 'disk sleep' else 'N',
                     psutil_proc=psproc,
                     is_parallel_worker=query['is_parallel_worker'],
                     appname=query['application_name'],
