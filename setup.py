@@ -31,7 +31,7 @@ setup(
         "attrs",
         "blessed",
         "humanize",
-        "psutil >= 0.4.1",
+        "psutil >= 2.0.0",
     ],
     data_files = data_files,
 )

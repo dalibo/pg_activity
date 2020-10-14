@@ -37,38 +37,6 @@ from .utils import return_as
 from .types import Activity, ActivityBW, IOCounter, Process, ProcessExtras
 
 
-if psutil.version_info < (2, 0, 0):
-    class PSProcess(psutil.Process):
-        """
-        Due to the new psutil 2 API we need to create a new class inherited
-        from psutil.Process and wrap old methods.
-        """
-        def status_iow(self,):
-            return str(self.status)
-
-        def io_counters(self,):
-            return self.get_io_counters()
-
-        def cpu_time(self,):
-            return self.get_cpu_times()
-
-        def memory_info(self,):
-            return self.get_memory_info()
-
-        def memory_percent(self,):
-            return self.get_memory_percent()
-
-        def cpu_percent(self, interval=0):
-            return self.get_cpu_percent(interval=interval)
-
-        def cpu_times(self,):
-            return self.get_cpu_times()
-else:
-    class PSProcess(psutil.Process):
-        def status_iow(self,):
-            return str(self.status())
-
-
 class Data:
     """
     Data class
@@ -178,7 +146,7 @@ class Data:
             with open(pid_file, 'r') as fd:
                 pid = fd.readlines()[0].strip()
                 try:
-                    proc = PSProcess(int(pid))
+                    proc = psutil.Process(int(pid))
                     proc.io_counters()
                     proc.cpu_times()
                     return True
@@ -873,7 +841,7 @@ class Data:
             return processes
         for query in queries:
             try:
-                psproc = PSProcess(query['pid'])
+                psproc = psutil.Process(query['pid'])
                 meminfo = psproc.memory_info()
                 mem_percent = psproc.memory_percent()
                 cpu_percent = psproc.cpu_percent(interval=0)
@@ -886,7 +854,7 @@ class Data:
                     read_chars,
                     write_chars,
                 ) = psproc.io_counters()
-                status_iow = psproc.status_iow()
+                status_iow = str(psproc.status())
             except (psutil.NoSuchProcess, psutil.AccessDenied):
                 continue
 
@@ -951,18 +919,10 @@ class Data:
         """
         with catch_warnings():
             simplefilter("ignore", RuntimeWarning)
-            try:
-                # psutil >= 0.6.0
-                phymem = psutil.virtual_memory()
-                buffers = psutil.virtual_memory().buffers
-                cached = psutil.virtual_memory().cached
-                vmem = psutil.swap_memory()
-            except AttributeError:
-                # psutil > 0.4.0 and < 0.6.0
-                phymem = psutil.phymem_usage()
-                buffers = getattr(psutil, 'phymem_buffers', lambda: 0)()
-                cached = getattr(psutil, 'cached_phymem', lambda: 0)()
-                vmem = psutil.virtmem_usage()
+            phymem = psutil.virtual_memory()
+            buffers = psutil.virtual_memory().buffers
+            cached = psutil.virtual_memory().cached
+            vmem = psutil.swap_memory()
 
         mem_used = phymem.total - (phymem.free + buffers + cached)
         return (
