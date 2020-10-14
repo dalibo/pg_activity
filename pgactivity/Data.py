@@ -31,7 +31,6 @@ import psycopg2
 import psycopg2.extras
 from psycopg2.extensions import connection
 
-from .activities import get_load_average, get_mem_swap
 from .types import BWProcess, RunningProcess
 
 
@@ -879,51 +878,3 @@ class Data:
         if duration_mode not in (1, 2, 3):
             duration_mode = 1
         return ['query_start', 'xact_start', 'backend_start'][duration_mode - 1]
-
-    def get_duration_mode_name(self, duration_mode=1):
-        if duration_mode not in (1, 2, 3):
-            duration_mode = 1
-        return ['query', 'transaction', 'backend'][duration_mode - 1]
-
-    def set_global_io_counters(
-        self,
-        read_bytes_delta,
-        write_bytes_delta,
-        read_count_delta,
-        write_count_delta,
-    ):
-        """
-        Set IO counters.
-        """
-        self.read_bytes_delta = read_bytes_delta
-        self.write_bytes_delta = write_bytes_delta
-        self.read_count_delta = read_count_delta
-        self.write_count_delta = write_count_delta
-
-    def get_global_io_counters(self,):
-        """
-        Get IO counters.
-        """
-        return {
-            'read_bytes': self.read_bytes_delta,
-            'write_bytes': self.write_bytes_delta,
-            'read_count': self.read_count_delta,
-            'write_count': self.write_count_delta}
-
-    def get_mem_swap(self,) -> Tuple[float, int, int, float, int, int]:
-        """
-        Get memory and swap usage
-        """
-        return get_mem_swap()
-
-    def get_load_average(self,) -> Tuple[float, float, float]:
-        """
-        Get load average
-        """
-        return get_load_average()
-
-    def set_refresh_dbsize(self, refresh_dbsize):
-        """
-        Set self.refresh_dbsize
-        """
-        self.refresh_dbsize = refresh_dbsize
