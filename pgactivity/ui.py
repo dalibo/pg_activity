@@ -80,6 +80,11 @@ def main(options: optparse.Values) -> None:
                 )
             elif in_help and key == "q":
                 in_help, key = False, None
+            elif key == keys.EXIT:
+                break
+            elif key == keys.EXIT_DEBUG:
+                debugger = True
+                break
             elif key == keys.PAUSE:
                 in_pause = not in_pause
             elif key in (keys.REFRESH_TIME_INCREASE, keys.REFRESH_TIME_DECREASE):
@@ -174,12 +179,6 @@ def main(options: optparse.Values) -> None:
                 print(f"sort key: {sort_key}{term.clear_eol}")
                 print(f"last key: {key!r}{term.clear_eol}")
                 print("*" * term.width)
-
-            if key == keys.EXIT:
-                break
-            if key == keys.EXIT_DEBUG:
-                debugger = True
-                break
 
             key = term.inkey(timeout=refresh_time) or None
 
