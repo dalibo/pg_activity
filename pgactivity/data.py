@@ -41,7 +41,7 @@ def pg_get_version(pg_conn: connection) -> str:
     cur = pg_conn.cursor()
     cur.execute(query)
     ret: Dict[str, str] = cur.fetchone()
-    return ret['pg_version']
+    return ret["pg_version"]
 
 
 def pg_get_num_version(text_version: str) -> Tuple[str, int]:
@@ -62,14 +62,14 @@ def pg_get_num_version(text_version: str) -> Tuple[str, int]:
     if res is not None:
         rmatch = res.group(2)
         if int(res.group(3)) < 10:
-            rmatch += '0'
+            rmatch += "0"
         rmatch += res.group(3)
         if res.group(4) is not None:
             if int(res.group(4)) < 10:
-                rmatch += '0'
+                rmatch += "0"
             rmatch += res.group(4)
         else:
-            rmatch += '00'
+            rmatch += "00"
         pg_version = str(res.group(0))
         pg_num_version = int(rmatch)
         return pg_version, pg_num_version
@@ -85,17 +85,18 @@ def pg_get_num_dev_version(text_version: str) -> Tuple[str, int]:
     """
     res = re.match(
         r"^(PostgreSQL|EnterpriseDB) ([0-9]+)(?:\.([0-9]+))?(devel|beta[0-9]+|rc[0-9]+)",
-        text_version)
+        text_version,
+    )
     if not res:
         raise Exception(f"Undefined PostgreSQL version: {text_version}")
     rmatch = res.group(2)
     if res.group(3) is not None:
         if int(res.group(3)) < 10:
-            rmatch += '0'
+            rmatch += "0"
         rmatch += res.group(3)
     else:
-        rmatch += '00'
-    rmatch += '00'
+        rmatch += "00"
+    rmatch += "00"
     pg_version = str(res.group(0))
     pg_num_version = int(rmatch)
     return pg_version, pg_num_version
@@ -115,15 +116,15 @@ class Data:
         *,
         host: Optional[str] = None,
         port: int = 5432,
-        user: str = 'postgres',
+        user: str = "postgres",
         password: Optional[str] = None,
-        database: str = 'postgres',
+        database: str = "postgres",
         rds_mode: bool = False,
         service: Optional[str] = None,
     ) -> "Data":
         """Create an instance by connecting to a PostgreSQL server."""
         pg_conn = None
-        if host is None or host == 'localhost':
+        if host is None or host == "localhost":
             # try to connect using UNIX socket
             try:
                 if service is not None:
@@ -167,7 +168,7 @@ class Data:
         pg_version, pg_num_version = pg_get_num_version(pg_get_version(pg_conn))
         return cls(pg_conn, pg_version, pg_num_version, min_duration=min_duration)
 
-    def pg_is_local_access(self,) -> bool:
+    def pg_is_local_access(self) -> bool:
         """
         Verify if the user running pg_activity can acces
         system informations for the postmaster process.
@@ -177,8 +178,8 @@ class Data:
             cur = self.pg_conn.cursor()
             cur.execute(query)
             ret = cur.fetchone()
-            pid_file = ret['pid_file']
-            with open(pid_file, 'r') as fd:
+            pid_file = ret["pid_file"]
+            with open(pid_file, "r") as fd:
                 pid = fd.readlines()[0].strip()
                 try:
                     proc = psutil.Process(int(pid))
@@ -200,7 +201,7 @@ class Data:
         cur = self.pg_conn.cursor()
         cur.execute(query, (pid,))
         ret: Dict[str, bool] = cur.fetchone()
-        return ret['cancelled']
+        return ret["cancelled"]
 
     def pg_terminate_backend(self, pid: int) -> bool:
         """
@@ -213,7 +214,7 @@ class Data:
         cur = self.pg_conn.cursor()
         cur.execute(query, (pid,))
         ret: Dict[str, bool] = cur.fetchone()
-        return ret['terminated']
+        return ret["terminated"]
 
     DbInfoDict = Dict[str, Union[str, int, float]]
 
@@ -228,7 +229,7 @@ class Data:
         """
         prev_total_size = "0"
         if prev_db_infos is not None:
-            prev_total_size = prev_db_infos['total_size']  # type: ignore
+            prev_total_size = prev_db_infos["total_size"]  # type: ignore
 
         skip_dbsize = skip_sizes
 
@@ -242,27 +243,35 @@ class Data:
         pg_database
         {no_rds}
         """.format(
-            db_size=prev_total_size if skip_dbsize else "SUM(pg_database_size(datname))",
-            no_rds="WHERE datname <> 'rdsadmin'" if using_rds else ''
+            db_size=prev_total_size
+            if skip_dbsize
+            else "SUM(pg_database_size(datname))",
+            no_rds="WHERE datname <> 'rdsadmin'" if using_rds else "",
         )
         cur = self.pg_conn.cursor()
-        cur.execute(query,)
+        cur.execute(
+            query,
+        )
         ret = cur.fetchone()
         tps = 0
         size_ev = 0.0
         if prev_db_infos is not None:
-            tps = int((ret['no_xact'] - prev_db_infos['no_xact'])
-                      / (ret['timestamp'] - prev_db_infos['timestamp']))
-            size_ev = float(float(ret['total_size']
-                                  - prev_db_infos['total_size'])
-                            / (ret['timestamp'] - prev_db_infos['timestamp']))
+            tps = int(
+                (ret["no_xact"] - prev_db_infos["no_xact"])
+                / (ret["timestamp"] - prev_db_infos["timestamp"])
+            )
+            size_ev = float(
+                float(ret["total_size"] - prev_db_infos["total_size"])
+                / (ret["timestamp"] - prev_db_infos["timestamp"])
+            )
         return {
-            'timestamp': ret['timestamp'],
-            'no_xact': ret['no_xact'],
-            'total_size': ret['total_size'],
-            'max_length': ret['max_length'],
-            'tps': tps,
-            'size_ev': size_ev}
+            "timestamp": ret["timestamp"],
+            "no_xact": ret["no_xact"],
+            "total_size": ret["total_size"],
+            "max_length": ret["max_length"],
+            "tps": tps,
+            "size_ev": size_ev,
+        }
 
     def pg_get_active_connections(self) -> int:
         """
@@ -286,9 +295,9 @@ class Data:
             """
 
         cur = self.pg_conn.cursor()
-        cur.execute(query,)
+        cur.execute(query)
         ret = cur.fetchone()
-        active_connections = int(ret['active_connections'])
+        active_connections = int(ret["active_connections"])
         return active_connections
 
     def pg_get_activities(self, duration_mode: int = 1) -> List[RunningProcess]:
@@ -478,7 +487,7 @@ class Data:
         query = query.format(duration_column=duration_column)
 
         cur = self.pg_conn.cursor()
-        cur.execute(query, {'min_duration': self.min_duration})
+        cur.execute(query, {"min_duration": self.min_duration})
         ret = cur.fetchall()
 
         return [RunningProcess(**row) for row in ret]
@@ -571,7 +580,7 @@ class Data:
         query = query.format(duration_column=duration_column)
 
         cur = self.pg_conn.cursor()
-        cur.execute(query, {'min_duration': self.min_duration})
+        cur.execute(query, {"min_duration": self.min_duration})
         ret = cur.fetchall()
         return [BWProcess(**row) for row in ret]
 
@@ -799,11 +808,11 @@ class Data:
         query = query.format(duration_column=duration_column)
 
         cur = self.pg_conn.cursor()
-        cur.execute(query, {'min_duration': self.min_duration})
+        cur.execute(query, {"min_duration": self.min_duration})
         ret = cur.fetchall()
         return [BWProcess(**row) for row in ret]
 
-    def pg_is_local(self,) -> bool:
+    def pg_is_local(self) -> bool:
         """
         Is pg_activity connected localy ?
         """
@@ -813,7 +822,7 @@ class Data:
         cur = self.pg_conn.cursor()
         cur.execute(query)
         ret = cur.fetchone()
-        if ret['inet_server_addr'] == ret['inet_client_addr']:
+        if ret["inet_server_addr"] == ret["inet_client_addr"]:
             return True
         return False
 
@@ -832,4 +841,4 @@ class Data:
         """
         if duration_mode not in (1, 2, 3):
             duration_mode = 1
-        return ['query_start', 'xact_start', 'backend_start'][duration_mode - 1]
+        return ["query_start", "xact_start", "backend_start"][duration_mode - 1]

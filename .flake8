@@ -11,7 +11,6 @@ exclude =
   pgactivity/Process.py,
 per-file-ignores =
   pg_activity:E251
-  pgactivity/data.py:E128,E251
   setup.py:E251,E402
 select = B,C,E,F,W,T4,B9
 mypy_config = mypy.ini
