@@ -51,6 +51,7 @@ def main(
     key, in_help, in_pause = None, False, False
     query_mode = types.QueryMode.activities
     sort_key = types.SortKey.default()
+    skip_sizes = options.nodbsize
     queries: Union[List[types.Activity], List[types.ActivityBW]]
     queries = data.pg_get_activities()
     procs = data.sys_get_proc(queries, is_local)
@@ -58,8 +59,10 @@ def main(
         pg_db_info = None
         while True:
             pg_db_info = data.pg_get_db_info(
-                pg_db_info, using_rds=options.rds, skip_sizes=options.nodbsize
+                pg_db_info, using_rds=options.rds, skip_sizes=skip_sizes
             )
+            if options.nodbsize and not skip_sizes:
+                skip_sizes = True
 
             dbinfo = types.DBInfo(
                 total_size=int(pg_db_info["total_size"]),
@@ -86,6 +89,8 @@ def main(
                 break
             elif key == keys.PAUSE:
                 in_pause = not in_pause
+            elif options.nodbsize and key == keys.REFRESH_DB_SIZE:
+                skip_sizes = False
             elif key in (keys.REFRESH_TIME_INCREASE, keys.REFRESH_TIME_DECREASE):
                 refresh_time = handlers.refresh_time(key, refresh_time)
             elif key is not None:

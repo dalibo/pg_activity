@@ -10,6 +10,7 @@ CHANGE_DURATION_MODE = "T"
 EXIT = "q"
 HELP = "h"
 PAUSE = " "
+REFRESH_DB_SIZE = "D"
 REFRESH_TIME_INCREASE = "+"
 REFRESH_TIME_DECREASE = "-"
 SORTBY_READ = "r"
@@ -50,7 +51,7 @@ BINDINGS: List[Key] = [
     Key(SORTBY_TIME, "sort by TIME+ desc. (activities)", local_only=True),
     Key("R", "force refresh"),
     Key(CHANGE_DURATION_MODE, "change duration mode"),
-    Key("D", "force refresh database size"),
+    Key(REFRESH_DB_SIZE, "force refresh database size"),
 ]
 
 
