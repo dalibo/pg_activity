@@ -1,7 +1,6 @@
 import getpass
 import optparse
 import re
-import sys
 from datetime import datetime
 from functools import wraps
 from typing import Any, Callable, IO, Iterable, List, Mapping, Optional, TypeVar, Union
@@ -237,7 +236,7 @@ def pg_connect(
                 password = getpass.getpass()
             elif exit_on_failed:
                 msg = str(err).replace("FATAL:", "")
-                sys.exit("pg_activity: FATAL: %s" % clean_str(msg))
+                raise SystemExit("pg_activity: FATAL: %s" % clean_str(msg))
             else:
                 raise Exception("Could not connect to PostgreSQL")
         else:
