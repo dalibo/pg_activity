@@ -6,7 +6,7 @@ from typing import Dict, Optional
 import attr
 from blessed import Terminal
 
-from . import __version__, Data, activities, handlers, keys, types, utils, views
+from . import __version__, activities, handlers, keys, types, utils, views
 
 
 def main(
@@ -15,22 +15,18 @@ def main(
     term: Optional[Terminal] = None,
     render_footer: bool = True,
 ) -> None:
-    data = Data.Data()
-    data.min_duration = options.minduration
-    utils.pg_connect(
-        data,
+    data = utils.pg_connect(
         options,
         password=os.environ.get("PGPASSWORD"),
         service=os.environ.get("PGSERVICE"),
+        min_duration=options.minduration,
     )
 
-    pg_version = data.pg_get_version()
-    data.pg_get_num_version(pg_version)
     hostname = socket.gethostname()
     fs_blocksize = options.blocksize
 
     host = types.Host(
-        data.get_pg_version(),
+        data.pg_version,
         hostname,
         options.username,
         options.host,

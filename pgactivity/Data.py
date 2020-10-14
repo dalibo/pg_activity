@@ -26,6 +26,7 @@ SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 import re
 from typing import Dict, List, Optional, Tuple, Union
 
+import attr
 import psutil
 import psycopg2
 import psycopg2.extras
@@ -100,46 +101,18 @@ def pg_get_num_dev_version(text_version: str) -> Tuple[str, int]:
     return pg_version, pg_num_version
 
 
+@attr.s(auto_attribs=True, frozen=True, slots=True)
 class Data:
-    """
-    Data class
-    """
-    pg_conn = None
-    pg_version = None
-    pg_num_version = None
-    io_counters = None
-    prev_io_counters = None
-    read_bytes_delta = 0
-    write_bytes_delta = 0
-    read_count_delta = 0
-    write_count_delta = 0
-    refresh_dbsize = False
-    min_duration = 0
+    pg_conn: connection
+    pg_version: str
+    pg_num_version: int
+    min_duration: float
 
-    def __init__(self) -> None:
-        """
-        Constructor.
-        """
-        self.pg_conn = None
-        self.pg_version = None
-        self.pg_num_version = None
-        self.io_counters = None
-        self.prev_io_counters = None
-        self.read_bytes_delta = 0
-        self.write_bytes_delta = 0
-        self.read_count_delta = 0
-        self.write_count_delta = 0
-        self.refresh_dbsize = False
-        self.min_duration = 0
-
-    def get_pg_version(self) -> str:
-        """
-        Get self.pg_version
-        """
-        return self.pg_version
-
+    @classmethod
     def pg_connect(
-        self,
+        cls,
+        min_duration,
+        *,
         host=None,
         port=5432,
         user='postgres',
@@ -147,22 +120,19 @@ class Data:
         database='postgres',
         rds_mode=False,
         service=None,
-    ):
-        """
-        Connect to a PostgreSQL server and return
-        cursor & connector.
-        """
-        self.pg_conn = None
+    ) -> "Data":
+        """Create an instance by connecting to a PostgreSQL server."""
+        pg_conn = None
         if host is None or host == 'localhost':
             # try to connect using UNIX socket
             try:
                 if service is not None:
-                    self.pg_conn = psycopg2.connect(
+                    pg_conn = psycopg2.connect(
                         service=service,
                         cursor_factory=psycopg2.extras.DictCursor,
                     )
                 else:
-                    self.pg_conn = psycopg2.connect(
+                    pg_conn = psycopg2.connect(
                         database=database,
                         user=user,
                         port=port,
@@ -172,14 +142,14 @@ class Data:
             except psycopg2.Error as psy_err:
                 if host is None:
                     raise psy_err
-        if self.pg_conn is None:  # fallback on TCP/IP connection
+        if pg_conn is None:  # fallback on TCP/IP connection
             if service is not None:
-                self.pg_conn = psycopg2.connect(
+                pg_conn = psycopg2.connect(
                     service=service,
                     cursor_factory=psycopg2.extras.DictCursor,
                 )
             else:
-                self.pg_conn = psycopg2.connect(
+                pg_conn = psycopg2.connect(
                     database=database,
                     host=host,
                     port=port,
@@ -187,13 +157,15 @@ class Data:
                     password=password,
                     cursor_factory=psycopg2.extras.DictCursor,
                 )
-        self.pg_conn.set_isolation_level(0)
+        pg_conn.set_isolation_level(0)
         if not rds_mode:  # Make sure we are using superuser if not on RDS
-            cur = self.pg_conn.cursor()
+            cur = pg_conn.cursor()
             cur.execute("SELECT current_setting('is_superuser')")
             ret = cur.fetchone()
             if ret[0] != "on":
                 raise Exception("Must be run with database superuser privileges.")
+        pg_version, pg_num_version = pg_get_num_version(pg_get_version(pg_conn))
+        return cls(pg_conn, pg_version, pg_num_version, min_duration=min_duration)
 
     def pg_is_local_access(self,) -> bool:
         """
@@ -220,13 +192,6 @@ class Data:
         except Exception:
             return False
 
-    def pg_get_version(self) -> str:
-        """
-        Get PostgreSQL server version.
-        """
-        assert self.pg_conn is not None
-        return pg_get_version(self.pg_conn)
-
     def pg_cancel_backend(self, pid,):
         """
         Cancel a backend
@@ -250,16 +215,6 @@ class Data:
         ret = cur.fetchone()
         return ret['terminated']
 
-    def pg_get_num_version(self, text_version: str) -> None:
-        """
-        Fetch PostgreSQL short & numeric version from
-        a string (SELECT version()) and set pg_version and pg_num_version
-        attributes.
-        """
-        pg_version, pg_num_version = pg_get_num_version(text_version)
-        self.pg_version = pg_version
-        self.pg_num_version = pg_num_version
-
     DbInfoDict = Dict[str, Union[str, int]]
 
     def pg_get_db_info(
@@ -275,7 +230,7 @@ class Data:
         if prev_db_infos is not None:
             prev_total_size = prev_db_infos['total_size']
 
-        skip_dbsize = skip_sizes and (not self.refresh_dbsize)
+        skip_dbsize = skip_sizes
 
         query = """
     SELECT

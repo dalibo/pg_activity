@@ -7,6 +7,8 @@ from typing import Any, IO, Iterable, Mapping, Optional
 import psycopg2
 from psycopg2 import errorcodes
 
+from .Data import Data
+
 
 def clean_str(string: str) -> str:
     r"""
@@ -169,18 +171,16 @@ def csv_write(
 
 
 def pg_connect(
-    data: Any,
     options: optparse.Values,
     password: Optional[str] = None,
     service: Optional[str] = None,
     exit_on_failed: bool = True,
-) -> Optional[str]:
-    """Try to connect to postgres using 'data' instance, return the password
-    to be used in case of reconnection.
-    """
+    min_duration: float = 0.0,
+) -> Data:
+    """Try to build a Data instance by to connecting to postgres."""
     for nb_try in range(2):
         try:
-            data.pg_connect(
+            data = Data.pg_connect(
                 host=options.host,
                 port=options.port,
                 user=options.username,
@@ -188,6 +188,7 @@ def pg_connect(
                 database=options.dbname,
                 rds_mode=options.rds,
                 service=service,
+                min_duration=min_duration,
             )
         except psycopg2.OperationalError as err:
             errmsg = str(err).strip()
@@ -204,4 +205,4 @@ def pg_connect(
                 raise Exception("Could not connect to PostgreSQL")
         else:
             break
-    return password
+    return data
