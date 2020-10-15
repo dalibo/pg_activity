@@ -4,8 +4,8 @@ SELECT current_setting('is_superuser') AS is_superuser;
 
 -- name : get_pid_file?
 -- Get the path of the pidfile
-SELECT setting||'/postmaster.pid' AS pid_file 
-  FROM pg_settings 
+SELECT setting||'/postmaster.pid' AS pid_file
+  FROM pg_settings
  WHERE name = 'data_directory';
 
 -- name : get_version?
@@ -25,7 +25,7 @@ SELECT pg_cancel_backend(:pid) AS is_cancelled;
 SELECT
       EXTRACT(EPOCH FROM NOW()) AS timestamp,
       SUM(pg_stat_get_db_xact_commit(oid)+pg_stat_get_db_xact_rollback(oid))::BIGINT AS no_xact,
-      CASE 
+      CASE
           WHEN :skip_db_size THEN :prev_total_size
           ELSE SUM(pg_database_size(datname))
       END AS total_size,
@@ -59,26 +59,26 @@ SELECT
           THEN 'local'
           ELSE pg_stat_activity.client_addr::TEXT
       END AS client,
-      EXTRACT(epoch FROM (NOW() - pg_stat_activity.:duration_column)) AS duration,
-      CASE WHEN pg_stat_activity.wait_event_type IN ('LWLock', 'Lock', 'BufferPin') 
-          THEN true 
-	  ELSE false 
+      EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
+      CASE WHEN pg_stat_activity.wait_event_type IN ('LWLock', 'Lock', 'BufferPin')
+          THEN true
+	  ELSE false
       END AS wait,
       pg_stat_activity.usename AS user,
       pg_stat_activity.state AS state,
       pg_stat_activity.query AS query,
       pg_stat_activity.backend_type = 'parallel worker' AS is_parallel_worker
- FROM 
+ FROM
       pg_stat_activity
- WHERE 
+ WHERE
       state <> 'idle'
   AND pid <> pg_backend_pid()
-  AND CASE WHEN :min_duration s = 0 
+  AND CASE WHEN %(min_duration)s = 0
           THEN true
-          ELSE extract(epoch from now() - :duration_column s) > :min_duration s
+          ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
       END
-ORDER BY 
-      EXTRACT(epoch FROM (NOW() - pg_stat_activity.:duration_column)) DESC;
+ORDER BY
+      EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) DESC;
 
 -- name : get_pg_activity_100000
 -- Get data from pg_activity for pg 10
@@ -93,15 +93,15 @@ SELECT
           THEN 'local'
           ELSE pg_stat_activity.client_addr::TEXT
       END AS client,
-      EXTRACT(epoch FROM (NOW() - pg_stat_activity.:duration_column)) AS duration,
-      CASE WHEN pg_stat_activity.wait_event_type IN ('LWLock', 'Lock', 'BufferPin') 
-          THEN true 
-	  ELSE false 
+      EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
+      CASE WHEN pg_stat_activity.wait_event_type IN ('LWLock', 'Lock', 'BufferPin')
+          THEN true
+	  ELSE false
       END AS wait,
       pg_stat_activity.usename AS user,
       pg_stat_activity.state AS state,
       pg_stat_activity.query AS query,
-      (   pg_stat_activity.backend_type = 'background worker' 
+      (   pg_stat_activity.backend_type = 'background worker'
           AND pg_stat_activity.query IS NOT NULL
       ) AS is_parallel_worker
   FROM
@@ -109,12 +109,12 @@ SELECT
  WHERE
       state <> 'idle'
   AND pid <> pg_backend_pid()
-  AND CASE WHEN :min_duration s = 0 
+  AND CASE WHEN %(min_duration)s = 0
           THEN true
-          ELSE extract(epoch from now() - :duration_column) > :min_duration s
+          ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
       END
 ORDER BY
-      EXTRACT(epoch FROM (NOW() - pg_stat_activity.:duration_column)) DESC;
+      EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) DESC;
 
 -- name : get_pg_activity_90600
 -- Get data from pg_activity for pg 9.6
@@ -129,7 +129,7 @@ SELECT
           THEN 'local'
           ELSE pg_stat_activity.client_addr::TEXT
       END AS client,
-      EXTRACT(epoch FROM (NOW() - pg_stat_activity.:duration_column)) AS duration,
+      EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
       pg_stat_activity.wait_event IS NOT NULL AS wait,
       pg_stat_activity.usename AS user,
       pg_stat_activity.state AS state,
@@ -140,12 +140,12 @@ SELECT
  WHERE
       state <> 'idle'
   AND pid <> pg_backend_pid()
-  AND CASE WHEN :min_duration s = 0 
+  AND CASE WHEN %(min_duration)s = 0
           THEN true
-          ELSE extract(epoch from now() - :duration_column) > :min_duration s
+          ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
       END
 ORDER BY
-      EXTRACT(epoch FROM (NOW() - pg_stat_activity.:duration_column)) DESC;
+      EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) DESC;
 
 -- name : get_pg_activity_90200_90500
 -- Get data from pg_activity from pg 9.2 to pg 9.5
@@ -160,7 +160,7 @@ SELECT
           THEN 'local'
           ELSE pg_stat_activity.client_addr::TEXT
       END AS client,
-      EXTRACT(epoch FROM (NOW() - pg_stat_activity.:duration_column)) AS duration,
+      EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
       pg_stat_activity.waiting AS wait,
       pg_stat_activity.usename AS user,
       pg_stat_activity.state AS state,
@@ -171,12 +171,12 @@ SELECT
  WHERE
       state <> 'idle'
   AND pid <> pg_backend_pid()
-  AND CASE WHEN :min_duration s = 0 
+  AND CASE WHEN %(min_duration)s = 0
           THEN true
-          ELSE extract(epoch from now() - :duration_column) > :min_duration s
+          ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
       END
 ORDER BY
-      EXTRACT(epoch FROM (NOW() - pg_stat_activity.:duration_column)) DESC;
+      EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) DESC;
 
 -- name : get_pg_activity_90200
 -- Get data from pg_activity before pg 9.2
@@ -217,7 +217,74 @@ SELECT
 ORDER BY
       EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) DESC
 
+-- name : get_waiting_90200
+-- Get waiting queries for versions before 9.2
+SELECT
+      pg_locks.pid AS pid,
+      pg_stat_activity.application_name AS appname,
+      CASE WHEN LENGTH(pg_stat_activity.datname) > 16
+               THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
+           ELSE pg_stat_activity.datname
+      END AS database,
+      pg_stat_activity.usename AS user,
+      pg_locks.mode AS mode,
+      pg_locks.locktype AS type,
+      pg_locks.relation::regclass AS relation,
+      EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
+      pg_stat_activity.state as state,
+      pg_stat_activity.query AS query
+  FROM
+      pg_catalog.pg_locks
+      JOIN pg_catalog.pg_stat_activity ON(pg_catalog.pg_locks.pid = pg_catalog.pg_stat_activity.pid)
+ WHERE
+      NOT pg_catalog.pg_locks.granted
+      AND pg_catalog.pg_stat_activity.pid <> pg_backend_pid()
+      AND CASE WHEN %(min_duration)s = 0 THEN true
+               ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
+          END
+ORDER BY
+      EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) DESC;
+
+
+-- name : get_waiting_before_90200
+-- Get waiting queries for versions before 9.2
+SELECT
+      pg_locks.pid AS pid,
+      '<unknown>' AS appname,
+      CASE WHEN LENGTH(pg_stat_activity.datname) > 16
+           THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
+           ELSE pg_stat_activity.datname
+      END AS database,
+      pg_stat_activity.usename AS user,
+      pg_locks.mode AS mode,
+      pg_locks.locktype AS type,
+      pg_locks.relation::regclass AS relation,
+      EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
+      CASE WHEN pg_stat_activity.current_query = '<IDLE> in transaction (aborted)'
+               THEN 'idle in transaction (aborted)'
+           WHEN pg_stat_activity.current_query = '<IDLE> in transaction'
+	       THEN 'idle in transaction'
+           WHEN pg_stat_activity.current_query = '<IDLE>'
+	       THEN 'idle'
+           ELSE 'active'
+      END AS state,
+      CASE WHEN pg_stat_activity.current_query LIKE '<IDLE>%%' THEN 'None'
+           ELSE pg_stat_activity.current_query
+      END AS query
+  FROM
+      pg_catalog.pg_locks
+      JOIN pg_catalog.pg_stat_activity ON(pg_catalog.pg_locks.pid = pg_catalog.pg_stat_activity.procpid)
+ WHERE
+      NOT pg_catalog.pg_locks.granted
+      AND pg_catalog.pg_stat_activity.procpid <> pg_backend_pid()
+      AND CASE WHEN %(min_duration)s = 0 THEN true
+               ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
+          END
+ORDER BY
+      EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) DESC;
+
+
 -- name : get_pga_inet_addresses?
 -- Get the inet address
 SELECT inet_server_addr() AS inet_server_addr, inet_client_addr() AS inet_client_addr;
-      
+

@@ -328,51 +328,28 @@ class Data:
         """
         if self.pg_num_version >= 110000:
             # PostgreSQL 11 and more
-            ret = self.queries.get_pg_activity_110000(
-                self.pg_conn,
-                duration_column=self.get_duration_column(duration_mode),
-                min_duration=self.min_duration
-            )
-            if not ret:
-                raise Exception('Failed to ' + self.queries.get_active_connections.__doc__)
+            query = self.queries.get_pg_activity_110000.sql
         elif self.pg_num_version >= 100000:
             # PostgreSQL 10
             # We assume a background_worker with a not null query is a parallel worker.
-            ret = self.queries.get_pg_activity_100000(
-                self.pg_conn,
-                duration_column=self.get_duration_column(duration_mode),
-                min_duration=self.min_duration
-            )
-            if not ret:
-                raise Exception('Failed to ' + self.queries.get_active_connections.__doc__)
+            query = self.queries.get_pg_activity_100000.sql
         elif self.pg_num_version >= 90600:
             # PostgreSQL prior to 10.0 and >= 9.6.0
             # There is no way to see parallel workers
-            ret = self.queries.get_pg_activity_90600(
-                self.pg_conn,
-                duration_column=self.get_duration_column(duration_mode),
-                min_duration=self.min_duration
-            )
-            if not ret:
-                raise Exception('Failed to ' + self.queries.get_active_connections.__doc__)
+            query = self.queries.get_pg_activity_90600.sql
         elif self.pg_num_version >= 90200:
             # PostgreSQL prior to 9.6.0 and >= 9.2.0
-            ret = self.queries.get_pg_activity_90200_90500(
-                self.pg_conn,
-                duration_column=self.get_duration_column(duration_mode),
-                min_duration=self.min_duration
-            )
-            if not ret:
-                raise Exception('Failed to ' + self.queries.get_active_connections.__doc__)
+            query = self.queries.get_pg_activity_90200_90500.sql
         elif self.pg_num_version < 90200:
             # PostgreSQL prior to 9.2.0
-            ret = self.queries.get_pg_activity_90200(
-                self.pg_conn,
-                duration_column=self.get_duration_column(duration_mode),
-                min_duration=self.min_duration
-            )
-            if not ret:
-                raise Exception('Failed to ' + self.queries.get_active_connections.__doc__)
+            ret = self.queries.get_pg_activity_90200.sql
+
+        duration_column = self.get_duration_column(duration_mode)
+        query = query.format(duration_column=duration_column)
+
+        cur = self.pg_conn.cursor()
+        cur.execute(query, {'min_duration': self.min_duration})
+        ret = cur.fetchall()
 
         return ret
 
@@ -381,74 +358,9 @@ class Data:
         Get waiting queries.
         """
         if self.pg_num_version >= 90200:
-            query = """
-    SELECT
-        pg_locks.pid AS pid,
-        pg_stat_activity.application_name AS appname,
-        CASE WHEN LENGTH(pg_stat_activity.datname) > 16
-            THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
-            ELSE pg_stat_activity.datname
-            END
-        AS database,
-        pg_stat_activity.usename AS user,
-        pg_locks.mode AS mode,
-        pg_locks.locktype AS type,
-        pg_locks.relation::regclass AS relation,
-        EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
-        pg_stat_activity.state as state,
-        pg_stat_activity.query AS query
-    FROM
-        pg_catalog.pg_locks
-        JOIN pg_catalog.pg_stat_activity ON(pg_catalog.pg_locks.pid = pg_catalog.pg_stat_activity.pid)
-    WHERE
-        NOT pg_catalog.pg_locks.granted
-        AND pg_catalog.pg_stat_activity.pid <> pg_backend_pid()
-        AND CASE WHEN %(min_duration)s = 0 THEN true
-            ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
-            END
-    ORDER BY
-        EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) DESC
-            """
+            query = self.queries.get_waiting_90200.sql
         elif self.pg_num_version < 90200:
-            query = """
-    SELECT
-        pg_locks.pid AS pid,
-        '<unknown>' AS appname,
-        CASE
-            WHEN LENGTH(pg_stat_activity.datname) > 16
-            THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
-            ELSE pg_stat_activity.datname
-            END
-        AS database,
-        pg_stat_activity.usename AS user,
-        pg_locks.mode AS mode,
-        pg_locks.locktype AS type,
-        pg_locks.relation::regclass AS relation,
-        EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
-        CASE
-           WHEN pg_stat_activity.current_query = '<IDLE> in transaction (aborted)' THEN 'idle in transaction (aborted)'
-           WHEN pg_stat_activity.current_query = '<IDLE> in transaction' THEN 'idle in transaction'
-           WHEN pg_stat_activity.current_query = '<IDLE>' THEN 'idle'
-           ELSE 'active'
-           END
-        AS state,
-        CASE
-           WHEN pg_stat_activity.current_query LIKE '<IDLE>%%' THEN 'None'
-           ELSE pg_stat_activity.current_query
-           END
-        AS query
-    FROM
-        pg_catalog.pg_locks
-        JOIN pg_catalog.pg_stat_activity ON(pg_catalog.pg_locks.pid = pg_catalog.pg_stat_activity.procpid)
-    WHERE
-        NOT pg_catalog.pg_locks.granted
-        AND pg_catalog.pg_stat_activity.procpid <> pg_backend_pid()
-        AND CASE WHEN %(min_duration)s = 0 THEN true
-            ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
-            END
-    ORDER BY
-        EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) DESC
-            """
+            query = self.queries.get_waiting_before_90200.sql
 
         duration_column = self.get_duration_column(duration_mode)
         query = query.format(duration_column=duration_column)
