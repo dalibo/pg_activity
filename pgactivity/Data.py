@@ -874,38 +874,42 @@ class Data:
         for query in queries:
             try:
                 psproc = PSProcess(query['pid'])
-                process = Process(
-                    pid=query['pid'],
-                    database=query['database'],
-                    user=query['user'],
-                    client=query['client'],
-                    duration=query['duration'],
-                    wait=query['wait'],
-                    state=query['state'],
-                    query=query['query'],
+                meminfo = psproc.memory_info()
+                mem_percent = psproc.memory_percent()
+                cpu_percent = psproc.cpu_percent(interval=0)
+                cpu_times = psproc.cpu_times()
+                io_counters = psproc.io_counters()
+                status_iow = psproc.status_iow()
+            except (psutil.NoSuchProcess, psutil.AccessDenied):
+                continue
+
+            pid = query['pid']
+            processes[pid] = Process(
+                pid=pid,
+                database=query['database'],
+                user=query['user'],
+                client=query['client'],
+                duration=query['duration'],
+                wait=query['wait'],
+                state=query['state'],
+                query=query['query'],
+                appname=query['application_name'],
+                extras=ProcessExtras(
+                    meminfo=meminfo,
+                    io_counters=IOCounters(*io_counters),
+                    io_time=time.time(),
+                    mem_percent=mem_percent,
+                    cpu_percent=cpu_percent,
+                    cpu_times=cpu_times,
+                    read_delta=0,
+                    write_delta=0,
+                    io_wait=self.__sys_get_iow_status(status_iow),
+                    psutil_proc=psproc,
+                    is_parallel_worker=query['is_parallel_worker'],
                     appname=query['application_name'],
-                    extras=ProcessExtras(
-                        meminfo=psproc.memory_info(),
-                        io_counters=IOCounters(*psproc.io_counters()),
-                        io_time=time.time(),
-                        mem_percent=psproc.memory_percent(),
-                        cpu_percent=psproc.cpu_percent(interval=0),
-                        cpu_times=psproc.cpu_times(),
-                        read_delta=0,
-                        write_delta=0,
-                        io_wait=self.__sys_get_iow_status(psproc.status_iow()),
-                        psutil_proc=psproc,
-                        is_parallel_worker=query['is_parallel_worker'],
-                        appname=query['application_name'],
-                    ),
-                )
+                ),
+            )
 
-                processes[process.pid] = process
-
-            except psutil.NoSuchProcess:
-                pass
-            except psutil.AccessDenied:
-                pass
         return processes
 
     def set_global_io_counters(
