@@ -32,6 +32,7 @@ Default CLI options, passed to ui.main():
 ...     "nodb": False,
 ...     "nodbsize": False,
 ...     "nomem": True,
+...     "nopid": False,
 ...     "noread": True,
 ...     "notime": True,
 ...     "nouser": False,

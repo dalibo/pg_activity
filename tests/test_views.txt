@@ -61,7 +61,7 @@
 ...     max_iops=76,
 ...     system_info=sysinfo,
 ...     querymode=QueryMode.activities,
-...     flag=Flag.CPU|Flag.MEM|Flag.DATABASE,
+...     flag=Flag.PID|Flag.CPU|Flag.MEM|Flag.DATABASE,
 ...     sort_key=SortKey.cpu,
 ...     activities=processes,
 ...     is_local=True,

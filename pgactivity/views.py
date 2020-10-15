@@ -467,7 +467,7 @@ class Column(enum.Enum):
         name="MODE", template_h="%16s ", flag=Flag.MODE, mandatory=False, sort_key=None
     )
     pid = ColumnTitle(
-        name="PID", template_h="%-6s ", flag=None, mandatory=True, sort_key=None
+        name="PID", template_h="%-6s ", flag=Flag.PID, mandatory=False, sort_key=None
     )
     query = ColumnTitle(
         name="Query", template_h=" %2s", flag=None, mandatory=True, sort_key=None
@@ -563,13 +563,13 @@ def columns_header(
     r"""Yield columns header lines.
 
     >>> term = Terminal()
-    >>> columns_header(term, QueryMode.activities, Flag.DATABASE, SortKey.cpu)  # doctest: +NORMALIZE_WHITESPACE
+    >>> columns_header(term, QueryMode.activities, Flag.PID | Flag.DATABASE, SortKey.cpu)  # doctest: +NORMALIZE_WHITESPACE
     PID    DATABASE                      state   Query
     >>> columns_header(term, QueryMode.activities, Flag.CPU, SortKey.cpu)  # doctest: +NORMALIZE_WHITESPACE
-    PID      CPU%              state   Query
+    CPU%              state   Query
     >>> columns_header(term, QueryMode.activities, Flag.MEM, SortKey.cpu)  # doctest: +NORMALIZE_WHITESPACE
-    PID    MEM%              state   Query
-    >>> flag = Flag.DATABASE | Flag.APPNAME | Flag.RELATION | Flag.CLIENT | Flag.WAIT
+    MEM%              state   Query
+    >>> flag = Flag.PID | Flag.DATABASE | Flag.APPNAME | Flag.RELATION | Flag.CLIENT | Flag.WAIT
     >>> columns_header(term, QueryMode.blocking, flag, SortKey.duration)  # doctest: +NORMALIZE_WHITESPACE
     PID    DATABASE                      APP  RELATION              state   Query
     >>> columns_header(term, QueryMode.activities, flag, SortKey.duration)  # doctest: +NORMALIZE_WHITESPACE
@@ -588,8 +588,8 @@ def get_indent(mode: QueryMode, flag: Flag, max_ncol: int = MAX_NCOL) -> str:
     """Return identation for Query column.
 
     >>> get_indent(QueryMode.activities, Flag.CPU)
-    '                                  '
-    >>> flag = Flag.DATABASE | Flag.APPNAME | Flag.RELATION
+    '                           '
+    >>> flag = Flag.PID | Flag.DATABASE | Flag.APPNAME | Flag.RELATION
     >>> get_indent(QueryMode.activities, flag)
     '                                                             '
     """
@@ -725,7 +725,7 @@ def processes_rows(
     ...     ),
     ... ]
 
-    >>> flag = Flag.CPU|Flag.MEM|Flag.DATABASE
+    >>> flag = Flag.PID|Flag.CPU|Flag.MEM|Flag.DATABASE
     >>> term.width
     80
 
@@ -771,7 +771,7 @@ def processes_rows(
                                                              HAVING sum(p.price *
                                                              s.units) > 5000;
 
-    >>> allflags = Flag.IOWAIT|Flag.MODE|Flag.TYPE|Flag.RELATION|Flag.WAIT|Flag.TIME|Flag.WRITE|Flag.READ|Flag.MEM|Flag.CPU|Flag.USER|Flag.CLIENT|Flag.APPNAME|Flag.DATABASE
+    >>> allflags = Flag.PID|Flag.IOWAIT|Flag.MODE|Flag.TYPE|Flag.RELATION|Flag.WAIT|Flag.TIME|Flag.WRITE|Flag.READ|Flag.MEM|Flag.CPU|Flag.USER|Flag.CLIENT|Flag.APPNAME|Flag.DATABASE
     >>> term.width
     80
 
@@ -788,15 +788,15 @@ def processes_rows(
     WHERE s.date > CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name,
     p.price, p.cost HAVING sum(p.price * s.units) > 5000;
 
-    >>> oneflag = Flag.DATABASE
-    >>> processes_rows(term, processes, is_local=True, flag=oneflag,
+    >>> flag = Flag.PID|Flag.DATABASE
+    >>> processes_rows(term, processes, is_local=True, flag=flag,
     ...                query_mode=QueryMode.activities,
     ...                verbose_mode=QueryDisplayMode.truncate)
     6239   pgbench               idle in trans   UPDATE pgbench_accounts SET abalanc
     6228   pgbench                      active   \_ UPDATE pgbench_accounts SET abal
     1234   business                     active   SELECT product_id, p.name FROM prod
 
-    >>> processes_rows(term, processes, is_local=True, flag=oneflag,
+    >>> processes_rows(term, processes, is_local=True, flag=flag,
     ...                query_mode=QueryMode.activities,
     ...                verbose_mode=QueryDisplayMode.wrap)
     6239   pgbench               idle in trans   UPDATE pgbench_accounts SET
@@ -839,7 +839,7 @@ def processes_rows(
     ...         query="UPDATE pgbench_branches SET bbalance = bbalance + 1788 WHERE bid = 68;",
     ...     ),
     ... ]
-    >>> processes_rows(term, processes, is_local=True, flag=oneflag,
+    >>> processes_rows(term, processes, is_local=True, flag=flag,
     ...                query_mode=QueryMode.waiting,
     ...                verbose_mode=QueryDisplayMode.wrap)
     6239   pgbench                      active   END;
@@ -881,8 +881,8 @@ def processes_rows(
 
     for process in processes:
         text: List[str] = []
-        cell(process, "pid", None)
-
+        if flag & Flag.PID:
+            cell(process, "pid", None)
         if flag & Flag.DATABASE:
             cell(process, "database", 16)
         if flag & Flag.APPNAME:

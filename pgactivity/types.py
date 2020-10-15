@@ -148,6 +148,7 @@ class Flag(enum.IntFlag):
     TYPE = 2048
     MODE = 4096
     IOWAIT = 8192
+    PID = 16384
 
     @classmethod
     def from_options(
@@ -159,6 +160,7 @@ class Flag(enum.IntFlag):
         nocpu: bool,
         nodb: bool,
         nomem: bool,
+        nopid: bool,
         noread: bool,
         notime: bool,
         nouser: bool,
@@ -174,6 +176,7 @@ class Flag(enum.IntFlag):
         ... 'nocpu': False,
         ... 'nodb': False,
         ... 'nomem': False,
+        ... 'nopid': False,
         ... 'noread': False,
         ... 'notime': False,
         ... 'nouser': False,
@@ -181,11 +184,12 @@ class Flag(enum.IntFlag):
         ... 'nowrite': False,
         ... }
         >>> Flag.from_options(is_local=True, **options)
-        <Flag.IOWAIT|MODE|TYPE|RELATION|WAIT|TIME|WRITE|READ|MEM|CPU|USER|CLIENT|APPNAME|DATABASE: 16383>
+        <Flag.PID|IOWAIT|MODE|TYPE|RELATION|WAIT|TIME|WRITE|READ|MEM|CPU|USER|CLIENT|APPNAME|DATABASE: 32767>
         >>> Flag.from_options(is_local=False, **options)
-        <Flag.MODE|TYPE|RELATION|WAIT|TIME|USER|CLIENT|APPNAME|DATABASE: 7951>
+        <Flag.PID|MODE|TYPE|RELATION|WAIT|TIME|USER|CLIENT|APPNAME|DATABASE: 24335>
         >>> options['nodb'] = True
         >>> options['notime'] = True
+        >>> options['nopid'] = True
         >>> Flag.from_options(is_local=False, **options)
         <Flag.MODE|TYPE|RELATION|WAIT|USER|CLIENT|APPNAME: 7694>
         """
@@ -204,6 +208,7 @@ class Flag(enum.IntFlag):
             | cls.MODE
             | cls.IOWAIT
             | cls.APPNAME
+            | cls.PID
         )
         if nodb:
             flag ^= cls.DATABASE
@@ -225,6 +230,8 @@ class Flag(enum.IntFlag):
             flag ^= cls.WAIT
         if noappname:
             flag ^= cls.APPNAME
+        if nopid:
+            flag ^= cls.PID
 
         # Remove some if no running against local pg server.
         if not is_local and (flag & cls.CPU):
