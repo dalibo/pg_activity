@@ -99,6 +99,28 @@ class Deserializable:
         return cls(**args)  # type: ignore
 
 
+E = TypeVar("E", bound=enum.IntEnum)
+
+
+def enum_next(e: E) -> E:
+    """Return an increment value of given enum.
+
+    >>> class Seasons(enum.IntEnum):
+    ...     winter = 1
+    ...     spring = 2
+    ...     summer = 3
+    ...     autumn = 4
+
+    >>> enum_next(Seasons.winter)
+    <Seasons.spring: 2>
+    >>> enum_next(Seasons.spring)
+    <Seasons.summer: 3>
+    >>> enum_next(Seasons.autumn)
+    <Seasons.winter: 1>
+    """
+    return e.__class__((e.value % max(e.__class__)) + 1)
+
+
 class Flag(enum.IntFlag):
     """Column flag.
 
@@ -318,9 +340,6 @@ class DurationMode(enum.IntEnum):
     query = 1
     transaction = 2
     backend = 3
-
-    def next(self) -> "DurationMode":
-        return self.__class__((self.value % max(self.__class__)) + 1)
 
 
 @attr.s(auto_attribs=True, slots=True)

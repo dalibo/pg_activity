@@ -3,7 +3,7 @@ from typing import Optional
 from blessed.keyboard import Keystroke
 
 from . import keys
-from .types import DurationMode, QueryMode, SortKey
+from .types import DurationMode, QueryMode, SortKey, enum_next
 
 
 def refresh_time(
@@ -42,15 +42,11 @@ def duration_mode(key: Keystroke, duration_mode: DurationMode) -> DurationMode:
 
     >>> duration_mode(k("42"), DurationMode.query)
     <DurationMode.query: 1>
-    >>> duration_mode(k("T"), DurationMode.query)
-    <DurationMode.transaction: 2>
     >>> duration_mode(k("T"), DurationMode.transaction)
     <DurationMode.backend: 3>
-    >>> duration_mode(k("T"), DurationMode.backend)
-    <DurationMode.query: 1>
     """
     if key == keys.CHANGE_DURATION_MODE:
-        return duration_mode.next()
+        return enum_next(duration_mode)
     return duration_mode
 
 
