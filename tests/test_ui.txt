@@ -83,7 +83,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2.0s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
  Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
- Load:         0.12 0.14 0.1          | Write:          0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                 RUNNING QUERIES
 PID    DATABASE                     USER           CLIENT  IOW              state   Query
 ------------------------------- Received key 'h' -------------------------------
@@ -116,7 +116,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2.0s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
  Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
- Load:         0.12 0.14 0.1          | Write:          0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                 RUNNING QUERIES
 PID    DATABASE                     USER           CLIENT  IOW              state   Query
 ------------------------------- Received key 'q' -------------------------------
@@ -143,7 +143,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2.0s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
  Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
- Load:         0.12 0.14 0.1          | Write:          0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                 RUNNING QUERIES
 DATABASE                     USER           CLIENT  IOW              state   Query
 tests                    postgres     127.0.0.1/32    N      idle in trans  SELECT pg_sleep(0)
@@ -152,7 +152,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1.0s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
  Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
- Load:         0.12 0.14 0.1          | Write:          0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                 RUNNING QUERIES
 DATABASE                     USER           CLIENT  IOW              state   Query
 tests                    postgres     127.0.0.1/32    N      idle in trans  SELECT pg_sleep(0)
@@ -161,7 +161,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 0.5s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
  Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
- Load:         0.12 0.14 0.1          | Write:          0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                 RUNNING QUERIES
 DATABASE                     USER           CLIENT  IOW              state   Query
 tests                    postgres     127.0.0.1/32    N      idle in trans  SELECT pg_sleep(0)
@@ -170,7 +170,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
  Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
- Load:         0.12 0.14 0.1          | Write:          0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                 RUNNING QUERIES
 DATABASE                     USER           CLIENT  IOW              state   Query
 tests                    postgres     127.0.0.1/32    N      idle in trans  SELECT pg_sleep(0)
@@ -179,7 +179,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
  Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
- Load:         0.12 0.14 0.1          | Write:          0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                      PAUSE                                      
 DATABASE                     USER           CLIENT  IOW              state   Query
 tests                    postgres     127.0.0.1/32    N      idle in trans  SELECT pg_sleep(0)
@@ -188,7 +188,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction
  Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
- Load:         0.12 0.14 0.1          | Write:          0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                      PAUSE                                      
 DATABASE                     USER           CLIENT  IOW              state   Query
 tests                    postgres     127.0.0.1/32    N      idle in trans  SELECT pg_sleep(0)
@@ -197,7 +197,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction
  Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
- Load:         0.12 0.14 0.1          | Write:          0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                      PAUSE                                      
 DATABASE                     USER           CLIENT  IOW              state   Query
 tests                    postgres     127.0.0.1/32    N      idle in trans  SELECT pg_sleep(0)
@@ -206,7 +206,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction
  Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
- Load:         0.12 0.14 0.1          | Write:          0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                 RUNNING QUERIES
 DATABASE                     USER           CLIENT  IOW              state   Query
 tests                    postgres     127.0.0.1/32    N      idle in trans  SELECT pg_sleep(0)
@@ -215,7 +215,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction
  Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
- Load:         0.12 0.14 0.1          | Write:          0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                 WAITING QUERIES
 DATABASE          RELATION             TYPE             MODE              state   Query
 ------------------------------- Received key '3' -------------------------------
@@ -223,7 +223,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction
  Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
- Load:         0.12 0.14 0.1          | Write:          0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                 BLOCKING QUERIES
 DATABASE          RELATION             TYPE             MODE              state   Query
 ------------------------------- Received key '1' -------------------------------
@@ -231,7 +231,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction
  Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
- Load:         0.12 0.14 0.1          | Write:          0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                 RUNNING QUERIES
 DATABASE                     USER           CLIENT  IOW              state   Query
 tests                    postgres     127.0.0.1/32    N      idle in trans  SELECT pg_sleep(0)
@@ -265,7 +265,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2.0s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction
  Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
- Load:         0.12 0.14 0.1          | Write:          0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                 RUNNING QUERIES
 DATABASE          IOW              state   Query                                
 tests               N      idle in trans   CREATE TABLE persons (firstname
@@ -276,7 +276,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2.0s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction
  Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
- Load:         0.12 0.14 0.1          | Write:          0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                 RUNNING QUERIES
 DATABASE          IOW              state   Query                                
 tests               N      idle in trans   CREATE TABLE persons (firstname
@@ -287,7 +287,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2.0s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction
  Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
- Load:         0.12 0.14 0.1          | Write:          0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                 RUNNING QUERIES
 DATABASE          IOW              state   Query                                
 tests               N      idle in trans   CREATE TABLE persons (firstname text,

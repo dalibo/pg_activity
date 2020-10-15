@@ -315,7 +315,7 @@ def header(
     >>> swap = MemoryInfo(total=6312423424, used=2340, percent=0.0)
     >>> io_read = IOCounter(bytes=128, count=6)
     >>> io_write = IOCounter(bytes=8, count=9)
-    >>> load = LoadAverage(0.25, 0.19, 0.39)
+    >>> load = LoadAverage(25.0, 0.19, 0.39)
     >>> sysinfo = SystemInfo(vmem, swap, load, io_read, io_write)
 
     >>> header(term, host, dbinfo, 1, 79, DurationMode.query, refresh_time=2,
@@ -324,7 +324,7 @@ def header(
      Size:       117.74M - 12B/s          | TPS:               1      | Active connections:              79      | Duration mode:       query
      Mem.:      42.5% - 1.87G/5.75G       | IO Max:       12/s
      Swap:       0.0% - 2.29K/5.88G       | Read:          128B/s - 6/s
-     Load:         0.25 0.19 0.39         | Write:          8B/s - 9/s
+     Load:        25.00 0.19 0.39         | Write:          8B/s - 9/s
     """
     pg_host = f"{host.user}@{host.host}:{host.port}/{host.dbname}"
     yield (
@@ -392,7 +392,11 @@ def header(
         load = system_info.load
         yield indent(
             row(
-                ("Load", f"{load.avg1:.2} {load.avg5:.2} {load.avg15:.2}", col_width),
+                (
+                    "Load",
+                    f"{load.avg1:.2f} {load.avg5:.2f} {load.avg15:.2f}",
+                    col_width,
+                ),
                 (
                     "Write",
                     render(system_info.io_write, col_width // 2 - len("Write")),
