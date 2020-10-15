@@ -266,6 +266,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2.0s
  Swap:      5.6% -     6.84K/7.45G    | Read:            0B/s -      0/s
  Load:         0.12 0.14 0.1          | Write:            0B/s -      0/s
                                 RUNNING QUERIES
+PID    DATABASE          IOW              state   Query                         
 ...    tests               N      idle in trans   CREATE TABLE persons
                                                   (firstname text, lastname
                                                   text, age int, address text)
@@ -276,6 +277,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2.0s
  Swap:      5.6% -     6.84K/7.45G    | Read:            0B/s -      0/s
  Load:         0.12 0.14 0.1          | Write:            0B/s -      0/s
                                 RUNNING QUERIES
+PID    DATABASE          IOW              state   Query                         
 ...    tests               N      idle in trans   CREATE TABLE persons
                                                   (firstname text, lastname
                                                   text, age int, address text)
@@ -286,6 +288,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2.0s
  Swap:      5.6% -     6.84K/7.45G    | Read:            0B/s -      0/s
  Load:         0.12 0.14 0.1          | Write:            0B/s -      0/s
                                 RUNNING QUERIES
+PID    DATABASE          IOW              state   Query                         
 ...    tests               N      idle in trans   CREATE TABLE persons (firstnam
 ------------------------------- Received key 'q' -------------------------------
 >>> with output.open() as f:
