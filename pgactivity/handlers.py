@@ -36,7 +36,7 @@ def refresh_time(
 
 
 def duration_mode(key: Keystroke, duration_mode: DurationMode) -> DurationMode:
-    """Return the duration mode matching input key or .
+    """Return the updated duration mode matching input key.
 
     >>> from blessed.keyboard import Keystroke as k
 
