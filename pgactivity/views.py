@@ -10,6 +10,7 @@ from typing import (
     Iterable,
     Iterator,
     List,
+    NoReturn,
     Optional,
     Tuple,
     Union,
@@ -175,6 +176,30 @@ def limit(func: Callable[..., Iterable[str]]) -> Callable[..., int]:
     return wrapper
 
 
+@functools.singledispatch
+def render(x: NoReturn, column_width: int) -> str:
+    raise AssertionError(f"not implemented for type '{type(x).__name__}'")
+
+
+@render.register(MemoryInfo)
+def render_meminfo(m: MemoryInfo, column_width: int) -> str:
+    used, total = naturalsize(m.used), naturalsize(m.total)
+    return _columns(f"{m.percent}%", f"{used}/{total}", column_width)
+
+
+@render.register(IOCounter)
+def render_iocounter(i: IOCounter, column_width: int) -> str:
+    hbytes = naturalsize(i.bytes)
+    return _columns(f"{hbytes}/s", f"{i.count}/s", column_width)
+
+
+def _columns(left: str, right: str, total_width: int) -> str:
+    column_width, r = divmod(total_width, 2)
+    if r:
+        column_width -= 1
+    return " - ".join([left.rjust(column_width - 1), right.ljust(column_width - 1)])
+
+
 @limit
 def help(term: Terminal, version: str, is_local: bool) -> Iterable[str]:
     """Render help menu.
@@ -280,7 +305,7 @@ def header(
 
     >>> header(term, host, dbinfo, 12, 0, DurationMode.backend, refresh_time=10)
     PostgreSQL 9.6 - server - pgadm@server.prod.tld:5433/app - Ref.: 10s
-     Size:        9.06P -     9.76K/s     | TPS:              12      | Active connections:               0      | Duration mode:     backend
+     Size:         9.06P - 9.76K/s        | TPS:              12      | Active connections:               0      | Duration mode:     backend
 
     Local host, with priviledged access:
 
@@ -296,10 +321,10 @@ def header(
     >>> header(term, host, dbinfo, 1, 79, DurationMode.query, refresh_time=2,
     ...        min_duration=1.2, max_iops=12, system_info=sysinfo)
     PostgreSQL 13.1 - localhost - tester@host:5432/postgres - Ref.: 2s - Min. duration: 1.2s
-     Size:      117.74M -       12B/s     | TPS:               1      | Active connections:              79      | Duration mode:       query
-     Mem.:     42.5% -     1.87G/5.75G    | IO Max:       12/s
-     Swap:      0.0% -     2.29K/5.88G    | Read:          128B/s -      6/s
-     Load:         0.25 0.19 0.39         | Write:            8B/s -      9/s
+     Size:       117.74M - 12B/s          | TPS:               1      | Active connections:              79      | Duration mode:       query
+     Mem.:      42.5% - 1.87G/5.75G       | IO Max:       12/s
+     Swap:       0.0% - 2.29K/5.88G       | Read:          128B/s - 6/s
+     Load:         0.25 0.19 0.39         | Write:          8B/s - 9/s
     """
     pg_host = f"{host.user}@{host.host}:{host.port}/{host.dbname}"
     yield (
@@ -322,11 +347,17 @@ def header(
     def indent(text: str, indent: int = 1) -> str:
         return " " * indent + text
 
+    col_width = 30  # TODO: use screen size
+
     total_size = naturalsize(dbinfo.total_size)
     size_ev = naturalsize(dbinfo.size_ev)
     yield indent(
         row(
-            ("Size", f"{total_size.rjust(8)} - {size_ev.rjust(9)}/s", 30),
+            (
+                "Size",
+                _columns(total_size, f"{size_ev}/s", 20),
+                col_width,
+            ),
             ("TPS", f"{term.bold_green}{str(tps).rjust(11)}{term.normal}", 20),
             (
                 "Active connections",
@@ -341,28 +372,19 @@ def header(
         )
     )
 
-    def render_meminfo(m: MemoryInfo) -> str:
-        used, total = naturalsize(m.used), naturalsize(m.total)
-        return f"{m.percent:6}% - {used.rjust(9)}/{total}"
-
-    def render_iocounter(i: IOCounter) -> str:
-        hbytes = naturalsize(i.bytes)
-        return f"{hbytes.rjust(10)}/s - {i.count:6}/s"
-
     if system_info is not None:
-        col_width = 30  # TODO: use screen size
         yield indent(
             row(
-                ("Mem.", render_meminfo(system_info.memory), col_width),
-                ("IO Max", f"{max_iops:8}/s", 8),
+                ("Mem.", render(system_info.memory, col_width // 2), col_width),
+                ("IO Max", f"{max_iops:8}/s", col_width // 4),
             )
         )
         yield indent(
             row(
-                ("Swap", render_meminfo(system_info.swap), col_width),
+                ("Swap", render(system_info.swap, col_width // 2), col_width),
                 (
                     "Read",
-                    render_iocounter(system_info.io_read),
+                    render(system_info.io_read, col_width // 2 - len("Read")),
                     col_width,
                 ),
             )
@@ -373,7 +395,7 @@ def header(
                 ("Load", f"{load.avg1:.2} {load.avg5:.2} {load.avg15:.2}", col_width),
                 (
                     "Write",
-                    render_iocounter(system_info.io_write),
+                    render(system_info.io_write, col_width // 2 - len("Write")),
                     col_width,
                 ),
             )
