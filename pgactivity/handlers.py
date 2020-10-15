@@ -3,7 +3,7 @@ from typing import Optional
 from blessed.keyboard import Keystroke
 
 from . import keys
-from .types import DurationMode, QueryMode, SortKey, enum_next
+from .types import DurationMode, QueryDisplayMode, QueryMode, SortKey, enum_next
 
 
 def refresh_time(
@@ -35,7 +35,7 @@ def refresh_time(
     raise ValueError(key)
 
 
-def duration_mode(key: Keystroke, duration_mode: DurationMode) -> DurationMode:
+def duration_mode(key: Keystroke, mode: DurationMode) -> DurationMode:
     """Return the updated duration mode matching input key.
 
     >>> from blessed.keyboard import Keystroke as k
@@ -46,8 +46,24 @@ def duration_mode(key: Keystroke, duration_mode: DurationMode) -> DurationMode:
     <DurationMode.backend: 3>
     """
     if key == keys.CHANGE_DURATION_MODE:
-        return enum_next(duration_mode)
-    return duration_mode
+        return enum_next(mode)
+    return mode
+
+
+def verbose_mode(key: Keystroke, mode: QueryDisplayMode) -> QueryDisplayMode:
+    """Return the updated query display mode (aka verbose mode) matching input
+    key.
+
+    >>> from blessed.keyboard import Keystroke as k
+
+    >>> verbose_mode(k("42"), QueryDisplayMode.truncate)
+    <QueryDisplayMode.truncate: 1>
+    >>> verbose_mode(k("v"), QueryDisplayMode.wrap_noindent)
+    <QueryDisplayMode.wrap: 3>
+    """
+    if key == keys.CHANGE_DISPLAY_MODE:
+        return enum_next(mode)
+    return mode
 
 
 def query_mode(key: Keystroke) -> Optional[QueryMode]:

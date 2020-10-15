@@ -258,7 +258,7 @@ Use another set of options:
 ...         output=str(output),
 ...     ),
 ... )
->>> with patch.object(term, "inkey", mk_inkey(["D", "q"])):
+>>> with patch.object(term, "inkey", mk_inkey(["D", "v", "q"])):
 ...     ui_main(options)  # doctest: +ELLIPSIS,+NORMALIZE_WHITESPACE
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2.0s
  Size:      106.07M -        0B/s     | TPS:               0      | Active connections:               1      | Duration mode: transaction
@@ -279,8 +279,16 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2.0s
 ...    tests               N      idle in trans   CREATE TABLE persons
                                                   (firstname text, lastname
                                                   text, age int, address text)
+------------------------------- Received key 'v' -------------------------------
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2.0s
+ Size:      106.07M -        0B/s     | TPS:               0      | Active connections:               1      | Duration mode: transaction
+ Mem.:      1.2% -     2.86M/3.73G    | IO Max:        0/s
+ Swap:      5.6% -     6.84K/7.45G    | Read:            0B/s -      0/s
+ Load:         0.12 0.14 0.1          | Write:            0B/s -      0/s
+                                RUNNING QUERIES
+...    tests               N      idle in trans   CREATE TABLE persons (firstnam
 ------------------------------- Received key 'q' -------------------------------
 >>> with output.open() as f:
 ...     lines = f.readlines()
 >>> len(lines)
-3
+4

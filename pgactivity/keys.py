@@ -7,6 +7,7 @@ from .types import QueryMode
 
 
 CHANGE_DURATION_MODE = "T"
+CHANGE_DISPLAY_MODE = "v"
 EXIT = "q"
 HELP = "h"
 PAUSE = " "
@@ -41,7 +42,7 @@ BINDINGS: List[Key] = [
     Key("C", "activate/deactivate colors"),
     PAUSE_KEY,
     Key(SORTBY_READ, "sort by READ/s desc. (activities)", local_only=True),
-    Key("v", "change display mode"),
+    Key(CHANGE_DISPLAY_MODE, "change display mode"),
     Key(SORTBY_WRITE, "sort by WRITE/s desc. (activities)", local_only=True),
     EXIT_KEY,
     Key(REFRESH_TIME_INCREASE, "increase refresh time (max:5s)"),
