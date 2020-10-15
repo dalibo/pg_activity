@@ -17,16 +17,18 @@
                     0,
                     0.06
                 ],
-                "io_counters": {
-                    "read_bytes": 172032,
-                    "read_chars": 6141498,
-                    "read_count": 830,
-                    "write_bytes": 4046848,
-                    "write_chars": 4251702,
-                    "write_count": 388
+                "io_read": {
+                    "bytes": 172032,
+                    "chars": 6141498,
+                    "count": 830
                 },
                 "io_time": 1596806345.17328,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 4046848,
+                    "chars": 4251702,
+                    "count": 388
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 1.05984334480723,
                 "meminfo": [
@@ -67,16 +69,18 @@
                     0,
                     0.05
                 ],
-                "io_counters": {
-                    "read_bytes": 151552,
-                    "read_chars": 6018613,
-                    "read_count": 810,
-                    "write_bytes": 5177344,
-                    "write_chars": 5357617,
-                    "write_count": 422
+                "io_read": {
+                    "bytes": 151552,
+                    "chars": 6018613,
+                    "count": 810
                 },
                 "io_time": 1596806345.17619,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 5177344,
+                    "chars": 5357617,
+                    "count": 422
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 1.06654197921434,
                 "meminfo": [
@@ -117,16 +121,18 @@
                     0,
                     0.03
                 ],
-                "io_counters": {
-                    "read_bytes": 131072,
-                    "read_chars": 6043191,
-                    "read_count": 815,
-                    "write_bytes": 4186112,
-                    "write_chars": 4399155,
-                    "write_count": 391
+                "io_read": {
+                    "bytes": 131072,
+                    "chars": 6043191,
+                    "count": 815
                 },
                 "io_time": 1596806345.17112,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 4186112,
+                    "chars": 4399155,
+                    "count": 391
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 1.03470688500235,
                 "meminfo": [
@@ -167,16 +173,18 @@
                     0,
                     0.03
                 ],
-                "io_counters": {
-                    "read_bytes": 208896,
-                    "read_chars": 5846582,
-                    "read_count": 790,
-                    "write_bytes": 4792320,
-                    "write_chars": 4988978,
-                    "write_count": 405
+                "io_read": {
+                    "bytes": 208896,
+                    "chars": 5846582,
+                    "count": 790
                 },
                 "io_time": 1596806345.17362,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 4792320,
+                    "chars": 4988978,
+                    "count": 405
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 1.05911379056487,
                 "meminfo": [
@@ -217,16 +225,18 @@
                     0,
                     0.07
                 ],
-                "io_counters": {
-                    "read_bytes": 192512,
-                    "read_chars": 5830194,
-                    "read_count": 784,
-                    "write_bytes": 5439488,
-                    "write_chars": 5603374,
-                    "write_count": 416
+                "io_read": {
+                    "bytes": 192512,
+                    "chars": 5830194,
+                    "count": 784
                 },
                 "io_time": 1596806345.17073,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 5439488,
+                    "chars": 5603374,
+                    "count": 416
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 1.04127287318358,
                 "meminfo": [
@@ -267,16 +277,18 @@
                     0,
                     0.06
                 ],
-                "io_counters": {
-                    "read_bytes": 102400,
-                    "read_chars": 5715499,
-                    "read_count": 763,
-                    "write_bytes": 4792320,
-                    "write_chars": 4964391,
-                    "write_count": 390
+                "io_read": {
+                    "bytes": 102400,
+                    "chars": 5715499,
+                    "count": 763
                 },
                 "io_time": 1596806345.17196,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 4792320,
+                    "chars": 4964391,
+                    "count": 390
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 1.05148663257659,
                 "meminfo": [
@@ -317,16 +329,18 @@
                     0,
                     0.06
                 ],
-                "io_counters": {
-                    "read_bytes": 131072,
-                    "read_chars": 5789225,
-                    "read_count": 770,
-                    "write_bytes": 5095424,
-                    "write_chars": 5234725,
-                    "write_count": 394
+                "io_read": {
+                    "bytes": 131072,
+                    "chars": 5789225,
+                    "count": 770
                 },
                 "io_time": 1596806345.17287,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 5095424,
+                    "chars": 5234725,
+                    "count": 394
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 1.04153816563534,
                 "meminfo": [
@@ -367,16 +381,18 @@
                     0,
                     0.03
                 ],
-                "io_counters": {
-                    "read_bytes": 98304,
-                    "read_chars": 5781046,
-                    "read_count": 782,
-                    "write_bytes": 5259264,
-                    "write_chars": 5496882,
-                    "write_count": 444
+                "io_read": {
+                    "bytes": 98304,
+                    "chars": 5781046,
+                    "count": 782
                 },
                 "io_time": 1596806345.17414,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 5259264,
+                    "chars": 5496882,
+                    "count": 444
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 1.02475841806111,
                 "meminfo": [
@@ -417,16 +433,18 @@
                     0,
                     0.04
                 ],
-                "io_counters": {
-                    "read_bytes": 184320,
-                    "read_chars": 5928507,
-                    "read_count": 805,
-                    "write_bytes": 4702208,
-                    "write_chars": 4866103,
-                    "write_count": 408
+                "io_read": {
+                    "bytes": 184320,
+                    "chars": 5928507,
+                    "count": 805
                 },
                 "io_time": 1596806345.17465,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 4702208,
+                    "chars": 4866103,
+                    "count": 408
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 1.03052852888703,
                 "meminfo": [
@@ -467,16 +485,18 @@
                     0,
                     0.08
                 ],
-                "io_counters": {
-                    "read_bytes": 90112,
-                    "read_chars": 5666362,
-                    "read_count": 772,
-                    "write_bytes": 4374528,
-                    "write_chars": 4489270,
-                    "write_count": 376
+                "io_read": {
+                    "bytes": 90112,
+                    "chars": 5666362,
+                    "count": 772
                 },
                 "io_time": 1596806345.17591,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 4374528,
+                    "chars": 4489270,
+                    "count": 376
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 1.05241515615777,
                 "meminfo": [
@@ -517,16 +537,18 @@
                     0,
                     0.04
                 ],
-                "io_counters": {
-                    "read_bytes": 204800,
-                    "read_chars": 5658169,
-                    "read_count": 770,
-                    "write_bytes": 4481024,
-                    "write_chars": 4595765,
-                    "write_count": 395
+                "io_read": {
+                    "bytes": 204800,
+                    "chars": 5658169,
+                    "count": 770
                 },
                 "io_time": 1596806345.17499,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 4481024,
+                    "chars": 4595765,
+                    "count": 395
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 1.03119176001645,
                 "meminfo": [
@@ -567,16 +589,18 @@
                     0,
                     0.04
                 ],
-                "io_counters": {
-                    "read_bytes": 114688,
-                    "read_chars": 5838385,
-                    "read_count": 784,
-                    "write_bytes": 4718592,
-                    "write_chars": 4890669,
-                    "write_count": 423
+                "io_read": {
+                    "bytes": 114688,
+                    "chars": 5838385,
+                    "count": 784
                 },
                 "io_time": 1596806345.16938,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 4718592,
+                    "chars": 4890669,
+                    "count": 423
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 1.05493543444955,
                 "meminfo": [
@@ -617,16 +641,18 @@
                     0,
                     0.05
                 ],
-                "io_counters": {
-                    "read_bytes": 212992,
-                    "read_chars": 5600824,
-                    "read_count": 762,
-                    "write_bytes": 4939776,
-                    "write_chars": 5029940,
-                    "write_count": 403
+                "io_read": {
+                    "bytes": 212992,
+                    "chars": 5600824,
+                    "count": 762
                 },
                 "io_time": 1596806345.17035,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 4939776,
+                    "chars": 5029940,
+                    "count": 403
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 1.026018557207,
                 "meminfo": [
@@ -667,16 +693,18 @@
                     0,
                     0.03
                 ],
-                "io_counters": {
-                    "read_bytes": 131072,
-                    "read_chars": 5649976,
-                    "read_count": 768,
-                    "write_bytes": 4177920,
-                    "write_chars": 4358196,
-                    "write_count": 389
+                "io_read": {
+                    "bytes": 131072,
+                    "chars": 5649976,
+                    "count": 768
                 },
                 "io_time": 1596806345.17153,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 4177920,
+                    "chars": 4358196,
+                    "count": 389
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 1.03702819395531,
                 "meminfo": [
@@ -717,16 +745,18 @@
                     0,
                     0.07
                 ],
-                "io_counters": {
-                    "read_bytes": 143360,
-                    "read_chars": 5576246,
-                    "read_count": 757,
-                    "write_bytes": 4661248,
-                    "write_chars": 4784178,
-                    "write_count": 422
+                "io_read": {
+                    "bytes": 143360,
+                    "chars": 5576246,
+                    "count": 757
                 },
                 "io_time": 1596806345.17238,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 4661248,
+                    "chars": 4784178,
+                    "count": 422
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 1.02111064684932,
                 "meminfo": [
@@ -767,16 +797,18 @@
                     0,
                     0.04
                 ],
-                "io_counters": {
-                    "read_bytes": 159744,
-                    "read_chars": 5502515,
-                    "read_count": 745,
-                    "write_bytes": 4669440,
-                    "write_chars": 4792367,
-                    "write_count": 381
+                "io_read": {
+                    "bytes": 159744,
+                    "chars": 5502515,
+                    "count": 745
                 },
                 "io_time": 1596806345.17644,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 4669440,
+                    "chars": 4792367,
+                    "count": 381
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 1.00061680495036,
                 "meminfo": [
@@ -817,16 +849,18 @@
                     0,
                     0.06
                 ],
-                "io_counters": {
-                    "read_bytes": 110592,
-                    "read_chars": 5625388,
-                    "read_count": 753,
-                    "write_bytes": 4923392,
-                    "write_chars": 5103656,
-                    "write_count": 399
+                "io_read": {
+                    "bytes": 110592,
+                    "chars": 5625388,
+                    "count": 753
                 },
                 "io_time": 1596806345.17561,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 4923392,
+                    "chars": 5103656,
+                    "count": 399
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 1.02741134257878,
                 "meminfo": [
@@ -867,16 +901,18 @@
                     0,
                     0.06
                 ],
-                "io_counters": {
-                    "read_bytes": 86016,
-                    "read_chars": 5461562,
-                    "read_count": 747,
-                    "write_bytes": 4382720,
-                    "write_chars": 4546614,
-                    "write_count": 383
+                "io_read": {
+                    "bytes": 86016,
+                    "chars": 5461562,
+                    "count": 747
                 },
                 "io_time": 1596806345.1753,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 4382720,
+                    "chars": 4546614,
+                    "count": 383
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 0.993254939413836,
                 "meminfo": [
@@ -917,16 +953,18 @@
                     0,
                     0.03
                 ],
-                "io_counters": {
-                    "read_bytes": 253952,
-                    "read_chars": 5510687,
-                    "read_count": 726,
-                    "write_bytes": 3850240,
-                    "write_chars": 4005915,
-                    "write_count": 344
+                "io_read": {
+                    "bytes": 253952,
+                    "chars": 5510687,
+                    "count": 726
                 },
                 "io_time": 1596806345.16992,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 3850240,
+                    "chars": 4005915,
+                    "count": 344
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 1.02137593930109,
                 "meminfo": [
@@ -969,16 +1007,18 @@
                     0,
                     0.06
                 ],
-                "io_counters": {
-                    "read_bytes": 163840,
-                    "read_chars": 6035002,
-                    "read_count": 817,
-                    "write_bytes": 3915776,
-                    "write_chars": 4112438,
-                    "write_count": 379
+                "io_read": {
+                    "bytes": 163840,
+                    "chars": 6035002,
+                    "count": 817
                 },
                 "io_time": 1596806345.13955,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 3915776,
+                    "chars": 4112438,
+                    "count": 379
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 1.03444159255059,
                 "meminfo": [
@@ -1019,16 +1059,18 @@
                     0,
                     0.05
                 ],
-                "io_counters": {
-                    "read_bytes": 151552,
-                    "read_chars": 5944883,
-                    "read_count": 799,
-                    "write_bytes": 5095424,
-                    "write_chars": 5275695,
-                    "write_count": 415
+                "io_read": {
+                    "bytes": 151552,
+                    "chars": 5944883,
+                    "count": 799
                 },
                 "io_time": 1596806345.14185,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 5095424,
+                    "chars": 5275695,
+                    "count": 415
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 1.06654197921434,
                 "meminfo": [
@@ -1069,16 +1111,18 @@
                     0,
                     0.03
                 ],
-                "io_counters": {
-                    "read_bytes": 131072,
-                    "read_chars": 5961271,
-                    "read_count": 805,
-                    "write_bytes": 4145152,
-                    "write_chars": 4358195,
-                    "write_count": 386
+                "io_read": {
+                    "bytes": 131072,
+                    "chars": 5961271,
+                    "count": 805
                 },
                 "io_time": 1596806345.1446,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 4145152,
+                    "chars": 4358195,
+                    "count": 386
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 1.03470688500235,
                 "meminfo": [
@@ -1119,16 +1163,18 @@
                     0,
                     0.03
                 ],
-                "io_counters": {
-                    "read_bytes": 208896,
-                    "read_chars": 5748277,
-                    "read_count": 777,
-                    "write_bytes": 4661248,
-                    "write_chars": 4849713,
-                    "write_count": 394
+                "io_read": {
+                    "bytes": 208896,
+                    "chars": 5748277,
+                    "count": 777
                 },
                 "io_time": 1596806345.14246,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 4661248,
+                    "chars": 4849713,
+                    "count": 394
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 1.05911379056487,
                 "meminfo": [
@@ -1169,16 +1215,18 @@
                     0,
                     0.07
                 ],
-                "io_counters": {
-                    "read_bytes": 192512,
-                    "read_chars": 5748273,
-                    "read_count": 773,
-                    "write_bytes": 5365760,
-                    "write_chars": 5529645,
-                    "write_count": 408
+                "io_read": {
+                    "bytes": 192512,
+                    "chars": 5748273,
+                    "count": 773
                 },
                 "io_time": 1596806345.14274,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 5365760,
+                    "chars": 5529645,
+                    "count": 408
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 1.04127287318358,
                 "meminfo": [
@@ -1219,16 +1267,18 @@
                     0,
                     0.06
                 ],
-                "io_counters": {
-                    "read_bytes": 102400,
-                    "read_chars": 5658154,
-                    "read_count": 755,
-                    "write_bytes": 4759552,
-                    "write_chars": 4931622,
-                    "write_count": 385
+                "io_read": {
+                    "bytes": 102400,
+                    "chars": 5658154,
+                    "count": 755
                 },
                 "io_time": 1596806345.14365,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 4759552,
+                    "chars": 4931622,
+                    "count": 385
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 1.05148663257659,
                 "meminfo": [
@@ -1269,16 +1319,18 @@
                     0,
                     0.04
                 ],
-                "io_counters": {
-                    "read_bytes": 131072,
-                    "read_chars": 5699111,
-                    "read_count": 757,
-                    "write_bytes": 4915200,
-                    "write_chars": 5054499,
-                    "write_count": 382
+                "io_read": {
+                    "bytes": 131072,
+                    "chars": 5699111,
+                    "count": 757
                 },
                 "io_time": 1596806345.13715,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 4915200,
+                    "chars": 5054499,
+                    "count": 382
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 1.01441201244222,
                 "meminfo": [
@@ -1319,16 +1371,18 @@
                     0,
                     0.03
                 ],
-                "io_counters": {
-                    "read_bytes": 98304,
-                    "read_chars": 5723702,
-                    "read_count": 775,
-                    "write_bytes": 5210112,
-                    "write_chars": 5439538,
-                    "write_count": 438
+                "io_read": {
+                    "bytes": 98304,
+                    "chars": 5723702,
+                    "count": 775
                 },
                 "io_time": 1596806345.14492,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 5210112,
+                    "chars": 5439538,
+                    "count": 438
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 1.02475841806111,
                 "meminfo": [
@@ -1369,16 +1423,18 @@
                     0,
                     0.04
                 ],
-                "io_counters": {
-                    "read_bytes": 184320,
-                    "read_chars": 5822010,
-                    "read_count": 791,
-                    "write_bytes": 4653056,
-                    "write_chars": 4808758,
-                    "write_count": 400
+                "io_read": {
+                    "bytes": 184320,
+                    "chars": 5822010,
+                    "count": 791
                 },
                 "io_time": 1596806345.14214,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 4653056,
+                    "chars": 4808758,
+                    "count": 400
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 1.03052852888703,
                 "meminfo": [
@@ -1419,16 +1475,18 @@
                     0,
                     0.08
                 ],
-                "io_counters": {
-                    "read_bytes": 90112,
-                    "read_chars": 5527095,
-                    "read_count": 752,
-                    "write_bytes": 4161536,
-                    "write_chars": 4276275,
-                    "write_count": 366
+                "io_read": {
+                    "bytes": 90112,
+                    "chars": 5527095,
+                    "count": 752
                 },
                 "io_time": 1596806345.13785,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 4161536,
+                    "chars": 4276275,
+                    "count": 366
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 1.05241515615777,
                 "meminfo": [
@@ -1469,16 +1527,18 @@
                     0,
                     0.04
                 ],
-                "io_counters": {
-                    "read_bytes": 204800,
-                    "read_chars": 5576248,
-                    "read_count": 759,
-                    "write_bytes": 4374528,
-                    "write_chars": 4489268,
-                    "write_count": 385
+                "io_read": {
+                    "bytes": 204800,
+                    "chars": 5576248,
+                    "count": 759
                 },
                 "io_time": 1596806345.13624,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 4374528,
+                    "chars": 4489268,
+                    "count": 385
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 1.03119176001645,
                 "meminfo": [
@@ -1519,16 +1579,18 @@
                     0,
                     0.04
                 ],
-                "io_counters": {
-                    "read_bytes": 114688,
-                    "read_chars": 5772849,
-                    "read_count": 776,
-                    "write_bytes": 4669440,
-                    "write_chars": 4841517,
-                    "write_count": 417
+                "io_read": {
+                    "bytes": 114688,
+                    "chars": 5772849,
+                    "count": 776
                 },
                 "io_time": 1596806345.14397,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 4669440,
+                    "chars": 4841517,
+                    "count": 417
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 1.03782407131061,
                 "meminfo": [
@@ -1569,16 +1631,18 @@
                     0,
                     0.05
                 ],
-                "io_counters": {
-                    "read_bytes": 212992,
-                    "read_chars": 5535288,
-                    "read_count": 754,
-                    "write_bytes": 4857856,
-                    "write_chars": 4948020,
-                    "write_count": 398
+                "io_read": {
+                    "bytes": 212992,
+                    "chars": 5535288,
+                    "count": 754
                 },
                 "io_time": 1596806345.14303,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 4857856,
+                    "chars": 4948020,
+                    "count": 398
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 1.026018557207,
                 "meminfo": [
@@ -1619,16 +1683,18 @@
                     0,
                     0.03
                 ],
-                "io_counters": {
-                    "read_bytes": 131072,
-                    "read_chars": 5584439,
-                    "read_count": 759,
-                    "write_bytes": 4046848,
-                    "write_chars": 4227123,
-                    "write_count": 382
+                "io_read": {
+                    "bytes": 131072,
+                    "chars": 5584439,
+                    "count": 759
                 },
                 "io_time": 1596806345.14158,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 4046848,
+                    "chars": 4227123,
+                    "count": 382
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 1.0097693945363,
                 "meminfo": [
@@ -1669,16 +1735,18 @@
                     0,
                     0.07
                 ],
-                "io_counters": {
-                    "read_bytes": 143360,
-                    "read_chars": 5510708,
-                    "read_count": 747,
-                    "write_bytes": 4587520,
-                    "write_chars": 4710448,
-                    "write_count": 414
+                "io_read": {
+                    "bytes": 143360,
+                    "chars": 5510708,
+                    "count": 747
                 },
                 "io_time": 1596806345.14336,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 4587520,
+                    "chars": 4710448,
+                    "count": 414
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 1.02111064684932,
                 "meminfo": [
@@ -1719,16 +1787,18 @@
                     0,
                     0.05
                 ],
-                "io_counters": {
-                    "read_bytes": 147456,
-                    "read_chars": 5436966,
-                    "read_count": 724,
-                    "write_bytes": 4186112,
-                    "write_chars": 4358178,
-                    "write_count": 346
+                "io_read": {
+                    "bytes": 147456,
+                    "chars": 5436966,
+                    "count": 724
                 },
                 "io_time": 1596806345.14033,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 4186112,
+                    "chars": 4358178,
+                    "count": 346
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 0.978199592776086,
                 "meminfo": [
@@ -1769,16 +1839,18 @@
                     0,
                     0.04
                 ],
-                "io_counters": {
-                    "read_bytes": 159744,
-                    "read_chars": 5387826,
-                    "read_count": 730,
-                    "write_bytes": 4505600,
-                    "write_chars": 4612142,
-                    "write_count": 367
+                "io_read": {
+                    "bytes": 159744,
+                    "chars": 5387826,
+                    "count": 730
                 },
                 "io_time": 1596806345.13865,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 4505600,
+                    "chars": 4612142,
+                    "count": 367
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 1.00061680495036,
                 "meminfo": [
@@ -1819,16 +1891,18 @@
                     0,
                     0.06
                 ],
-                "io_counters": {
-                    "read_bytes": 110592,
-                    "read_chars": 5527083,
-                    "read_count": 740,
-                    "write_bytes": 4825088,
-                    "write_chars": 4988967,
-                    "write_count": 387
+                "io_read": {
+                    "bytes": 110592,
+                    "chars": 5527083,
+                    "count": 740
                 },
                 "io_time": 1596806345.1443,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 4825088,
+                    "chars": 4988967,
+                    "count": 387
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 1.02741134257878,
                 "meminfo": [
@@ -1869,16 +1943,18 @@
                     0,
                     0.06
                 ],
-                "io_counters": {
-                    "read_bytes": 86016,
-                    "read_chars": 5355065,
-                    "read_count": 733,
-                    "write_bytes": 4259840,
-                    "write_chars": 4423733,
-                    "write_count": 374
+                "io_read": {
+                    "bytes": 86016,
+                    "chars": 5355065,
+                    "count": 733
                 },
                 "io_time": 1596806345.14122,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 4259840,
+                    "chars": 4423733,
+                    "count": 374
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 0.993254939413836,
                 "meminfo": [
@@ -1919,16 +1995,18 @@
                     0,
                     0.03
                 ],
-                "io_counters": {
-                    "read_bytes": 253952,
-                    "read_chars": 5436959,
-                    "read_count": 717,
-                    "write_bytes": 3809280,
-                    "write_chars": 3964955,
-                    "write_count": 339
+                "io_read": {
+                    "bytes": 253952,
+                    "chars": 5436959,
+                    "count": 717
                 },
                 "io_time": 1596806345.14523,
                 "io_wait": "N",
+                "io_write": {
+                    "bytes": 3809280,
+                    "chars": 3964955,
+                    "count": 339
+                },
                 "is_parallel_worker": false,
                 "mem_percent": 1.02137593930109,
                 "meminfo": [

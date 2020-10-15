@@ -126,11 +126,13 @@ def main(
                                 memory=memory,
                                 swap=swap,
                                 load=load,
-                                ios=types.IOCounters(
-                                    read_count_delta,
-                                    write_count_delta,
-                                    int(read_bytes_delta),
-                                    int(write_count_delta),
+                                io_read=types.IOCounter(
+                                    count=read_count_delta,
+                                    bytes=int(read_bytes_delta),
+                                ),
+                                io_write=types.IOCounter(
+                                    count=write_count_delta,
+                                    bytes=int(write_count_delta),
                                 ),
                             )
                             acts = activity_procs

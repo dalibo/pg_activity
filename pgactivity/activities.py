@@ -34,14 +34,13 @@ def update_processes_local(
                 proc.wait = new_proc.wait
                 proc.extras.io_wait = new_proc.extras.io_wait
                 proc.extras.read_delta = (
-                    new_proc.extras.io_counters.read_bytes
-                    - proc.extras.io_counters.read_bytes
+                    new_proc.extras.io_read.bytes - proc.extras.io_read.bytes
                 ) / (n_io_time - proc.extras.io_time)
                 proc.extras.write_delta = (
-                    new_proc.extras.io_counters.write_bytes
-                    - proc.extras.io_counters.write_bytes
+                    new_proc.extras.io_write.bytes - proc.extras.io_write.bytes
                 ) / (n_io_time - proc.extras.io_time)
-                proc.extras.io_counters = new_proc.extras.io_counters
+                proc.extras.io_read = new_proc.extras.io_read
+                proc.extras.io_write = new_proc.extras.io_write
                 proc.extras.io_time = n_io_time
 
                 # Global io counters

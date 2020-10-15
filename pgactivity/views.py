@@ -3,7 +3,17 @@ import functools
 import itertools
 from datetime import timedelta
 from textwrap import dedent
-from typing import Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Optional,
+    Tuple,
+    Union,
+)
 
 import humanize
 from blessed import Terminal
@@ -27,6 +37,7 @@ from .types import (
     DurationMode,
     Flag,
     Host,
+    IOCounter,
     MemoryInfo,
     QueryDisplayMode,
     QueryMode,
@@ -259,7 +270,7 @@ def header(
 ) -> Iterator[str]:
     r"""Return window header lines.
 
-    >>> from pgactivity.types import IOCounters, LoadAverage
+    >>> from pgactivity.types import IOCounter, LoadAverage
     >>> term = Terminal()
 
     Remote host:
@@ -277,9 +288,10 @@ def header(
     >>> dbinfo = DBInfo(123456789, 12)
     >>> vmem = MemoryInfo(total=6175825920, percent=42.5, used=2007146496)
     >>> swap = MemoryInfo(total=6312423424, used=2340, percent=0.0)
-    >>> ios = IOCounters(read_bytes=128, write_bytes=8, read_count=6, write_count=9)
+    >>> io_read = IOCounter(bytes=128, count=6)
+    >>> io_write = IOCounter(bytes=8, count=9)
     >>> load = LoadAverage(0.25, 0.19, 0.39)
-    >>> sysinfo = SystemInfo(vmem, swap, load, ios)
+    >>> sysinfo = SystemInfo(vmem, swap, load, io_read, io_write)
 
     >>> header(term, host, dbinfo, 1, 79, DurationMode.query, refresh_time=2,
     ...        min_duration=1.2, max_iops=12, system_info=sysinfo)
@@ -333,9 +345,9 @@ def header(
         used, total = naturalsize(m.used), naturalsize(m.total)
         return f"{m.percent:6}% - {used.rjust(9)}/{total}"
 
-    def render_ios(nbytes: int, count: int) -> str:
-        hbytes = naturalsize(nbytes)
-        return f"{hbytes.rjust(10)}/s - {count:6}/s"
+    def render_iocounter(i: IOCounter) -> str:
+        hbytes = naturalsize(i.bytes)
+        return f"{hbytes.rjust(10)}/s - {i.count:6}/s"
 
     if system_info is not None:
         col_width = 30  # TODO: use screen size
@@ -350,7 +362,7 @@ def header(
                 ("Swap", render_meminfo(system_info.swap), col_width),
                 (
                     "Read",
-                    render_ios(system_info.ios.read_bytes, system_info.ios.read_count),
+                    render_iocounter(system_info.io_read),
                     col_width,
                 ),
             )
@@ -361,9 +373,7 @@ def header(
                 ("Load", f"{load.avg1:.2} {load.avg5:.2} {load.avg15:.2}", col_width),
                 (
                     "Write",
-                    render_ios(
-                        system_info.ios.write_bytes, system_info.ios.write_count
-                    ),
+                    render_iocounter(system_info.io_write),
                     col_width,
                 ),
             )

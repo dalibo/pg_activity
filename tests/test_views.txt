@@ -45,9 +45,10 @@
 
 >>> vmem = MemoryInfo(total=4_220_876_001, percent=2.5, used=1_001_232_608)
 >>> swap = MemoryInfo(total=6_312_423_424, used=2_340, percent=1.0)
->>> ios = IOCounters(read_bytes=128, write_bytes=8, read_count=6, write_count=9)
+>>> io_read = IOCounter(bytes=128, count=6)
+>>> io_write = IOCounter(bytes=8, count=9)
 >>> load = LoadAverage(0.5, 1.9, 0.93)
->>> sysinfo = SystemInfo(vmem, swap, load, ios)
+>>> sysinfo = SystemInfo(vmem, swap, load, io_read, io_write)
 >>> screen(
 ...     term,
 ...     host=Host("PostgreSQL 13", "testhost", "pgadm", "server.prod.tld", 5433, "app"),

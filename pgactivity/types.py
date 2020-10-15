@@ -345,18 +345,15 @@ class LoadAverage:
         return cls(0.0, 0.0, 0.0)
 
 
-@attr.s(auto_attribs=True, slots=True)
-class IOCounters(Deserializable):
-    read_count: int
-    write_count: int
-    read_bytes: int
-    write_bytes: int
-    read_chars: int = 0
-    write_chars: int = 0
+@attr.s(auto_attribs=True, frozen=True, slots=True)
+class IOCounter(Deserializable):
+    count: int
+    bytes: int
+    chars: int = 0
 
     @classmethod
-    def default(cls) -> "IOCounters":
-        return cls(0, 0, 0, 0)
+    def default(cls) -> "IOCounter":
+        return cls(0, 0)
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
@@ -364,7 +361,8 @@ class SystemInfo:
     memory: MemoryInfo
     swap: MemoryInfo
     load: LoadAverage
-    ios: IOCounters
+    io_read: IOCounter
+    io_write: IOCounter
 
     @classmethod
     def default(
@@ -380,21 +378,23 @@ class SystemInfo:
         SystemInfo(memory=MemoryInfo(percent=0.0, used=0, total=0),
                    swap=MemoryInfo(percent=0.0, used=0, total=0),
                    load=LoadAverage(avg1=0.0, avg5=0.0, avg15=0.0),
-                   ios=IOCounters(read_count=0, write_count=0, read_bytes=0,
-                                  write_bytes=0, read_chars=0, write_chars=0))
+                   io_read=IOCounter(count=0, bytes=0, chars=0),
+                   io_write=IOCounter(count=0, bytes=0, chars=0))
         """
         return cls(
             memory or MemoryInfo.default(),
             swap or MemoryInfo.default(),
             load or LoadAverage.default(),
-            IOCounters.default(),
+            IOCounter.default(),
+            IOCounter.default(),
         )
 
 
 @attr.s(auto_attribs=True, slots=True)
 class ProcessExtras(Deserializable):
     meminfo: Tuple[int, ...]
-    io_counters: IOCounters
+    io_read: IOCounter
+    io_write: IOCounter
     io_time: float
     mem_percent: float
     cpu_percent: float
@@ -432,13 +432,15 @@ class Process(Deserializable):
     ...        "appname" : "pgbench",
     ...        "psutil_proc" : None,
     ...        "io_wait" : "N",
-    ...        "io_counters" : {
-    ...           "read_bytes" : 184320,
-    ...           "read_chars" : 5928507,
-    ...           "write_count" : 408,
-    ...           "write_chars" : 4866103,
-    ...           "write_bytes" : 4702208,
-    ...           "read_count" : 805
+    ...        "io_read" : {
+    ...           "count" : 805,
+    ...           "bytes" : 184320,
+    ...           "chars" : 5928507,
+    ...        },
+    ...        "io_write" : {
+    ...           "count" : 408,
+    ...           "bytes" : 4702208,
+    ...           "chars" : 4866103,
     ...        },
     ...        "cpu_percent" : 0.0,
     ...        "mem_percent" : 1.03052852888703,

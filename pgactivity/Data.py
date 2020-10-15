@@ -34,7 +34,7 @@ import psycopg2
 import psycopg2.extras
 
 from .utils import return_as
-from .types import Activity, ActivityBW, IOCounters, Process, ProcessExtras
+from .types import Activity, ActivityBW, IOCounter, Process, ProcessExtras
 
 
 if psutil.version_info < (2, 0, 0):
@@ -878,7 +878,14 @@ class Data:
                 mem_percent = psproc.memory_percent()
                 cpu_percent = psproc.cpu_percent(interval=0)
                 cpu_times = psproc.cpu_times()
-                io_counters = psproc.io_counters()
+                (
+                    read_count,
+                    write_count,
+                    read_bytes,
+                    write_bytes,
+                    read_chars,
+                    write_chars,
+                ) = psproc.io_counters()
                 status_iow = psproc.status_iow()
             except (psutil.NoSuchProcess, psutil.AccessDenied):
                 continue
@@ -896,7 +903,8 @@ class Data:
                 appname=query['application_name'],
                 extras=ProcessExtras(
                     meminfo=meminfo,
-                    io_counters=IOCounters(*io_counters),
+                    io_read=IOCounter(read_count, read_bytes, read_chars),
+                    io_write=IOCounter(write_count, write_bytes, write_chars),
                     io_time=time.time(),
                     mem_percent=mem_percent,
                     cpu_percent=cpu_percent,
