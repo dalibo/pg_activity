@@ -13,7 +13,6 @@ def main(
     options: optparse.Values,
     *,
     term: Optional[Terminal] = None,
-    screen_delimiter: Optional[str] = None,
     render_footer: bool = True,
 ) -> None:
     data = Data.Data()
@@ -176,7 +175,3 @@ def main(
                 )
 
             key = term.inkey(timeout=refresh_time) or None
-
-            if screen_delimiter is not None:
-                # Used in tests.
-                print(term.center(f" Received key '{key}' ", fillchar=screen_delimiter))
