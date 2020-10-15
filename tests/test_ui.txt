@@ -1,3 +1,9 @@
+Functional tests for 'ui' module
+--------------------------------
+
+(TODO: avoid NORMALIZE_WHITESPACE doctest flag)
+
+
 >>> import functools
 >>> import optparse
 >>> from unittest.mock import patch
