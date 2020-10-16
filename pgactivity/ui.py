@@ -104,15 +104,15 @@ def main(
                     if ui.query_mode == types.QueryMode.activities:
                         queries = data.pg_get_activities(ui.duration_mode)
                         if is_local:
-                            new_procs = data.sys_get_proc(queries, is_local)
+                            old_procs = procs
+                            procs = data.sys_get_proc(queries, is_local)
                             (
                                 io_counters,
-                                pids,
-                                activity_procs,
+                                __,
+                                acts,
                             ) = activities.update_processes_local(
-                                procs, new_procs, fs_blocksize
+                                old_procs, procs, fs_blocksize
                             )
-                            procs = new_procs
                             (
                                 read_bytes_delta,
                                 write_bytes_delta,
@@ -137,7 +137,6 @@ def main(
                                     bytes=int(write_count_delta),
                                 ),
                             )
-                            acts = activity_procs
                         else:
                             acts = queries  # type: ignore # XXX
 
