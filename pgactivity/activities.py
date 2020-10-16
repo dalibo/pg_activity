@@ -6,7 +6,15 @@ import psutil
 
 from . import utils
 from .Data import Data
-from .types import Activity, ActivityProcess, LoadAverage, MemoryInfo, Process, SortKey
+from .types import (
+    Activity,
+    ActivityBW,
+    ActivityProcess,
+    LoadAverage,
+    MemoryInfo,
+    Process,
+    SortKey,
+)
 
 
 def update_processes_local(
@@ -98,7 +106,7 @@ def update_processes_local(
     return io_counters, pids, procs
 
 
-T = TypeVar("T", Activity, ActivityProcess)
+T = TypeVar("T", Activity, ActivityBW, ActivityProcess)
 
 
 def sorted(activities: List[T], *, key: SortKey, reverse: bool = False) -> List[T]:
