@@ -708,7 +708,7 @@ def processes_rows(
     ...         write=12.3,
     ...         state="idle in transaction",
     ...         query="UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;",
-    ...         duration=None,
+    ...         duration=0.0,
     ...         wait=False,
     ...         io_wait="N",
     ...         is_parallel_worker=False,
@@ -799,7 +799,7 @@ def processes_rows(
     Terminal is too narrow given selected flags, we switch to wrap_noindent mode
     (TODO: this is buggy, the first line should be wrapped as well if too long)
     >>> processes_rows(term, ui, processes, is_local=True)
-    6239   pgbench                   pgbench         postgres            local    0.1  1.0       7B      12B  N/A       N    N      idle in trans  UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
+    6239   pgbench                   pgbench         postgres            local    0.1  1.0       7B      12B  0.000000  N    N      idle in trans  UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
     6228   pgbench                   pgbench         postgres            local    0.2  1.0       0B    1.08M  0.000413  N    Y             active  \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
     1234   business               accounting              bob            local    2.4  1.0    9.42M    1.21K  20:34.00  Y    N             active  SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id)
     WHERE s.date > CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name,

@@ -615,7 +615,7 @@ class ActivityProcess:
     write: float
     state: str
     query: str
-    duration: Optional[float]
+    duration: float
     wait: bool
     io_wait: str
     is_parallel_worker: bool
