@@ -244,6 +244,35 @@ class SortKey(enum.Enum):
         return cls.duration
 
 
+@enum.unique
+class QueryDisplayMode(enum.IntEnum):
+    truncate = 1
+    wrap_noindent = 2
+    wrap = 3
+
+    @classmethod
+    def default(cls) -> "QueryDisplayMode":
+        return cls.wrap_noindent
+
+
+@enum.unique
+class QueryMode(enum.Enum):
+    activities = "running queries"
+    waiting = "waiting queries"
+    blocking = "blocking queries"
+
+    @classmethod
+    def default(cls) -> "QueryMode":
+        return cls.activities
+
+
+@enum.unique
+class DurationMode(enum.IntEnum):
+    query = 1
+    transaction = 2
+    backend = 3
+
+
 @attr.s(auto_attribs=True, frozen=True, slots=True)
 class ColumnTitle:
     """Title of a column in stats table.
@@ -306,35 +335,6 @@ class Host:
 class DBInfo:
     total_size: int
     size_ev: int
-
-
-@enum.unique
-class QueryDisplayMode(enum.IntEnum):
-    truncate = 1
-    wrap_noindent = 2
-    wrap = 3
-
-    @classmethod
-    def default(cls) -> "QueryDisplayMode":
-        return cls.wrap_noindent
-
-
-@enum.unique
-class QueryMode(enum.Enum):
-    activities = "running queries"
-    waiting = "waiting queries"
-    blocking = "blocking queries"
-
-    @classmethod
-    def default(cls) -> "QueryMode":
-        return cls.activities
-
-
-@enum.unique
-class DurationMode(enum.IntEnum):
-    query = 1
-    transaction = 2
-    backend = 3
 
 
 @attr.s(auto_attribs=True, slots=True)
