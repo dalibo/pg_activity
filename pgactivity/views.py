@@ -35,7 +35,6 @@ from .types import (
     ActivityProcess,
     ColumnTitle,
     DBInfo,
-    DurationMode,
     Flag,
     Host,
     IOCounter,
@@ -44,6 +43,7 @@ from .types import (
     QueryMode,
     SortKey,
     SystemInfo,
+    UI,
 )
 from . import utils
 
@@ -282,28 +282,28 @@ def help(term: Terminal, version: str, is_local: bool) -> Iterable[str]:
 @limit
 def header(
     term: Terminal,
+    ui: UI,
+    *,
     host: Host,
     dbinfo: DBInfo,
     tps: int,
     active_connections: int,
-    duration_mode: DurationMode,
-    refresh_time: float,
-    *,
-    min_duration: float = 0,
     max_iops: int = 0,
     system_info: Optional[SystemInfo] = None,
 ) -> Iterator[str]:
     r"""Return window header lines.
 
-    >>> from pgactivity.types import IOCounter, LoadAverage
+    >>> from pgactivity.types import DurationMode, IOCounter, LoadAverage, UI
+
     >>> term = Terminal()
+    >>> ui = UI(refresh_time=10, duration_mode=DurationMode.backend)
 
     Remote host:
 
     >>> host = Host("PostgreSQL 9.6", "server", "pgadm", "server.prod.tld", 5433, "app")
     >>> dbinfo = DBInfo(10203040506070809, 9999)
 
-    >>> header(term, host, dbinfo, 12, 0, DurationMode.backend, refresh_time=10)
+    >>> header(term, ui, host=host, dbinfo=dbinfo, tps=12, active_connections=0)
     PostgreSQL 9.6 - server - pgadm@server.prod.tld:5433/app - Ref.: 10s
      Size:         9.06P - 9.76K/s        | TPS:              12      | Active connections:               0      | Duration mode:     backend
 
@@ -318,8 +318,9 @@ def header(
     >>> load = LoadAverage(25.0, 0.19, 0.39)
     >>> sysinfo = SystemInfo(vmem, swap, load, io_read, io_write)
 
-    >>> header(term, host, dbinfo, 1, 79, DurationMode.query, refresh_time=2,
-    ...        min_duration=1.2, max_iops=12, system_info=sysinfo)
+    >>> ui = UI(refresh_time=2, min_duration=1.2)
+    >>> header(term, ui, host=host, dbinfo=dbinfo, tps=1, active_connections=79,
+    ...        max_iops=12, system_info=sysinfo)
     PostgreSQL 13.1 - localhost - tester@host:5432/postgres - Ref.: 2s - Min. duration: 1.2s
      Size:       117.74M - 12B/s          | TPS:               1      | Active connections:              79      | Duration mode:       query
      Mem.:      42.5% - 1.87G/5.75G       | IO Max:       12/s
@@ -333,9 +334,9 @@ def header(
                 host.pg_version,
                 f"{term.bold}{host.hostname}{term.normal}",
                 f"{term.cyan}{pg_host}{term.normal}",
-                f"Ref.: {refresh_time}s",
+                f"Ref.: {ui.refresh_time}s",
             ]
-            + ([f"Min. duration: {min_duration}s"] if min_duration else [])
+            + ([f"Min. duration: {ui.min_duration}s"] if ui.min_duration else [])
         )
     )
 
@@ -366,7 +367,7 @@ def header(
             ),
             (
                 "Duration mode",
-                f"{term.bold_green}{duration_mode.name.rjust(11)}{term.normal}",
+                f"{term.bold_green}{ui.duration_mode.name.rjust(11)}{term.normal}",
                 5,
             ),
         )
@@ -407,23 +408,25 @@ def header(
 
 
 @limit
-def query_mode(
-    term: Terminal, mode: QueryMode, *, in_pause: bool = False
-) -> Iterator[str]:
+def query_mode(term: Terminal, ui: UI) -> Iterator[str]:
     r"""Display query mode title.
 
-    >>> from pgactivity.types import QueryMode
+    >>> from pgactivity.types import QueryMode, UI
 
     >>> term = Terminal()
-    >>> query_mode(term, QueryMode.blocking)
+    >>> ui = UI(query_mode=QueryMode.blocking)
+    >>> query_mode(term, ui)
                                     BLOCKING QUERIES
-    >>> query_mode(term, QueryMode.activities, in_pause=True)  # doctest: +NORMALIZE_WHITESPACE
+    >>> ui = UI(query_mode=QueryMode.activities, in_pause=True)
+    >>> query_mode(term, ui)  # doctest: +NORMALIZE_WHITESPACE
                                     PAUSE
     """
-    if in_pause:
+    if ui.in_pause:
         yield term.black_bold_on_orange(term.center("PAUSE", fillchar=" "))
     else:
-        yield term.green_bold(term.center(mode.value.upper(), fillchar=" ").rstrip())
+        yield term.green_bold(
+            term.center(ui.query_mode.value.upper(), fillchar=" ").rstrip()
+        )
 
 
 class Column(enum.Enum):
@@ -561,29 +564,46 @@ COLUMNS_BY_QUERYMODE: Dict[QueryMode, List[Column]] = {
 
 
 @limit
-def columns_header(
-    term: Terminal, mode: QueryMode, flag: Flag, sort_by: SortKey
-) -> Iterator[str]:
+def columns_header(term: Terminal, ui: UI) -> Iterator[str]:
     r"""Yield columns header lines.
 
+    >>> from pgactivity.types import Flag, QueryMode, SortKey, UI
+
     >>> term = Terminal()
-    >>> columns_header(term, QueryMode.activities, Flag.PID | Flag.DATABASE, SortKey.cpu)  # doctest: +NORMALIZE_WHITESPACE
+
+    >>> ui = UI(query_mode=QueryMode.activities,
+    ...         flag=Flag.PID | Flag.DATABASE,
+    ...         sort_key=SortKey.cpu)
+    >>> columns_header(term, ui)  # doctest: +NORMALIZE_WHITESPACE
     PID    DATABASE                      state   Query
-    >>> columns_header(term, QueryMode.activities, Flag.CPU, SortKey.cpu)  # doctest: +NORMALIZE_WHITESPACE
+
+    >>> ui = UI(query_mode=QueryMode.activities,
+    ...         flag=Flag.CPU,
+    ...         sort_key=SortKey.cpu)
+    >>> columns_header(term, ui)  # doctest: +NORMALIZE_WHITESPACE
     CPU%              state   Query
-    >>> columns_header(term, QueryMode.activities, Flag.MEM, SortKey.cpu)  # doctest: +NORMALIZE_WHITESPACE
+
+    >>> ui = UI(query_mode=QueryMode.activities,
+    ...         flag=Flag.MEM,
+    ...         sort_key=SortKey.cpu)
+    >>> columns_header(term, ui)  # doctest: +NORMALIZE_WHITESPACE
     MEM%              state   Query
-    >>> flag = Flag.PID | Flag.DATABASE | Flag.APPNAME | Flag.RELATION | Flag.CLIENT | Flag.WAIT
-    >>> columns_header(term, QueryMode.blocking, flag, SortKey.duration)  # doctest: +NORMALIZE_WHITESPACE
+
+    >>> ui = UI(query_mode=QueryMode.blocking,
+    ...         flag=Flag.PID | Flag.DATABASE | Flag.APPNAME | Flag.RELATION | Flag.CLIENT | Flag.WAIT,
+    ...         sort_key=SortKey.duration)
+    >>> columns_header(term, ui)  # doctest: +NORMALIZE_WHITESPACE
     PID    DATABASE                      APP  RELATION              state   Query
-    >>> columns_header(term, QueryMode.activities, flag, SortKey.duration)  # doctest: +NORMALIZE_WHITESPACE
+
+    >>> ui.query_mode = QueryMode.activities
+    >>> columns_header(term, ui)  # doctest: +NORMALIZE_WHITESPACE
     PID    DATABASE                      APP           CLIENT  W              state   Query
     """
-    columns = (c.value for c in COLUMNS_BY_QUERYMODE[mode])
+    columns = (c.value for c in COLUMNS_BY_QUERYMODE[ui.query_mode])
     htitles = []
     for column in columns:
-        if column.mandatory or (column.flag & flag):
-            color = getattr(term, f"black_on_{column.color(sort_by)}")
+        if column.mandatory or (column.flag & ui.flag):
+            color = getattr(term, f"black_on_{column.color(ui.sort_key)}")
             htitles.append(f"{color}{column.render()}")
     yield term.ljust("".join(htitles), fillchar=" ") + term.normal
 
@@ -664,15 +684,15 @@ def format_duration(duration: Optional[float]) -> Tuple[str, str]:
 @limit
 def processes_rows(
     term: Terminal,
+    ui: UI,
     processes: Union[Iterable[Activity], Iterable[ActivityProcess]],
     *,
     is_local: bool,
-    flag: Flag,
-    query_mode: QueryMode,
     color_type: str = "default",
-    verbose_mode: QueryDisplayMode = QueryDisplayMode.default(),
 ) -> Iterator[str]:
     r"""Display table rows with processes information.
+
+    >>> from pgactivity.types import UI
 
     >>> term = Terminal(force_styling=None)
     >>> processes = [
@@ -729,12 +749,11 @@ def processes_rows(
     ...     ),
     ... ]
 
-    >>> flag = Flag.PID|Flag.CPU|Flag.MEM|Flag.DATABASE
+    >>> ui = UI(flag=Flag.PID|Flag.CPU|Flag.MEM|Flag.DATABASE)
     >>> term.width
     80
 
-    >>> processes_rows(term, processes, is_local=True, flag=flag,
-    ...                query_mode=QueryMode.activities)
+    >>> processes_rows(term, ui, processes, is_local=True)
     6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts
     SET abalance = abalance + 141 WHERE aid = 1932841;
     6228   pgbench             0.2  1.0             active   \_ UPDATE
@@ -744,16 +763,14 @@ def processes_rows(
     CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name, p.price, p.cost
     HAVING sum(p.price * s.units) > 5000;
 
-    >>> processes_rows(term, processes, is_local=True, flag=flag,
-    ...                query_mode=QueryMode.activities,
-    ...                verbose_mode=QueryDisplayMode.truncate)
+    >>> ui.verbose_mode = QueryDisplayMode.truncate
+    >>> processes_rows(term, ui, processes, is_local=True)
     6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts
     6228   pgbench             0.2  1.0             active   \_ UPDATE pgbench_accou
     1234   business            2.4  1.0             active   SELECT product_id, p.na
 
-    >>> processes_rows(term, processes, is_local=True, flag=flag,
-    ...                query_mode=QueryMode.activities,
-    ...                verbose_mode=QueryDisplayMode.wrap)
+    >>> ui.verbose_mode = QueryDisplayMode.wrap
+    >>> processes_rows(term, ui, processes, is_local=True)
     6239   pgbench             0.1  1.0      idle in trans   UPDATE
                                                              pgbench_accounts SET
                                                              abalance = abalance +
@@ -775,14 +792,12 @@ def processes_rows(
                                                              HAVING sum(p.price *
                                                              s.units) > 5000;
 
-    >>> allflags = Flag.PID|Flag.IOWAIT|Flag.MODE|Flag.TYPE|Flag.RELATION|Flag.WAIT|Flag.TIME|Flag.WRITE|Flag.READ|Flag.MEM|Flag.CPU|Flag.USER|Flag.CLIENT|Flag.APPNAME|Flag.DATABASE
+    >>> ui.flag = allflags = sum(Flag)
     >>> term.width
     80
 
     # terminal is too narrow given selected flags, we switch to wrap_noindent mode
-    >>> processes_rows(term, processes, is_local=True, flag=allflags,
-    ...                query_mode=QueryMode.activities,
-    ...                verbose_mode=QueryDisplayMode.wrap)  # doctest: +NORMALIZE_WHITESPACE
+    >>> processes_rows(term, ui, processes, is_local=True)  # doctest: +NORMALIZE_WHITESPACE
     6239   pgbench                   pgbench         postgres            local    0.1  1.0       7B      12B  N/A       N    N      idle in trans
     UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
     6228   pgbench                   pgbench         postgres            local    0.2  1.0       0B    1.08M  0.000413  N    Y             active
@@ -792,17 +807,15 @@ def processes_rows(
     WHERE s.date > CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name,
     p.price, p.cost HAVING sum(p.price * s.units) > 5000;
 
-    >>> flag = Flag.PID|Flag.DATABASE
-    >>> processes_rows(term, processes, is_local=True, flag=flag,
-    ...                query_mode=QueryMode.activities,
-    ...                verbose_mode=QueryDisplayMode.truncate)
+    >>> ui.flag = Flag.PID|Flag.DATABASE
+    >>> ui.verbose_mode = QueryDisplayMode.truncate
+    >>> processes_rows(term, ui, processes, is_local=True)
     6239   pgbench               idle in trans   UPDATE pgbench_accounts SET abalanc
     6228   pgbench                      active   \_ UPDATE pgbench_accounts SET abal
     1234   business                     active   SELECT product_id, p.name FROM prod
 
-    >>> processes_rows(term, processes, is_local=True, flag=flag,
-    ...                query_mode=QueryMode.activities,
-    ...                verbose_mode=QueryDisplayMode.wrap)
+    >>> ui.verbose_mode = QueryDisplayMode.wrap
+    >>> processes_rows(term, ui, processes, is_local=True)
     6239   pgbench               idle in trans   UPDATE pgbench_accounts SET
                                                  abalance = abalance + 141 WHERE aid
                                                  = 1932841;
@@ -843,15 +856,15 @@ def processes_rows(
     ...         query="UPDATE pgbench_branches SET bbalance = bbalance + 1788 WHERE bid = 68;",
     ...     ),
     ... ]
-    >>> processes_rows(term, processes, is_local=True, flag=flag,
-    ...                query_mode=QueryMode.waiting,
-    ...                verbose_mode=QueryDisplayMode.wrap)
+    >>> ui.query_mode = QueryMode.waiting
+    >>> processes_rows(term, ui, processes, is_local=True)
     6239   pgbench                      active   END;
     6228   pgbench               idle in trans   UPDATE pgbench_branches SET
                                                  bbalance = bbalance + 1788 WHERE
                                                  bid = 68;
-    >>> processes_rows(term, processes, is_local=False, flag=allflags,
-    ...                query_mode=QueryMode.blocking)  # doctest: +NORMALIZE_WHITESPACE
+    >>> ui.query_mode = QueryMode.blocking
+    >>> ui.flag = allflags
+    >>> processes_rows(term, ui, processes, is_local=False)  # doctest: +NORMALIZE_WHITESPACE
     6239   pgbench                   pgbench      None    transactionid    ExclusiveLock  11:06.00             active
     END;
     6228   pgbench                   pgbench      ahah            tuple RowExclusiveLock  0.000413      idle in trans
@@ -882,6 +895,9 @@ def processes_rows(
         column_value = transform(getattr(process, key))[:crop]
         color_key = color_key or key
         text_append(f"{color_for(color_key)}{template_for(key) % column_value}")
+
+    flag = ui.flag
+    query_mode = ui.query_mode
 
     for process in processes:
         text: List[str] = []
@@ -958,6 +974,7 @@ def processes_rows(
         indent = get_indent(query_mode, flag) + " "
         dif = term.width - len(indent)
 
+        verbose_mode = ui.verbose_mode
         if dif < 0:
             # Switch to wrap_noindent mode if terminal is too narrow.
             verbose_mode = QueryDisplayMode.wrap_noindent
@@ -1025,23 +1042,16 @@ def footer(term: Terminal) -> None:
 
 def screen(
     term: Terminal,
+    ui: UI,
     *,
     host: Host,
     dbinfo: DBInfo,
     tps: int,
     active_connections: int,
-    duration_mode: DurationMode,
-    refresh_time: float,
-    min_duration: float = 0,
     max_iops: int = 0,
     system_info: Optional[SystemInfo] = None,
-    querymode: QueryMode,
-    flag: Flag,
-    sort_key: SortKey,
     activities: Union[Iterable[Activity], Iterable[ActivityProcess]],
     is_local: bool,
-    verbose_mode: QueryDisplayMode,
-    in_pause: bool,
     render_footer: bool = True,
 ) -> None:
     """Display the screen."""
@@ -1050,27 +1060,23 @@ def screen(
     lines_counter = line_counter(top_height)
     header(
         term,
-        host,
-        dbinfo,
-        tps,
-        active_connections,
-        duration_mode,
-        refresh_time,
-        min_duration=min_duration,
+        ui,
+        host=host,
+        dbinfo=dbinfo,
+        tps=tps,
+        active_connections=active_connections,
         max_iops=max_iops,
         system_info=system_info,
         lines_counter=lines_counter,
     )
 
-    query_mode(term, querymode, in_pause=in_pause, lines_counter=lines_counter)
-    columns_header(term, querymode, flag, sort_key, lines_counter=lines_counter)
+    query_mode(term, ui, lines_counter=lines_counter)
+    columns_header(term, ui, lines_counter=lines_counter)
     processes_rows(
         term,
+        ui,
         activities,
         is_local=is_local,
-        flag=flag,
-        query_mode=querymode,
-        verbose_mode=verbose_mode,
         lines_counter=lines_counter,
     )
     if render_footer:

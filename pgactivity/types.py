@@ -273,6 +273,24 @@ class DurationMode(enum.IntEnum):
     backend = 3
 
 
+@attr.s(auto_attribs=True, slots=True)
+class UI:
+    """State of the UI."""
+
+    min_duration: float = 0.0
+    flag: Flag = Flag(sum(Flag))
+    duration_mode: DurationMode = attr.ib(
+        default=DurationMode.query, converter=DurationMode
+    )
+    verbose_mode: QueryDisplayMode = attr.ib(
+        default=QueryDisplayMode.default(), converter=QueryDisplayMode
+    )
+    sort_key: SortKey = attr.ib(default=SortKey.default(), converter=SortKey)
+    query_mode: QueryMode = attr.ib(default=QueryMode.activities, converter=QueryMode)
+    refresh_time: float = 2.0
+    in_pause: bool = False
+
+
 @attr.s(auto_attribs=True, frozen=True, slots=True)
 class ColumnTitle:
     """Title of a column in stats table.

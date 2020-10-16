@@ -16,8 +16,7 @@ def main(
     render_footer: bool = True,
 ) -> None:
     data = Data.Data()
-    refresh_time = 2.0
-    min_duration = data.min_duration = options.minduration
+    data.min_duration = options.minduration
     utils.pg_connect(
         data,
         options,
@@ -40,16 +39,17 @@ def main(
     )
 
     is_local = data.pg_is_local() and data.pg_is_local_access()
-    duration_mode = types.DurationMode(int(options.durationmode))
-    verbose_mode = types.QueryDisplayMode(int(options.verbosemode))
-    flag = types.Flag.from_options(is_local=is_local, **vars(options))
+    ui = types.UI(
+        min_duration=options.minduration,
+        flag=types.Flag.from_options(is_local=is_local, **vars(options)),
+        duration_mode=int(options.durationmode),
+        verbose_mode=int(options.verbosemode),
+    )
 
     if term is None:
         # Used in tests.
         term = Terminal()
-    key, in_help, in_pause = None, False, False
-    query_mode = types.QueryMode.activities
-    sort_key = types.SortKey.default()
+    key, in_help = None, False
     skip_sizes = options.nodbsize
     queries: Union[List[types.Activity], List[types.ActivityBW]]
     queries = data.pg_get_activities()
@@ -87,20 +87,22 @@ def main(
             elif key == keys.EXIT:
                 break
             elif key == keys.PAUSE:
-                in_pause = not in_pause
+                ui.in_pause = not ui.in_pause
             elif options.nodbsize and key == keys.REFRESH_DB_SIZE:
                 skip_sizes = False
             elif key in (keys.REFRESH_TIME_INCREASE, keys.REFRESH_TIME_DECREASE):
-                refresh_time = handlers.refresh_time(key, refresh_time)
+                ui.refresh_time = handlers.refresh_time(key, ui.refresh_time)
             elif key is not None:
-                query_mode = handlers.query_mode(key) or query_mode
-                sort_key = handlers.sort_key_for(key, query_mode, is_local) or sort_key
-                duration_mode = handlers.duration_mode(key, duration_mode)
-                verbose_mode = handlers.verbose_mode(key, verbose_mode)
+                ui.query_mode = handlers.query_mode(key) or ui.query_mode
+                ui.sort_key = (
+                    handlers.sort_key_for(key, ui.query_mode, is_local) or ui.sort_key
+                )
+                ui.duration_mode = handlers.duration_mode(key, ui.duration_mode)
+                ui.verbose_mode = handlers.verbose_mode(key, ui.verbose_mode)
             if not in_help:
-                if not in_pause:
-                    if query_mode == types.QueryMode.activities:
-                        queries = data.pg_get_activities(duration_mode)
+                if not ui.in_pause:
+                    if ui.query_mode == types.QueryMode.activities:
+                        queries = data.pg_get_activities(ui.duration_mode)
                         if is_local:
                             new_procs = data.sys_get_proc(queries, is_local)
                             (
@@ -139,15 +141,15 @@ def main(
                         else:
                             acts = queries  # type: ignore # XXX
 
-                    elif query_mode == types.QueryMode.blocking:
-                        queries = data.pg_get_blocking(duration_mode)
+                    elif ui.query_mode == types.QueryMode.blocking:
+                        queries = data.pg_get_blocking(ui.duration_mode)
                         acts = queries  # type: ignore # XXX
 
-                    elif query_mode == types.QueryMode.waiting:
-                        queries = data.pg_get_waiting(duration_mode)
+                    elif ui.query_mode == types.QueryMode.waiting:
+                        queries = data.pg_get_waiting(ui.duration_mode)
                         acts = queries  # type: ignore # XXX
 
-                    acts = activities.sorted(acts, key=sort_key, reverse=True)
+                    acts = activities.sorted(acts, key=ui.sort_key, reverse=True)
 
                 if options.output is not None:
                     with open(options.output, "a") as f:
@@ -155,23 +157,16 @@ def main(
 
                 views.screen(
                     term,
+                    ui,
                     host=host,
                     dbinfo=dbinfo,
                     tps=tps,
                     active_connections=active_connections,
-                    duration_mode=duration_mode,
-                    refresh_time=refresh_time,
-                    min_duration=min_duration,
                     max_iops=max_iops,
                     system_info=system_info,
-                    querymode=query_mode,
-                    flag=flag,
-                    sort_key=sort_key,
                     activities=acts,
                     is_local=is_local,
-                    verbose_mode=verbose_mode,
-                    in_pause=in_pause,
                     render_footer=render_footer,
                 )
 
-            key = term.inkey(timeout=refresh_time) or None
+            key = term.inkey(timeout=ui.refresh_time) or None

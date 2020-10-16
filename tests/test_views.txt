@@ -49,24 +49,27 @@
 >>> io_write = IOCounter(bytes=8, count=9)
 >>> load = LoadAverage(0.5, 1.9, 0.93)
 >>> sysinfo = SystemInfo(vmem, swap, load, io_read, io_write)
+>>> ui = UI(
+...     duration_mode=DurationMode.backend,
+...     refresh_time=10,
+...     min_duration=1,
+...     query_mode=QueryMode.activities,
+...     flag=Flag.PID|Flag.CPU|Flag.MEM|Flag.DATABASE,
+...     sort_key=SortKey.cpu,
+...     verbose_mode=QueryDisplayMode.truncate,
+...     in_pause=False,
+... )
 >>> screen(
 ...     term,
+...     ui,
 ...     host=Host("PostgreSQL 13", "testhost", "pgadm", "server.prod.tld", 5433, "app"),
 ...     dbinfo=DBInfo(10203040506070809, 9999),
 ...     tps=5,
 ...     active_connections=7,
-...     duration_mode=DurationMode.backend,
-...     refresh_time=10,
-...     min_duration=1,
 ...     max_iops=76,
 ...     system_info=sysinfo,
-...     querymode=QueryMode.activities,
-...     flag=Flag.PID|Flag.CPU|Flag.MEM|Flag.DATABASE,
-...     sort_key=SortKey.cpu,
 ...     activities=processes,
 ...     is_local=True,
-...     verbose_mode=QueryDisplayMode.truncate,
-...     in_pause=False,
 ... )
 PostgreSQL 13 - testhost - pgadm@server.prod.tld:5433/app - Ref.: 10s - Min. duration: 1s
  Size:         9.06P - 9.76K/s        | TPS:               5      | Active connections:               7      | Duration mode:     backend
