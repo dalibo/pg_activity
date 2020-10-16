@@ -395,6 +395,7 @@ class SystemInfo:
     load: LoadAverage
     io_read: IOCounter
     io_write: IOCounter
+    max_iops: int = 0
 
     @classmethod
     def default(
@@ -411,7 +412,8 @@ class SystemInfo:
                    swap=MemoryInfo(percent=0.0, used=0, total=0),
                    load=LoadAverage(avg1=0.0, avg5=0.0, avg15=0.0),
                    io_read=IOCounter(count=0, bytes=0, chars=0),
-                   io_write=IOCounter(count=0, bytes=0, chars=0))
+                   io_write=IOCounter(count=0, bytes=0, chars=0),
+                   max_iops=0)
         """
         return cls(
             memory or MemoryInfo.default(),

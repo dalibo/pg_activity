@@ -69,7 +69,6 @@ def main(
             )
             tps = int(pg_db_info["tps"])
             active_connections = data.pg_get_active_connections()
-            max_iops = 0
             memory, swap, load = activities.mem_swap_load(data)
             system_info = types.SystemInfo.default(memory=memory, swap=swap, load=load)
 
@@ -119,9 +118,6 @@ def main(
                                 read_count_delta,
                                 write_count_delta,
                             ) = io_counters
-                            max_iops = activities.update_max_iops(
-                                max_iops, read_count_delta, write_count_delta
-                            )
                             memory, swap, load = activities.mem_swap_load(data)
                             system_info = attr.evolve(
                                 system_info,
@@ -135,6 +131,11 @@ def main(
                                 io_write=types.IOCounter(
                                     count=write_count_delta,
                                     bytes=int(write_count_delta),
+                                ),
+                                max_iops=activities.update_max_iops(
+                                    system_info.max_iops,
+                                    read_count_delta,
+                                    write_count_delta,
                                 ),
                             )
                         else:
@@ -161,7 +162,6 @@ def main(
                     dbinfo=dbinfo,
                     tps=tps,
                     active_connections=active_connections,
-                    max_iops=max_iops,
                     system_info=system_info,
                     activities=acts,
                     is_local=is_local,

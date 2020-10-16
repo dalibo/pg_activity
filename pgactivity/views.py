@@ -288,7 +288,6 @@ def header(
     dbinfo: DBInfo,
     tps: int,
     active_connections: int,
-    max_iops: int = 0,
     system_info: Optional[SystemInfo] = None,
 ) -> Iterator[str]:
     r"""Return window header lines.
@@ -316,11 +315,11 @@ def header(
     >>> io_read = IOCounter(bytes=128, count=6)
     >>> io_write = IOCounter(bytes=8, count=9)
     >>> load = LoadAverage(25.0, 0.19, 0.39)
-    >>> sysinfo = SystemInfo(vmem, swap, load, io_read, io_write)
+    >>> sysinfo = SystemInfo(vmem, swap, load, io_read, io_write, 12)
 
     >>> ui = UI(refresh_time=2, min_duration=1.2)
     >>> header(term, ui, host=host, dbinfo=dbinfo, tps=1, active_connections=79,
-    ...        max_iops=12, system_info=sysinfo)
+    ...        system_info=sysinfo)
     PostgreSQL 13.1 - localhost - tester@host:5432/postgres - Ref.: 2s - Min. duration: 1.2s
      Size:       117.74M - 12B/s          | TPS:               1      | Active connections:              79      | Duration mode:       query
      Mem.:      42.5% - 1.87G/5.75G       | IO Max:       12/s
@@ -377,7 +376,7 @@ def header(
         yield indent(
             row(
                 ("Mem.", render(system_info.memory, col_width // 2), col_width),
-                ("IO Max", f"{max_iops:8}/s", col_width // 4),
+                ("IO Max", f"{system_info.max_iops:8}/s", col_width // 4),
             )
         )
         yield indent(
@@ -1049,7 +1048,6 @@ def screen(
     dbinfo: DBInfo,
     tps: int,
     active_connections: int,
-    max_iops: int = 0,
     system_info: Optional[SystemInfo] = None,
     activities: Union[Iterable[Activity], Iterable[ActivityProcess]],
     is_local: bool,
@@ -1066,7 +1064,6 @@ def screen(
         dbinfo=dbinfo,
         tps=tps,
         active_connections=active_connections,
-        max_iops=max_iops,
         system_info=system_info,
         lines_counter=lines_counter,
     )

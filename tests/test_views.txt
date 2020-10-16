@@ -48,7 +48,7 @@
 >>> io_read = IOCounter(bytes=128, count=6)
 >>> io_write = IOCounter(bytes=8, count=9)
 >>> load = LoadAverage(0.5, 1.9, 0.93)
->>> sysinfo = SystemInfo(vmem, swap, load, io_read, io_write)
+>>> sysinfo = SystemInfo(vmem, swap, load, io_read, io_write, 76)
 >>> ui = UI(
 ...     duration_mode=DurationMode.backend,
 ...     refresh_time=10,
@@ -66,7 +66,6 @@
 ...     dbinfo=DBInfo(10203040506070809, 9999),
 ...     tps=5,
 ...     active_connections=7,
-...     max_iops=76,
 ...     system_info=sysinfo,
 ...     activities=processes,
 ...     is_local=True,
