@@ -194,23 +194,7 @@ class Flag(enum.IntFlag):
         >>> Flag.from_options(is_local=False, **options)
         <Flag.MODE|TYPE|RELATION|WAIT|USER|CLIENT|APPNAME: 7694>
         """
-        flag = (
-            cls.DATABASE
-            | cls.USER
-            | cls.CLIENT
-            | cls.CPU
-            | cls.MEM
-            | cls.READ
-            | cls.WRITE
-            | cls.TIME
-            | cls.WAIT
-            | cls.RELATION
-            | cls.TYPE
-            | cls.MODE
-            | cls.IOWAIT
-            | cls.APPNAME
-            | cls.PID
-        )
+        flag = cls(sum(cls))
         if nodb:
             flag ^= cls.DATABASE
         if nouser:
