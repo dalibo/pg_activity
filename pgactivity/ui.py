@@ -114,6 +114,7 @@ def main(
                     if ui.query_mode == types.QueryMode.activities:
                         queries = data.pg_get_activities(ui.duration_mode)
                         if is_local:
+                            # TODO: Use this logic in waiting and blocking cases.
                             old_procs = procs
                             procs = data.sys_get_proc(queries, is_local)
                             (
