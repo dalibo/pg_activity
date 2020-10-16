@@ -10,7 +10,6 @@ from typing import (
     NoReturn,
     Optional,
     Tuple,
-    Union,
 )
 
 from blessed import Terminal
@@ -27,17 +26,15 @@ from .keys import (
 )
 from .types import (
     ActivityStats,
-    BWProcess,
     Column,
     DBInfo,
     Flag,
     Host,
     IOCounter,
-    LocalRunningProcess,
     MemoryInfo,
     ProcessSet,
     QueryDisplayMode,
-    RunningProcess,
+    SelectableProcesses,
     SystemInfo,
     UI,
 )
@@ -305,16 +302,9 @@ def format_query(query: str, is_parallel_worker: bool) -> str:
 def processes_rows(
     term: Terminal,
     ui: UI,
-    processes: Union[
-        Iterable[BWProcess], Iterable[RunningProcess], Iterable[LocalRunningProcess]
-    ],
-    *,
-    color_type: str = "default",
+    processes: SelectableProcesses,
 ) -> Iterator[str]:
     """Display table rows with processes information."""
-
-    # if color_type == 'default' and self.pid_yank.count(process['pid']) > 0:
-    # color_type = 'yellow'
 
     def color_for(field: str) -> FormattingString:
         return getattr(term, colors.FIELD_BY_MODE[field][color_type])
@@ -330,7 +320,10 @@ def processes_rows(
     ) -> None:
         text_append(f"{color_for(column.color(value))}{column.render(value)}")
 
+    selected = processes.selected
+
     for process in processes:
+        color_type = "yellow" if process.pid == selected else "default"
         text: List[str] = []
         for column in ui.columns():
             field = column.key
@@ -421,7 +414,7 @@ def screen(
         processes, system_info = activity_stats
     else:
         processes, system_info = activity_stats, None
-    processes = sorted_processes(processes, key=ui.sort_key, reverse=True)  # type: ignore  # TODO: fixme
+    processes.set_items(sorted_processes(processes, key=ui.sort_key, reverse=True))  # type: ignore  # TODO: fixme
 
     print(term.clear + term.home, end="")
     top_height = term.height - 1

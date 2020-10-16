@@ -8,6 +8,7 @@ from typing import (
     List,
     Mapping,
     Optional,
+    Sequence,
     Tuple,
     Type,
     TypeVar,
@@ -770,12 +771,97 @@ class LocalRunningProcess(RunningProcess):
         return cls(**dict(attr.asdict(process), **kwargs))
 
 
+@attr.s(auto_attribs=True, slots=True)
+class SelectableProcesses:
+    """Selectable list of processes.
+
+    >>> @attr.s(auto_attribs=True)
+    ... class Proc:
+    ...     pid: int
+
+    >>> w = SelectableProcesses(list(map(Proc, [456, 123, 789])))
+    >>> len(w)
+    3
+
+    Nothing selected at initialization:
+    >>> w.selected
+
+    >>> w.select_next()
+    >>> w.selected
+    456
+    >>> w.select_next()
+    >>> w.selected
+    123
+    >>> w.select_prev()
+    >>> w.selected
+    456
+    >>> w.select_prev()
+    >>> w.selected
+    789
+    >>> w.selected = 789
+    >>> w.select_next()
+    >>> w.selected
+    456
+    >>> w.select_prev()
+    >>> w.selected
+    789
+    >>> w.set_items(sorted(w.items))
+    >>> w.selected
+    789
+    >>> w.select_prev()
+    >>> w.selected
+    456
+    >>> w.select_next()
+    >>> w.selected
+    789
+    """
+
+    items: List[BaseProcess]
+    selected: Optional[int] = None
+
+    def __len__(self) -> int:
+        return len(self.items)
+
+    def __iter__(self) -> Iterator[BaseProcess]:
+        return iter(self.items)
+
+    def set_items(self, new_items: Sequence[BaseProcess]) -> None:
+        self.items[:] = list(new_items)
+
+    def _position(self) -> Optional[int]:
+        if self.selected is None:
+            return None
+        for idx, proc in enumerate(self.items):
+            if proc.pid == self.selected:
+                return idx
+        return None
+
+    def select_next(self) -> None:
+        if not self.items:
+            return
+        idx = self._position()
+        if idx is None:
+            next_idx = 0
+        elif idx == len(self.items) - 1:
+            next_idx = 0
+        else:
+            next_idx = idx + 1
+        self.selected = self.items[next_idx].pid
+
+    def select_prev(self) -> None:
+        if not self.items:
+            return
+        idx = self._position() or 0
+        self.selected = self.items[idx - 1].pid
+
+
 ActivityStats = Union[
     Iterable[BWProcess],
     Iterable[RunningProcess],
     Tuple[Iterable[BWProcess], SystemInfo],
     Tuple[Iterable[LocalRunningProcess], SystemInfo],
 ]
+Process = Union[LocalRunningProcess, RunningProcess, BWProcess]
 ProcessSet = Union[
     Iterable[LocalRunningProcess], Iterable[RunningProcess], Iterable[BWProcess]
 ]

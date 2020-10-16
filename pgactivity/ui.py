@@ -1,7 +1,7 @@
 import optparse
 import os
 import socket
-from typing import Dict, Optional
+from typing import Dict, List, Optional, cast
 
 import attr
 from blessed import Terminal
@@ -53,9 +53,9 @@ def main(
     if term is None:
         # Used in tests.
         term = Terminal()
-    key, in_help = None, False
+    key, in_help, wait_for = None, False, None
     sys_procs: Dict[int, types.SystemProcess] = {}
-    pg_procs: types.ProcessSet
+    pg_procs = types.SelectableProcesses([])
     activity_stats: types.ActivityStats
 
     with term.fullscreen(), term.cbreak():
@@ -96,17 +96,27 @@ def main(
             elif key in (keys.REFRESH_TIME_INCREASE, keys.REFRESH_TIME_DECREASE):
                 ui = ui.evolve(refresh_time=handlers.refresh_time(key, ui.refresh_time))
             elif key is not None:
-                ui = ui.evolve(
-                    query_mode=handlers.query_mode(key) or ui.query_mode,
-                    sort_key=(
-                        handlers.sort_key_for(key, ui.query_mode, is_local)
-                        or ui.sort_key
-                    ),
-                    duration_mode=handlers.duration_mode(key, ui.duration_mode),
-                    verbose_mode=handlers.verbose_mode(key, ui.verbose_mode),
-                )
+                if key.name == keys.PROCESS_NEXT:
+                    pg_procs.select_next()
+                    wait_for = 3
+                elif key.name == keys.PROCESS_PREV:
+                    pg_procs.select_prev()
+                    wait_for = 3
+                elif key.name == keys.CANCEL_SELECTION:
+                    pg_procs.selected = None
+                    wait_for = None
+                else:
+                    ui = ui.evolve(
+                        query_mode=handlers.query_mode(key) or ui.query_mode,
+                        sort_key=(
+                            handlers.sort_key_for(key, ui.query_mode, is_local)
+                            or ui.sort_key
+                        ),
+                        duration_mode=handlers.duration_mode(key, ui.duration_mode),
+                        verbose_mode=handlers.verbose_mode(key, ui.verbose_mode),
+                    )
             if not in_help:
-                if not ui.in_pause:
+                if not ui.in_pause and wait_for is None:
                     if is_local:
                         memory, swap, load = activities.mem_swap_load()
                         system_info = attr.evolve(
@@ -117,11 +127,13 @@ def main(
                         )
 
                     if ui.query_mode == types.QueryMode.activities:
-                        pg_procs = data.pg_get_activities(ui.duration_mode)
+                        pg_procs.set_items(data.pg_get_activities(ui.duration_mode))
                         if is_local:
                             # TODO: Use this logic in waiting and blocking cases.
-                            pg_procs, io_read, io_write = activities.ps_complete(
-                                pg_procs, sys_procs, fs_blocksize
+                            local_pg_procs, io_read, io_write = activities.ps_complete(
+                                cast(List[types.RunningProcess], pg_procs.items),
+                                sys_procs,
+                                fs_blocksize,
                             )
                             system_info = attr.evolve(
                                 system_info,
@@ -133,26 +145,21 @@ def main(
                                     io_write.count,
                                 ),
                             )
-                            activity_stats = pg_procs, system_info
-                        else:
-                            activity_stats = pg_procs
+                            pg_procs.set_items(local_pg_procs)
 
                     else:
                         if ui.query_mode == types.QueryMode.blocking:
-                            pg_procs = data.pg_get_blocking(ui.duration_mode)
+                            pg_procs.set_items(data.pg_get_blocking(ui.duration_mode))
                         elif ui.query_mode == types.QueryMode.waiting:
-                            pg_procs = data.pg_get_waiting(ui.duration_mode)
+                            pg_procs.set_items(data.pg_get_waiting(ui.duration_mode))
                         else:
                             assert False  # help type checking
 
-                        if is_local:
-                            activity_stats = pg_procs, system_info
-                        else:
-                            activity_stats = pg_procs
+                    activity_stats = (pg_procs, system_info) if is_local else pg_procs  # type: ignore
 
                 if options.output is not None:
                     with open(options.output, "a") as f:
-                        utils.csv_write(f, map(attr.asdict, pg_procs))
+                        utils.csv_write(f, map(attr.asdict, pg_procs.items))
 
                 views.screen(
                     term,
@@ -164,5 +171,10 @@ def main(
                     activity_stats=activity_stats,
                     render_footer=render_footer,
                 )
+
+                if wait_for is not None:
+                    wait_for -= 1
+                    if wait_for == 0:
+                        wait_for = None
 
             key = term.inkey(timeout=ui.refresh_time) or None

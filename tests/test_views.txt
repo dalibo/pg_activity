@@ -184,7 +184,7 @@ Tests for processes_rows()
 
 >>> ui = UI.make(flag=Flag.PID|Flag.CPU|Flag.MEM|Flag.DATABASE)
 
->>> processes_rows(term, ui, processes1)
+>>> processes_rows(term, ui, SelectableProcesses(processes1))
 6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts
 SET abalance = abalance + 141 WHERE aid = 1932841;
 6228   pgbench             0.2  1.0             active   \_ UPDATE
@@ -195,13 +195,13 @@ CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name, p.price, p.cost
 HAVING sum(p.price * s.units) > 5000;
 
 >>> ui = ui.evolve(verbose_mode=QueryDisplayMode.truncate)
->>> processes_rows(term, ui, processes1)
+>>> processes_rows(term, ui, SelectableProcesses(processes1))
 6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts
 6228   pgbench             0.2  1.0             active   \_ UPDATE pgbench_accou
 1234   business            2.4  1.0             active   SELECT product_id, p.na
 
 >>> ui = ui.evolve(verbose_mode=QueryDisplayMode.wrap)
->>> processes_rows(term, ui, processes1)
+>>> processes_rows(term, ui, SelectableProcesses(processes1))
 6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts
                                                          SET abalance = abalance
                                                          + 141 WHERE aid =
@@ -229,7 +229,7 @@ HAVING sum(p.price * s.units) > 5000;
 
 Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 (TODO: this is buggy, the first line should be wrapped as well if too long)
->>> processes_rows(term, ui, processes1)
+>>> processes_rows(term, ui, SelectableProcesses(processes1))
 6239   pgbench                   pgbench         postgres            local    0.1  1.0       7B      12B  0.000000  N    N      idle in trans   UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
 6228   pgbench                   pgbench         postgres            local    0.2  1.0       0B    1.08M  0.000413  N    Y             active   \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
 1234   business               accounting              bob            local    2.4  1.0    9.42M    1.21K  20:34.00  Y    N             active   SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id)
@@ -238,13 +238,13 @@ p.price, p.cost HAVING sum(p.price * s.units) > 5000;
 
 >>> ui = UI.make(flag=Flag.PID|Flag.DATABASE,
 ...              verbose_mode=QueryDisplayMode.truncate)
->>> processes_rows(term, ui, processes1)
+>>> processes_rows(term, ui, SelectableProcesses(processes1))
 6239   pgbench               idle in trans   UPDATE pgbench_accounts SET abalanc
 6228   pgbench                      active   \_ UPDATE pgbench_accounts SET abal
 1234   business                     active   SELECT product_id, p.name FROM prod
 
 >>> ui = ui.evolve(verbose_mode=QueryDisplayMode.wrap)
->>> processes_rows(term, ui, processes1)
+>>> processes_rows(term, ui, SelectableProcesses(processes1))
 6239   pgbench               idle in trans   UPDATE pgbench_accounts SET
                                              abalance = abalance + 141 WHERE aid
                                              = 1932841;
@@ -288,13 +288,13 @@ p.price, p.cost HAVING sum(p.price * s.units) > 5000;
 ...     ),
 ... ]
 >>> ui = ui.evolve(query_mode=QueryMode.waiting)
->>> processes_rows(term, ui, processes2)
+>>> processes_rows(term, ui, SelectableProcesses(processes2))
 6239   pgbench                      active   END;
 6228   pgbench               idle in trans   UPDATE pgbench_branches SET
                                              bbalance = bbalance + 1788 WHERE
                                              bid = 68;
 >>> ui = UI.make(query_mode=QueryMode.blocking, flag=allflags)
->>> processes_rows(term, ui, processes2)
+>>> processes_rows(term, ui, SelectableProcesses(processes2))
 6239   pgbench                   pgbench         postgres          1.2.3.4      None    transactionid    ExclusiveLock  11:06.00             active   END;
 6228   pgbench                   pgbench         postgres            local      ahah            tuple RowExclusiveLock  0.000413      idle in trans   UPDATE pgbench_branches SET bbalance = bbalance + 1788 WHERE bid = 68;
 
@@ -338,7 +338,7 @@ p.price, p.cost HAVING sum(p.price * s.units) > 5000;
 ... ]
 >>> all_but_local_flags = Flag.PID|Flag.DATABASE|Flag.APPNAME|Flag.USER|Flag.CLIENT|Flag.TIME|Flag.WAIT
 >>> ui = UI.make(query_mode=QueryMode.activities,flag=all_but_local_flags)
->>> processes_rows(term, ui, processes1b)
+>>> processes_rows(term, ui, SelectableProcesses(processes1b))
 6239   pgbench                   pgbench         postgres            local  0.000000  N      idle in trans   UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
 6228   pgbench                      none         postgres            local  0.000413  N             active   \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
 1234   business               accounting              bob     192.168.0.47  20:34.00  Y             active   SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id)
@@ -382,7 +382,7 @@ Tests for screen()
 ...     dbinfo=DBInfo(10203040506070809, 9999),
 ...     tps=5,
 ...     active_connections=7,
-...     activity_stats=(processes3, sysinfo),
+...     activity_stats=(SelectableProcesses(processes3), sysinfo),
 ... )
 PostgreSQL 13 - testhost - pgadm@server.prod.tld:5433/app - Ref.: 10s - Min. duration: 1s
  Size:         9.06P - 9.76K/s        | TPS:               5      | Active connections:               7      | Duration mode:     backend
