@@ -429,6 +429,7 @@ def query_mode(term: Terminal, ui: UI) -> Iterator[str]:
         )
 
 
+@enum.unique
 class Column(enum.Enum):
     """Model for each column that may appear in the table."""
 
