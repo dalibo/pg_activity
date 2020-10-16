@@ -54,6 +54,8 @@ def main(
     queries: Union[List[types.Activity], List[types.ActivityBW]]
     queries = data.pg_get_activities()
     procs = data.sys_get_proc(queries, is_local)
+    activity_stats: types.ActivityStats
+
     with term.fullscreen(), term.cbreak():
         pg_db_info = None
         while True:
@@ -100,6 +102,15 @@ def main(
                 ui.verbose_mode = handlers.verbose_mode(key, ui.verbose_mode)
             if not in_help:
                 if not ui.in_pause:
+                    if is_local:
+                        memory, swap, load = activities.mem_swap_load(data)
+                        system_info = attr.evolve(
+                            system_info,
+                            memory=memory,
+                            swap=swap,
+                            load=load,
+                        )
+
                     if ui.query_mode == types.QueryMode.activities:
                         queries = data.pg_get_activities(ui.duration_mode)
                         if is_local:
@@ -118,12 +129,8 @@ def main(
                                 read_count_delta,
                                 write_count_delta,
                             ) = io_counters
-                            memory, swap, load = activities.mem_swap_load(data)
                             system_info = attr.evolve(
                                 system_info,
-                                memory=memory,
-                                swap=swap,
-                                load=load,
                                 io_read=types.IOCounter(
                                     count=read_count_delta,
                                     bytes=int(read_bytes_delta),
@@ -138,22 +145,26 @@ def main(
                                     write_count_delta,
                                 ),
                             )
+                            activity_stats = acts, system_info
                         else:
-                            acts = queries  # type: ignore # XXX
+                            activity_stats = queries
 
-                    elif ui.query_mode == types.QueryMode.blocking:
-                        queries = data.pg_get_blocking(ui.duration_mode)
-                        acts = queries  # type: ignore # XXX
+                    else:
+                        if ui.query_mode == types.QueryMode.blocking:
+                            queries = data.pg_get_blocking(ui.duration_mode)
+                        elif ui.query_mode == types.QueryMode.waiting:
+                            queries = data.pg_get_waiting(ui.duration_mode)
+                        else:
+                            assert False  # help type checking
 
-                    elif ui.query_mode == types.QueryMode.waiting:
-                        queries = data.pg_get_waiting(ui.duration_mode)
-                        acts = queries  # type: ignore # XXX
-
-                    acts = activities.sorted(acts, key=ui.sort_key, reverse=True)
+                        if is_local:
+                            activity_stats = queries, system_info
+                        else:
+                            activity_stats = queries
 
                 if options.output is not None:
                     with open(options.output, "a") as f:
-                        utils.csv_write(f, map(attr.asdict, acts))
+                        utils.csv_write(f, map(attr.asdict, queries))
 
                 views.screen(
                     term,
@@ -162,9 +173,7 @@ def main(
                     dbinfo=dbinfo,
                     tps=tps,
                     active_connections=active_connections,
-                    system_info=system_info,
-                    activities=acts,
-                    is_local=is_local,
+                    activity_stats=activity_stats,
                     render_footer=render_footer,
                 )
 

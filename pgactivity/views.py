@@ -33,6 +33,7 @@ from .types import (
     Activity,
     ActivityBW,
     ActivityProcess,
+    ActivityStats,
     ColumnTitle,
     DBInfo,
     Flag,
@@ -46,6 +47,7 @@ from .types import (
     UI,
 )
 from . import utils
+from .activities import sorted as sorted_activities
 
 LINE_COLORS = {
     "pid": {"default": "cyan", "cursor": "cyan_reverse", "yellow": "yellow_bold"},
@@ -1046,12 +1048,21 @@ def screen(
     dbinfo: DBInfo,
     tps: int,
     active_connections: int,
-    system_info: Optional[SystemInfo] = None,
-    activities: Union[Iterable[Activity], Iterable[ActivityProcess]],
-    is_local: bool,
+    activity_stats: ActivityStats,
     render_footer: bool = True,
 ) -> None:
     """Display the screen."""
+
+    activities: Union[List[Activity], List[ActivityBW], List[ActivityProcess]]
+    system_info: Optional[SystemInfo]
+    if isinstance(activity_stats, tuple):
+        is_local = True
+        activities, system_info = activity_stats
+    else:
+        is_local = False
+        activities, system_info = activity_stats, None
+    activities = sorted_activities(activities, key=ui.sort_key, reverse=True)  # type: ignore  # TODO: fixme
+
     print(term.clear + term.home, end="")
     top_height = term.height - 1
     lines_counter = line_counter(top_height)

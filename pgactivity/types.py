@@ -1,6 +1,7 @@
 import enum
 from typing import (
     Any,
+    List,
     Mapping,
     Optional,
     Tuple,
@@ -619,3 +620,7 @@ class ActivityProcess:
     wait: bool
     io_wait: str
     is_parallel_worker: bool
+
+
+LocalActivities = Tuple[Union[List[ActivityBW], List[ActivityProcess]], SystemInfo]
+ActivityStats = Union[List[Activity], List[ActivityBW], LocalActivities]

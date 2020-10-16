@@ -66,9 +66,7 @@
 ...     dbinfo=DBInfo(10203040506070809, 9999),
 ...     tps=5,
 ...     active_connections=7,
-...     system_info=sysinfo,
-...     activities=processes,
-...     is_local=True,
+...     activity_stats=(processes, sysinfo),
 ... )
 PostgreSQL 13 - testhost - pgadm@server.prod.tld:5433/app - Ref.: 10s - Min. duration: 1s
  Size:         9.06P - 9.76K/s        | TPS:               5      | Active connections:               7      | Duration mode:     backend
@@ -77,6 +75,6 @@ PostgreSQL 13 - testhost - pgadm@server.prod.tld:5433/app - Ref.: 10s - Min. dur
  Load:         0.50 1.90 0.93         | Write:          8B/s - 9/s
                                 RUNNING QUERIES
 PID    DATABASE           CPU% MEM%              state   Query                  
-6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts
 1234   business            2.4  1.0             active   SELECT product_id, p.na
+6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts
 F1/1 Running queries  F2/2 Waiting queries  F3/3 Blocking queries Space Pause            q Quit             h Help            
