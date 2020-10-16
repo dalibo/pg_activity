@@ -884,7 +884,7 @@ def processes_rows(
         text.append(value + term.normal)
 
     def cell(
-        process: Union[Activity, ActivityProcess],
+        process: Union[Activity, ActivityBW, ActivityProcess],
         key: str,
         crop: Optional[int],
         transform: Callable[[Any], str] = str,
