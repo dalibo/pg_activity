@@ -121,6 +121,7 @@ def enum_next(e: E) -> E:
     return e.__class__((e.value % max(e.__class__)) + 1)
 
 
+@enum.unique
 class Flag(enum.IntFlag):
     """Column flag.
 
@@ -323,6 +324,7 @@ class DBInfo:
     size_ev: int
 
 
+@enum.unique
 class QueryDisplayMode(enum.IntEnum):
     truncate = 1
     wrap_noindent = 2
@@ -333,6 +335,7 @@ class QueryDisplayMode(enum.IntEnum):
         return cls.wrap_noindent
 
 
+@enum.unique
 class QueryMode(enum.Enum):
     activities = "running queries"
     waiting = "waiting queries"
@@ -343,6 +346,7 @@ class QueryMode(enum.Enum):
         return cls.activities
 
 
+@enum.unique
 class DurationMode(enum.IntEnum):
     query = 1
     transaction = 2
