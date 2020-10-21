@@ -546,7 +546,6 @@ class ProcessExtras(Deserializable):
     io_wait: str
     psutil_proc: Optional[psutil.Process]
     is_parallel_worker: bool
-    appname: str
 
 
 @attr.s(auto_attribs=True, slots=True)
@@ -571,7 +570,6 @@ class Process(Deserializable, BaseProcess):
     ...        "is_parallel_worker" : False,
     ...        "read_delta" : 0.0,
     ...        "io_time" : 1596806345.17465,
-    ...        "appname" : "pgbench",
     ...        "psutil_proc" : None,
     ...        "io_wait" : "N",
     ...        "io_read" : {

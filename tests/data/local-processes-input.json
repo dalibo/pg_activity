@@ -8,7 +8,6 @@
             "database": "pgbench",
             "duration": -0.002731,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.29,
@@ -60,7 +59,6 @@
             "database": "pgbench",
             "duration": -0.003539,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.26,
@@ -112,7 +110,6 @@
             "database": "pgbench",
             "duration": -0.002385,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.27,
@@ -164,7 +161,6 @@
             "database": "pgbench",
             "duration": -0.00302,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.24,
@@ -216,7 +212,6 @@
             "database": "pgbench",
             "duration": -0.002305,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.27,
@@ -268,7 +263,6 @@
             "database": "pgbench",
             "duration": -0.002623,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.24,
@@ -320,7 +314,6 @@
             "database": "pgbench",
             "duration": -0.002693,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.26,
@@ -372,7 +365,6 @@
             "database": "pgbench",
             "duration": -0.003339,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.26,
@@ -424,7 +416,6 @@
             "database": "pgbench",
             "duration": -0.003353,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.25,
@@ -476,7 +467,6 @@
             "database": "pgbench",
             "duration": -0.003495,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.26,
@@ -528,7 +518,6 @@
             "database": "pgbench",
             "duration": -0.003384,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.25,
@@ -580,7 +569,6 @@
             "database": "pgbench",
             "duration": -0.002212,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.27,
@@ -632,7 +620,6 @@
             "database": "pgbench",
             "duration": -0.002273,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.27,
@@ -684,7 +671,6 @@
             "database": "pgbench",
             "duration": -0.002408,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.24,
@@ -736,7 +722,6 @@
             "database": "pgbench",
             "duration": -0.002635,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.23,
@@ -788,7 +773,6 @@
             "database": "pgbench",
             "duration": -0.003559,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.24,
@@ -840,7 +824,6 @@
             "database": "pgbench",
             "duration": -0.003481,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.25,
@@ -892,7 +875,6 @@
             "database": "pgbench",
             "duration": -0.003428,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.24,
@@ -944,7 +926,6 @@
             "database": "pgbench",
             "duration": -0.002256,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.23,
@@ -998,7 +979,6 @@
             "database": "pgbench",
             "duration": -0.002794,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.29,
@@ -1050,7 +1030,6 @@
             "database": "pgbench",
             "duration": -0.003188,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.26,
@@ -1102,7 +1081,6 @@
             "database": "pgbench",
             "duration": -0.00347,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.27,
@@ -1154,7 +1132,6 @@
             "database": "pgbench",
             "duration": -0.003245,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.23,
@@ -1206,7 +1183,6 @@
             "database": "pgbench",
             "duration": -0.003286,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.27,
@@ -1258,7 +1234,6 @@
             "database": "pgbench",
             "duration": -0.003431,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.24,
@@ -1310,7 +1285,6 @@
             "database": "pgbench",
             "duration": -0.002061,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.25,
@@ -1362,7 +1336,6 @@
             "database": "pgbench",
             "duration": -0.003475,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.26,
@@ -1414,7 +1387,6 @@
             "database": "pgbench",
             "duration": -0.003226,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.25,
@@ -1466,7 +1438,6 @@
             "database": "pgbench",
             "duration": -0.002711,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.25,
@@ -1518,7 +1489,6 @@
             "database": "pgbench",
             "duration": -0.001462,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.24,
@@ -1570,7 +1540,6 @@
             "database": "pgbench",
             "duration": -0.003435,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.26,
@@ -1622,7 +1591,6 @@
             "database": "pgbench",
             "duration": -0.00339,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.26,
@@ -1674,7 +1642,6 @@
             "database": "pgbench",
             "duration": -0.003179,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.24,
@@ -1726,7 +1693,6 @@
             "database": "pgbench",
             "duration": -0.003405,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.23,
@@ -1778,7 +1744,6 @@
             "database": "pgbench",
             "duration": -0.002822,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.25,
@@ -1830,7 +1795,6 @@
             "database": "pgbench",
             "duration": -0.002788,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.23,
@@ -1882,7 +1846,6 @@
             "database": "pgbench",
             "duration": -0.003436,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.25,
@@ -1934,7 +1897,6 @@
             "database": "pgbench",
             "duration": -0.00305,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.23,
@@ -1986,7 +1948,6 @@
             "database": "pgbench",
             "duration": -0.003586,
             "extras": {
-                "appname": "pgbench",
                 "cpu_percent": 0.0,
                 "cpu_times": [
                     0.23,

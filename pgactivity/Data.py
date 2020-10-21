@@ -944,7 +944,6 @@ class Data:
                     io_wait='Y' if status_iow == 'disk sleep' else 'N',
                     psutil_proc=psproc,
                     is_parallel_worker=query['is_parallel_worker'],
-                    appname=query['appname'],
                 ),
             )
 
