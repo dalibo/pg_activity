@@ -69,21 +69,21 @@ def update_processes_local(
             new_processes[pid] = proc
             procs.append(
                 ActivityProcess(
-                    pid,
-                    proc.appname,
-                    proc.database,
-                    proc.user,
-                    proc.client,
-                    proc.extras.cpu_percent,
-                    proc.extras.mem_percent,
-                    proc.extras.read_delta,
-                    proc.extras.write_delta,
-                    proc.state,
-                    proc.query,
-                    utils.get_duration(proc.duration),
-                    proc.wait,
-                    proc.extras.io_wait,
-                    proc.extras.is_parallel_worker,
+                    pid=pid,
+                    appname=proc.appname,
+                    database=proc.database,
+                    user=proc.user,
+                    client=proc.client,
+                    cpu=proc.extras.cpu_percent,
+                    mem=proc.extras.mem_percent,
+                    read=proc.extras.read_delta,
+                    write=proc.extras.write_delta,
+                    state=proc.state,
+                    query=proc.query,
+                    duration=utils.get_duration(proc.duration),
+                    wait=proc.wait,
+                    io_wait=proc.extras.io_wait,
+                    is_parallel_worker=proc.extras.is_parallel_worker,
                 )
             )
 

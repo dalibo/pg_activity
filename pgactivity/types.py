@@ -618,19 +618,11 @@ class ActivityBW(BaseProcess, DictSequenceProxy):
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
-class ActivityProcess:
-    pid: int
-    appname: str
-    database: str
-    user: str
-    client: str
+class ActivityProcess(BaseProcess):
     cpu: float
     mem: float
     read: float
     write: float
-    state: str
-    query: str
-    duration: float
     wait: bool
     io_wait: str
     is_parallel_worker: bool
