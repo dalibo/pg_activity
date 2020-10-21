@@ -109,10 +109,10 @@ def update_processes_local(
 T = TypeVar("T", RunningProcess, BWProcess, LocalRunningProcess)
 
 
-def sorted(activities: List[T], *, key: SortKey, reverse: bool = False) -> List[T]:
-    """Return activities sorted.
+def sorted(processes: List[T], *, key: SortKey, reverse: bool = False) -> List[T]:
+    """Return processes sorted.
 
-    >>> activities = [
+    >>> processes = [
     ...     LocalRunningProcess(
     ...         pid="6239",
     ...         appname="pgbench",
@@ -149,15 +149,15 @@ def sorted(activities: List[T], *, key: SortKey, reverse: bool = False) -> List[
     ...     ),
     ... ]
 
-    >>> activities = sorted(activities, key=SortKey.cpu, reverse=True)
-    >>> [a.pid for a in activities]
+    >>> processes = sorted(processes, key=SortKey.cpu, reverse=True)
+    >>> [p.pid for p in processes]
     ['6228', '6239']
-    >>> activities = sorted(activities, key=SortKey.mem)
-    >>> [a.pid for a in activities]
+    >>> processes = sorted(processes, key=SortKey.mem)
+    >>> [p.pid for p in processes]
     ['6239', '6228']
     """
     return builtins.sorted(
-        activities,
+        processes,
         key=lambda p: getattr(p, key.name),  # type: ignore  # TODO: avoid getattr()
         reverse=reverse,
     )

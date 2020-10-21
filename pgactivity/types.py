@@ -622,7 +622,7 @@ class LocalRunningProcess(RunningProcess):
     io_wait: str
 
 
-LocalActivities = Tuple[Union[List[BWProcess], List[LocalRunningProcess]], SystemInfo]
-ActivityStats = Union[List[RunningProcess], List[BWProcess], LocalActivities]
+LocalProcesses = Tuple[Union[List[BWProcess], List[LocalRunningProcess]], SystemInfo]
+ActivityStats = Union[List[RunningProcess], List[BWProcess], LocalProcesses]
 
 ProcessSet = Union[List[RunningProcess], List[BWProcess]]

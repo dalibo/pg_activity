@@ -47,7 +47,7 @@ from .types import (
     UI,
 )
 from . import utils
-from .activities import sorted as sorted_activities
+from .activities import sorted as sorted_processes
 
 LINE_COLORS = {
     "pid": {"default": "cyan", "cursor": "cyan_reverse", "yellow": "yellow_bold"},
@@ -1058,15 +1058,15 @@ def screen(
 ) -> None:
     """Display the screen."""
 
-    activities: Union[List[RunningProcess], List[BWProcess], List[LocalRunningProcess]]
+    processes: Union[List[RunningProcess], List[BWProcess], List[LocalRunningProcess]]
     system_info: Optional[SystemInfo]
     if isinstance(activity_stats, tuple):
         is_local = True
-        activities, system_info = activity_stats
+        processes, system_info = activity_stats
     else:
         is_local = False
-        activities, system_info = activity_stats, None
-    activities = sorted_activities(activities, key=ui.sort_key, reverse=True)  # type: ignore  # TODO: fixme
+        processes, system_info = activity_stats, None
+    processes = sorted_processes(processes, key=ui.sort_key, reverse=True)  # type: ignore  # TODO: fixme
 
     print(term.clear + term.home, end="")
     top_height = term.height - 1
@@ -1087,7 +1087,7 @@ def screen(
     processes_rows(
         term,
         ui,
-        activities,
+        processes,
         is_local=is_local,
         lines_counter=lines_counter,
     )

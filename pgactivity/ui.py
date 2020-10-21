@@ -119,7 +119,7 @@ def main(
                             (
                                 io_counters,
                                 __,
-                                acts,
+                                local_procs,
                             ) = activities.update_processes_local(
                                 old_procs, procs, fs_blocksize
                             )
@@ -145,7 +145,7 @@ def main(
                                     write_count_delta,
                                 ),
                             )
-                            activity_stats = acts, system_info
+                            activity_stats = local_procs, system_info
                         else:
                             activity_stats = queries
 
