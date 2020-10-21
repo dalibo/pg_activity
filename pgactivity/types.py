@@ -100,6 +100,49 @@ class Deserializable:
         return cls(**args)  # type: ignore
 
 
+class DictSequenceProxy:
+    """Proxy class for Dict and Sequence protocols.
+
+    >>> @attr.s(auto_attribs=True)
+    ... class A(DictSequenceProxy):
+    ...     x: str
+
+    >>> a = A("x")
+    >>> a[0]
+    'x'
+    >>> a["x"]
+    'x'
+
+    >>> a["y"]
+    Traceback (most recent call last):
+        ...
+    KeyError: 'y'
+    >>> a[42]
+    Traceback (most recent call last):
+        ...
+    IndexError: 42
+    >>> a[[]]
+    Traceback (most recent call last):
+        ...
+    TypeError: expecting a string or int key
+    """
+
+    def __getitem__(self, key: Union[int, str]) -> Any:
+        if isinstance(key, str):
+            try:
+                return getattr(self, key)
+            except AttributeError:
+                raise KeyError(key) from None
+        elif isinstance(key, int):
+            seq = attr.astuple(self)
+            try:
+                return seq[key]
+            except IndexError:
+                raise IndexError(key) from None
+        else:
+            raise TypeError("expecting a string or int key")
+
+
 E = TypeVar("E", bound=enum.IntEnum)
 
 
@@ -520,49 +563,6 @@ class Process(Deserializable, BaseProcess):
     mem: Optional[float] = None
     read: Optional[float] = None
     write: Optional[float] = None
-
-
-class DictSequenceProxy:
-    """Proxy class for Dict and Sequence protocols.
-
-    >>> @attr.s(auto_attribs=True)
-    ... class A(DictSequenceProxy):
-    ...     x: str
-
-    >>> a = A("x")
-    >>> a[0]
-    'x'
-    >>> a["x"]
-    'x'
-
-    >>> a["y"]
-    Traceback (most recent call last):
-        ...
-    KeyError: 'y'
-    >>> a[42]
-    Traceback (most recent call last):
-        ...
-    IndexError: 42
-    >>> a[[]]
-    Traceback (most recent call last):
-        ...
-    TypeError: expecting a string or int key
-    """
-
-    def __getitem__(self, key: Union[int, str]) -> Any:
-        if isinstance(key, str):
-            try:
-                return getattr(self, key)
-            except AttributeError:
-                raise KeyError(key) from None
-        elif isinstance(key, int):
-            seq = attr.astuple(self)
-            try:
-                return seq[key]
-            except IndexError:
-                raise IndexError(key) from None
-        else:
-            raise TypeError("expecting a string or int key")
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
