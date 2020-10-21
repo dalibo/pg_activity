@@ -426,6 +426,18 @@ class SystemInfo:
 
 
 @attr.s(auto_attribs=True, slots=True)
+class BaseProcess:
+    pid: int
+    appname: str
+    database: str
+    user: str
+    client: str
+    duration: float
+    state: str
+    query: str
+
+
+@attr.s(auto_attribs=True, slots=True)
 class ProcessExtras(Deserializable):
     meminfo: Tuple[int, ...]
     io_read: IOCounter
@@ -443,7 +455,7 @@ class ProcessExtras(Deserializable):
 
 
 @attr.s(auto_attribs=True, slots=True)
-class Process(Deserializable):
+class Process(Deserializable, BaseProcess):
     """Simple class for process management.
 
     >>> data = {
@@ -499,18 +511,10 @@ class Process(Deserializable):
     ...     }
     ... }
     >>> Process.deserialize(data)  # doctest: +ELLIPSIS
-    Process(pid=6229, database='pgbench', user='postgres', client='local', duration=-0.003353, wait=True, ...)
+    Process(pid=6229, appname='pgbench', database='pgbench', user='postgres', client='local', duration=-0.003353, ...)
     """
 
-    pid: int
-    database: str
-    user: str
-    client: str
-    duration: float
     wait: bool
-    query: str
-    state: str
-    appname: str
     extras: ProcessExtras
     cpu: Optional[float] = None
     mem: Optional[float] = None
@@ -562,19 +566,7 @@ class DictSequenceProxy:
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
-class BaseQuery:
-    pid: int
-    appname: str
-    database: str
-    user: str
-    client: str
-    duration: float
-    state: str
-    query: str
-
-
-@attr.s(auto_attribs=True, frozen=True, slots=True)
-class Activity(BaseQuery, DictSequenceProxy):
+class Activity(BaseProcess, DictSequenceProxy):
     """Result from pg_stat_activity view query."""
 
     wait: bool
@@ -610,7 +602,7 @@ def locktype(value: str) -> LockType:
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
-class ActivityBW(BaseQuery, DictSequenceProxy):
+class ActivityBW(BaseProcess, DictSequenceProxy):
     """Result from pg_stat_activity view query for blocking/waiting queries."""
 
     # Lock information from pg_locks view
