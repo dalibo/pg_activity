@@ -611,10 +611,8 @@ class BWProcess(BaseProcess, DictSequenceProxy):
     type: LockType = attr.ib(converter=locktype)
     relation: str
 
-    @property
-    def is_parallel_worker(self) -> bool:
-        # TODO: update queries to select/compute this column.
-        return False
+    # TODO: update queries to select/compute this column.
+    is_parallel_worker: bool = attr.ib(default=False, init=False)
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
