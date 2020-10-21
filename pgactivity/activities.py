@@ -8,8 +8,8 @@ from . import utils
 from .Data import Data
 from .types import (
     BWProcess,
-    ActivityProcess,
     LoadAverage,
+    LocalRunningProcess,
     MemoryInfo,
     Process,
     RunningProcess,
@@ -19,7 +19,7 @@ from .types import (
 
 def update_processes_local(
     processes: Dict[int, Process], new_processes: Dict[int, Process], fs_blocksize: int
-) -> Tuple[Tuple[float, float, int, int], List[int], List[ActivityProcess]]:
+) -> Tuple[Tuple[float, float, int, int], List[int], List[LocalRunningProcess]]:
     """Update resource usage for each process in *local* mode."""
     pids = []
     procs = []
@@ -68,7 +68,7 @@ def update_processes_local(
                 )
             new_processes[pid] = proc
             procs.append(
-                ActivityProcess(
+                LocalRunningProcess(
                     pid=pid,
                     appname=proc.appname,
                     database=proc.database,
@@ -106,14 +106,14 @@ def update_processes_local(
     return io_counters, pids, procs
 
 
-T = TypeVar("T", RunningProcess, BWProcess, ActivityProcess)
+T = TypeVar("T", RunningProcess, BWProcess, LocalRunningProcess)
 
 
 def sorted(activities: List[T], *, key: SortKey, reverse: bool = False) -> List[T]:
     """Return activities sorted.
 
     >>> activities = [
-    ...     ActivityProcess(
+    ...     LocalRunningProcess(
     ...         pid="6239",
     ...         appname="pgbench",
     ...         database="pgbench",
@@ -130,7 +130,7 @@ def sorted(activities: List[T], *, key: SortKey, reverse: bool = False) -> List[
     ...         io_wait="N",
     ...         is_parallel_worker=False,
     ...     ),
-    ...     ActivityProcess(
+    ...     LocalRunningProcess(
     ...         pid="6228",
     ...         appname="pgbench",
     ...         database="pgbench",

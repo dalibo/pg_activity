@@ -4,7 +4,7 @@
 
 >>> term = Terminal(force_styling=None)
 >>> processes = [
-...     ActivityProcess(
+...     LocalRunningProcess(
 ...         pid="6239",
 ...         appname="pgbench",
 ...         database="pgbench",
@@ -21,7 +21,7 @@
 ...         io_wait="N",
 ...         is_parallel_worker=False,
 ...     ),
-...     ActivityProcess(
+...     LocalRunningProcess(
 ...         pid="1234",
 ...         appname="accounting",
 ...         database="business",

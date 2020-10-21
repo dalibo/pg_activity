@@ -31,13 +31,13 @@ from .keys import (
 )
 from .types import (
     BWProcess,
-    ActivityProcess,
     ActivityStats,
     ColumnTitle,
     DBInfo,
     Flag,
     Host,
     IOCounter,
+    LocalRunningProcess,
     MemoryInfo,
     QueryDisplayMode,
     QueryMode,
@@ -691,7 +691,7 @@ def format_duration(duration: Optional[float]) -> Tuple[str, str]:
 def processes_rows(
     term: Terminal,
     ui: UI,
-    processes: Union[Iterable[RunningProcess], Iterable[ActivityProcess]],
+    processes: Union[Iterable[RunningProcess], Iterable[LocalRunningProcess]],
     *,
     is_local: bool,
     color_type: str = "default",
@@ -702,7 +702,7 @@ def processes_rows(
 
     >>> term = Terminal(force_styling=None)
     >>> processes = [
-    ...     ActivityProcess(
+    ...     LocalRunningProcess(
     ...         pid="6239",
     ...         appname="pgbench",
     ...         database="pgbench",
@@ -719,7 +719,7 @@ def processes_rows(
     ...         io_wait="N",
     ...         is_parallel_worker=False,
     ...     ),
-    ...     ActivityProcess(
+    ...     LocalRunningProcess(
     ...         pid="6228",
     ...         appname="pgbench",
     ...         database="pgbench",
@@ -736,7 +736,7 @@ def processes_rows(
     ...         io_wait="Y",
     ...         is_parallel_worker=True,
     ...     ),
-    ...     ActivityProcess(
+    ...     LocalRunningProcess(
     ...         pid="1234",
     ...         appname="accounting",
     ...         database="business",
@@ -890,7 +890,7 @@ def processes_rows(
         text.append(value + term.normal)
 
     def cell(
-        process: Union[RunningProcess, BWProcess, ActivityProcess],
+        process: Union[RunningProcess, BWProcess, LocalRunningProcess],
         key: str,
         crop: Optional[int],
         transform: Callable[[Any], str] = str,
@@ -916,7 +916,7 @@ def processes_rows(
         if flag & Flag.CLIENT:
             cell(process, "client", 16)
         if query_mode == QueryMode.activities:
-            assert isinstance(process, ActivityProcess), process
+            assert isinstance(process, LocalRunningProcess), process
             if flag & Flag.CPU:
                 cell(process, "cpu", None)
             if flag & Flag.MEM:
@@ -955,7 +955,7 @@ def processes_rows(
                 text_append(f"{color_for('wait_green')}{template_for('wait') % 'N'}")
 
         if (
-            isinstance(process, ActivityProcess)
+            isinstance(process, LocalRunningProcess)
             and query_mode == QueryMode.activities
             and flag & Flag.IOWAIT
         ):
@@ -1058,7 +1058,7 @@ def screen(
 ) -> None:
     """Display the screen."""
 
-    activities: Union[List[RunningProcess], List[BWProcess], List[ActivityProcess]]
+    activities: Union[List[RunningProcess], List[BWProcess], List[LocalRunningProcess]]
     system_info: Optional[SystemInfo]
     if isinstance(activity_stats, tuple):
         is_local = True

@@ -614,17 +614,15 @@ class Process(Deserializable, RunningProcess):
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
-class ActivityProcess(BaseProcess):
+class LocalRunningProcess(RunningProcess):
     cpu: float
     mem: float
     read: float
     write: float
-    wait: bool
     io_wait: str
-    is_parallel_worker: bool
 
 
-LocalActivities = Tuple[Union[List[BWProcess], List[ActivityProcess]], SystemInfo]
+LocalActivities = Tuple[Union[List[BWProcess], List[LocalRunningProcess]], SystemInfo]
 ActivityStats = Union[List[RunningProcess], List[BWProcess], LocalActivities]
 
 ProcessSet = Union[List[RunningProcess], List[BWProcess]]
