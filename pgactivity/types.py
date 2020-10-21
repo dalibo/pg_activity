@@ -566,8 +566,8 @@ class DictSequenceProxy:
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
-class Activity(BaseProcess, DictSequenceProxy):
-    """Result from pg_stat_activity view query."""
+class RunningProcess(BaseProcess, DictSequenceProxy):
+    """Process for a running query."""
 
     wait: bool
     is_parallel_worker: bool
@@ -602,8 +602,8 @@ def locktype(value: str) -> LockType:
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
-class ActivityBW(BaseProcess, DictSequenceProxy):
-    """Result from pg_stat_activity view query for blocking/waiting queries."""
+class BWProcess(BaseProcess, DictSequenceProxy):
+    """Process for a blocking or waiting query."""
 
     # Lock information from pg_locks view
     # https://www.postgresql.org/docs/current/view-pg-locks.html
@@ -628,5 +628,7 @@ class ActivityProcess(BaseProcess):
     is_parallel_worker: bool
 
 
-LocalActivities = Tuple[Union[List[ActivityBW], List[ActivityProcess]], SystemInfo]
-ActivityStats = Union[List[Activity], List[ActivityBW], LocalActivities]
+LocalActivities = Tuple[Union[List[BWProcess], List[ActivityProcess]], SystemInfo]
+ActivityStats = Union[List[RunningProcess], List[BWProcess], LocalActivities]
+
+ProcessSet = Union[List[RunningProcess], List[BWProcess]]

@@ -1,7 +1,7 @@
 import optparse
 import os
 import socket
-from typing import List, Optional, Union
+from typing import Optional
 
 import attr
 from blessed import Terminal
@@ -51,7 +51,7 @@ def main(
         term = Terminal()
     key, in_help = None, False
     skip_sizes = options.nodbsize
-    queries: Union[List[types.Activity], List[types.ActivityBW]]
+    queries: types.ProcessSet
     queries = data.pg_get_activities()
     procs = data.sys_get_proc(queries, is_local)
     activity_stats: types.ActivityStats

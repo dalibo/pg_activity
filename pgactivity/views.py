@@ -30,8 +30,7 @@ from .keys import (
     PAUSE_KEY,
 )
 from .types import (
-    Activity,
-    ActivityBW,
+    BWProcess,
     ActivityProcess,
     ActivityStats,
     ColumnTitle,
@@ -42,6 +41,7 @@ from .types import (
     MemoryInfo,
     QueryDisplayMode,
     QueryMode,
+    RunningProcess,
     SortKey,
     SystemInfo,
     UI,
@@ -691,7 +691,7 @@ def format_duration(duration: Optional[float]) -> Tuple[str, str]:
 def processes_rows(
     term: Terminal,
     ui: UI,
-    processes: Union[Iterable[Activity], Iterable[ActivityProcess]],
+    processes: Union[Iterable[RunningProcess], Iterable[ActivityProcess]],
     *,
     is_local: bool,
     color_type: str = "default",
@@ -835,7 +835,7 @@ def processes_rows(
                                                  * s.units) > 5000;
 
     >>> processes = [
-    ...     ActivityBW(
+    ...     BWProcess(
     ...         pid="6239",
     ...         appname="pgbench",
     ...         database="pgbench",
@@ -848,7 +848,7 @@ def processes_rows(
     ...         state="active",
     ...         query="END;"
     ...     ),
-    ...     ActivityBW(
+    ...     BWProcess(
     ...         pid="6228",
     ...         appname="pgbench",
     ...         database="pgbench",
@@ -890,7 +890,7 @@ def processes_rows(
         text.append(value + term.normal)
 
     def cell(
-        process: Union[Activity, ActivityBW, ActivityProcess],
+        process: Union[RunningProcess, BWProcess, ActivityProcess],
         key: str,
         crop: Optional[int],
         transform: Callable[[Any], str] = str,
@@ -927,7 +927,7 @@ def processes_rows(
                 cell(process, "write", None, naturalsize)
 
         elif query_mode in (QueryMode.waiting, QueryMode.blocking):
-            assert isinstance(process, ActivityBW), process
+            assert isinstance(process, BWProcess), process
             if flag & Flag.RELATION:
                 cell(process, "relation", 9)
             if flag & Flag.TYPE:
@@ -1058,7 +1058,7 @@ def screen(
 ) -> None:
     """Display the screen."""
 
-    activities: Union[List[Activity], List[ActivityBW], List[ActivityProcess]]
+    activities: Union[List[RunningProcess], List[BWProcess], List[ActivityProcess]]
     system_info: Optional[SystemInfo]
     if isinstance(activity_stats, tuple):
         is_local = True

@@ -35,7 +35,7 @@ import psycopg2.extras
 from psycopg2.extensions import connection
 
 from .utils import return_as
-from .types import Activity, ActivityBW, IOCounter, Process, ProcessExtras
+from .types import BWProcess, IOCounter, Process, ProcessExtras, RunningProcess
 
 
 def pg_get_version(pg_conn: connection) -> str:
@@ -340,7 +340,7 @@ class Data:
         active_connections = int(ret['active_connections'])
         return active_connections
 
-    @return_as(Activity)
+    @return_as(RunningProcess)
     def pg_get_activities(self, duration_mode: int = 1) -> List[Any]:
         """
         Get activity from pg_stat_activity view.
@@ -533,7 +533,7 @@ class Data:
 
         return ret
 
-    @return_as(ActivityBW)
+    @return_as(BWProcess)
     def pg_get_waiting(self, duration_mode: int = 1) -> List[Any]:
         """
         Get waiting queries.
@@ -626,7 +626,7 @@ class Data:
         ret = cur.fetchall()
         return ret
 
-    @return_as(ActivityBW)
+    @return_as(BWProcess)
     def pg_get_blocking(self, duration_mode: int = 1) -> List[Any]:
         """
         Get blocking queries
@@ -892,7 +892,7 @@ class Data:
         return ['query', 'transaction', 'backend'][duration_mode - 1]
 
     def sys_get_proc(
-        self, queries: List[Activity], is_local: bool
+        self, queries: List[RunningProcess], is_local: bool
     ) -> Dict[int, Process]:
         """
         Get system informations (CPU, memory, IO read & write)
