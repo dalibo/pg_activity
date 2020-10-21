@@ -510,7 +510,7 @@ class BaseProcess:
     query: str
 
 
-@attr.s(auto_attribs=True, frozen=True, slots=True)
+@attr.s(auto_attribs=True, frozen=False, slots=True)  # TODO: frozen=True
 class RunningProcess(BaseProcess, DictSequenceProxy):
     """Process for a running query."""
 
@@ -545,11 +545,10 @@ class ProcessExtras(Deserializable):
     write_delta: float
     io_wait: str
     psutil_proc: Optional[psutil.Process]
-    is_parallel_worker: bool
 
 
-@attr.s(auto_attribs=True, slots=True)
-class Process(Deserializable, BaseProcess):
+@attr.s(auto_attribs=True, frozen=False, slots=True)  # TODO: frozen=True
+class Process(Deserializable, RunningProcess):
     """Simple class for process management.
 
     >>> data = {
@@ -566,8 +565,8 @@ class Process(Deserializable, BaseProcess):
     ...     "state" : "active",
     ...     "user" : "postgres",
     ...     "write" : None,
+    ...     "is_parallel_worker" : False,
     ...     "extras" : {
-    ...        "is_parallel_worker" : False,
     ...        "read_delta" : 0.0,
     ...        "io_time" : 1596806345.17465,
     ...        "psutil_proc" : None,
@@ -607,7 +606,6 @@ class Process(Deserializable, BaseProcess):
     Process(pid=6229, appname='pgbench', database='pgbench', user='postgres', client='local', duration=-0.003353, ...)
     """
 
-    wait: bool
     extras: ProcessExtras
     cpu: Optional[float] = None
     mem: Optional[float] = None

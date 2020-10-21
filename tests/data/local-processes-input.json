@@ -28,7 +28,6 @@
                     "chars": 4251702,
                     "count": 388
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 1.05984334480723,
                 "meminfo": [
                     65454080,
@@ -43,6 +42,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6221,
             "query": "END;",
@@ -79,7 +79,6 @@
                     "chars": 5357617,
                     "count": 422
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 1.06654197921434,
                 "meminfo": [
                     65867776,
@@ -94,6 +93,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6222,
             "query": "SELECT abalance FROM pgbench_accounts WHERE aid = 883793;",
@@ -130,7 +130,6 @@
                     "chars": 4399155,
                     "count": 391
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 1.03470688500235,
                 "meminfo": [
                     63901696,
@@ -145,6 +144,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6223,
             "query": "END;",
@@ -181,7 +181,6 @@
                     "chars": 4988978,
                     "count": 405
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 1.05911379056487,
                 "meminfo": [
                     65409024,
@@ -196,6 +195,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6224,
             "query": "END;",
@@ -232,7 +232,6 @@
                     "chars": 5603374,
                     "count": 416
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 1.04127287318358,
                 "meminfo": [
                     64307200,
@@ -247,6 +246,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6225,
             "query": "END;",
@@ -283,7 +283,6 @@
                     "chars": 4964391,
                     "count": 390
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 1.05148663257659,
                 "meminfo": [
                     64937984,
@@ -298,6 +297,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6226,
             "query": "END;",
@@ -334,7 +334,6 @@
                     "chars": 5234725,
                     "count": 394
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 1.04153816563534,
                 "meminfo": [
                     64323584,
@@ -349,6 +348,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6227,
             "query": "UPDATE pgbench_branches SET bbalance = bbalance + -1015 WHERE bid = 77;",
@@ -385,7 +385,6 @@
                     "chars": 5496882,
                     "count": 444
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 1.02475841806111,
                 "meminfo": [
                     63287296,
@@ -400,6 +399,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6228,
             "query": "UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;",
@@ -436,7 +436,6 @@
                     "chars": 4866103,
                     "count": 408
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 1.03052852888703,
                 "meminfo": [
                     63643648,
@@ -451,6 +450,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6229,
             "query": "END;",
@@ -487,7 +487,6 @@
                     "chars": 4489270,
                     "count": 376
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 1.05241515615777,
                 "meminfo": [
                     64995328,
@@ -502,6 +501,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6230,
             "query": "END;",
@@ -538,7 +538,6 @@
                     "chars": 4595765,
                     "count": 395
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 1.03119176001645,
                 "meminfo": [
                     63684608,
@@ -553,6 +552,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6231,
             "query": "UPDATE pgbench_accounts SET abalance = abalance + 157 WHERE aid = 4244124;",
@@ -589,7 +589,6 @@
                     "chars": 4890669,
                     "count": 423
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 1.05493543444955,
                 "meminfo": [
                     65150976,
@@ -604,6 +603,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6232,
             "query": "END;",
@@ -640,7 +640,6 @@
                     "chars": 5029940,
                     "count": 403
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 1.026018557207,
                 "meminfo": [
                     63365120,
@@ -655,6 +654,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6233,
             "query": "END;",
@@ -691,7 +691,6 @@
                     "chars": 4358196,
                     "count": 389
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 1.03702819395531,
                 "meminfo": [
                     64045056,
@@ -706,6 +705,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6234,
             "query": "END;",
@@ -742,7 +742,6 @@
                     "chars": 4784178,
                     "count": 422
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 1.02111064684932,
                 "meminfo": [
                     63062016,
@@ -757,6 +756,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6235,
             "query": "END;",
@@ -793,7 +793,6 @@
                     "chars": 4792367,
                     "count": 381
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 1.00061680495036,
                 "meminfo": [
                     61796352,
@@ -808,6 +807,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6237,
             "query": "UPDATE pgbench_tellers SET tbalance = tbalance + 566 WHERE tid = 733;",
@@ -844,7 +844,6 @@
                     "chars": 5103656,
                     "count": 399
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 1.02741134257878,
                 "meminfo": [
                     63451136,
@@ -859,6 +858,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6238,
             "query": "UPDATE pgbench_accounts SET abalance = abalance + -3113 WHERE aid = 8943851;",
@@ -895,7 +895,6 @@
                     "chars": 4546614,
                     "count": 383
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 0.993254939413836,
                 "meminfo": [
                     61341696,
@@ -910,6 +909,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6239,
             "query": "UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;",
@@ -946,7 +946,6 @@
                     "chars": 4005915,
                     "count": 344
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 1.02137593930109,
                 "meminfo": [
                     63078400,
@@ -961,6 +960,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6240,
             "query": "END;",
@@ -999,7 +999,6 @@
                     "chars": 4112438,
                     "count": 379
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 1.03444159255059,
                 "meminfo": [
                     63885312,
@@ -1014,6 +1013,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6221,
             "query": "END;",
@@ -1050,7 +1050,6 @@
                     "chars": 5275695,
                     "count": 415
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 1.06654197921434,
                 "meminfo": [
                     65867776,
@@ -1065,6 +1064,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6222,
             "query": "UPDATE pgbench_branches SET bbalance = bbalance + 1107 WHERE bid = 84;",
@@ -1101,7 +1101,6 @@
                     "chars": 4358195,
                     "count": 386
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 1.03470688500235,
                 "meminfo": [
                     63901696,
@@ -1116,6 +1115,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6223,
             "query": "END;",
@@ -1152,7 +1152,6 @@
                     "chars": 4849713,
                     "count": 394
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 1.05911379056487,
                 "meminfo": [
                     65409024,
@@ -1167,6 +1166,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6224,
             "query": "UPDATE pgbench_tellers SET tbalance = tbalance + -4335 WHERE tid = 682;",
@@ -1203,7 +1203,6 @@
                     "chars": 5529645,
                     "count": 408
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 1.04127287318358,
                 "meminfo": [
                     64307200,
@@ -1218,6 +1217,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6225,
             "query": "INSERT INTO pgbench_history (tid, bid, aid, delta, mtime) VALUES (297, 63, 5970520, -2396, CURRENT_TIMESTAMP);",
@@ -1254,7 +1254,6 @@
                     "chars": 4931622,
                     "count": 385
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 1.05148663257659,
                 "meminfo": [
                     64937984,
@@ -1269,6 +1268,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6226,
             "query": "SELECT abalance FROM pgbench_accounts WHERE aid = 518562;",
@@ -1305,7 +1305,6 @@
                     "chars": 5054499,
                     "count": 382
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 1.01441201244222,
                 "meminfo": [
                     62648320,
@@ -1320,6 +1319,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6227,
             "query": "UPDATE pgbench_branches SET bbalance = bbalance + 4427 WHERE bid = 28;",
@@ -1356,7 +1356,6 @@
                     "chars": 5439538,
                     "count": 438
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 1.02475841806111,
                 "meminfo": [
                     63287296,
@@ -1371,6 +1370,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6228,
             "query": "SELECT abalance FROM pgbench_accounts WHERE aid = 2514784;",
@@ -1407,7 +1407,6 @@
                     "chars": 4808758,
                     "count": 400
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 1.03052852888703,
                 "meminfo": [
                     63643648,
@@ -1422,6 +1421,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6229,
             "query": "END;",
@@ -1458,7 +1458,6 @@
                     "chars": 4276275,
                     "count": 366
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 1.05241515615777,
                 "meminfo": [
                     64995328,
@@ -1473,6 +1472,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6230,
             "query": "END;",
@@ -1509,7 +1509,6 @@
                     "chars": 4489268,
                     "count": 385
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 1.03119176001645,
                 "meminfo": [
                     63684608,
@@ -1524,6 +1523,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6231,
             "query": "UPDATE pgbench_branches SET bbalance = bbalance + 3357 WHERE bid = 6;",
@@ -1560,7 +1560,6 @@
                     "chars": 4841517,
                     "count": 417
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 1.03782407131061,
                 "meminfo": [
                     64094208,
@@ -1575,6 +1574,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6232,
             "query": "END;",
@@ -1611,7 +1611,6 @@
                     "chars": 4948020,
                     "count": 398
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 1.026018557207,
                 "meminfo": [
                     63365120,
@@ -1626,6 +1625,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6233,
             "query": "UPDATE pgbench_accounts SET abalance = abalance + -1917 WHERE aid = 9235835;",
@@ -1662,7 +1662,6 @@
                     "chars": 4227123,
                     "count": 382
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 1.0097693945363,
                 "meminfo": [
                     62361600,
@@ -1677,6 +1676,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6234,
             "query": "SELECT abalance FROM pgbench_accounts WHERE aid = 4511601;",
@@ -1713,7 +1713,6 @@
                     "chars": 4710448,
                     "count": 414
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 1.02111064684932,
                 "meminfo": [
                     63062016,
@@ -1728,6 +1727,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6235,
             "query": "UPDATE pgbench_accounts SET abalance = abalance + -3841 WHERE aid = 1460066;",
@@ -1764,7 +1764,6 @@
                     "chars": 4358178,
                     "count": 346
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 0.978199592776086,
                 "meminfo": [
                     60411904,
@@ -1779,6 +1778,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6236,
             "query": "UPDATE pgbench_branches SET bbalance = bbalance + -1147 WHERE bid = 26;",
@@ -1815,7 +1815,6 @@
                     "chars": 4612142,
                     "count": 367
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 1.00061680495036,
                 "meminfo": [
                     61796352,
@@ -1830,6 +1829,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6237,
             "query": "END;",
@@ -1866,7 +1866,6 @@
                     "chars": 4988967,
                     "count": 387
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 1.02741134257878,
                 "meminfo": [
                     63451136,
@@ -1881,6 +1880,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6238,
             "query": "END;",
@@ -1917,7 +1917,6 @@
                     "chars": 4423733,
                     "count": 374
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 0.993254939413836,
                 "meminfo": [
                     61341696,
@@ -1932,6 +1931,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6239,
             "query": "END;",
@@ -1968,7 +1968,6 @@
                     "chars": 3964955,
                     "count": 339
                 },
-                "is_parallel_worker": false,
                 "mem_percent": 1.02137593930109,
                 "meminfo": [
                     63078400,
@@ -1983,6 +1982,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+            "is_parallel_worker": false,
             "mem": null,
             "pid": 6240,
             "query": "END;",

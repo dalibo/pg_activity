@@ -931,6 +931,7 @@ class Data:
                 state=query['state'],
                 query=query['query'],
                 appname=query['appname'],
+                is_parallel_worker=query['is_parallel_worker'],
                 extras=ProcessExtras(
                     meminfo=meminfo,
                     io_read=IOCounter(read_count, read_bytes, read_chars),
@@ -943,7 +944,6 @@ class Data:
                     write_delta=0,
                     io_wait='Y' if status_iow == 'disk sleep' else 'N',
                     psutil_proc=psproc,
-                    is_parallel_worker=query['is_parallel_worker'],
                 ),
             )
 

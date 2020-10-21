@@ -83,7 +83,7 @@ def update_processes_local(
                     duration=utils.get_duration(proc.duration),
                     wait=proc.wait,
                     io_wait=proc.extras.io_wait,
-                    is_parallel_worker=proc.extras.is_parallel_worker,
+                    is_parallel_worker=proc.is_parallel_worker,
                 )
             )
 
