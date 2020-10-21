@@ -562,35 +562,32 @@ class DictSequenceProxy:
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
-class Activity(DictSequenceProxy):
-    """Result from pg_stat_activity view query."""
-
+class BaseQuery:
     pid: int
     appname: str
     database: str
-    client: str
-    duration: float
-    wait: bool
     user: str
+    duration: float
     state: str
     query: str
+
+
+@attr.s(auto_attribs=True, frozen=True, slots=True)
+class Activity(BaseQuery, DictSequenceProxy):
+    """Result from pg_stat_activity view query."""
+
+    client: str
+    wait: bool
     is_parallel_worker: bool
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
-class ActivityBW(DictSequenceProxy):
+class ActivityBW(BaseQuery, DictSequenceProxy):
     """Result from pg_stat_activity view query for blocking/waiting queries."""
 
-    pid: int
-    appname: str
-    database: str
-    user: str
     mode: str  # TODO: enum
     type: str  # TODO: enum
     relation: str
-    duration: float
-    state: str
-    query: str
 
     @property
     def is_parallel_worker(self) -> bool:
