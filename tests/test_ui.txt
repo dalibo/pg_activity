@@ -229,7 +229,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
  Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                 WAITING QUERIES
-DATABASE          RELATION             TYPE             MODE              state   Query
+DATABASE                     USER  RELATION             TYPE             MODE              state   Query
 ------------------------------- sending key '3' --------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction
@@ -237,7 +237,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
  Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                 BLOCKING QUERIES
-DATABASE          RELATION             TYPE             MODE              state   Query
+DATABASE                     USER  RELATION             TYPE             MODE              state   Query
 ------------------------------- sending key '1' --------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction

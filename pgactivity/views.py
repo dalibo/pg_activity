@@ -544,6 +544,7 @@ COLUMNS_BY_QUERYMODE: Dict[QueryMode, List[Column]] = {
         Column.pid,
         Column.database,
         Column.appname,
+        Column.user,
         Column.relation,
         Column.type,
         Column.mode,
@@ -555,6 +556,7 @@ COLUMNS_BY_QUERYMODE: Dict[QueryMode, List[Column]] = {
         Column.pid,
         Column.database,
         Column.appname,
+        Column.user,
         Column.relation,
         Column.type,
         Column.mode,
@@ -864,11 +866,9 @@ def processes_rows(
                                                  bid = 68;
     >>> ui.query_mode = QueryMode.blocking
     >>> ui.flag = allflags
-    >>> processes_rows(term, ui, processes, is_local=False)  # doctest: +NORMALIZE_WHITESPACE
-    6239   pgbench                   pgbench      None    transactionid    ExclusiveLock  11:06.00             active
-    END;
-    6228   pgbench                   pgbench      ahah            tuple RowExclusiveLock  0.000413      idle in trans
-    UPDATE pgbench_branches SET bbalance = bbalance + 1788 WHERE bid = 68;
+    >>> processes_rows(term, ui, processes, is_local=False)
+    6239   pgbench                   pgbench         postgres      None    transactionid    ExclusiveLock  11:06.00             active  END;
+    6228   pgbench                   pgbench         postgres      ahah            tuple RowExclusiveLock  0.000413      idle in trans  UPDATE pgbench_branches SET bbalance = bbalance + 1788 WHERE bid = 68;
     """
 
     # if color_type == 'default' and self.pid_yank.count(process['pid']) > 0:
@@ -907,9 +907,9 @@ def processes_rows(
             cell(process, "database", 16)
         if flag & Flag.APPNAME:
             cell(process, "appname", 16)
+        if flag & Flag.USER:
+            cell(process, "user", 16)
         if query_mode == QueryMode.activities:
-            if flag & Flag.USER:
-                cell(process, "user", 16)
             if flag & Flag.CLIENT:
                 cell(process, "client", 16)
             if flag & Flag.CPU:
