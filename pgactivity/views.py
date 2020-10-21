@@ -916,6 +916,7 @@ def processes_rows(
         if flag & Flag.CLIENT:
             cell(process, "client", 16)
         if query_mode == QueryMode.activities:
+            assert isinstance(process, ActivityProcess), process
             if flag & Flag.CPU:
                 cell(process, "cpu", None)
             if flag & Flag.MEM:
@@ -926,13 +927,13 @@ def processes_rows(
                 cell(process, "write", None, naturalsize)
 
         elif query_mode in (QueryMode.waiting, QueryMode.blocking):
+            assert isinstance(process, ActivityBW), process
             if flag & Flag.RELATION:
                 cell(process, "relation", 9)
             if flag & Flag.TYPE:
                 cell(process, "type", 16)
 
             if flag & Flag.MODE:
-                assert isinstance(process, ActivityBW)
                 if process.mode in (
                     "ExclusiveLock",
                     "RowExclusiveLock",
