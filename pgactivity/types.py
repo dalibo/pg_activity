@@ -613,7 +613,9 @@ def locktype(value: str) -> LockType:
 class ActivityBW(BaseQuery, DictSequenceProxy):
     """Result from pg_stat_activity view query for blocking/waiting queries."""
 
-    mode: str  # TODO: enum
+    # Lock information from pg_locks view
+    # https://www.postgresql.org/docs/current/view-pg-locks.html
+    mode: str
     type: LockType = attr.ib(converter=locktype)
     relation: str
 
