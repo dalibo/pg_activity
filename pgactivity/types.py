@@ -510,7 +510,7 @@ class Process(Deserializable):
     wait: bool
     query: str
     state: str
-    appname: str  # TODO: rename as application_name
+    appname: str
     extras: ProcessExtras
     cpu: Optional[float] = None
     mem: Optional[float] = None
@@ -566,8 +566,7 @@ class Activity(DictSequenceProxy):
     """Result from pg_stat_activity view query."""
 
     pid: int
-    application_name: str  # TODO: change queries to return 'appname' directly
-    appname: str = attr.ib(init=False)
+    appname: str
     database: str
     client: str
     duration: float
@@ -576,10 +575,6 @@ class Activity(DictSequenceProxy):
     state: str
     query: str
     is_parallel_worker: bool
-
-    def __attrs_post_init__(self) -> None:
-        # Work around instance being frozen, per attrs documentation.
-        object.__setattr__(self, "appname", self.application_name)
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)

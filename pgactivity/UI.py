@@ -1289,7 +1289,7 @@ class UI:
                     self.pid.append(query['pid'])
                 procs.append({
                     'pid': query['pid'],
-                    'appname': query['application_name'],
+                    'appname': query['appname'],
                     'database': query['database'],
                     'user': query['user'],
                     'client': query['client'],
