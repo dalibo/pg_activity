@@ -581,12 +581,40 @@ class Activity(BaseQuery, DictSequenceProxy):
     is_parallel_worker: bool
 
 
+class LockType(enum.Enum):
+    """Type of lockable object
+
+    https://www.postgresql.org/docs/current/view-pg-locks.html
+    """
+
+    relation = enum.auto()
+    extend = enum.auto()
+    page = enum.auto()
+    tuple = enum.auto()
+    transactionid = enum.auto()
+    virtualxid = enum.auto()
+    object = enum.auto()
+    userlock = enum.auto()
+    advisory = enum.auto()
+
+    def __str__(self) -> str:
+        # Custom str(self) for transparent rendering in views.
+        return self.name
+
+
+def locktype(value: str) -> LockType:
+    try:
+        return LockType[value]
+    except KeyError as exc:
+        raise ValueError(f"invalid lock type {exc}") from None
+
+
 @attr.s(auto_attribs=True, frozen=True, slots=True)
 class ActivityBW(BaseQuery, DictSequenceProxy):
     """Result from pg_stat_activity view query for blocking/waiting queries."""
 
     mode: str  # TODO: enum
-    type: str  # TODO: enum
+    type: LockType = attr.ib(converter=locktype)
     relation: str
 
     @property
