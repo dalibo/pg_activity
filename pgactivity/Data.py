@@ -104,6 +104,43 @@ def pg_get_num_dev_version(text_version: str) -> Tuple[str, int]:
     return pg_version, pg_num_version
 
 
+def sys_get_proc(pid: int) -> Optional[ProcessExtras]:
+    """Return a ProcessExtras instance matching given pid or None if access with psutil
+    is not possible.
+    """
+    try:
+        psproc = psutil.Process(pid)
+        meminfo = psproc.memory_info()
+        mem_percent = psproc.memory_percent()
+        cpu_percent = psproc.cpu_percent(interval=0)
+        cpu_times = psproc.cpu_times()
+        (
+            read_count,
+            write_count,
+            read_bytes,
+            write_bytes,
+            read_chars,
+            write_chars,
+        ) = psproc.io_counters()
+        status_iow = str(psproc.status())
+    except (psutil.NoSuchProcess, psutil.AccessDenied):
+        return None
+
+    return ProcessExtras(
+        meminfo=meminfo,
+        io_read=IOCounter(read_count, read_bytes, read_chars),
+        io_write=IOCounter(write_count, write_bytes, write_chars),
+        io_time=time.time(),
+        mem_percent=mem_percent,
+        cpu_percent=cpu_percent,
+        cpu_times=cpu_times,
+        read_delta=0,
+        write_delta=0,
+        io_wait="Y" if status_iow == "disk sleep" else "N",
+        psutil_proc=psproc,
+    )
+
+
 class Data:
     """
     Data class
@@ -902,25 +939,11 @@ class Data:
         if not is_local:
             return processes
         for query in queries:
-            try:
-                psproc = psutil.Process(query['pid'])
-                meminfo = psproc.memory_info()
-                mem_percent = psproc.memory_percent()
-                cpu_percent = psproc.cpu_percent(interval=0)
-                cpu_times = psproc.cpu_times()
-                (
-                    read_count,
-                    write_count,
-                    read_bytes,
-                    write_bytes,
-                    read_chars,
-                    write_chars,
-                ) = psproc.io_counters()
-                status_iow = str(psproc.status())
-            except (psutil.NoSuchProcess, psutil.AccessDenied):
+            pid = query['pid']
+            process_extra = sys_get_proc(pid)
+            if process_extra is None:
                 continue
 
-            pid = query['pid']
             processes[pid] = Process(
                 pid=pid,
                 database=query['database'],
@@ -932,19 +955,7 @@ class Data:
                 query=query['query'],
                 appname=query['appname'],
                 is_parallel_worker=query['is_parallel_worker'],
-                extras=ProcessExtras(
-                    meminfo=meminfo,
-                    io_read=IOCounter(read_count, read_bytes, read_chars),
-                    io_write=IOCounter(write_count, write_bytes, write_chars),
-                    io_time=time.time(),
-                    mem_percent=mem_percent,
-                    cpu_percent=cpu_percent,
-                    cpu_times=cpu_times,
-                    read_delta=0,
-                    write_delta=0,
-                    io_wait='Y' if status_iow == 'disk sleep' else 'N',
-                    psutil_proc=psproc,
-                ),
+                extras=process_extra,
             )
 
         return processes
