@@ -545,6 +545,7 @@ COLUMNS_BY_QUERYMODE: Dict[QueryMode, List[Column]] = {
         Column.database,
         Column.appname,
         Column.user,
+        Column.client,
         Column.relation,
         Column.type,
         Column.mode,
@@ -557,6 +558,7 @@ COLUMNS_BY_QUERYMODE: Dict[QueryMode, List[Column]] = {
         Column.database,
         Column.appname,
         Column.user,
+        Column.client,
         Column.relation,
         Column.type,
         Column.mode,
@@ -597,7 +599,7 @@ def columns_header(term: Terminal, ui: UI) -> Iterator[str]:
     ...         flag=Flag.PID | Flag.DATABASE | Flag.APPNAME | Flag.RELATION | Flag.CLIENT | Flag.WAIT,
     ...         sort_key=SortKey.duration)
     >>> columns_header(term, ui)  # doctest: +NORMALIZE_WHITESPACE
-    PID    DATABASE                      APP  RELATION              state   Query
+    PID    DATABASE                      APP           CLIENT  RELATION              state   Query
 
     >>> ui.query_mode = QueryMode.activities
     >>> columns_header(term, ui)  # doctest: +NORMALIZE_WHITESPACE
@@ -838,6 +840,7 @@ def processes_rows(
     ...         appname="pgbench",
     ...         database="pgbench",
     ...         user="postgres",
+    ...         client="1.2.3.4",
     ...         mode="ExclusiveLock",
     ...         type="transactionid",
     ...         relation="None",
@@ -850,6 +853,7 @@ def processes_rows(
     ...         appname="pgbench",
     ...         database="pgbench",
     ...         user="postgres",
+    ...         client="local",
     ...         mode="RowExclusiveLock",
     ...         type="tuple",
     ...         relation="ahah",
@@ -867,8 +871,8 @@ def processes_rows(
     >>> ui.query_mode = QueryMode.blocking
     >>> ui.flag = allflags
     >>> processes_rows(term, ui, processes, is_local=False)
-    6239   pgbench                   pgbench         postgres      None    transactionid    ExclusiveLock  11:06.00             active  END;
-    6228   pgbench                   pgbench         postgres      ahah            tuple RowExclusiveLock  0.000413      idle in trans  UPDATE pgbench_branches SET bbalance = bbalance + 1788 WHERE bid = 68;
+    6239   pgbench                   pgbench         postgres          1.2.3.4      None    transactionid    ExclusiveLock  11:06.00             active  END;
+    6228   pgbench                   pgbench         postgres            local      ahah            tuple RowExclusiveLock  0.000413      idle in trans  UPDATE pgbench_branches SET bbalance = bbalance + 1788 WHERE bid = 68;
     """
 
     # if color_type == 'default' and self.pid_yank.count(process['pid']) > 0:
@@ -909,9 +913,9 @@ def processes_rows(
             cell(process, "appname", 16)
         if flag & Flag.USER:
             cell(process, "user", 16)
+        if flag & Flag.CLIENT:
+            cell(process, "client", 16)
         if query_mode == QueryMode.activities:
-            if flag & Flag.CLIENT:
-                cell(process, "client", 16)
             if flag & Flag.CPU:
                 cell(process, "cpu", None)
             if flag & Flag.MEM:

@@ -549,6 +549,11 @@ class Data:
             END
         AS database,
         pg_stat_activity.usename AS user,
+        CASE WHEN pg_stat_activity.client_addr IS NULL
+            THEN 'local'
+            ELSE pg_stat_activity.client_addr::TEXT
+            END
+        AS client,
         pg_locks.mode AS mode,
         pg_locks.locktype AS type,
         pg_locks.relation::regclass AS relation,
@@ -579,6 +584,11 @@ class Data:
             END
         AS database,
         pg_stat_activity.usename AS user,
+        CASE WHEN pg_stat_activity.client_addr IS NULL
+            THEN 'local'
+            ELSE pg_stat_activity.client_addr::TEXT
+            END
+        AS client,
         pg_locks.mode AS mode,
         pg_locks.locktype AS type,
         pg_locks.relation::regclass AS relation,
@@ -633,6 +643,7 @@ class Data:
             END
         AS database,
         usename AS user,
+        client,
         relation,
         mode,
         locktype AS type,
@@ -648,6 +659,11 @@ class Data:
             blocking.mode,
             pg_stat_activity.datname,
             pg_stat_activity.usename,
+            CASE WHEN pg_stat_activity.client_addr IS NULL
+                THEN 'local'
+                ELSE pg_stat_activity.client_addr::TEXT
+                END
+            AS client,
             blocking.locktype,
             EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
             pg_stat_activity.state as state,
@@ -675,6 +691,11 @@ class Data:
             blocking.mode,
             pg_stat_activity.datname,
             pg_stat_activity.usename,
+            CASE WHEN pg_stat_activity.client_addr IS NULL
+                THEN 'local'
+                ELSE pg_stat_activity.client_addr::TEXT
+                END
+            AS client,
             blocking.locktype,
             EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
             pg_stat_activity.state as state,
@@ -707,6 +728,7 @@ class Data:
         duration,
         datname,
         usename,
+        client,
         state,
         relation
     ORDER BY
@@ -724,6 +746,7 @@ class Data:
             END
         AS database,
         usename AS user,
+        client,
         relation,
         mode,
         locktype AS type,
@@ -749,6 +772,11 @@ class Data:
             blocking.mode,
             pg_stat_activity.datname,
             pg_stat_activity.usename,
+            CASE WHEN pg_stat_activity.client_addr IS NULL
+                THEN 'local'
+                ELSE pg_stat_activity.client_addr::TEXT
+                END
+            AS client,
             blocking.locktype,EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
             NULL AS state,
             blocking.relation::regclass AS relation
@@ -775,6 +803,11 @@ class Data:
             blocking.mode,
             pg_stat_activity.datname,
             pg_stat_activity.usename,
+            CASE WHEN pg_stat_activity.client_addr IS NULL
+                THEN 'local'
+                ELSE pg_stat_activity.client_addr::TEXT
+                END
+            AS client,
             blocking.locktype,
             EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
             NULL AS state,
@@ -807,6 +840,7 @@ class Data:
         duration,
         datname,
         usename,
+        client,
         state,
         relation
     ORDER BY

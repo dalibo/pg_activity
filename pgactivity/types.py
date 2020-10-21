@@ -567,6 +567,7 @@ class BaseQuery:
     appname: str
     database: str
     user: str
+    client: str
     duration: float
     state: str
     query: str
@@ -576,7 +577,6 @@ class BaseQuery:
 class Activity(BaseQuery, DictSequenceProxy):
     """Result from pg_stat_activity view query."""
 
-    client: str
     wait: bool
     is_parallel_worker: bool
 
