@@ -468,6 +468,34 @@ class SystemInfo:
         )
 
 
+class LockType(enum.Enum):
+    """Type of lockable object
+
+    https://www.postgresql.org/docs/current/view-pg-locks.html
+    """
+
+    relation = enum.auto()
+    extend = enum.auto()
+    page = enum.auto()
+    tuple = enum.auto()
+    transactionid = enum.auto()
+    virtualxid = enum.auto()
+    object = enum.auto()
+    userlock = enum.auto()
+    advisory = enum.auto()
+
+    def __str__(self) -> str:
+        # Custom str(self) for transparent rendering in views.
+        return self.name
+
+
+def locktype(value: str) -> LockType:
+    try:
+        return LockType[value]
+    except KeyError as exc:
+        raise ValueError(f"invalid lock type {exc}") from None
+
+
 @attr.s(auto_attribs=True, slots=True)
 class BaseProcess:
     pid: int
@@ -478,6 +506,28 @@ class BaseProcess:
     duration: float
     state: str
     query: str
+
+
+@attr.s(auto_attribs=True, frozen=True, slots=True)
+class RunningProcess(BaseProcess, DictSequenceProxy):
+    """Process for a running query."""
+
+    wait: bool
+    is_parallel_worker: bool
+
+
+@attr.s(auto_attribs=True, frozen=True, slots=True)
+class BWProcess(BaseProcess, DictSequenceProxy):
+    """Process for a blocking or waiting query."""
+
+    # Lock information from pg_locks view
+    # https://www.postgresql.org/docs/current/view-pg-locks.html
+    mode: str
+    type: LockType = attr.ib(converter=locktype)
+    relation: str
+
+    # TODO: update queries to select/compute this column.
+    is_parallel_worker: bool = attr.ib(default=False, init=False)
 
 
 @attr.s(auto_attribs=True, slots=True)
@@ -563,56 +613,6 @@ class Process(Deserializable, BaseProcess):
     mem: Optional[float] = None
     read: Optional[float] = None
     write: Optional[float] = None
-
-
-@attr.s(auto_attribs=True, frozen=True, slots=True)
-class RunningProcess(BaseProcess, DictSequenceProxy):
-    """Process for a running query."""
-
-    wait: bool
-    is_parallel_worker: bool
-
-
-class LockType(enum.Enum):
-    """Type of lockable object
-
-    https://www.postgresql.org/docs/current/view-pg-locks.html
-    """
-
-    relation = enum.auto()
-    extend = enum.auto()
-    page = enum.auto()
-    tuple = enum.auto()
-    transactionid = enum.auto()
-    virtualxid = enum.auto()
-    object = enum.auto()
-    userlock = enum.auto()
-    advisory = enum.auto()
-
-    def __str__(self) -> str:
-        # Custom str(self) for transparent rendering in views.
-        return self.name
-
-
-def locktype(value: str) -> LockType:
-    try:
-        return LockType[value]
-    except KeyError as exc:
-        raise ValueError(f"invalid lock type {exc}") from None
-
-
-@attr.s(auto_attribs=True, frozen=True, slots=True)
-class BWProcess(BaseProcess, DictSequenceProxy):
-    """Process for a blocking or waiting query."""
-
-    # Lock information from pg_locks view
-    # https://www.postgresql.org/docs/current/view-pg-locks.html
-    mode: str
-    type: LockType = attr.ib(converter=locktype)
-    relation: str
-
-    # TODO: update queries to select/compute this column.
-    is_parallel_worker: bool = attr.ib(default=False, init=False)
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
