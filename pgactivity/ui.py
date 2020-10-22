@@ -7,7 +7,6 @@ import attr
 from blessed import Terminal
 
 from . import __version__, Data, activities, handlers, keys, types, utils, views
-from .Data import sys_get_proc
 
 
 def main(
@@ -118,7 +117,7 @@ def main(
                             old_procs = procs
                             procs = {}
                             for p in queries:
-                                sys_proc = sys_get_proc(p.pid)
+                                sys_proc = activities.sys_get_proc(p.pid)
                                 if sys_proc is not None:
                                     procs[p.pid] = sys_proc
                             (

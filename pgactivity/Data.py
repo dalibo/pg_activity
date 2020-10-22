@@ -23,9 +23,7 @@ BASIS, AND JULIEN TACHOIRES HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE,
 SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 """
 
-import os
 import re
-import time
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import psutil
@@ -33,9 +31,9 @@ import psycopg2
 import psycopg2.extras
 from psycopg2.extensions import connection
 
-from .activities import get_load_average, get_mem_swap
+from .activities import get_load_average, get_mem_swap, sys_get_proc
 from .utils import return_as
-from .types import BWProcess, IOCounter, Process, SystemProcess, RunningProcess
+from .types import BWProcess, Process, RunningProcess
 
 
 def pg_get_version(pg_conn: connection) -> str:
@@ -102,43 +100,6 @@ def pg_get_num_dev_version(text_version: str) -> Tuple[str, int]:
     pg_version = str(res.group(0))
     pg_num_version = int(rmatch)
     return pg_version, pg_num_version
-
-
-def sys_get_proc(pid: int) -> Optional[SystemProcess]:
-    """Return a SystemProcess instance matching given pid or None if access with psutil
-    is not possible.
-    """
-    try:
-        psproc = psutil.Process(pid)
-        meminfo = psproc.memory_info()
-        mem_percent = psproc.memory_percent()
-        cpu_percent = psproc.cpu_percent(interval=0)
-        cpu_times = psproc.cpu_times()
-        (
-            read_count,
-            write_count,
-            read_bytes,
-            write_bytes,
-            read_chars,
-            write_chars,
-        ) = psproc.io_counters()
-        status_iow = str(psproc.status())
-    except (psutil.NoSuchProcess, psutil.AccessDenied):
-        return None
-
-    return SystemProcess(
-        meminfo=meminfo,
-        io_read=IOCounter(read_count, read_bytes, read_chars),
-        io_write=IOCounter(write_count, write_bytes, write_chars),
-        io_time=time.time(),
-        mem_percent=mem_percent,
-        cpu_percent=cpu_percent,
-        cpu_times=cpu_times,
-        read_delta=0,
-        write_delta=0,
-        io_wait="Y" if status_iow == "disk sleep" else "N",
-        psutil_proc=psproc,
-    )
 
 
 class Data:

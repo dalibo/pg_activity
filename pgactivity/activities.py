@@ -1,7 +1,7 @@
 import builtins
 import os
 import time
-from typing import Dict, List, Sequence, Tuple, TypeVar
+from typing import Dict, List, Optional, Sequence, Tuple, TypeVar
 from warnings import catch_warnings, simplefilter
 
 import psutil
@@ -18,6 +18,43 @@ from .types import (
     SortKey,
     SystemProcess,
 )
+
+
+def sys_get_proc(pid: int) -> Optional[SystemProcess]:
+    """Return a SystemProcess instance matching given pid or None if access with psutil
+    is not possible.
+    """
+    try:
+        psproc = psutil.Process(pid)
+        meminfo = psproc.memory_info()
+        mem_percent = psproc.memory_percent()
+        cpu_percent = psproc.cpu_percent(interval=0)
+        cpu_times = psproc.cpu_times()
+        (
+            read_count,
+            write_count,
+            read_bytes,
+            write_bytes,
+            read_chars,
+            write_chars,
+        ) = psproc.io_counters()
+        status_iow = str(psproc.status())
+    except (psutil.NoSuchProcess, psutil.AccessDenied):
+        return None
+
+    return SystemProcess(
+        meminfo=meminfo,
+        io_read=IOCounter(read_count, read_bytes, read_chars),
+        io_write=IOCounter(write_count, write_bytes, write_chars),
+        io_time=time.time(),
+        mem_percent=mem_percent,
+        cpu_percent=cpu_percent,
+        cpu_times=cpu_times,
+        read_delta=0,
+        write_delta=0,
+        io_wait="Y" if status_iow == "disk sleep" else "N",
+        psutil_proc=psproc,
+    )
 
 
 def update_processes_local2(
