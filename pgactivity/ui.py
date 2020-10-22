@@ -117,32 +117,20 @@ def main(
                             old_procs = procs
                             procs = data.sys_get_proc(queries, is_local)
                             (
-                                io_counters,
-                                __,
+                                io_read,
+                                io_write,
                                 local_procs,
-                            ) = activities.update_processes_local(
+                            ) = activities.update_processes_local2(
                                 old_procs, procs, fs_blocksize
                             )
-                            (
-                                read_bytes_delta,
-                                write_bytes_delta,
-                                read_count_delta,
-                                write_count_delta,
-                            ) = io_counters
                             system_info = attr.evolve(
                                 system_info,
-                                io_read=types.IOCounter(
-                                    count=read_count_delta,
-                                    bytes=int(read_bytes_delta),
-                                ),
-                                io_write=types.IOCounter(
-                                    count=write_count_delta,
-                                    bytes=int(write_count_delta),
-                                ),
+                                io_read=io_read,
+                                io_write=io_write,
                                 max_iops=activities.update_max_iops(
                                     system_info.max_iops,
-                                    read_count_delta,
-                                    write_count_delta,
+                                    io_read.count,
+                                    io_write.count,
                                 ),
                             )
                             activity_stats = local_procs, system_info

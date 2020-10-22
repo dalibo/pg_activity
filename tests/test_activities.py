@@ -1,11 +1,14 @@
 import json
 from unittest.mock import patch
 
+import pytest
+
 from pgactivity import activities
-from pgactivity.types import LoadAverage, MemoryInfo, Process
+from pgactivity.types import IOCounter, LoadAverage, MemoryInfo, Process
 
 
-def test_update_processes_local(shared_datadir):
+@pytest.fixture
+def processes(shared_datadir):
     with (shared_datadir / "local-processes-input.json").open() as f:
         input_data = json.load(f)
 
@@ -14,6 +17,11 @@ def test_update_processes_local(shared_datadir):
         k: Process.deserialize(p) for k, p in input_data["new_processes"].items()
     }
     fs_blocksize = input_data["fs_blocksize"]
+    return processes, new_processes, fs_blocksize
+
+
+def test_update_processes_local(processes):
+    processes, new_processes, fs_blocksize = processes
 
     iocounters_delta, pids, procs = activities.update_processes_local(
         processes, new_processes, fs_blocksize
@@ -50,6 +58,16 @@ def test_update_processes_local(shared_datadir):
         "6240",
     ]
     assert set(pids) == {a.pid for a in procs}
+
+
+def test_update_processes_local2(processes):
+    processes, new_processes, fs_blocksize = processes
+
+    io_read, io_write, procs = activities.update_processes_local2(
+        processes, new_processes, fs_blocksize
+    )
+    assert io_read == IOCounter.default()
+    assert io_write == IOCounter.default()
 
 
 def test_mem_swap_load() -> None:
