@@ -24,8 +24,8 @@ def test_update_processes_local(shared_datadir):
         read_count_delta,
         write_count_delta,
     ) = iocounters_delta
-    assert read_bytes_delta != 0
-    assert write_bytes_delta != 0
+    assert int(read_bytes_delta) == 0
+    assert int(write_bytes_delta) == 0
     assert read_count_delta == 0
     assert write_count_delta == 0
     assert pids == [
