@@ -1,10 +1,11 @@
 import json
 from unittest.mock import patch
 
+import attr
 import pytest
 
 from pgactivity import activities
-from pgactivity.types import IOCounter, LoadAverage, MemoryInfo, Process
+from pgactivity.types import IOCounter, LoadAverage, MemoryInfo, Process, RunningProcess
 
 
 @pytest.fixture
@@ -60,12 +61,33 @@ def test_update_processes_local(processes):
     assert set(pids) == {a.pid for a in procs}
 
 
-def test_update_processes_local2(processes):
+@pytest.fixture
+def system_processes(processes):
     processes, new_processes, fs_blocksize = processes
+    pg_processes = []
+    new_system_procs = {}
+    system_procs = {}
 
+    def running_process_fields(attribute, value):
+        return attribute in attr.fields(RunningProcess)
+
+    for new_proc in new_processes.values():
+        new_system_procs[new_proc.pid] = new_proc.extras
+        pg_processes.append(
+            RunningProcess(**attr.asdict(new_proc, filter=running_process_fields))
+        )
+
+    system_procs = {proc.pid: proc.extras for proc in processes.values()}
+
+    return pg_processes, system_procs, new_system_procs, fs_blocksize
+
+
+def test_update_processes_local2(system_processes):
+    pg_processes, system_procs, new_system_procs, fs_blocksize = system_processes
     io_read, io_write, procs = activities.update_processes_local2(
-        processes, new_processes, fs_blocksize
+        pg_processes, system_procs, new_system_procs, fs_blocksize
     )
+
     assert io_read == IOCounter.default()
     assert io_write == IOCounter.default()
 

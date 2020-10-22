@@ -7,6 +7,7 @@ import attr
 from blessed import Terminal
 
 from . import __version__, Data, activities, handlers, keys, types, utils, views
+from .Data import sys_get_proc
 
 
 def main(
@@ -51,7 +52,7 @@ def main(
         term = Terminal()
     key, in_help = None, False
     skip_sizes = options.nodbsize
-    procs: Dict[int, types.Process] = {}
+    procs: Dict[int, types.SystemProcess] = {}
     queries: types.ProcessSet
     activity_stats: types.ActivityStats
 
@@ -115,13 +116,17 @@ def main(
                         if is_local:
                             # TODO: Use this logic in waiting and blocking cases.
                             old_procs = procs
-                            procs = data.sys_get_proc(queries, is_local)
+                            procs = {}
+                            for p in queries:
+                                sys_proc = sys_get_proc(p.pid)
+                                if sys_proc is not None:
+                                    procs[p.pid] = sys_proc
                             (
                                 io_read,
                                 io_write,
                                 local_procs,
                             ) = activities.update_processes_local2(
-                                old_procs, procs, fs_blocksize
+                                queries, old_procs, procs, fs_blocksize
                             )
                             system_info = attr.evolve(
                                 system_info,

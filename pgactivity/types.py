@@ -621,6 +621,12 @@ class LocalRunningProcess(RunningProcess):
     write: float
     io_wait: str
 
+    @classmethod
+    def from_process(
+        cls, process: RunningProcess, **kwargs: Union[float, str]
+    ) -> "LocalRunningProcess":
+        return cls(**dict(attr.asdict(process), **kwargs))
+
 
 LocalProcesses = Tuple[Union[List[BWProcess], List[LocalRunningProcess]], SystemInfo]
 ActivityStats = Union[List[RunningProcess], List[BWProcess], LocalProcesses]
