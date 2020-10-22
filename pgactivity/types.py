@@ -565,7 +565,7 @@ class LocalRunningProcess(RunningProcess):
 LocalProcesses = Tuple[Union[List[BWProcess], List[LocalRunningProcess]], SystemInfo]
 ActivityStats = Union[List[RunningProcess], List[BWProcess], LocalProcesses]
 
-ProcessSet = Union[List[RunningProcess], List[BWProcess]]
+ProcessSet = Union[List[LocalRunningProcess], List[RunningProcess], List[BWProcess]]
 
 
 @attr.s(auto_attribs=True, frozen=False, slots=True)

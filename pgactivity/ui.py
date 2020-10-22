@@ -51,8 +51,8 @@ def main(
         term = Terminal()
     key, in_help = None, False
     skip_sizes = options.nodbsize
-    procs: Dict[int, types.SystemProcess] = {}
-    queries: types.ProcessSet
+    sys_procs: Dict[int, types.SystemProcess] = {}
+    pg_procs: types.ProcessSet
     activity_stats: types.ActivityStats
 
     with term.fullscreen(), term.cbreak():
@@ -111,15 +111,15 @@ def main(
                         )
 
                     if ui.query_mode == types.QueryMode.activities:
-                        queries = data.pg_get_activities(ui.duration_mode)
+                        pg_procs = data.pg_get_activities(ui.duration_mode)
                         if is_local:
                             # TODO: Use this logic in waiting and blocking cases.
                             (
                                 io_read,
                                 io_write,
-                                local_procs,
+                                pg_procs,
                             ) = activities.update_processes_local2(
-                                queries, procs, fs_blocksize
+                                pg_procs, sys_procs, fs_blocksize
                             )
                             system_info = attr.evolve(
                                 system_info,
@@ -131,26 +131,26 @@ def main(
                                     io_write.count,
                                 ),
                             )
-                            activity_stats = local_procs, system_info
+                            activity_stats = pg_procs, system_info
                         else:
-                            activity_stats = queries
+                            activity_stats = pg_procs
 
                     else:
                         if ui.query_mode == types.QueryMode.blocking:
-                            queries = data.pg_get_blocking(ui.duration_mode)
+                            pg_procs = data.pg_get_blocking(ui.duration_mode)
                         elif ui.query_mode == types.QueryMode.waiting:
-                            queries = data.pg_get_waiting(ui.duration_mode)
+                            pg_procs = data.pg_get_waiting(ui.duration_mode)
                         else:
                             assert False  # help type checking
 
                         if is_local:
-                            activity_stats = queries, system_info
+                            activity_stats = pg_procs, system_info
                         else:
-                            activity_stats = queries
+                            activity_stats = pg_procs
 
                 if options.output is not None:
                     with open(options.output, "a") as f:
-                        utils.csv_write(f, map(attr.asdict, queries))
+                        utils.csv_write(f, map(attr.asdict, pg_procs))
 
                 views.screen(
                     term,
