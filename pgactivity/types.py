@@ -547,6 +547,27 @@ class SystemProcess(Deserializable):
     psutil_proc: Optional[psutil.Process]
 
 
+@attr.s(auto_attribs=True, frozen=True, slots=True)
+class LocalRunningProcess(RunningProcess):
+    cpu: float
+    mem: float
+    read: float
+    write: float
+    io_wait: str
+
+    @classmethod
+    def from_process(
+        cls, process: RunningProcess, **kwargs: Union[float, str]
+    ) -> "LocalRunningProcess":
+        return cls(**dict(attr.asdict(process), **kwargs))
+
+
+LocalProcesses = Tuple[Union[List[BWProcess], List[LocalRunningProcess]], SystemInfo]
+ActivityStats = Union[List[RunningProcess], List[BWProcess], LocalProcesses]
+
+ProcessSet = Union[List[RunningProcess], List[BWProcess]]
+
+
 @attr.s(auto_attribs=True, frozen=False, slots=True)
 class LegacyProcess(Deserializable):
     """Legacy model for a running process in local mode.
@@ -621,24 +642,3 @@ class LegacyProcess(Deserializable):
     mem: Optional[float] = None
     read: Optional[float] = None
     write: Optional[float] = None
-
-
-@attr.s(auto_attribs=True, frozen=True, slots=True)
-class LocalRunningProcess(RunningProcess):
-    cpu: float
-    mem: float
-    read: float
-    write: float
-    io_wait: str
-
-    @classmethod
-    def from_process(
-        cls, process: RunningProcess, **kwargs: Union[float, str]
-    ) -> "LocalRunningProcess":
-        return cls(**dict(attr.asdict(process), **kwargs))
-
-
-LocalProcesses = Tuple[Union[List[BWProcess], List[LocalRunningProcess]], SystemInfo]
-ActivityStats = Union[List[RunningProcess], List[BWProcess], LocalProcesses]
-
-ProcessSet = Union[List[RunningProcess], List[BWProcess]]
