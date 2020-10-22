@@ -85,12 +85,45 @@ def system_processes(processes):
 
 def test_update_processes_local2(system_processes):
     pg_processes, system_procs, new_system_procs, fs_blocksize = system_processes
-    io_read, io_write, procs = activities.update_processes_local2(
-        pg_processes, system_procs, new_system_procs, fs_blocksize
-    )
+
+    def sys_get_proc(pid):
+        return new_system_procs.pop(pid, None)
+
+    n_system_procs = len(system_procs)
+
+    with patch("pgactivity.activities.sys_get_proc", new=sys_get_proc):
+        io_read, io_write, procs = activities.update_processes_local2(
+            pg_processes, system_procs, fs_blocksize
+        )
+
+    assert not new_system_procs  # all new system processes consumed
 
     assert io_read == IOCounter.default()
     assert io_write == IOCounter.default()
+    assert len(procs) == len(pg_processes)
+    assert len(system_procs) == n_system_procs
+
+
+def test_update_processes_local2_empty_procs(system_processes):
+    # same as test_update_processes_local2 but starting with an empty "system_procs" dict
+    pg_processes, __, new_system_procs, fs_blocksize = system_processes
+
+    def sys_get_proc(pid):
+        return new_system_procs.pop(pid, None)
+
+    system_procs = {}
+
+    with patch("pgactivity.activities.sys_get_proc", new=sys_get_proc):
+        io_read, io_write, procs = activities.update_processes_local2(
+            pg_processes, system_procs, fs_blocksize
+        )
+
+    assert not new_system_procs  # all new system processes consumed
+
+    assert io_read == IOCounter.default()
+    assert io_write == IOCounter.default()
+    assert len(procs) == len(pg_processes)
+    assert system_procs
 
 
 def test_mem_swap_load() -> None:

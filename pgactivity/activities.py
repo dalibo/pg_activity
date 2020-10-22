@@ -60,60 +60,59 @@ def sys_get_proc(pid: int) -> Optional[SystemProcess]:
 def update_processes_local2(
     pg_processes: Sequence[RunningProcess],
     processes: Dict[int, SystemProcess],
-    new_processes: Dict[int, SystemProcess],
     fs_blocksize: int,
 ) -> Tuple[IOCounter, IOCounter, List[LocalRunningProcess]]:
     """Update resource usage for each process in *local* mode."""
-    procs = []
+    local_procs = []
     read_bytes_delta = 0.0
     write_bytes_delta = 0.0
     read_count_delta = 0
     write_count_delta = 0
     n_io_time = time.time()
-    pg_procs_by_pids = {p.pid: p for p in pg_processes}
-    for pid, new_proc in new_processes.items():
-        pg_proc = pg_procs_by_pids[pid]
+    for pg_proc in pg_processes:
+        pid = pg_proc.pid
+        new_proc = sys_get_proc(pid)
+        assert new_proc is not None
         try:
+            # Getting informations from the previous loop
+            proc = processes[pid]
+        except KeyError:
+            # No previous information about this process
+            processes[pid] = proc = new_proc
+        else:
+            # Update old process with new informations
+            proc.io_wait = new_proc.io_wait
+            proc.read_delta = (new_proc.io_read.bytes - proc.io_read.bytes) / (
+                n_io_time - proc.io_time
+            )
+            proc.write_delta = (new_proc.io_write.bytes - proc.io_write.bytes) / (
+                n_io_time - proc.io_time
+            )
+            proc.io_read = new_proc.io_read
+            proc.io_write = new_proc.io_write
+            proc.io_time = n_io_time
+
+            # Global io counters
+            read_bytes_delta += proc.read_delta
+            write_bytes_delta += proc.write_delta
+
+        if proc.psutil_proc is not None:
             try:
-                # Getting informations from the previous loop
-                proc = processes[pid]
-            except KeyError:
-                # No previous information about this process
-                proc = new_proc
-            else:
-                # Update old process with new informations
-                proc.io_wait = new_proc.io_wait
-                proc.read_delta = (new_proc.io_read.bytes - proc.io_read.bytes) / (
-                    n_io_time - proc.io_time
-                )
-                proc.write_delta = (new_proc.io_write.bytes - proc.io_write.bytes) / (
-                    n_io_time - proc.io_time
-                )
-                proc.io_read = new_proc.io_read
-                proc.io_write = new_proc.io_write
-                proc.io_time = n_io_time
-
-                # Global io counters
-                read_bytes_delta += proc.read_delta
-                write_bytes_delta += proc.write_delta
-
-            if proc.psutil_proc is not None:
                 proc.mem_percent = proc.psutil_proc.memory_percent()
                 proc.cpu_percent = proc.psutil_proc.cpu_percent(interval=0)
-            new_processes[pid] = proc
-            procs.append(
-                LocalRunningProcess.from_process(
-                    pg_proc,
-                    cpu=proc.cpu_percent,
-                    mem=proc.mem_percent,
-                    read=proc.read_delta,
-                    write=proc.write_delta,
-                    io_wait=proc.io_wait,
-                )
-            )
+            except (psutil.NoSuchProcess, psutil.AccessDenied):
+                pass
 
-        except (psutil.NoSuchProcess, psutil.AccessDenied):
-            pass
+        local_procs.append(
+            LocalRunningProcess.from_process(
+                pg_proc,
+                cpu=proc.cpu_percent,
+                mem=proc.mem_percent,
+                read=proc.read_delta,
+                write=proc.write_delta,
+                io_wait=proc.io_wait,
+            )
+        )
 
     # store io counters
     if read_bytes_delta > 0:
@@ -124,7 +123,7 @@ def update_processes_local2(
     io_read = IOCounter(count=read_count_delta, bytes=int(read_bytes_delta))
     io_write = IOCounter(count=write_count_delta, bytes=int(write_bytes_delta))
 
-    return io_read, io_write, procs
+    return io_read, io_write, local_procs
 
 
 def update_processes_local(

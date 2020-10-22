@@ -114,18 +114,12 @@ def main(
                         queries = data.pg_get_activities(ui.duration_mode)
                         if is_local:
                             # TODO: Use this logic in waiting and blocking cases.
-                            old_procs = procs
-                            procs = {}
-                            for p in queries:
-                                sys_proc = activities.sys_get_proc(p.pid)
-                                if sys_proc is not None:
-                                    procs[p.pid] = sys_proc
                             (
                                 io_read,
                                 io_write,
                                 local_procs,
                             ) = activities.update_processes_local2(
-                                queries, old_procs, procs, fs_blocksize
+                                queries, procs, fs_blocksize
                             )
                             system_info = attr.evolve(
                                 system_info,
