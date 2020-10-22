@@ -204,55 +204,7 @@ def _columns(left: str, right: str, total_width: int) -> str:
 
 @limit
 def help(term: Terminal, version: str, is_local: bool) -> Iterable[str]:
-    """Render help menu.
-
-    >>> term = Terminal()
-    >>> help(term, "2.1", True)
-    pg_activity 2.1 - https://github.com/dalibo/pg_activity
-    Released under PostgreSQL License.
-    <BLANKLINE>
-       Up/Down: scroll process list
-             C: activate/deactivate colors
-         Space: pause
-             r: sort by READ/s desc. (activities)
-             v: change display mode
-             w: sort by WRITE/s desc. (activities)
-             q: quit
-             +: increase refresh time (max:5s)
-             c: sort by CPU% desc. (activities)
-             m: sort by MEM% desc. (activities)
-             -: decrease refresh time (min:0.5s)
-             t: sort by TIME+ desc. (activities)
-             R: force refresh
-             T: change duration mode
-             D: force refresh database size
-    Mode
-          F1/1: running queries
-          F2/2: waiting queries
-          F3/3: blocking queries
-    <BLANKLINE>
-    Press any key to exit.
-    >>> help(term, "5.0", False)
-    pg_activity 5.0 - https://github.com/dalibo/pg_activity
-    Released under PostgreSQL License.
-    <BLANKLINE>
-       Up/Down: scroll process list
-             C: activate/deactivate colors
-         Space: pause
-             v: change display mode
-             q: quit
-             +: increase refresh time (max:5s)
-             -: decrease refresh time (min:0.5s)
-             R: force refresh
-             T: change duration mode
-             D: force refresh database size
-    Mode
-          F1/1: running queries
-          F2/2: waiting queries
-          F3/3: blocking queries
-    <BLANKLINE>
-    Press any key to exit.
-    """
+    """Render help menu."""
     project_url = "https://github.com/dalibo/pg_activity"
     intro = dedent(
         f"""\
@@ -292,42 +244,7 @@ def header(
     active_connections: int,
     system_info: Optional[SystemInfo] = None,
 ) -> Iterator[str]:
-    r"""Return window header lines.
-
-    >>> from pgactivity.types import DurationMode, IOCounter, LoadAverage, UI
-
-    >>> term = Terminal()
-    >>> ui = UI(refresh_time=10, duration_mode=DurationMode.backend)
-
-    Remote host:
-
-    >>> host = Host("PostgreSQL 9.6", "server", "pgadm", "server.prod.tld", 5433, "app")
-    >>> dbinfo = DBInfo(10203040506070809, 9999)
-
-    >>> header(term, ui, host=host, dbinfo=dbinfo, tps=12, active_connections=0)
-    PostgreSQL 9.6 - server - pgadm@server.prod.tld:5433/app - Ref.: 10s
-     Size:         9.06P - 9.76K/s        | TPS:              12      | Active connections:               0      | Duration mode:     backend
-
-    Local host, with priviledged access:
-
-    >>> host = Host("PostgreSQL 13.1", "localhost", "tester", "host", 5432, "postgres")
-    >>> dbinfo = DBInfo(123456789, 12)
-    >>> vmem = MemoryInfo(total=6175825920, percent=42.5, used=2007146496)
-    >>> swap = MemoryInfo(total=6312423424, used=2340, percent=0.0)
-    >>> io_read = IOCounter(bytes=128, count=6)
-    >>> io_write = IOCounter(bytes=8, count=9)
-    >>> load = LoadAverage(25.0, 0.19, 0.39)
-    >>> sysinfo = SystemInfo(vmem, swap, load, io_read, io_write, 12)
-
-    >>> ui = UI(refresh_time=2, min_duration=1.2)
-    >>> header(term, ui, host=host, dbinfo=dbinfo, tps=1, active_connections=79,
-    ...        system_info=sysinfo)
-    PostgreSQL 13.1 - localhost - tester@host:5432/postgres - Ref.: 2s - Min. duration: 1.2s
-     Size:       117.74M - 12B/s          | TPS:               1      | Active connections:              79      | Duration mode:       query
-     Mem.:      42.5% - 1.87G/5.75G       | IO Max:       12/s
-     Swap:       0.0% - 2.29K/5.88G       | Read:          128B/s - 6/s
-     Load:        25.00 0.19 0.39         | Write:          8B/s - 9/s
-    """
+    """Return window header lines."""
     pg_host = f"{host.user}@{host.host}:{host.port}/{host.dbname}"
     yield (
         " - ".join(
@@ -571,40 +488,7 @@ COLUMNS_BY_QUERYMODE: Dict[QueryMode, List[Column]] = {
 
 @limit
 def columns_header(term: Terminal, ui: UI) -> Iterator[str]:
-    r"""Yield columns header lines.
-
-    >>> from pgactivity.types import Flag, QueryMode, SortKey, UI
-
-    >>> term = Terminal()
-
-    >>> ui = UI(query_mode=QueryMode.activities,
-    ...         flag=Flag.PID | Flag.DATABASE,
-    ...         sort_key=SortKey.cpu)
-    >>> columns_header(term, ui)  # doctest: +NORMALIZE_WHITESPACE
-    PID    DATABASE                      state   Query
-
-    >>> ui = UI(query_mode=QueryMode.activities,
-    ...         flag=Flag.CPU,
-    ...         sort_key=SortKey.cpu)
-    >>> columns_header(term, ui)  # doctest: +NORMALIZE_WHITESPACE
-    CPU%              state   Query
-
-    >>> ui = UI(query_mode=QueryMode.activities,
-    ...         flag=Flag.MEM,
-    ...         sort_key=SortKey.cpu)
-    >>> columns_header(term, ui)  # doctest: +NORMALIZE_WHITESPACE
-    MEM%              state   Query
-
-    >>> ui = UI(query_mode=QueryMode.blocking,
-    ...         flag=Flag.PID | Flag.DATABASE | Flag.APPNAME | Flag.RELATION | Flag.CLIENT | Flag.WAIT,
-    ...         sort_key=SortKey.duration)
-    >>> columns_header(term, ui)  # doctest: +NORMALIZE_WHITESPACE
-    PID    DATABASE                      APP           CLIENT  RELATION              state   Query
-
-    >>> ui.query_mode = QueryMode.activities
-    >>> columns_header(term, ui)  # doctest: +NORMALIZE_WHITESPACE
-    PID    DATABASE                      APP           CLIENT  W              state   Query
-    """
+    """Yield columns header lines."""
     columns = (c.value for c in COLUMNS_BY_QUERYMODE[ui.query_mode])
     htitles = []
     for column in columns:
@@ -696,184 +580,7 @@ def processes_rows(
     is_local: bool,
     color_type: str = "default",
 ) -> Iterator[str]:
-    r"""Display table rows with processes information.
-
-    >>> from pgactivity.types import UI
-
-    >>> term = Terminal(force_styling=None)
-    >>> processes = [
-    ...     LocalRunningProcess(
-    ...         pid="6239",
-    ...         appname="pgbench",
-    ...         database="pgbench",
-    ...         user="postgres",
-    ...         client="local",
-    ...         cpu=0.1,
-    ...         mem=0.993_254_939_413_836,
-    ...         read=7,
-    ...         write=12.3,
-    ...         state="idle in transaction",
-    ...         query="UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;",
-    ...         duration=0.0,
-    ...         wait=False,
-    ...         io_wait="N",
-    ...         is_parallel_worker=False,
-    ...     ),
-    ...     LocalRunningProcess(
-    ...         pid="6228",
-    ...         appname="pgbench",
-    ...         database="pgbench",
-    ...         user="postgres",
-    ...         client="local",
-    ...         cpu=0.2,
-    ...         mem=1.024_758_418_061_11,
-    ...         read=0.2,
-    ...         write=1_128_201,
-    ...         state="active",
-    ...         query="UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;",
-    ...         duration=0.000413,
-    ...         wait=False,
-    ...         io_wait="Y",
-    ...         is_parallel_worker=True,
-    ...     ),
-    ...     LocalRunningProcess(
-    ...         pid="1234",
-    ...         appname="accounting",
-    ...         database="business",
-    ...         user="bob",
-    ...         client="local",
-    ...         cpu=2.4,
-    ...         mem=1.031_191_760_016_45,
-    ...         read=9_876_543.21,
-    ...         write=1_234,
-    ...         state="active",
-    ...         query="SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id) WHERE s.date > CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name, p.price, p.cost HAVING sum(p.price * s.units) > 5000;",
-    ...         duration=1234,
-    ...         wait=True,
-    ...         io_wait="N",
-    ...         is_parallel_worker=False,
-    ...     ),
-    ... ]
-
-    >>> ui = UI(flag=Flag.PID|Flag.CPU|Flag.MEM|Flag.DATABASE)
-    >>> term.width
-    80
-
-    >>> processes_rows(term, ui, processes, is_local=True)
-    6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts
-    SET abalance = abalance + 141 WHERE aid = 1932841;
-    6228   pgbench             0.2  1.0             active   \_ UPDATE
-    pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
-    1234   business            2.4  1.0             active   SELECT product_id,
-    p.name FROM products p LEFT JOIN sales s USING (product_id) WHERE s.date >
-    CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name, p.price, p.cost
-    HAVING sum(p.price * s.units) > 5000;
-
-    >>> ui.verbose_mode = QueryDisplayMode.truncate
-    >>> processes_rows(term, ui, processes, is_local=True)
-    6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts
-    6228   pgbench             0.2  1.0             active   \_ UPDATE pgbench_accou
-    1234   business            2.4  1.0             active   SELECT product_id, p.na
-
-    >>> ui.verbose_mode = QueryDisplayMode.wrap
-    >>> processes_rows(term, ui, processes, is_local=True)
-    6239   pgbench             0.1  1.0      idle in trans   UPDATE
-                                                             pgbench_accounts SET
-                                                             abalance = abalance +
-                                                             141 WHERE aid =
-                                                             1932841;
-    6228   pgbench             0.2  1.0             active   \_ UPDATE
-                                                             pgbench_accounts SET
-                                                             abalance = abalance +
-                                                             3062 WHERE aid =
-                                                             7289374;
-    1234   business            2.4  1.0             active   SELECT product_id,
-                                                             p.name FROM products p
-                                                             LEFT JOIN sales s USING
-                                                             (product_id) WHERE
-                                                             s.date > CURRENT_DATE -
-                                                             INTERVAL '4 weeks'
-                                                             GROUP BY product_id,
-                                                             p.name, p.price, p.cost
-                                                             HAVING sum(p.price *
-                                                             s.units) > 5000;
-
-    >>> ui.flag = allflags = sum(Flag)
-    >>> term.width
-    80
-
-    Terminal is too narrow given selected flags, we switch to wrap_noindent mode
-    (TODO: this is buggy, the first line should be wrapped as well if too long)
-    >>> processes_rows(term, ui, processes, is_local=True)
-    6239   pgbench                   pgbench         postgres            local    0.1  1.0       7B      12B  0.000000  N    N      idle in trans  UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
-    6228   pgbench                   pgbench         postgres            local    0.2  1.0       0B    1.08M  0.000413  N    Y             active  \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
-    1234   business               accounting              bob            local    2.4  1.0    9.42M    1.21K  20:34.00  Y    N             active  SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id)
-    WHERE s.date > CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name,
-    p.price, p.cost HAVING sum(p.price * s.units) > 5000;
-
-    >>> ui.flag = Flag.PID|Flag.DATABASE
-    >>> ui.verbose_mode = QueryDisplayMode.truncate
-    >>> processes_rows(term, ui, processes, is_local=True)
-    6239   pgbench               idle in trans   UPDATE pgbench_accounts SET abalanc
-    6228   pgbench                      active   \_ UPDATE pgbench_accounts SET abal
-    1234   business                     active   SELECT product_id, p.name FROM prod
-
-    >>> ui.verbose_mode = QueryDisplayMode.wrap
-    >>> processes_rows(term, ui, processes, is_local=True)
-    6239   pgbench               idle in trans   UPDATE pgbench_accounts SET
-                                                 abalance = abalance + 141 WHERE aid
-                                                 = 1932841;
-    6228   pgbench                      active   \_ UPDATE pgbench_accounts SET
-                                                 abalance = abalance + 3062 WHERE
-                                                 aid = 7289374;
-    1234   business                     active   SELECT product_id, p.name FROM
-                                                 products p LEFT JOIN sales s USING
-                                                 (product_id) WHERE s.date >
-                                                 CURRENT_DATE - INTERVAL '4 weeks'
-                                                 GROUP BY product_id, p.name,
-                                                 p.price, p.cost HAVING sum(p.price
-                                                 * s.units) > 5000;
-
-    >>> processes = [
-    ...     BWProcess(
-    ...         pid="6239",
-    ...         appname="pgbench",
-    ...         database="pgbench",
-    ...         user="postgres",
-    ...         client="1.2.3.4",
-    ...         mode="ExclusiveLock",
-    ...         type="transactionid",
-    ...         relation="None",
-    ...         duration=666,
-    ...         state="active",
-    ...         query="END;"
-    ...     ),
-    ...     BWProcess(
-    ...         pid="6228",
-    ...         appname="pgbench",
-    ...         database="pgbench",
-    ...         user="postgres",
-    ...         client="local",
-    ...         mode="RowExclusiveLock",
-    ...         type="tuple",
-    ...         relation="ahah",
-    ...         duration=0.000413,
-    ...         state="idle in transaction",
-    ...         query="UPDATE pgbench_branches SET bbalance = bbalance + 1788 WHERE bid = 68;",
-    ...     ),
-    ... ]
-    >>> ui.query_mode = QueryMode.waiting
-    >>> processes_rows(term, ui, processes, is_local=True)
-    6239   pgbench                      active   END;
-    6228   pgbench               idle in trans   UPDATE pgbench_branches SET
-                                                 bbalance = bbalance + 1788 WHERE
-                                                 bid = 68;
-    >>> ui.query_mode = QueryMode.blocking
-    >>> ui.flag = allflags
-    >>> processes_rows(term, ui, processes, is_local=False)
-    6239   pgbench                   pgbench         postgres          1.2.3.4      None    transactionid    ExclusiveLock  11:06.00             active  END;
-    6228   pgbench                   pgbench         postgres            local      ahah            tuple RowExclusiveLock  0.000413      idle in trans  UPDATE pgbench_branches SET bbalance = bbalance + 1788 WHERE bid = 68;
-    """
+    """Display table rows with processes information."""
 
     # if color_type == 'default' and self.pid_yank.count(process['pid']) > 0:
     # color_type = 'yellow'
@@ -1014,12 +721,7 @@ def processes_rows(
 
 
 def footer(term: Terminal) -> None:
-    """Yield footer line.
-
-    >>> term = Terminal(force_styling=None)
-    >>> footer(term)  # doctest: +NORMALIZE_WHITESPACE
-    F1/1 Running queries  F2/2 Waiting queries  F3/3 Blocking queries Space Pause            q Quit             h Help
-    """
+    """Display footer line."""
     query_modes_help = [
         ("/".join(keys[:-1]), qm.value) for qm, keys in KEYS_BY_QUERYMODE.items()
     ]
