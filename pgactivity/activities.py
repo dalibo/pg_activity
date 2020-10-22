@@ -4,6 +4,7 @@ import time
 from typing import Dict, List, Optional, Sequence, Tuple, TypeVar
 from warnings import catch_warnings, simplefilter
 
+import attr
 import psutil
 
 from . import utils
@@ -78,30 +79,40 @@ def update_processes_local2(
             proc = processes[pid]
         except KeyError:
             # No previous information about this process
-            processes[pid] = proc = new_proc
+            proc = new_proc
         else:
             # Update old process with new informations
-            proc.io_wait = new_proc.io_wait
-            proc.read_delta = (new_proc.io_read.bytes - proc.io_read.bytes) / (
-                n_io_time - proc.io_time
+            mem_percent = proc.mem_percent
+            cpu_percent = proc.cpu_percent
+            if proc.psutil_proc is not None:
+                try:
+                    mem_percent = proc.psutil_proc.memory_percent()
+                    cpu_percent = proc.psutil_proc.cpu_percent(interval=0)
+                except (psutil.NoSuchProcess, psutil.AccessDenied):
+                    pass
+            proc = attr.evolve(
+                proc,
+                io_wait=new_proc.io_wait,
+                read_delta=(
+                    (new_proc.io_read.bytes - proc.io_read.bytes)
+                    / (n_io_time - proc.io_time)
+                ),
+                write_delta=(
+                    (new_proc.io_write.bytes - proc.io_write.bytes)
+                    / (n_io_time - proc.io_time)
+                ),
+                io_read=new_proc.io_read,
+                io_write=new_proc.io_write,
+                io_time=n_io_time,
+                mem_percent=mem_percent,
+                cpu_percent=cpu_percent,
             )
-            proc.write_delta = (new_proc.io_write.bytes - proc.io_write.bytes) / (
-                n_io_time - proc.io_time
-            )
-            proc.io_read = new_proc.io_read
-            proc.io_write = new_proc.io_write
-            proc.io_time = n_io_time
 
             # Global io counters
             read_bytes_delta += proc.read_delta
             write_bytes_delta += proc.write_delta
 
-        if proc.psutil_proc is not None:
-            try:
-                proc.mem_percent = proc.psutil_proc.memory_percent()
-                proc.cpu_percent = proc.psutil_proc.cpu_percent(interval=0)
-            except (psutil.NoSuchProcess, psutil.AccessDenied):
-                pass
+        processes[pid] = proc
 
         local_procs.append(
             LocalRunningProcess.from_process(

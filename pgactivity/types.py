@@ -532,7 +532,7 @@ class BWProcess(BaseProcess, DictSequenceProxy):
     is_parallel_worker: bool = attr.ib(default=False, init=False)
 
 
-@attr.s(auto_attribs=True, slots=True)
+@attr.s(auto_attribs=True, frozen=False, slots=True)  # TODO: frozen=True
 class SystemProcess(Deserializable):
     meminfo: Tuple[int, ...]
     io_read: IOCounter
