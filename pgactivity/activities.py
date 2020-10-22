@@ -1,11 +1,12 @@
 import builtins
+import os
 import time
 from typing import Dict, List, Sequence, Tuple, TypeVar
+from warnings import catch_warnings, simplefilter
 
 import psutil
 
 from . import utils
-from .Data import Data
 from .types import (
     BWProcess,
     IOCounter,
@@ -246,10 +247,27 @@ def update_max_iops(max_iops: int, read_count: float, write_count: float) -> int
     return max(int(read_count + write_count), max_iops)
 
 
-def mem_swap_load(data: Data) -> Tuple[MemoryInfo, MemoryInfo, LoadAverage]:
+def get_load_average() -> Tuple[float, float, float]:
+    """Get load average"""
+    return os.getloadavg()
+
+
+def get_mem_swap() -> Tuple[float, int, int, float, int, int]:
+    """Get memory and swap usage"""
+    with catch_warnings():
+        simplefilter("ignore", RuntimeWarning)
+        phymem = psutil.virtual_memory()
+        vmem = psutil.swap_memory()
+    buffers = phymem.buffers
+    cached = phymem.cached
+    mem_used = phymem.total - (phymem.free + buffers + cached)
+    return (phymem.percent, mem_used, phymem.total, vmem.percent, vmem.used, vmem.total)
+
+
+def mem_swap_load() -> Tuple[MemoryInfo, MemoryInfo, LoadAverage]:
     """Read memory, swap and load average from Data object."""
-    mem_swap = data.get_mem_swap()
+    mem_swap = get_mem_swap()
     memory = MemoryInfo(*mem_swap[:3])
     swap = MemoryInfo(*mem_swap[3:])
-    load = LoadAverage(*data.get_load_average())
+    load = LoadAverage(*get_load_average())
     return memory, swap, load

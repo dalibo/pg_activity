@@ -71,7 +71,7 @@ def main(
             )
             tps = int(pg_db_info["tps"])
             active_connections = data.pg_get_active_connections()
-            memory, swap, load = activities.mem_swap_load(data)
+            memory, swap, load = activities.mem_swap_load()
             system_info = types.SystemInfo.default(memory=memory, swap=swap, load=load)
 
             if key == keys.HELP:
@@ -103,7 +103,7 @@ def main(
             if not in_help:
                 if not ui.in_pause:
                     if is_local:
-                        memory, swap, load = activities.mem_swap_load(data)
+                        memory, swap, load = activities.mem_swap_load()
                         system_info = attr.evolve(
                             system_info,
                             memory=memory,

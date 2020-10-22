@@ -27,13 +27,13 @@ import os
 import re
 import time
 from typing import Any, Dict, List, Optional, Tuple, Union
-from warnings import catch_warnings, simplefilter
 
 import psutil
 import psycopg2
 import psycopg2.extras
 from psycopg2.extensions import connection
 
+from .activities import get_load_average, get_mem_swap
 from .utils import return_as
 from .types import BWProcess, IOCounter, Process, SystemProcess, RunningProcess
 
@@ -989,27 +989,13 @@ class Data:
         """
         Get memory and swap usage
         """
-        with catch_warnings():
-            simplefilter("ignore", RuntimeWarning)
-            phymem = psutil.virtual_memory()
-            buffers = psutil.virtual_memory().buffers
-            cached = psutil.virtual_memory().cached
-            vmem = psutil.swap_memory()
-
-        mem_used = phymem.total - (phymem.free + buffers + cached)
-        return (
-            phymem.percent,
-            mem_used,
-            phymem.total,
-            vmem.percent,
-            vmem.used,
-            vmem.total)
+        return get_mem_swap()
 
     def get_load_average(self,) -> Tuple[float, float, float]:
         """
         Get load average
         """
-        return os.getloadavg()
+        return get_load_average()
 
     def set_refresh_dbsize(self, refresh_dbsize):
         """

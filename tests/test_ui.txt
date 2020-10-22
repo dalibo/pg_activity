@@ -73,11 +73,11 @@ Default CLI options, passed to ui.main():
 
 Mock system statistics
 >>> get_mem_swap = patch(
-...     "pgactivity.Data.Data.get_mem_swap",
+...     "pgactivity.activities.get_mem_swap",
 ...     return_value=(1.2, 3_000_000, 4_000_000_000, 5.6, 7_000, 8_000_000_000),
 ... )
 >>> get_load_average = patch(
-...     "pgactivity.Data.Data.get_load_average",
+...     "pgactivity.activities.get_load_average",
 ...     return_value=(0.12, 0.14, 0.1),
 ... )
 >>> pg_get_db_info = patch(

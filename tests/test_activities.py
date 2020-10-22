@@ -1,4 +1,5 @@
 import json
+from collections import namedtuple
 from unittest.mock import patch
 
 import attr
@@ -93,12 +94,19 @@ def test_update_processes_local2(system_processes):
 
 
 def test_mem_swap_load() -> None:
-    with patch("pgactivity.Data.Data") as data:
-        data.get_mem_swap.return_value = (12.3, 34, 45, 6.7, 8, 90)
-        data.get_load_average.return_value = (0.14, 0.27, 0.44)
-        memory, swap, load = activities.mem_swap_load(data)
-    data.get_mem_swap.assert_called_once_with()
-    data.get_load_average.assert_called_once_with()
-    assert memory == MemoryInfo(percent=12.3, used=34, total=45)
+    pmem = namedtuple("pmem", ["percent", "total", "free", "buffers", "cached"])
+    vmem = namedtuple("vmem", ["percent", "used", "total"])
+    with patch(
+        "psutil.virtual_memory", return_value=pmem(12.3, 45, 6, 6, 7)
+    ) as virtual_memory, patch(
+        "psutil.swap_memory", return_value=vmem(6.7, 8, 90)
+    ) as swap_memory, patch(
+        "os.getloadavg", return_value=(0.14, 0.27, 0.44)
+    ) as getloadavg:
+        memory, swap, load = activities.mem_swap_load()
+    virtual_memory.assert_called_once_with()
+    swap_memory.assert_called_once_with()
+    getloadavg.assert_called_once_with()
+    assert memory == MemoryInfo(percent=12.3, used=26, total=45)
     assert swap == MemoryInfo(percent=6.7, used=8, total=90)
     assert load == LoadAverage(0.14, 0.27, 0.44)
