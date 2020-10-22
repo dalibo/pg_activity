@@ -10,10 +10,10 @@ from . import utils
 from .types import (
     BWProcess,
     IOCounter,
+    LegacyProcess,
     LoadAverage,
     LocalRunningProcess,
     MemoryInfo,
-    Process,
     RunningProcess,
     SortKey,
     SystemProcess,
@@ -127,7 +127,9 @@ def update_processes_local2(
 
 
 def update_processes_local(
-    processes: Dict[int, Process], new_processes: Dict[int, Process], fs_blocksize: int
+    processes: Dict[int, LegacyProcess],
+    new_processes: Dict[int, LegacyProcess],
+    fs_blocksize: int,
 ) -> Tuple[Tuple[float, float, int, int], List[int], List[LocalRunningProcess]]:
     """Update resource usage for each process in *local* mode."""
     pids = []

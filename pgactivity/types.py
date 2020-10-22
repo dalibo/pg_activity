@@ -510,7 +510,7 @@ class BaseProcess:
     query: str
 
 
-@attr.s(auto_attribs=True, frozen=False, slots=True)  # TODO: frozen=True
+@attr.s(auto_attribs=True, frozen=True, slots=True)
 class RunningProcess(BaseProcess, DictSequenceProxy):
     """Process for a running query."""
 
@@ -547,9 +547,9 @@ class SystemProcess(Deserializable):
     psutil_proc: Optional[psutil.Process]
 
 
-@attr.s(auto_attribs=True, frozen=False, slots=True)  # TODO: frozen=True
-class Process(Deserializable, RunningProcess):
-    """Simple class for process management.
+@attr.s(auto_attribs=True, frozen=False, slots=True)
+class LegacyProcess(Deserializable):
+    """Legacy model for a running process in local mode.
 
     >>> data = {
     ...     "database" : "pgbench",
@@ -602,10 +602,20 @@ class Process(Deserializable, RunningProcess):
     ...        ]
     ...     }
     ... }
-    >>> Process.deserialize(data)  # doctest: +ELLIPSIS
-    Process(pid=6229, appname='pgbench', database='pgbench', user='postgres', client='local', duration=-0.003353, ...)
+    >>> LegacyProcess.deserialize(data)  # doctest: +ELLIPSIS
+    LegacyProcess(pid=6229, appname='pgbench', database='pgbench', user='postgres', client='local', duration=-0.003353, ...)
     """
 
+    pid: int
+    appname: str
+    database: str
+    user: str
+    client: str
+    duration: float
+    state: str
+    query: str
+    wait: bool
+    is_parallel_worker: bool
     extras: SystemProcess
     cpu: Optional[float] = None
     mem: Optional[float] = None

@@ -33,7 +33,7 @@ from psycopg2.extensions import connection
 
 from .activities import get_load_average, get_mem_swap, sys_get_proc
 from .utils import return_as
-from .types import BWProcess, Process, RunningProcess
+from .types import BWProcess, LegacyProcess as Process, RunningProcess
 
 
 def pg_get_version(pg_conn: connection) -> str:

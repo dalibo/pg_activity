@@ -6,7 +6,13 @@ import attr
 import pytest
 
 from pgactivity import activities
-from pgactivity.types import IOCounter, LoadAverage, MemoryInfo, Process, RunningProcess
+from pgactivity.types import (
+    IOCounter,
+    LegacyProcess,
+    LoadAverage,
+    MemoryInfo,
+    RunningProcess,
+)
 
 
 @pytest.fixture
@@ -14,9 +20,11 @@ def processes(shared_datadir):
     with (shared_datadir / "local-processes-input.json").open() as f:
         input_data = json.load(f)
 
-    processes = {k: Process.deserialize(p) for k, p in input_data["processes"].items()}
+    processes = {
+        k: LegacyProcess.deserialize(p) for k, p in input_data["processes"].items()
+    }
     new_processes = {
-        k: Process.deserialize(p) for k, p in input_data["new_processes"].items()
+        k: LegacyProcess.deserialize(p) for k, p in input_data["new_processes"].items()
     }
     fs_blocksize = input_data["fs_blocksize"]
     return processes, new_processes, fs_blocksize
