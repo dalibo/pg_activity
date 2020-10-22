@@ -575,7 +575,9 @@ def format_duration(duration: Optional[float]) -> Tuple[str, str]:
 def processes_rows(
     term: Terminal,
     ui: UI,
-    processes: Union[Iterable[RunningProcess], Iterable[LocalRunningProcess]],
+    processes: Union[
+        Iterable[BWProcess], Iterable[RunningProcess], Iterable[LocalRunningProcess]
+    ],
     *,
     color_type: str = "default",
 ) -> Iterator[str]:
@@ -655,6 +657,7 @@ def processes_rows(
             text_append(f"{color_for(color)}{template_for('time') % ctime}")
 
         if query_mode == QueryMode.activities and flag & Flag.WAIT:
+            assert isinstance(process, RunningProcess)
             if process.wait:
                 text_append(f"{color_for('wait_red')}{template_for('wait') % 'Y'}")
             else:
