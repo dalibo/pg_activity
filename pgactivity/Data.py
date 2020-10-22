@@ -35,7 +35,7 @@ import psycopg2.extras
 from psycopg2.extensions import connection
 
 from .utils import return_as
-from .types import BWProcess, IOCounter, Process, ProcessExtras, RunningProcess
+from .types import BWProcess, IOCounter, Process, SystemProcess, RunningProcess
 
 
 def pg_get_version(pg_conn: connection) -> str:
@@ -104,8 +104,8 @@ def pg_get_num_dev_version(text_version: str) -> Tuple[str, int]:
     return pg_version, pg_num_version
 
 
-def sys_get_proc(pid: int) -> Optional[ProcessExtras]:
-    """Return a ProcessExtras instance matching given pid or None if access with psutil
+def sys_get_proc(pid: int) -> Optional[SystemProcess]:
+    """Return a SystemProcess instance matching given pid or None if access with psutil
     is not possible.
     """
     try:
@@ -126,7 +126,7 @@ def sys_get_proc(pid: int) -> Optional[ProcessExtras]:
     except (psutil.NoSuchProcess, psutil.AccessDenied):
         return None
 
-    return ProcessExtras(
+    return SystemProcess(
         meminfo=meminfo,
         io_read=IOCounter(read_count, read_bytes, read_chars),
         io_write=IOCounter(write_count, write_bytes, write_chars),

@@ -533,7 +533,7 @@ class BWProcess(BaseProcess, DictSequenceProxy):
 
 
 @attr.s(auto_attribs=True, slots=True)
-class ProcessExtras(Deserializable):
+class SystemProcess(Deserializable):
     meminfo: Tuple[int, ...]
     io_read: IOCounter
     io_write: IOCounter
@@ -606,7 +606,7 @@ class Process(Deserializable, RunningProcess):
     Process(pid=6229, appname='pgbench', database='pgbench', user='postgres', client='local', duration=-0.003353, ...)
     """
 
-    extras: ProcessExtras
+    extras: SystemProcess
     cpu: Optional[float] = None
     mem: Optional[float] = None
     read: Optional[float] = None
