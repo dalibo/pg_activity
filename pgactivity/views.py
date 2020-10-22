@@ -577,7 +577,6 @@ def processes_rows(
     ui: UI,
     processes: Union[Iterable[RunningProcess], Iterable[LocalRunningProcess]],
     *,
-    is_local: bool,
     color_type: str = "default",
 ) -> Iterator[str]:
     """Display table rows with processes information."""
@@ -763,10 +762,8 @@ def screen(
     processes: Union[List[RunningProcess], List[BWProcess], List[LocalRunningProcess]]
     system_info: Optional[SystemInfo]
     if isinstance(activity_stats, tuple):
-        is_local = True
         processes, system_info = activity_stats
     else:
-        is_local = False
         processes, system_info = activity_stats, None
     processes = sorted_processes(processes, key=ui.sort_key, reverse=True)  # type: ignore  # TODO: fixme
 
@@ -790,7 +787,6 @@ def screen(
         term,
         ui,
         processes,
-        is_local=is_local,
         lines_counter=lines_counter,
     )
     if render_footer:
