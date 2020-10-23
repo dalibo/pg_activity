@@ -586,7 +586,7 @@ def processes_rows(
         return getattr(term, LINE_COLORS[field][color_type])
 
     def template_for(column_name: str) -> str:
-        return getattr(Column, column_name).value.template_h  # type: ignore
+        return Column[column_name].value.template_h  # type: ignore
 
     def text_append(value: str) -> None:
         # We also restore 'normal' style so that the next item does not
