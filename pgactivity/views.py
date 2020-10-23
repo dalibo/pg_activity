@@ -619,8 +619,9 @@ def processes_rows(
             cell(process, "user", 16)
         if flag & Flag.CLIENT:
             cell(process, "client", 16)
-        if query_mode == QueryMode.activities:
-            assert isinstance(process, LocalRunningProcess), process
+        if query_mode == QueryMode.activities and isinstance(
+            process, LocalRunningProcess
+        ):
             if flag & Flag.CPU:
                 cell(process, "cpu", None)
             if flag & Flag.MEM:

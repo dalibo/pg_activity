@@ -299,6 +299,53 @@ p.price, p.cost HAVING sum(p.price * s.units) > 5000;
 6239   pgbench                   pgbench         postgres          1.2.3.4      None    transactionid    ExclusiveLock  11:06.00             active  END;
 6228   pgbench                   pgbench         postgres            local      ahah            tuple RowExclusiveLock  0.000413      idle in trans  UPDATE pgbench_branches SET bbalance = bbalance + 1788 WHERE bid = 68;
 
+>>> processes1b = [
+...     RunningProcess(
+...         pid=6239,
+...         appname="pgbench",
+...         database="pgbench",
+...         user="postgres",
+...         client="local",
+...         state="idle in transaction",
+...         query="UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;",
+...         duration=0.0,
+...         wait=False,
+...         is_parallel_worker=False,
+...     ),
+...     RunningProcess(
+...         pid=6228,
+...         appname="none",
+...         database="pgbench",
+...         user="postgres",
+...         client="local",
+...         state="active",
+...         query="UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;",
+...         duration=0.000413,
+...         wait=False,
+...         is_parallel_worker=True,
+...     ),
+...     RunningProcess(
+...         pid=1234,
+...         appname="accounting",
+...         database="business",
+...         user="bob",
+...         client="192.168.0.47",
+...         state="active",
+...         query="SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id) WHERE s.date > CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name, p.price, p.cost HAVING sum(p.price * s.units) > 5000;",
+...         duration=1234,
+...         wait=True,
+...         is_parallel_worker=False,
+...     ),
+... ]
+>>> ui.query_mode = QueryMode.activities
+>>> processes_rows(term, ui, processes1b)
+6239   pgbench                   pgbench         postgres            local  0.000000  N      idle in trans  UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
+6228   pgbench                      none         postgres            local  0.000413  N             active  \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
+1234   business               accounting              bob     192.168.0.47  20:34.00  Y             active  SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id)
+WHERE s.date > CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name,
+p.price, p.cost HAVING sum(p.price * s.units) > 5000;
+
+
 
 Tests for footer()
 ------------------
