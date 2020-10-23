@@ -276,7 +276,7 @@ class DurationMode(enum.IntEnum):
     backend = 3
 
 
-@attr.s(auto_attribs=True, slots=True)
+@attr.s(auto_attribs=True, frozen=True, slots=True)
 class UI:
     """State of the UI."""
 

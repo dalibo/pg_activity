@@ -92,18 +92,24 @@ def main(
             elif key == keys.EXIT:
                 break
             elif key == keys.PAUSE:
-                ui.in_pause = not ui.in_pause
+                ui = attr.evolve(ui, in_pause=not ui.in_pause)
             elif options.nodbsize and key == keys.REFRESH_DB_SIZE:
                 skip_sizes = False
             elif key in (keys.REFRESH_TIME_INCREASE, keys.REFRESH_TIME_DECREASE):
-                ui.refresh_time = handlers.refresh_time(key, ui.refresh_time)
-            elif key is not None:
-                ui.query_mode = handlers.query_mode(key) or ui.query_mode
-                ui.sort_key = (
-                    handlers.sort_key_for(key, ui.query_mode, is_local) or ui.sort_key
+                ui = attr.evolve(
+                    ui, refresh_time=handlers.refresh_time(key, ui.refresh_time)
                 )
-                ui.duration_mode = handlers.duration_mode(key, ui.duration_mode)
-                ui.verbose_mode = handlers.verbose_mode(key, ui.verbose_mode)
+            elif key is not None:
+                ui = attr.evolve(
+                    ui,
+                    query_mode=handlers.query_mode(key) or ui.query_mode,
+                    sort_key=(
+                        handlers.sort_key_for(key, ui.query_mode, is_local)
+                        or ui.sort_key
+                    ),
+                    duration_mode=handlers.duration_mode(key, ui.duration_mode),
+                    verbose_mode=handlers.verbose_mode(key, ui.verbose_mode),
+                )
             if not in_help:
                 if not ui.in_pause:
                     if is_local:

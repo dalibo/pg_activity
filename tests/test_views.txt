@@ -1,3 +1,4 @@
+>>> import attr
 >>> from blessed import Terminal
 >>> from pgactivity.types import *
 >>> from pgactivity.views import *
@@ -120,7 +121,7 @@ MEM%              state   Query
 >>> columns_header(term, ui)
 PID    DATABASE                      APP           CLIENT  RELATION              state   Query
 
->>> ui.query_mode = QueryMode.activities
+>>> ui = attr.evolve(ui, query_mode=QueryMode.activities)
 >>> columns_header(term, ui)
 PID    DATABASE                      APP           CLIENT  W              state   Query
 
@@ -194,13 +195,13 @@ p.name FROM products p LEFT JOIN sales s USING (product_id) WHERE s.date >
 CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name, p.price, p.cost
 HAVING sum(p.price * s.units) > 5000;
 
->>> ui.verbose_mode = QueryDisplayMode.truncate
+>>> ui = attr.evolve(ui, verbose_mode=QueryDisplayMode.truncate)
 >>> processes_rows(term, ui, processes1)
 6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts
 6228   pgbench             0.2  1.0             active   \_ UPDATE pgbench_accou
 1234   business            2.4  1.0             active   SELECT product_id, p.na
 
->>> ui.verbose_mode = QueryDisplayMode.wrap
+>>> ui = attr.evolve(ui, verbose_mode=QueryDisplayMode.wrap)
 >>> processes_rows(term, ui, processes1)
 6239   pgbench             0.1  1.0      idle in trans   UPDATE
                                                          pgbench_accounts SET
@@ -223,7 +224,8 @@ HAVING sum(p.price * s.units) > 5000;
                                                          HAVING sum(p.price *
                                                          s.units) > 5000;
 
->>> ui.flag = allflags = sum(Flag)
+>>> allflags = sum(Flag)
+>>> ui = attr.evolve(ui, flag=allflags)
 >>> term.width
 80
 
@@ -236,14 +238,14 @@ Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 WHERE s.date > CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name,
 p.price, p.cost HAVING sum(p.price * s.units) > 5000;
 
->>> ui.flag = Flag.PID|Flag.DATABASE
->>> ui.verbose_mode = QueryDisplayMode.truncate
+>>> ui = attr.evolve(ui, flag=Flag.PID|Flag.DATABASE,
+...                  verbose_mode=QueryDisplayMode.truncate)
 >>> processes_rows(term, ui, processes1)
 6239   pgbench               idle in trans   UPDATE pgbench_accounts SET abalanc
 6228   pgbench                      active   \_ UPDATE pgbench_accounts SET abal
 1234   business                     active   SELECT product_id, p.name FROM prod
 
->>> ui.verbose_mode = QueryDisplayMode.wrap
+>>> ui = attr.evolve(ui, verbose_mode=QueryDisplayMode.wrap)
 >>> processes_rows(term, ui, processes1)
 6239   pgbench               idle in trans   UPDATE pgbench_accounts SET
                                              abalance = abalance + 141 WHERE aid
@@ -287,14 +289,13 @@ p.price, p.cost HAVING sum(p.price * s.units) > 5000;
 ...         query="UPDATE pgbench_branches SET bbalance = bbalance + 1788 WHERE bid = 68;",
 ...     ),
 ... ]
->>> ui.query_mode = QueryMode.waiting
+>>> ui = attr.evolve(ui, query_mode=QueryMode.waiting)
 >>> processes_rows(term, ui, processes2)
 6239   pgbench                      active   END;
 6228   pgbench               idle in trans   UPDATE pgbench_branches SET
                                              bbalance = bbalance + 1788 WHERE
                                              bid = 68;
->>> ui.query_mode = QueryMode.blocking
->>> ui.flag = allflags
+>>> ui = attr.evolve(ui, query_mode=QueryMode.blocking, flag=allflags)
 >>> processes_rows(term, ui, processes2)
 6239   pgbench                   pgbench         postgres          1.2.3.4      None    transactionid    ExclusiveLock  11:06.00             active  END;
 6228   pgbench                   pgbench         postgres            local      ahah            tuple RowExclusiveLock  0.000413      idle in trans  UPDATE pgbench_branches SET bbalance = bbalance + 1788 WHERE bid = 68;
@@ -337,7 +338,7 @@ p.price, p.cost HAVING sum(p.price * s.units) > 5000;
 ...         is_parallel_worker=False,
 ...     ),
 ... ]
->>> ui.query_mode = QueryMode.activities
+>>> ui = attr.evolve(ui, query_mode=QueryMode.activities)
 >>> processes_rows(term, ui, processes1b)
 6239   pgbench                   pgbench         postgres            local  0.000000  N      idle in trans  UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
 6228   pgbench                      none         postgres            local  0.000413  N             active  \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
