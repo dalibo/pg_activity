@@ -82,7 +82,8 @@ Mock system statistics
 ... )
 >>> pg_get_db_info = patch(
 ...     "pgactivity.data.Data.pg_get_db_info",
-...     return_value={"total_size": 111_222_333, "size_ev": 0, "tps": 0},
+...     return_value={"total_size": 111_222_333, "size_ev": 0,
+...                   "tps": 0, "max_length": 27},
 ... )
 >>> get_mem_swap.start()
 <MagicMock name='get_mem_swap' id='...'>

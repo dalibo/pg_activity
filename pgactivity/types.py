@@ -291,6 +291,7 @@ class UI:
     )
     sort_key: SortKey = attr.ib(default=SortKey.default(), converter=SortKey)
     query_mode: QueryMode = attr.ib(default=QueryMode.activities, converter=QueryMode)
+    max_db_length: int = 16
     refresh_time: float = 2.0
     in_pause: bool = False
     _columns: Any = attr.ib(init=False)
@@ -319,7 +320,7 @@ class UI:
             if Flag.DATABASE & self.flag:
                 database = ColumnTitle(
                     name="DATABASE",
-                    template_h="%-16s ",
+                    template_h=f"%-{self.max_db_length}s ",
                     sort_key=None,
                 )
             if Flag.IOWAIT & self.flag:

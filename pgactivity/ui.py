@@ -40,16 +40,13 @@ def main(
     pg_db_info = data.pg_get_db_info(
         None, using_rds=options.rds, skip_sizes=options.nodbsize
     )
-    # TODO: use max_db_length to set template_h length of database column, see
-    # set_max_db_length() method of old UI class.
-    # max_db_length = min(max(pg_db_info["max_length"], 8), 16)
-    # database_template_h = f"-{max_db_length}s "
 
     ui = types.UI(
         min_duration=options.minduration,
         flag=types.Flag.from_options(is_local=is_local, **vars(options)),
         duration_mode=int(options.durationmode),
         verbose_mode=int(options.verbosemode),
+        max_db_length=min(max(int(pg_db_info["max_length"]), 8), 16),
     )
 
     if term is None:
