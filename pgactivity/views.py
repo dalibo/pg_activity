@@ -124,10 +124,6 @@ LINE_COLORS = {
 }
 
 
-# Maximum number of columns
-MAX_NCOL = 15
-
-
 line_counter = functools.partial(itertools.count, step=-1)
 naturalsize = functools.partial(humanize.naturalsize, gnu=True, format="%.2f")
 
@@ -498,7 +494,7 @@ def columns_header(term: Terminal, ui: UI) -> Iterator[str]:
     yield term.ljust("".join(htitles), fillchar=" ") + term.normal
 
 
-def get_indent(mode: QueryMode, flag: Flag, max_ncol: int = MAX_NCOL) -> str:
+def get_indent(mode: QueryMode, flag: Flag) -> str:
     """Return identation for Query column.
 
     >>> get_indent(QueryMode.activities, Flag.CPU)
