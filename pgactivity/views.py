@@ -1,4 +1,3 @@
-import enum
 import functools
 import itertools
 from datetime import timedelta
@@ -6,7 +5,6 @@ from textwrap import dedent
 from typing import (
     Any,
     Callable,
-    Dict,
     Iterable,
     Iterator,
     List,
@@ -32,7 +30,6 @@ from .keys import (
 from .types import (
     BWProcess,
     ActivityStats,
-    ColumnTitle,
     DBInfo,
     Flag,
     Host,
@@ -42,7 +39,6 @@ from .types import (
     QueryDisplayMode,
     QueryMode,
     RunningProcess,
-    SortKey,
     SystemInfo,
     UI,
 )
@@ -343,172 +339,30 @@ def query_mode(term: Terminal, ui: UI) -> Iterator[str]:
         )
 
 
-@enum.unique
-class Column(enum.Enum):
-    """Model for each column that may appear in the table."""
-
-    appname = ColumnTitle(
-        name="APP",
-        template_h="%16s ",
-        flag=Flag.APPNAME,
-        mandatory=False,
-        sort_key=None,
-    )
-    client = ColumnTitle(
-        name="CLIENT",
-        template_h="%16s ",
-        flag=Flag.CLIENT,
-        mandatory=False,
-        sort_key=None,
-    )
-    cpu = ColumnTitle(
-        name="CPU%",
-        template_h="%6s ",
-        flag=Flag.CPU,
-        mandatory=False,
-        sort_key=SortKey.cpu,
-    )
-    database = ColumnTitle(
-        name="DATABASE",
-        template_h="%-16s ",
-        flag=Flag.DATABASE,
-        mandatory=False,
-        sort_key=None,
-    )
-    iowait = ColumnTitle(
-        name="IOW", template_h="%4s ", flag=Flag.IOWAIT, mandatory=False, sort_key=None
-    )
-    mem = ColumnTitle(
-        name="MEM%",
-        template_h="%4s ",
-        flag=Flag.MEM,
-        mandatory=False,
-        sort_key=SortKey.mem,
-    )
-    mode = ColumnTitle(
-        name="MODE", template_h="%16s ", flag=Flag.MODE, mandatory=False, sort_key=None
-    )
-    pid = ColumnTitle(
-        name="PID", template_h="%-6s ", flag=Flag.PID, mandatory=False, sort_key=None
-    )
-    query = ColumnTitle(
-        name="Query", template_h=" %2s", flag=None, mandatory=True, sort_key=None
-    )
-    read = ColumnTitle(
-        name="READ/s",
-        template_h="%8s ",
-        flag=Flag.READ,
-        mandatory=False,
-        sort_key=SortKey.read,
-    )
-    relation = ColumnTitle(
-        name="RELATION",
-        template_h="%9s ",
-        flag=Flag.RELATION,
-        mandatory=False,
-        sort_key=None,
-    )
-    state = ColumnTitle(
-        name="state", template_h=" %17s  ", flag=None, mandatory=True, sort_key=None
-    )
-    time = ColumnTitle(
-        name="TIME+",
-        template_h="%9s ",
-        flag=Flag.TIME,
-        mandatory=False,
-        sort_key=SortKey.duration,
-    )
-    type = ColumnTitle(
-        name="TYPE", template_h="%16s ", flag=Flag.TYPE, mandatory=False, sort_key=None
-    )
-    user = ColumnTitle(
-        name="USER", template_h="%16s ", flag=Flag.USER, mandatory=False, sort_key=None
-    )
-    wait = ColumnTitle(
-        name="W", template_h="%2s ", flag=Flag.WAIT, mandatory=False, sort_key=None
-    )
-    write = ColumnTitle(
-        name="WRITE/s",
-        template_h="%8s ",
-        flag=Flag.WRITE,
-        mandatory=False,
-        sort_key=SortKey.write,
-    )
-
-
-COLUMNS_BY_QUERYMODE: Dict[QueryMode, List[Column]] = {
-    QueryMode.activities: [
-        Column.pid,
-        Column.database,
-        Column.appname,
-        Column.user,
-        Column.client,
-        Column.cpu,
-        Column.mem,
-        Column.read,
-        Column.write,
-        Column.time,
-        Column.wait,
-        Column.iowait,
-        Column.state,
-        Column.query,
-    ],
-    QueryMode.waiting: [
-        Column.pid,
-        Column.database,
-        Column.appname,
-        Column.user,
-        Column.client,
-        Column.relation,
-        Column.type,
-        Column.mode,
-        Column.time,
-        Column.state,
-        Column.query,
-    ],
-    QueryMode.blocking: [
-        Column.pid,
-        Column.database,
-        Column.appname,
-        Column.user,
-        Column.client,
-        Column.relation,
-        Column.type,
-        Column.mode,
-        Column.time,
-        Column.state,
-        Column.query,
-    ],
-}
-
-
 @limit
 def columns_header(term: Terminal, ui: UI) -> Iterator[str]:
     """Yield columns header lines."""
-    columns = (c.value for c in COLUMNS_BY_QUERYMODE[ui.query_mode])
     htitles = []
-    for column in columns:
-        if column.mandatory or (column.flag & ui.flag):
-            color = getattr(term, f"black_on_{column.color(ui.sort_key)}")
-            htitles.append(f"{color}{column.render()}")
+    for column in ui.columns():
+        color = getattr(term, f"black_on_{column.color(ui.sort_key)}")
+        htitles.append(f"{color}{column.render()}")
     yield term.ljust("".join(htitles), fillchar=" ") + term.normal
 
 
-def get_indent(mode: QueryMode, flag: Flag) -> str:
+def get_indent(ui: UI) -> str:
     """Return identation for Query column.
 
-    >>> get_indent(QueryMode.activities, Flag.CPU)
+    >>> ui = UI(flag=Flag.CPU)
+    >>> get_indent(ui)
     '                           '
-    >>> flag = Flag.PID | Flag.DATABASE | Flag.APPNAME | Flag.RELATION
-    >>> get_indent(QueryMode.activities, flag)
+    >>> ui = UI(flag=Flag.PID | Flag.DATABASE | Flag.APPNAME | Flag.RELATION)
+    >>> get_indent(ui)
     '                                                             '
     """
     indent = ""
-    columns = (c.value for c in COLUMNS_BY_QUERYMODE[mode])
-    for idx, column in enumerate(columns):
-        if column.mandatory or column.flag & flag:
-            if column.name != "Query":
-                indent += column.template_h % " "
+    for column in ui.columns():
+        if column.name != "Query":
+            indent += column.template_h % " "
     return indent
 
 
@@ -586,7 +440,7 @@ def processes_rows(
         return getattr(term, LINE_COLORS[field][color_type])
 
     def template_for(column_name: str) -> str:
-        return Column[column_name].value.template_h  # type: ignore
+        return ui.column(column_name).template_h
 
     def text_append(value: str) -> None:
         # We also restore 'normal' style so that the next item does not
@@ -682,7 +536,7 @@ def processes_rows(
             color_state = "state_default"
         text_append(f"{color_for(color_state)}{template_for('state') % state}")
 
-        indent = get_indent(query_mode, flag) + " "
+        indent = get_indent(ui) + " "
         dif = term.width - len(indent)
 
         verbose_mode = ui.verbose_mode

@@ -1,6 +1,7 @@
 import enum
 from typing import (
     Any,
+    Iterator,
     List,
     Mapping,
     Optional,
@@ -292,13 +293,162 @@ class UI:
     query_mode: QueryMode = attr.ib(default=QueryMode.activities, converter=QueryMode)
     refresh_time: float = 2.0
     in_pause: bool = False
+    _columns: Any = attr.ib(init=False)
+
+    def __attrs_post_init__(self) -> None:
+        @enum.unique
+        class Column(enum.Enum):
+            """Model for each column that may appear in the table."""
+
+            if Flag.APPNAME & self.flag:
+                appname = ColumnTitle(
+                    name="APP",
+                    template_h="%16s ",
+                )
+            if Flag.CLIENT & self.flag:
+                client = ColumnTitle(
+                    name="CLIENT",
+                    template_h="%16s ",
+                )
+            if Flag.CPU & self.flag:
+                cpu = ColumnTitle(
+                    name="CPU%",
+                    template_h="%6s ",
+                    sort_key=SortKey.cpu,
+                )
+            if Flag.DATABASE & self.flag:
+                database = ColumnTitle(
+                    name="DATABASE",
+                    template_h="%-16s ",
+                    sort_key=None,
+                )
+            if Flag.IOWAIT & self.flag:
+                iowait = ColumnTitle(name="IOW", template_h="%4s ")
+            if Flag.MEM & self.flag:
+                mem = ColumnTitle(
+                    name="MEM%",
+                    template_h="%4s ",
+                    sort_key=SortKey.mem,
+                )
+            if Flag.MODE & self.flag:
+                mode = ColumnTitle(name="MODE", template_h="%16s ")
+            if Flag.PID & self.flag:
+                pid = ColumnTitle(name="PID", template_h="%-6s ")
+            query = ColumnTitle(name="Query", template_h=" %2s")
+            if Flag.READ & self.flag:
+                read = ColumnTitle(
+                    name="READ/s",
+                    template_h="%8s ",
+                    sort_key=SortKey.read,
+                )
+            if Flag.RELATION & self.flag:
+                relation = ColumnTitle(
+                    name="RELATION",
+                    template_h="%9s ",
+                )
+            state = ColumnTitle(name="state", template_h=" %17s  ")
+            if Flag.TIME & self.flag:
+                time = ColumnTitle(
+                    name="TIME+",
+                    template_h="%9s ",
+                    sort_key=SortKey.duration,
+                )
+            if Flag.TYPE & self.flag:
+                type = ColumnTitle(name="TYPE", template_h="%16s ")
+            if Flag.USER & self.flag:
+                user = ColumnTitle(name="USER", template_h="%16s ")
+            if Flag.WAIT & self.flag:
+                wait = ColumnTitle(name="W", template_h="%2s ")
+            if Flag.WRITE & self.flag:
+                write = ColumnTitle(
+                    name="WRITE/s",
+                    template_h="%8s ",
+                )
+
+        object.__setattr__(self, "_columns", Column)
+
+    _columns_by_querymode: Mapping[QueryMode, List[str]] = {
+        QueryMode.activities: [
+            "pid",
+            "database",
+            "appname",
+            "user",
+            "client",
+            "cpu",
+            "mem",
+            "read",
+            "write",
+            "time",
+            "wait",
+            "iowait",
+            "state",
+            "query",
+        ],
+        QueryMode.waiting: [
+            "pid",
+            "database",
+            "appname",
+            "user",
+            "client",
+            "relation",
+            "type",
+            "mode",
+            "time",
+            "state",
+            "query",
+        ],
+        QueryMode.blocking: [
+            "pid",
+            "database",
+            "appname",
+            "user",
+            "client",
+            "relation",
+            "type",
+            "mode",
+            "time",
+            "state",
+            "query",
+        ],
+    }
+
+    def column(self, key: str) -> "ColumnTitle":
+        """Return the column matching 'key'.
+
+        >>> ui = UI()
+        >>> ui.column("cpu")
+        ColumnTitle(name='CPU%', template_h='%6s ', mandatory=False, sort_key=<SortKey.cpu: 1>)
+        >>> ui.column("gloups")
+        Traceback (most recent call last):
+          ...
+        ValueError: 'gloups'
+        """
+        try:
+            column: ColumnTitle = self._columns[key].value
+        except KeyError as e:
+            raise ValueError(str(e)) from None
+        return column
+
+    def columns(self) -> Iterator["ColumnTitle"]:
+        """Return the list of ColumnTitle for current mode.
+
+        >>> flag = Flag.PID | Flag.DATABASE | Flag.APPNAME | Flag.RELATION
+        >>> ui = UI(flag=flag)
+        >>> [c.name for c in ui.columns()]
+        ['PID', 'DATABASE', 'APP', 'state', 'Query']
+        """
+        for key in self._columns_by_querymode[self.query_mode]:
+            try:
+                yield self._columns[key].value
+            except KeyError:
+                pass
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
 class ColumnTitle:
     """Title of a column in stats table.
 
-    >>> c = ColumnTitle("PID", "%-6s", None, True, SortKey.cpu)
+    >>> c = ColumnTitle("PID", "%-6s", True, SortKey.cpu)
     >>> c.render()
     'PID   '
     >>> c.color(SortKey.cpu)
@@ -309,24 +459,23 @@ class ColumnTitle:
 
     name: str
     template_h: str = attr.ib()
-    flag: Optional[Flag]
-    mandatory: bool
+    mandatory: bool = False
     sort_key: Optional[SortKey] = None
 
     @template_h.validator
     def _template_h_is_a_format_string_(self, attribute: Any, value: str) -> None:
         """Validate template_h attribute.
 
-        >>> ColumnTitle("a", "b%%aa", Flag.DATABASE, False)
+        >>> ColumnTitle("a", "b%%aa")
         Traceback (most recent call last):
             ...
         ValueError: template_h must be a format string with one placeholder
-        >>> ColumnTitle("a", "baad", Flag.DATABASE, False)
+        >>> ColumnTitle("a", "baad")
         Traceback (most recent call last):
             ...
         ValueError: template_h must be a format string with one placeholder
-        >>> ColumnTitle("a", "%s is good", Flag.DATABASE, False)  # doctest: +ELLIPSIS
-        ColumnTitle(name='a', template_h='%s is good', flag=<Flag.DATABASE: 1>, ...)
+        >>> ColumnTitle("a", "%s is good")  # doctest: +ELLIPSIS
+        ColumnTitle(name='a', template_h='%s is good', ...)
         """
         if value.count("%") != 1:
             raise ValueError(
