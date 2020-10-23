@@ -39,6 +39,16 @@ def main(
     )
 
     is_local = data.pg_is_local() and data.pg_is_local_access()
+
+    skip_sizes = options.nodbsize
+    pg_db_info = data.pg_get_db_info(
+        None, using_rds=options.rds, skip_sizes=options.nodbsize
+    )
+    # TODO: use max_db_length to set template_h length of database column, see
+    # set_max_db_length() method of old UI class.
+    # max_db_length = min(max(pg_db_info["max_length"], 8), 16)
+    # database_template_h = f"-{max_db_length}s "
+
     ui = types.UI(
         min_duration=options.minduration,
         flag=types.Flag.from_options(is_local=is_local, **vars(options)),
@@ -50,13 +60,11 @@ def main(
         # Used in tests.
         term = Terminal()
     key, in_help = None, False
-    skip_sizes = options.nodbsize
     sys_procs: Dict[int, types.SystemProcess] = {}
     pg_procs: types.ProcessSet
     activity_stats: types.ActivityStats
 
     with term.fullscreen(), term.cbreak():
-        pg_db_info = None
         while True:
             pg_db_info = data.pg_get_db_info(
                 pg_db_info, using_rds=options.rds, skip_sizes=skip_sizes
@@ -69,6 +77,7 @@ def main(
                 size_ev=int(pg_db_info["size_ev"]),
             )
             tps = int(pg_db_info["tps"])
+
             active_connections = data.pg_get_active_connections()
             memory, swap, load = activities.mem_swap_load()
             system_info = types.SystemInfo.default(memory=memory, swap=swap, load=load)
