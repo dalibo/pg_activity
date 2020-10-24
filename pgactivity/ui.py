@@ -119,11 +119,7 @@ def main(
                         pg_procs = data.pg_get_activities(ui.duration_mode)
                         if is_local:
                             # TODO: Use this logic in waiting and blocking cases.
-                            (
-                                io_read,
-                                io_write,
-                                pg_procs,
-                            ) = activities.update_processes_local2(
+                            pg_procs, io_read, io_write = activities.ps_complete(
                                 pg_procs, sys_procs, fs_blocksize
                             )
                             system_info = attr.evolve(

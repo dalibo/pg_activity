@@ -46,7 +46,7 @@ def system_processes(shared_datadir):
     return pg_processes, system_procs, new_system_procs, fs_blocksize
 
 
-def test_update_processes_local2(system_processes):
+def test_ps_complete(system_processes):
     pg_processes, system_procs, new_system_procs, fs_blocksize = system_processes
 
     def sys_get_proc(pid):
@@ -55,7 +55,7 @@ def test_update_processes_local2(system_processes):
     n_system_procs = len(system_procs)
 
     with patch("pgactivity.activities.sys_get_proc", new=sys_get_proc):
-        io_read, io_write, procs = activities.update_processes_local2(
+        procs, io_read, io_write = activities.ps_complete(
             pg_processes, system_procs, fs_blocksize
         )
 
@@ -88,8 +88,8 @@ def test_update_processes_local2(system_processes):
     }
 
 
-def test_update_processes_local2_empty_procs(system_processes):
-    # same as test_update_processes_local2 but starting with an empty "system_procs" dict
+def test_ps_complete_empty_procs(system_processes):
+    # same as test_ps_complete() but starting with an empty "system_procs" dict
     pg_processes, __, new_system_procs, fs_blocksize = system_processes
 
     def sys_get_proc(pid):
@@ -98,7 +98,7 @@ def test_update_processes_local2_empty_procs(system_processes):
     system_procs = {}
 
     with patch("pgactivity.activities.sys_get_proc", new=sys_get_proc):
-        io_read, io_write, procs = activities.update_processes_local2(
+        procs, io_read, io_write = activities.ps_complete(
             pg_processes, system_procs, fs_blocksize
         )
 

@@ -56,12 +56,17 @@ def sys_get_proc(pid: int) -> Optional[SystemProcess]:
     )
 
 
-def update_processes_local2(
+def ps_complete(
     pg_processes: Sequence[RunningProcess],
     processes: Dict[int, SystemProcess],
     fs_blocksize: int,
-) -> Tuple[IOCounter, IOCounter, List[LocalRunningProcess]]:
-    """Update resource usage for each process in *local* mode."""
+) -> Tuple[List[LocalRunningProcess], IOCounter, IOCounter]:
+    """Transform the sequence of 'pg_processes' (RunningProcess) as LocalRunningProcess
+    with local system information from the 'processes' map. Return LocalRunningProcess
+    list, as well as read and write IO counters.
+
+    The 'processes' map is updated in place.
+    """
     local_procs = []
     read_bytes_delta = 0.0
     write_bytes_delta = 0.0
@@ -132,7 +137,7 @@ def update_processes_local2(
     io_read = IOCounter(count=read_count_delta, bytes=int(read_bytes_delta))
     io_write = IOCounter(count=write_count_delta, bytes=int(write_bytes_delta))
 
-    return io_read, io_write, local_procs
+    return local_procs, io_read, io_write
 
 
 T = TypeVar("T", RunningProcess, BWProcess, LocalRunningProcess)
