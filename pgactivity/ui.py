@@ -7,6 +7,7 @@ import attr
 from blessed import Terminal
 
 from . import __version__, activities, handlers, keys, types, utils, views
+from .data import pg_connect
 
 
 def main(
@@ -15,7 +16,7 @@ def main(
     term: Optional[Terminal] = None,
     render_footer: bool = True,
 ) -> None:
-    data = utils.pg_connect(
+    data = pg_connect(
         options,
         password=os.environ.get("PGPASSWORD"),
         service=os.environ.get("PGSERVICE"),

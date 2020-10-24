@@ -23,6 +23,8 @@ BASIS, AND JULIEN TACHOIRES HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE,
 SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 """
 
+import getpass
+import optparse
 import re
 from typing import Dict, List, Optional, Tuple, Union
 
@@ -30,9 +32,11 @@ import attr
 import psutil
 import psycopg2
 import psycopg2.extras
+from psycopg2 import errorcodes
 from psycopg2.extensions import connection
 
 from .types import BWProcess, RunningProcess
+from .utils import clean_str
 
 
 def pg_get_version(pg_conn: connection) -> str:
@@ -842,3 +846,41 @@ class Data:
         if duration_mode not in (1, 2, 3):
             duration_mode = 1
         return ["query_start", "xact_start", "backend_start"][duration_mode - 1]
+
+
+def pg_connect(
+    options: optparse.Values,
+    password: Optional[str] = None,
+    service: Optional[str] = None,
+    exit_on_failed: bool = True,
+    min_duration: float = 0.0,
+) -> Data:
+    """Try to build a Data instance by to connecting to postgres."""
+    for nb_try in range(2):
+        try:
+            data = Data.pg_connect(
+                host=options.host,
+                port=options.port,
+                user=options.username,
+                password=password,
+                database=options.dbname,
+                rds_mode=options.rds,
+                service=service,
+                min_duration=min_duration,
+            )
+        except psycopg2.OperationalError as err:
+            errmsg = str(err).strip()
+            if nb_try < 1 and (
+                err.pgcode == errorcodes.INVALID_PASSWORD
+                or errmsg.startswith("FATAL:  password authentication failed for user")
+                or errmsg == "fe_sendauth: no password supplied"
+            ):
+                password = getpass.getpass()
+            elif exit_on_failed:
+                msg = str(err).replace("FATAL:", "")
+                raise SystemExit("pg_activity: FATAL: %s" % clean_str(msg))
+            else:
+                raise Exception("Could not connect to PostgreSQL")
+        else:
+            break
+    return data
