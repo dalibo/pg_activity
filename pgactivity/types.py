@@ -279,10 +279,10 @@ class DurationMode(enum.IntEnum):
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
-class ColumnTitle:
-    """Title of a column in stats table.
+class Column:
+    """A column in stats table.
 
-    >>> c = ColumnTitle("pid", "PID", "%-6s", True, SortKey.cpu)
+    >>> c = Column("pid", "PID", "%-6s", True, SortKey.cpu)
     >>> c.render()
     'PID   '
     >>> c.color(SortKey.cpu)
@@ -301,16 +301,16 @@ class ColumnTitle:
     def _template_h_is_a_format_string_(self, attribute: Any, value: str) -> None:
         """Validate template_h attribute.
 
-        >>> ColumnTitle("k", "a", "b%%aa")
+        >>> Column("k", "a", "b%%aa")
         Traceback (most recent call last):
             ...
         ValueError: template_h must be a format string with one placeholder
-        >>> ColumnTitle("k", "a", "baad")
+        >>> Column("k", "a", "baad")
         Traceback (most recent call last):
             ...
         ValueError: template_h must be a format string with one placeholder
-        >>> ColumnTitle("k", "a", "%s is good")  # doctest: +ELLIPSIS
-        ColumnTitle(name='a', template_h='%s is good', ...)
+        >>> Column("k", "a", "%s is good")  # doctest: +ELLIPSIS
+        Column(name='a', template_h='%s is good', ...)
         """
         if value.count("%") != 1:
             raise ValueError(
@@ -330,7 +330,7 @@ class ColumnTitle:
 class UI:
     """State of the UI."""
 
-    columns_by_querymode: Mapping[QueryMode, Tuple[ColumnTitle, ...]]
+    columns_by_querymode: Mapping[QueryMode, Tuple[Column, ...]]
     flag: Flag
     min_duration: float = 0.0
     duration_mode: DurationMode = attr.ib(
@@ -352,11 +352,11 @@ class UI:
         max_db_length: int = 16,
         **kwargs: Any,
     ) -> "UI":
-        possible_columns: Dict[str, ColumnTitle] = {}
+        possible_columns: Dict[str, Column] = {}
 
         def add_column(key: str, **kwargs: Any) -> None:
             assert key not in possible_columns, f"duplicated key {key}"
-            possible_columns[key] = ColumnTitle(key, **kwargs)
+            possible_columns[key] = Column(key, **kwargs)
 
         if Flag.APPNAME & flag:
             add_column(
@@ -477,7 +477,7 @@ class UI:
             ],
         }
 
-        def make_columns_for(query_mode: QueryMode) -> Iterator[ColumnTitle]:
+        def make_columns_for(query_mode: QueryMode) -> Iterator[Column]:
             for key in columns_key_by_querymode[query_mode]:
                 try:
                     yield possible_columns[key]
@@ -500,12 +500,12 @@ class UI:
         assert "flag" not in changes, "cannot evolve with a new flag"
         return attr.evolve(self, **changes)
 
-    def column(self, key: str) -> ColumnTitle:
+    def column(self, key: str) -> Column:
         """Return the column matching 'key'.
 
         >>> ui = UI.make()
         >>> ui.column("cpu")
-        ColumnTitle(name='CPU%', template_h='%6s ', mandatory=False, sort_key=<SortKey.cpu: 1>)
+        Column(name='CPU%', template_h='%6s ', mandatory=False, sort_key=<SortKey.cpu: 1>)
         >>> ui.column("gloups")
         Traceback (most recent call last):
           ...
@@ -517,8 +517,8 @@ class UI:
         else:
             raise ValueError(key)
 
-    def columns(self) -> Tuple[ColumnTitle, ...]:
-        """Return the tuple of ColumnTitle for current mode.
+    def columns(self) -> Tuple[Column, ...]:
+        """Return the tuple of Column for current mode.
 
         >>> flag = Flag.PID | Flag.DATABASE | Flag.APPNAME | Flag.RELATION
         >>> ui = UI.make(flag=flag)
