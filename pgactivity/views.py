@@ -324,10 +324,10 @@ def query_mode(term: Terminal, ui: UI) -> Iterator[str]:
     >>> from pgactivity.types import QueryMode, UI
 
     >>> term = Terminal()
-    >>> ui = UI(query_mode=QueryMode.blocking)
+    >>> ui = UI.make(query_mode=QueryMode.blocking)
     >>> query_mode(term, ui)
                                     BLOCKING QUERIES
-    >>> ui = UI(query_mode=QueryMode.activities, in_pause=True)
+    >>> ui = UI.make(query_mode=QueryMode.activities, in_pause=True)
     >>> query_mode(term, ui)  # doctest: +NORMALIZE_WHITESPACE
                                     PAUSE
     """
@@ -352,10 +352,10 @@ def columns_header(term: Terminal, ui: UI) -> Iterator[str]:
 def get_indent(ui: UI) -> str:
     """Return identation for Query column.
 
-    >>> ui = UI(flag=Flag.CPU)
+    >>> ui = UI.make(flag=Flag.CPU)
     >>> get_indent(ui)
     '                           '
-    >>> ui = UI(flag=Flag.PID | Flag.DATABASE | Flag.APPNAME | Flag.RELATION)
+    >>> ui = UI.make(flag=Flag.PID | Flag.DATABASE | Flag.APPNAME | Flag.RELATION)
     >>> get_indent(ui)
     '                                                             '
     """

@@ -1,4 +1,3 @@
->>> import attr
 >>> from blessed import Terminal
 >>> from pgactivity.types import *
 >>> from pgactivity.views import *
@@ -62,7 +61,7 @@ Tests for header()
 ------------------
 
 
->>> ui = UI(refresh_time=10, duration_mode=DurationMode.backend)
+>>> ui = UI.make(refresh_time=10, duration_mode=DurationMode.backend)
 
 Remote host:
 
@@ -84,7 +83,7 @@ Local host, with priviledged access:
 >>> load = LoadAverage(25.0, 0.19, 0.39)
 >>> sysinfo = SystemInfo(vmem, swap, load, io_read, io_write, 12)
 
->>> ui = UI(refresh_time=2, min_duration=1.2)
+>>> ui = UI.make(refresh_time=2, min_duration=1.2)
 >>> header(term, ui, host=host, dbinfo=dbinfo, tps=1, active_connections=79,
 ...        system_info=sysinfo)
 PostgreSQL 13.1 - localhost - tester@host:5432/postgres - Ref.: 2s - Min. duration: 1.2s
@@ -97,31 +96,31 @@ PostgreSQL 13.1 - localhost - tester@host:5432/postgres - Ref.: 2s - Min. durati
 Tests for columns_header()
 --------------------------
 
->>> ui = UI(query_mode=QueryMode.activities,
-...         flag=Flag.PID | Flag.DATABASE,
-...         sort_key=SortKey.cpu)
+>>> ui = UI.make(query_mode=QueryMode.activities,
+...              flag=Flag.PID | Flag.DATABASE,
+...              sort_key=SortKey.cpu)
 >>> columns_header(term, ui)
 PID    DATABASE                      state   Query                              
 
->>> ui = UI(query_mode=QueryMode.activities,
-...         flag=Flag.CPU,
-...         sort_key=SortKey.cpu)
+>>> ui = UI.make(query_mode=QueryMode.activities,
+...              flag=Flag.CPU,
+...              sort_key=SortKey.cpu)
 >>> columns_header(term, ui)
   CPU%              state   Query                                               
 
->>> ui = UI(query_mode=QueryMode.activities,
-...         flag=Flag.MEM,
-...         sort_key=SortKey.cpu)
+>>> ui = UI.make(query_mode=QueryMode.activities,
+...              flag=Flag.MEM,
+...              sort_key=SortKey.cpu)
 >>> columns_header(term, ui)
 MEM%              state   Query                                                 
 
->>> ui = UI(query_mode=QueryMode.blocking,
-...         flag=Flag.PID | Flag.DATABASE | Flag.APPNAME | Flag.RELATION | Flag.CLIENT | Flag.WAIT,
-...         sort_key=SortKey.duration)
+>>> ui = UI.make(query_mode=QueryMode.blocking,
+...              flag=Flag.PID | Flag.DATABASE | Flag.APPNAME | Flag.RELATION | Flag.CLIENT | Flag.WAIT,
+...              sort_key=SortKey.duration)
 >>> columns_header(term, ui)
 PID    DATABASE                      APP           CLIENT  RELATION              state   Query
 
->>> ui = attr.evolve(ui, query_mode=QueryMode.activities)
+>>> ui = ui.evolve(query_mode=QueryMode.activities)
 >>> columns_header(term, ui)
 PID    DATABASE                      APP           CLIENT  W              state   Query
 
@@ -183,7 +182,7 @@ Tests for processes_rows()
 ...     ),
 ... ]
 
->>> ui = UI(flag=Flag.PID|Flag.CPU|Flag.MEM|Flag.DATABASE)
+>>> ui = UI.make(flag=Flag.PID|Flag.CPU|Flag.MEM|Flag.DATABASE)
 
 >>> processes_rows(term, ui, processes1)
 6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts
@@ -195,13 +194,13 @@ p.name FROM products p LEFT JOIN sales s USING (product_id) WHERE s.date >
 CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name, p.price, p.cost
 HAVING sum(p.price * s.units) > 5000;
 
->>> ui = attr.evolve(ui, verbose_mode=QueryDisplayMode.truncate)
+>>> ui = ui.evolve(verbose_mode=QueryDisplayMode.truncate)
 >>> processes_rows(term, ui, processes1)
 6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts
 6228   pgbench             0.2  1.0             active   \_ UPDATE pgbench_accou
 1234   business            2.4  1.0             active   SELECT product_id, p.na
 
->>> ui = attr.evolve(ui, verbose_mode=QueryDisplayMode.wrap)
+>>> ui = ui.evolve(verbose_mode=QueryDisplayMode.wrap)
 >>> processes_rows(term, ui, processes1)
 6239   pgbench             0.1  1.0      idle in trans   UPDATE
                                                          pgbench_accounts SET
@@ -225,7 +224,7 @@ HAVING sum(p.price * s.units) > 5000;
                                                          s.units) > 5000;
 
 >>> allflags = sum(Flag)
->>> ui = attr.evolve(ui, flag=allflags)
+>>> ui = UI.make(flag=allflags)
 >>> term.width
 80
 
@@ -238,14 +237,14 @@ Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 WHERE s.date > CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name,
 p.price, p.cost HAVING sum(p.price * s.units) > 5000;
 
->>> ui = attr.evolve(ui, flag=Flag.PID|Flag.DATABASE,
-...                  verbose_mode=QueryDisplayMode.truncate)
+>>> ui = UI.make(flag=Flag.PID|Flag.DATABASE,
+...              verbose_mode=QueryDisplayMode.truncate)
 >>> processes_rows(term, ui, processes1)
 6239   pgbench               idle in trans   UPDATE pgbench_accounts SET abalanc
 6228   pgbench                      active   \_ UPDATE pgbench_accounts SET abal
 1234   business                     active   SELECT product_id, p.name FROM prod
 
->>> ui = attr.evolve(ui, verbose_mode=QueryDisplayMode.wrap)
+>>> ui = ui.evolve(verbose_mode=QueryDisplayMode.wrap)
 >>> processes_rows(term, ui, processes1)
 6239   pgbench               idle in trans   UPDATE pgbench_accounts SET
                                              abalance = abalance + 141 WHERE aid
@@ -289,13 +288,13 @@ p.price, p.cost HAVING sum(p.price * s.units) > 5000;
 ...         query="UPDATE pgbench_branches SET bbalance = bbalance + 1788 WHERE bid = 68;",
 ...     ),
 ... ]
->>> ui = attr.evolve(ui, query_mode=QueryMode.waiting)
+>>> ui = ui.evolve(query_mode=QueryMode.waiting)
 >>> processes_rows(term, ui, processes2)
 6239   pgbench                      active   END;
 6228   pgbench               idle in trans   UPDATE pgbench_branches SET
                                              bbalance = bbalance + 1788 WHERE
                                              bid = 68;
->>> ui = attr.evolve(ui, query_mode=QueryMode.blocking, flag=allflags)
+>>> ui = UI.make(query_mode=QueryMode.blocking, flag=allflags)
 >>> processes_rows(term, ui, processes2)
 6239   pgbench                   pgbench         postgres          1.2.3.4      None    transactionid    ExclusiveLock  11:06.00             active  END;
 6228   pgbench                   pgbench         postgres            local      ahah            tuple RowExclusiveLock  0.000413      idle in trans  UPDATE pgbench_branches SET bbalance = bbalance + 1788 WHERE bid = 68;
@@ -338,7 +337,7 @@ p.price, p.cost HAVING sum(p.price * s.units) > 5000;
 ...         is_parallel_worker=False,
 ...     ),
 ... ]
->>> ui = attr.evolve(ui, query_mode=QueryMode.activities)
+>>> ui = ui.evolve(query_mode=QueryMode.activities)
 >>> processes_rows(term, ui, processes1b)
 6239   pgbench                   pgbench         postgres            local  0.000000  N      idle in trans  UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
 6228   pgbench                      none         postgres            local  0.000413  N             active  \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
@@ -366,7 +365,7 @@ Tests for screen()
 >>> io_write = IOCounter(bytes=8, count=9)
 >>> load = LoadAverage(0.5, 1.9, 0.93)
 >>> sysinfo = SystemInfo(vmem, swap, load, io_read, io_write, 76)
->>> ui = UI(
+>>> ui = UI.make(
 ...     duration_mode=DurationMode.backend,
 ...     refresh_time=10,
 ...     min_duration=1,

@@ -281,8 +281,8 @@ class DurationMode(enum.IntEnum):
 class UI:
     """State of the UI."""
 
+    flag: Flag
     min_duration: float = 0.0
-    flag: Flag = Flag(sum(Flag))
     duration_mode: DurationMode = attr.ib(
         default=DurationMode.query, converter=DurationMode
     )
@@ -291,82 +291,101 @@ class UI:
     )
     sort_key: SortKey = attr.ib(default=SortKey.default(), converter=SortKey)
     query_mode: QueryMode = attr.ib(default=QueryMode.activities, converter=QueryMode)
-    max_db_length: int = 16
     refresh_time: float = 2.0
     in_pause: bool = False
-    _columns: Any = attr.ib(init=False)
+    all_columns: Any = attr.ib(default=None, repr=False)
 
-    def __attrs_post_init__(self) -> None:
+    @classmethod
+    def make(
+        cls,
+        flag: Flag = Flag(sum(Flag)),
+        *,
+        max_db_length: int = 16,
+        **kwargs: Any,
+    ) -> "UI":
         @enum.unique
         class Column(enum.Enum):
             """Model for each column that may appear in the table."""
 
-            if Flag.APPNAME & self.flag:
+            if Flag.APPNAME & flag:
                 appname = ColumnTitle(
                     name="APP",
                     template_h="%16s ",
                 )
-            if Flag.CLIENT & self.flag:
+            if Flag.CLIENT & flag:
                 client = ColumnTitle(
                     name="CLIENT",
                     template_h="%16s ",
                 )
-            if Flag.CPU & self.flag:
+            if Flag.CPU & flag:
                 cpu = ColumnTitle(
                     name="CPU%",
                     template_h="%6s ",
                     sort_key=SortKey.cpu,
                 )
-            if Flag.DATABASE & self.flag:
+            if Flag.DATABASE & flag:
                 database = ColumnTitle(
                     name="DATABASE",
-                    template_h=f"%-{self.max_db_length}s ",
+                    template_h=f"%-{max_db_length}s ",
                     sort_key=None,
                 )
-            if Flag.IOWAIT & self.flag:
+            if Flag.IOWAIT & flag:
                 iowait = ColumnTitle(name="IOW", template_h="%4s ")
-            if Flag.MEM & self.flag:
+            if Flag.MEM & flag:
                 mem = ColumnTitle(
                     name="MEM%",
                     template_h="%4s ",
                     sort_key=SortKey.mem,
                 )
-            if Flag.MODE & self.flag:
+            if Flag.MODE & flag:
                 mode = ColumnTitle(name="MODE", template_h="%16s ")
-            if Flag.PID & self.flag:
+            if Flag.PID & flag:
                 pid = ColumnTitle(name="PID", template_h="%-6s ")
             query = ColumnTitle(name="Query", template_h=" %2s")
-            if Flag.READ & self.flag:
+            if Flag.READ & flag:
                 read = ColumnTitle(
                     name="READ/s",
                     template_h="%8s ",
                     sort_key=SortKey.read,
                 )
-            if Flag.RELATION & self.flag:
+            if Flag.RELATION & flag:
                 relation = ColumnTitle(
                     name="RELATION",
                     template_h="%9s ",
                 )
             state = ColumnTitle(name="state", template_h=" %17s  ")
-            if Flag.TIME & self.flag:
+            if Flag.TIME & flag:
                 time = ColumnTitle(
                     name="TIME+",
                     template_h="%9s ",
                     sort_key=SortKey.duration,
                 )
-            if Flag.TYPE & self.flag:
+            if Flag.TYPE & flag:
                 type = ColumnTitle(name="TYPE", template_h="%16s ")
-            if Flag.USER & self.flag:
+            if Flag.USER & flag:
                 user = ColumnTitle(name="USER", template_h="%16s ")
-            if Flag.WAIT & self.flag:
+            if Flag.WAIT & flag:
                 wait = ColumnTitle(name="W", template_h="%2s ")
-            if Flag.WRITE & self.flag:
+            if Flag.WRITE & flag:
                 write = ColumnTitle(
                     name="WRITE/s",
                     template_h="%8s ",
                 )
 
-        object.__setattr__(self, "_columns", Column)
+        return cls(flag=flag, all_columns=Column, **kwargs)
+
+    def evolve(self, **changes: Any) -> "UI":
+        """Return a new UI with 'changes' applied.
+
+        >>> ui = UI.make()
+        >>> ui.query_mode.value
+        'running queries'
+        >>> new_ui = ui.evolve(query_mode=QueryMode.blocking)
+        >>> new_ui.query_mode.value
+        'blocking queries'
+        """
+        assert "flag" not in changes, "cannot evolve with a new flag"
+        return attr.evolve(self, **changes)
 
     _columns_by_querymode: Mapping[QueryMode, List[str]] = {
         QueryMode.activities: [
@@ -416,7 +435,7 @@ class UI:
     def column(self, key: str) -> "ColumnTitle":
         """Return the column matching 'key'.
 
-        >>> ui = UI()
+        >>> ui = UI.make()
         >>> ui.column("cpu")
         ColumnTitle(name='CPU%', template_h='%6s ', mandatory=False, sort_key=<SortKey.cpu: 1>)
         >>> ui.column("gloups")
@@ -425,7 +444,7 @@ class UI:
         ValueError: 'gloups'
         """
         try:
-            column: ColumnTitle = self._columns[key].value
+            column: ColumnTitle = self.all_columns[key].value
         except KeyError as e:
             raise ValueError(str(e)) from None
         return column
@@ -434,13 +453,13 @@ class UI:
         """Return the list of ColumnTitle for current mode.
 
         >>> flag = Flag.PID | Flag.DATABASE | Flag.APPNAME | Flag.RELATION
-        >>> ui = UI(flag=flag)
+        >>> ui = UI.make(flag=flag)
         >>> [c.name for c in ui.columns()]
         ['PID', 'DATABASE', 'APP', 'state', 'Query']
         """
         for key in self._columns_by_querymode[self.query_mode]:
             try:
-                yield self._columns[key].value
+                yield self.all_columns[key].value
             except KeyError:
                 pass
 

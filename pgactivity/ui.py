@@ -41,9 +41,9 @@ def main(
         None, using_rds=options.rds, skip_sizes=options.nodbsize
     )
 
-    ui = types.UI(
-        min_duration=options.minduration,
+    ui = types.UI.make(
         flag=types.Flag.from_options(is_local=is_local, **vars(options)),
+        min_duration=options.minduration,
         duration_mode=int(options.durationmode),
         verbose_mode=int(options.verbosemode),
         max_db_length=min(max(int(pg_db_info["max_length"]), 8), 16),
@@ -89,16 +89,13 @@ def main(
             elif key == keys.EXIT:
                 break
             elif key == keys.PAUSE:
-                ui = attr.evolve(ui, in_pause=not ui.in_pause)
+                ui = ui.evolve(in_pause=not ui.in_pause)
             elif options.nodbsize and key == keys.REFRESH_DB_SIZE:
                 skip_sizes = False
             elif key in (keys.REFRESH_TIME_INCREASE, keys.REFRESH_TIME_DECREASE):
-                ui = attr.evolve(
-                    ui, refresh_time=handlers.refresh_time(key, ui.refresh_time)
-                )
+                ui = ui.evolve(refresh_time=handlers.refresh_time(key, ui.refresh_time))
             elif key is not None:
-                ui = attr.evolve(
-                    ui,
+                ui = ui.evolve(
                     query_mode=handlers.query_mode(key) or ui.query_mode,
                     sort_key=(
                         handlers.sort_key_for(key, ui.query_mode, is_local)
