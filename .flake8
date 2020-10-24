@@ -1,4 +1,5 @@
 [flake8]
+doctests = True
 ignore =
   E203, # whitespace before ‘:’
   E501, # line too long
