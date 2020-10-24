@@ -439,9 +439,6 @@ def processes_rows(
     def color_for(field: str) -> FormattingString:
         return getattr(term, LINE_COLORS[field][color_type])
 
-    def template_for(column_name: str) -> str:
-        return ui.column(column_name).template_h
-
     def text_append(value: str) -> None:
         # We also restore 'normal' style so that the next item does not
         # inherit previous one's style.
@@ -456,7 +453,7 @@ def processes_rows(
     ) -> None:
         column_value = transform(getattr(process, key))[:crop]
         color_key = color_key or key
-        text_append(f"{color_for(color_key)}{template_for(key) % column_value}")
+        text_append(f"{color_for(color_key)}{ui.column(key).render(column_value)}")
 
     flag = ui.flag
     query_mode = ui.query_mode
@@ -505,14 +502,14 @@ def processes_rows(
 
         if flag & Flag.TIME:
             ctime, color = format_duration(process.duration)
-            text_append(f"{color_for(color)}{template_for('time') % ctime}")
+            text_append(f"{color_for(color)}{ui.column('time').render(ctime)}")
 
         if query_mode == QueryMode.activities and flag & Flag.WAIT:
             assert isinstance(process, RunningProcess)
             if process.wait:
-                text_append(f"{color_for('wait_red')}{template_for('wait') % 'Y'}")
+                text_append(f"{color_for('wait_red')}{ui.column('wait').render('Y')}")
             else:
-                text_append(f"{color_for('wait_green')}{template_for('wait') % 'N'}")
+                text_append(f"{color_for('wait_green')}{ui.column('wait').render('N')}")
 
         if (
             isinstance(process, LocalRunningProcess)
@@ -521,9 +518,11 @@ def processes_rows(
         ):
             assert process.io_wait in "YN", process.io_wait
             if process.io_wait == "Y":
-                text_append(f"{color_for('wait_red')}{template_for('iowait') % 'Y'}")
+                text_append(f"{color_for('wait_red')}{ui.column('iowait').render('Y')}")
             else:
-                text_append(f"{color_for('wait_green')}{template_for('iowait') % 'N'}")
+                text_append(
+                    f"{color_for('wait_green')}{ui.column('iowait').render('N')}"
+                )
 
         state = utils.short_state(process.state)
         if state == "active":
@@ -534,7 +533,7 @@ def processes_rows(
             color_state = "state_red"
         else:
             color_state = "state_default"
-        text_append(f"{color_for(color_state)}{template_for('state') % state}")
+        text_append(f"{color_for(color_state)}{ui.column('state').render(state)}")
 
         indent = get_indent(ui) + " "
         dif = term.width - len(indent)

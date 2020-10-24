@@ -289,6 +289,8 @@ class Column:
     'cyan'
     >>> c.title_color(SortKey.duration)
     'green'
+    >>> c.render('1234')
+    '1234  '
     """
 
     key: str = attr.ib(repr=False)
@@ -324,6 +326,9 @@ class Column:
         if self.sort_key == sort_by:
             return "cyan"  # TODO: define a Color enum
         return "green"
+
+    def render(self, value: str) -> str:
+        return self.template_h % value
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
