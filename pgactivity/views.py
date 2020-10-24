@@ -14,7 +14,6 @@ from typing import (
     Union,
 )
 
-import humanize
 from blessed import Terminal
 from blessed.formatters import FormattingString
 
@@ -121,7 +120,6 @@ LINE_COLORS = {
 
 
 line_counter = functools.partial(itertools.count, step=-1)
-naturalsize = functools.partial(humanize.naturalsize, gnu=True, format="%.2f")
 
 
 def limit(func: Callable[..., Iterable[str]]) -> Callable[..., int]:
@@ -177,13 +175,13 @@ def render(x: NoReturn, column_width: int) -> str:
 
 @render.register(MemoryInfo)
 def render_meminfo(m: MemoryInfo, column_width: int) -> str:
-    used, total = naturalsize(m.used), naturalsize(m.total)
+    used, total = utils.naturalsize(m.used), utils.naturalsize(m.total)
     return _columns(f"{m.percent}%", f"{used}/{total}", column_width)
 
 
 @render.register(IOCounter)
 def render_iocounter(i: IOCounter, column_width: int) -> str:
-    hbytes = naturalsize(i.bytes)
+    hbytes = utils.naturalsize(i.bytes)
     return _columns(f"{hbytes}/s", f"{i.count}/s", column_width)
 
 
@@ -260,8 +258,8 @@ def header(
 
     col_width = 30  # TODO: use screen size
 
-    total_size = naturalsize(dbinfo.total_size)
-    size_ev = naturalsize(dbinfo.size_ev)
+    total_size = utils.naturalsize(dbinfo.total_size)
+    size_ev = utils.naturalsize(dbinfo.size_ev)
     yield indent(
         row(
             (
@@ -477,9 +475,9 @@ def processes_rows(
             if flag & Flag.MEM:
                 cell(process, "mem", lambda v: str(round(v, 1)))
             if flag & Flag.READ:
-                cell(process, "read", naturalsize)
+                cell(process, "read", utils.naturalsize)
             if flag & Flag.WRITE:
-                cell(process, "write", naturalsize)
+                cell(process, "write", utils.naturalsize)
 
         elif query_mode in (QueryMode.waiting, QueryMode.blocking):
             assert isinstance(process, BWProcess), process

@@ -1,6 +1,12 @@
+import functools
 import re
 from datetime import datetime
 from typing import Any, IO, Iterable, Mapping, Optional
+
+import humanize
+
+
+naturalsize = functools.partial(humanize.naturalsize, gnu=True, format="%.2f")
 
 
 def clean_str(string: str) -> str:
