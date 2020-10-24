@@ -283,11 +283,11 @@ class Column:
     """A column in stats table.
 
     >>> c = Column("pid", "PID", "%-6s", True, SortKey.cpu)
-    >>> c.render()
+    >>> c.title_render()
     'PID   '
-    >>> c.color(SortKey.cpu)
+    >>> c.title_color(SortKey.cpu)
     'cyan'
-    >>> c.color(SortKey.duration)
+    >>> c.title_color(SortKey.duration)
     'green'
     """
 
@@ -317,10 +317,10 @@ class Column:
                 f"{attribute.name} must be a format string with one placeholder"
             )
 
-    def render(self) -> str:
+    def title_render(self) -> str:
         return self.template_h % self.name
 
-    def color(self, sort_by: SortKey) -> str:
+    def title_color(self, sort_by: SortKey) -> str:
         if self.sort_key == sort_by:
             return "cyan"  # TODO: define a Color enum
         return "green"

@@ -344,8 +344,8 @@ def columns_header(term: Terminal, ui: UI) -> Iterator[str]:
     """Yield columns header lines."""
     htitles = []
     for column in ui.columns():
-        color = getattr(term, f"black_on_{column.color(ui.sort_key)}")
-        htitles.append(f"{color}{column.render()}")
+        color = getattr(term, f"black_on_{column.title_color(ui.sort_key)}")
+        htitles.append(f"{color}{column.title_render()}")
     yield term.ljust("".join(htitles), fillchar=" ") + term.normal
 
 
