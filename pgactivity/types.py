@@ -278,6 +278,53 @@ class DurationMode(enum.IntEnum):
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
+class ColumnTitle:
+    """Title of a column in stats table.
+
+    >>> c = ColumnTitle("PID", "%-6s", True, SortKey.cpu)
+    >>> c.render()
+    'PID   '
+    >>> c.color(SortKey.cpu)
+    'cyan'
+    >>> c.color(SortKey.duration)
+    'green'
+    """
+
+    name: str
+    template_h: str = attr.ib()
+    mandatory: bool = False
+    sort_key: Optional[SortKey] = None
+
+    @template_h.validator
+    def _template_h_is_a_format_string_(self, attribute: Any, value: str) -> None:
+        """Validate template_h attribute.
+
+        >>> ColumnTitle("a", "b%%aa")
+        Traceback (most recent call last):
+            ...
+        ValueError: template_h must be a format string with one placeholder
+        >>> ColumnTitle("a", "baad")
+        Traceback (most recent call last):
+            ...
+        ValueError: template_h must be a format string with one placeholder
+        >>> ColumnTitle("a", "%s is good")  # doctest: +ELLIPSIS
+        ColumnTitle(name='a', template_h='%s is good', ...)
+        """
+        if value.count("%") != 1:
+            raise ValueError(
+                f"{attribute.name} must be a format string with one placeholder"
+            )
+
+    def render(self) -> str:
+        return self.template_h % self.name
+
+    def color(self, sort_by: SortKey) -> str:
+        if self.sort_key == sort_by:
+            return "cyan"  # TODO: define a Color enum
+        return "green"
+
+
+@attr.s(auto_attribs=True, frozen=True, slots=True)
 class UI:
     """State of the UI."""
 
@@ -432,7 +479,7 @@ class UI:
         ],
     }
 
-    def column(self, key: str) -> "ColumnTitle":
+    def column(self, key: str) -> ColumnTitle:
         """Return the column matching 'key'.
 
         >>> ui = UI.make()
@@ -449,7 +496,7 @@ class UI:
             raise ValueError(str(e)) from None
         return column
 
-    def columns(self) -> Iterator["ColumnTitle"]:
+    def columns(self) -> Iterator[ColumnTitle]:
         """Return the list of ColumnTitle for current mode.
 
         >>> flag = Flag.PID | Flag.DATABASE | Flag.APPNAME | Flag.RELATION
@@ -462,53 +509,6 @@ class UI:
                 yield self.all_columns[key].value
             except KeyError:
                 pass
-
-
-@attr.s(auto_attribs=True, frozen=True, slots=True)
-class ColumnTitle:
-    """Title of a column in stats table.
-
-    >>> c = ColumnTitle("PID", "%-6s", True, SortKey.cpu)
-    >>> c.render()
-    'PID   '
-    >>> c.color(SortKey.cpu)
-    'cyan'
-    >>> c.color(SortKey.duration)
-    'green'
-    """
-
-    name: str
-    template_h: str = attr.ib()
-    mandatory: bool = False
-    sort_key: Optional[SortKey] = None
-
-    @template_h.validator
-    def _template_h_is_a_format_string_(self, attribute: Any, value: str) -> None:
-        """Validate template_h attribute.
-
-        >>> ColumnTitle("a", "b%%aa")
-        Traceback (most recent call last):
-            ...
-        ValueError: template_h must be a format string with one placeholder
-        >>> ColumnTitle("a", "baad")
-        Traceback (most recent call last):
-            ...
-        ValueError: template_h must be a format string with one placeholder
-        >>> ColumnTitle("a", "%s is good")  # doctest: +ELLIPSIS
-        ColumnTitle(name='a', template_h='%s is good', ...)
-        """
-        if value.count("%") != 1:
-            raise ValueError(
-                f"{attribute.name} must be a format string with one placeholder"
-            )
-
-    def render(self) -> str:
-        return self.template_h % self.name
-
-    def color(self, sort_by: SortKey) -> str:
-        if self.sort_key == sort_by:
-            return "cyan"  # TODO: define a Color enum
-        return "green"
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
