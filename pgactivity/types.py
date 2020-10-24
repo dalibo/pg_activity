@@ -1,6 +1,7 @@
 import enum
 from typing import (
     Any,
+    Dict,
     Iterator,
     List,
     Mapping,
@@ -351,85 +352,87 @@ class UI:
         max_db_length: int = 16,
         **kwargs: Any,
     ) -> "UI":
-        @enum.unique
-        class Column(enum.Enum):
-            """Model for each column that may appear in the table."""
+        possible_columns: Dict[str, ColumnTitle] = {}
 
-            if Flag.APPNAME & flag:
-                appname = ColumnTitle(
-                    key="appname",
-                    name="APP",
-                    template_h="%16s ",
-                )
-            if Flag.CLIENT & flag:
-                client = ColumnTitle(
-                    key="client",
-                    name="CLIENT",
-                    template_h="%16s ",
-                )
-            if Flag.CPU & flag:
-                cpu = ColumnTitle(
-                    key="cpu",
-                    name="CPU%",
-                    template_h="%6s ",
-                    sort_key=SortKey.cpu,
-                )
-            if Flag.DATABASE & flag:
-                database = ColumnTitle(
-                    key="database",
-                    name="DATABASE",
-                    template_h=f"%-{max_db_length}s ",
-                    sort_key=None,
-                )
-            if Flag.IOWAIT & flag:
-                iowait = ColumnTitle(key="iowait", name="IOW", template_h="%4s ")
-            if Flag.MEM & flag:
-                mem = ColumnTitle(
-                    key="mem",
-                    name="MEM%",
-                    template_h="%4s ",
-                    sort_key=SortKey.mem,
-                )
-            if Flag.MODE & flag:
-                mode = ColumnTitle(key="mode", name="MODE", template_h="%16s ")
-            if Flag.PID & flag:
-                pid = ColumnTitle(key="pid", name="PID", template_h="%-6s ")
-            query = ColumnTitle(key="query", name="Query", template_h=" %2s")
-            if Flag.READ & flag:
-                read = ColumnTitle(
-                    key="read",
-                    name="READ/s",
-                    template_h="%8s ",
-                    sort_key=SortKey.read,
-                )
-            if Flag.RELATION & flag:
-                relation = ColumnTitle(
-                    key="relation",
-                    name="RELATION",
-                    template_h="%9s ",
-                )
-            state = ColumnTitle(key="state", name="state", template_h=" %17s  ")
-            if Flag.TIME & flag:
-                time = ColumnTitle(
-                    key="time",
-                    name="TIME+",
-                    template_h="%9s ",
-                    sort_key=SortKey.duration,
-                )
-            if Flag.TYPE & flag:
-                type = ColumnTitle(key="type", name="TYPE", template_h="%16s ")
-            if Flag.USER & flag:
-                user = ColumnTitle(key="user", name="USER", template_h="%16s ")
-            if Flag.WAIT & flag:
-                wait = ColumnTitle(key="wait", name="W", template_h="%2s ")
-            if Flag.WRITE & flag:
-                write = ColumnTitle(
-                    key="write",
-                    name="WRITE/s",
-                    template_h="%8s ",
-                )
+        def add_column(key: str, **kwargs: Any) -> None:
+            assert key not in possible_columns, f"duplicated key {key}"
+            possible_columns[key] = ColumnTitle(key, **kwargs)
 
-        columns_name_by_querymode: Mapping[QueryMode, List[str]] = {
+        if Flag.APPNAME & flag:
+            add_column(
+                key="appname",
+                name="APP",
+                template_h="%16s ",
+            )
+        if Flag.CLIENT & flag:
+            add_column(
+                key="client",
+                name="CLIENT",
+                template_h="%16s ",
+            )
+        if Flag.CPU & flag:
+            add_column(
+                key="cpu",
+                name="CPU%",
+                template_h="%6s ",
+                sort_key=SortKey.cpu,
+            )
+        if Flag.DATABASE & flag:
+            add_column(
+                key="database",
+                name="DATABASE",
+                template_h=f"%-{max_db_length}s ",
+                sort_key=None,
+            )
+        if Flag.IOWAIT & flag:
+            add_column(key="iowait", name="IOW", template_h="%4s ")
+        if Flag.MEM & flag:
+            add_column(
+                key="mem",
+                name="MEM%",
+                template_h="%4s ",
+                sort_key=SortKey.mem,
+            )
+        if Flag.MODE & flag:
+            add_column(key="mode", name="MODE", template_h="%16s ")
+        if Flag.PID & flag:
+            add_column(key="pid", name="PID", template_h="%-6s ")
+        add_column(key="query", name="Query", template_h=" %2s")
+        if Flag.READ & flag:
+            add_column(
+                key="read",
+                name="READ/s",
+                template_h="%8s ",
+                sort_key=SortKey.read,
+            )
+        if Flag.RELATION & flag:
+            add_column(
+                key="relation",
+                name="RELATION",
+                template_h="%9s ",
+            )
+        add_column(key="state", name="state", template_h=" %17s  ")
+        if Flag.TIME & flag:
+            add_column(
+                key="time",
+                name="TIME+",
+                template_h="%9s ",
+                sort_key=SortKey.duration,
+            )
+        if Flag.TYPE & flag:
+            add_column(key="type", name="TYPE", template_h="%16s ")
+        if Flag.USER & flag:
+            add_column(key="user", name="USER", template_h="%16s ")
+        if Flag.WAIT & flag:
+            add_column(key="wait", name="W", template_h="%2s ")
+        if Flag.WRITE & flag:
+            add_column(
+                key="write",
+                name="WRITE/s",
+                template_h="%8s ",
+            )
+
+        columns_key_by_querymode: Mapping[QueryMode, List[str]] = {
             QueryMode.activities: [
                 "pid",
                 "database",
@@ -475,9 +478,9 @@ class UI:
         }
 
         def make_columns_for(query_mode: QueryMode) -> Iterator[ColumnTitle]:
-            for name in columns_name_by_querymode[query_mode]:
+            for key in columns_key_by_querymode[query_mode]:
                 try:
-                    yield Column[name].value
+                    yield possible_columns[key]
                 except KeyError:
                     pass
 
