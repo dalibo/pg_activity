@@ -27,8 +27,9 @@ from .keys import (
     PAUSE_KEY,
 )
 from .types import (
-    BWProcess,
     ActivityStats,
+    BWProcess,
+    Column,
     DBInfo,
     Flag,
     Host,
@@ -443,13 +444,11 @@ def processes_rows(
         text.append(value + term.normal)
 
     def cell(
-        process: Union[RunningProcess, BWProcess, LocalRunningProcess],
-        key: str,
-        color_key: Optional[str] = None,
+        value: Any,
+        column: Column,
+        color_key: str,
     ) -> None:
-        column_value = getattr(process, key)
-        color_key = color_key or key
-        text_append(f"{color_for(color_key)}{ui.column(key).render(column_value)}")
+        text_append(f"{color_for(color_key)}{column.render(value)}")
 
     flag = ui.flag
     query_mode = ui.query_mode
@@ -457,36 +456,37 @@ def processes_rows(
     for process in processes:
         text: List[str] = []
         if flag & Flag.PID:
-            cell(process, "pid")
+            cell(process.pid, ui.column("pid"), "pid")
         if flag & Flag.DATABASE:
-            cell(process, "database")
+            cell(process.database, ui.column("database"), "database")
         if flag & Flag.APPNAME:
-            cell(process, "appname")
+            cell(process.appname, ui.column("appname"), "appname")
         if flag & Flag.USER:
-            cell(process, "user")
+            cell(process.user, ui.column("user"), "user")
         if flag & Flag.CLIENT:
-            cell(process, "client")
+            cell(process.client, ui.column("client"), "client")
         if query_mode == QueryMode.activities and isinstance(
             process, LocalRunningProcess
         ):
             if flag & Flag.CPU:
-                cell(process, "cpu")
+                cell(process.cpu, ui.column("cpu"), "cpu")
             if flag & Flag.MEM:
-                cell(process, "mem")
+                cell(process.mem, ui.column("mem"), "mem")
             if flag & Flag.READ:
-                cell(process, "read")
+                cell(process.read, ui.column("read"), "read")
             if flag & Flag.WRITE:
-                cell(process, "write")
+                cell(process.write, ui.column("write"), "write")
 
         elif query_mode in (QueryMode.waiting, QueryMode.blocking):
             assert isinstance(process, BWProcess), process
             if flag & Flag.RELATION:
-                cell(process, "relation")
+                cell(process.relation, ui.column("relation"), "relation")
             if flag & Flag.TYPE:
-                cell(process, "type")
+                cell(process.type, ui.column("type"), "type")
 
             if flag & Flag.MODE:
-                if process.mode in (
+                mode = process.mode
+                if mode in (
                     "ExclusiveLock",
                     "RowExclusiveLock",
                     "AccessExclusiveLock",
@@ -494,18 +494,19 @@ def processes_rows(
                     mode_color = "mode_red"
                 else:
                     mode_color = "mode_yellow"
-                cell(process, "mode", color_key=mode_color)
+                cell(mode, ui.column("mode"), mode_color)
 
         if flag & Flag.TIME:
             ctime, color = format_duration(process.duration)
-            text_append(f"{color_for(color)}{ui.column('time').render(ctime)}")
+            cell(ctime, ui.column("time"), color)
 
         if query_mode == QueryMode.activities and flag & Flag.WAIT:
             assert isinstance(process, RunningProcess)
             if process.wait:
-                text_append(f"{color_for('wait_red')}{ui.column('wait').render('Y')}")
+                wait_value, wait_color = "Y", "wait_red"
             else:
-                text_append(f"{color_for('wait_green')}{ui.column('wait').render('N')}")
+                wait_value, wait_color = "N", "wait_green"
+            cell(wait_value, ui.column("wait"), wait_color)
 
         if (
             isinstance(process, LocalRunningProcess)
@@ -514,11 +515,10 @@ def processes_rows(
         ):
             assert process.io_wait in "YN", process.io_wait
             if process.io_wait == "Y":
-                text_append(f"{color_for('wait_red')}{ui.column('iowait').render('Y')}")
+                iowait_value, iowait_color = "Y", "wait_red"
             else:
-                text_append(
-                    f"{color_for('wait_green')}{ui.column('iowait').render('N')}"
-                )
+                iowait_value, iowait_color = "N", "wait_green"
+            cell(iowait_value, ui.column("iowait"), iowait_color)
 
         state = utils.short_state(process.state)
         if state == "active":
@@ -529,7 +529,7 @@ def processes_rows(
             color_state = "state_red"
         else:
             color_state = "state_default"
-        text_append(f"{color_for(color_state)}{ui.column('state').render(state)}")
+        cell(state, ui.column("state"), color_state)
 
         indent = get_indent(ui) + " "
         dif = term.width - len(indent)
