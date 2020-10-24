@@ -445,10 +445,9 @@ def processes_rows(
     def cell(
         process: Union[RunningProcess, BWProcess, LocalRunningProcess],
         key: str,
-        transform: Callable[[Any], str] = str,
         color_key: Optional[str] = None,
     ) -> None:
-        column_value = transform(getattr(process, key))
+        column_value = getattr(process, key)
         color_key = color_key or key
         text_append(f"{color_for(color_key)}{ui.column(key).render(column_value)}")
 
@@ -473,11 +472,11 @@ def processes_rows(
             if flag & Flag.CPU:
                 cell(process, "cpu")
             if flag & Flag.MEM:
-                cell(process, "mem", lambda v: str(round(v, 1)))
+                cell(process, "mem")
             if flag & Flag.READ:
-                cell(process, "read", utils.naturalsize)
+                cell(process, "read")
             if flag & Flag.WRITE:
-                cell(process, "write", utils.naturalsize)
+                cell(process, "write")
 
         elif query_mode in (QueryMode.waiting, QueryMode.blocking):
             assert isinstance(process, BWProcess), process

@@ -1,6 +1,7 @@
 import enum
 from typing import (
     Any,
+    Callable,
     Dict,
     Iterator,
     List,
@@ -14,6 +15,8 @@ from typing import (
 
 import attr
 import psutil
+
+from . import utils
 
 
 T = TypeVar("T")
@@ -282,7 +285,8 @@ class DurationMode(enum.IntEnum):
 class Column:
     """A column in stats table.
 
-    >>> c = Column("pid", "PID", "%-6s", True, SortKey.cpu, max_width=6)
+    >>> c = Column("pid", "PID", "%-6s", True, SortKey.cpu, max_width=6,
+    ...            transform=lambda v: str(v)[::-1])
     >>> c.title_render()
     'PID   '
     >>> c.title_color(SortKey.cpu)
@@ -290,9 +294,9 @@ class Column:
     >>> c.title_color(SortKey.duration)
     'green'
     >>> c.render('1234')
-    '1234  '
+    '4321  '
     >>> c.render('12345678')
-    '123456'
+    '876543'
     """
 
     key: str = attr.ib(repr=False)
@@ -301,6 +305,7 @@ class Column:
     mandatory: bool = False
     sort_key: Optional[SortKey] = None
     max_width: Optional[int] = attr.ib(default=None, repr=False)
+    transform: Callable[[Any], str] = attr.ib(default=str, repr=False)
 
     @template_h.validator
     def _template_h_is_a_format_string_(self, attribute: Any, value: str) -> None:
@@ -330,8 +335,8 @@ class Column:
             return "cyan"  # TODO: define a Color enum
         return "green"
 
-    def render(self, value: str) -> str:
-        return self.template_h % value[: self.max_width]
+    def render(self, value: Any) -> str:
+        return self.template_h % self.transform(value)[: self.max_width]
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
@@ -403,6 +408,7 @@ class UI:
                 name="MEM%",
                 template_h="%4s ",
                 sort_key=SortKey.mem,
+                transform=lambda v: str(round(v, 1)),
             )
         if Flag.MODE & flag:
             add_column(key="mode", name="MODE", template_h="%16s ", max_width=16)
@@ -415,6 +421,7 @@ class UI:
                 name="READ/s",
                 template_h="%8s ",
                 sort_key=SortKey.read,
+                transform=utils.naturalsize,
             )
         if Flag.RELATION & flag:
             add_column(
@@ -442,6 +449,7 @@ class UI:
                 key="write",
                 name="WRITE/s",
                 template_h="%8s ",
+                transform=utils.naturalsize,
             )
 
         columns_key_by_querymode: Mapping[QueryMode, List[str]] = {
