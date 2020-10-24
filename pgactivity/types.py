@@ -282,7 +282,7 @@ class DurationMode(enum.IntEnum):
 class Column:
     """A column in stats table.
 
-    >>> c = Column("pid", "PID", "%-6s", True, SortKey.cpu)
+    >>> c = Column("pid", "PID", "%-6s", True, SortKey.cpu, max_width=6)
     >>> c.title_render()
     'PID   '
     >>> c.title_color(SortKey.cpu)
@@ -291,6 +291,8 @@ class Column:
     'green'
     >>> c.render('1234')
     '1234  '
+    >>> c.render('12345678')
+    '123456'
     """
 
     key: str = attr.ib(repr=False)
@@ -298,6 +300,7 @@ class Column:
     template_h: str = attr.ib()
     mandatory: bool = False
     sort_key: Optional[SortKey] = None
+    max_width: Optional[int] = attr.ib(default=None, repr=False)
 
     @template_h.validator
     def _template_h_is_a_format_string_(self, attribute: Any, value: str) -> None:
@@ -328,7 +331,7 @@ class Column:
         return "green"
 
     def render(self, value: str) -> str:
-        return self.template_h % value
+        return self.template_h % value[: self.max_width]
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
@@ -368,12 +371,14 @@ class UI:
                 key="appname",
                 name="APP",
                 template_h="%16s ",
+                max_width=16,
             )
         if Flag.CLIENT & flag:
             add_column(
                 key="client",
                 name="CLIENT",
                 template_h="%16s ",
+                max_width=16,
             )
         if Flag.CPU & flag:
             add_column(
@@ -388,6 +393,7 @@ class UI:
                 name="DATABASE",
                 template_h=f"%-{max_db_length}s ",
                 sort_key=None,
+                max_width=16,
             )
         if Flag.IOWAIT & flag:
             add_column(key="iowait", name="IOW", template_h="%4s ")
@@ -399,7 +405,7 @@ class UI:
                 sort_key=SortKey.mem,
             )
         if Flag.MODE & flag:
-            add_column(key="mode", name="MODE", template_h="%16s ")
+            add_column(key="mode", name="MODE", template_h="%16s ", max_width=16)
         if Flag.PID & flag:
             add_column(key="pid", name="PID", template_h="%-6s ")
         add_column(key="query", name="Query", template_h=" %2s")
@@ -415,6 +421,7 @@ class UI:
                 key="relation",
                 name="RELATION",
                 template_h="%9s ",
+                max_width=9,
             )
         add_column(key="state", name="state", template_h=" %17s  ")
         if Flag.TIME & flag:
@@ -425,9 +432,9 @@ class UI:
                 sort_key=SortKey.duration,
             )
         if Flag.TYPE & flag:
-            add_column(key="type", name="TYPE", template_h="%16s ")
+            add_column(key="type", name="TYPE", template_h="%16s ", max_width=16)
         if Flag.USER & flag:
-            add_column(key="user", name="USER", template_h="%16s ")
+            add_column(key="user", name="USER", template_h="%16s ", max_width=16)
         if Flag.WAIT & flag:
             add_column(key="wait", name="W", template_h="%2s ")
         if Flag.WRITE & flag:

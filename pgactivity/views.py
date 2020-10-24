@@ -447,11 +447,10 @@ def processes_rows(
     def cell(
         process: Union[RunningProcess, BWProcess, LocalRunningProcess],
         key: str,
-        crop: Optional[int],
         transform: Callable[[Any], str] = str,
         color_key: Optional[str] = None,
     ) -> None:
-        column_value = transform(getattr(process, key))[:crop]
+        column_value = transform(getattr(process, key))
         color_key = color_key or key
         text_append(f"{color_for(color_key)}{ui.column(key).render(column_value)}")
 
@@ -461,33 +460,33 @@ def processes_rows(
     for process in processes:
         text: List[str] = []
         if flag & Flag.PID:
-            cell(process, "pid", None)
+            cell(process, "pid")
         if flag & Flag.DATABASE:
-            cell(process, "database", 16)
+            cell(process, "database")
         if flag & Flag.APPNAME:
-            cell(process, "appname", 16)
+            cell(process, "appname")
         if flag & Flag.USER:
-            cell(process, "user", 16)
+            cell(process, "user")
         if flag & Flag.CLIENT:
-            cell(process, "client", 16)
+            cell(process, "client")
         if query_mode == QueryMode.activities and isinstance(
             process, LocalRunningProcess
         ):
             if flag & Flag.CPU:
-                cell(process, "cpu", None)
+                cell(process, "cpu")
             if flag & Flag.MEM:
-                cell(process, "mem", None, lambda v: str(round(v, 1)))
+                cell(process, "mem", lambda v: str(round(v, 1)))
             if flag & Flag.READ:
-                cell(process, "read", None, naturalsize)
+                cell(process, "read", naturalsize)
             if flag & Flag.WRITE:
-                cell(process, "write", None, naturalsize)
+                cell(process, "write", naturalsize)
 
         elif query_mode in (QueryMode.waiting, QueryMode.blocking):
             assert isinstance(process, BWProcess), process
             if flag & Flag.RELATION:
-                cell(process, "relation", 9)
+                cell(process, "relation")
             if flag & Flag.TYPE:
-                cell(process, "type", 16)
+                cell(process, "type")
 
             if flag & Flag.MODE:
                 if process.mode in (
@@ -498,7 +497,7 @@ def processes_rows(
                     mode_color = "mode_red"
                 else:
                     mode_color = "mode_yellow"
-                cell(process, "mode", 16, color_key=mode_color)
+                cell(process, "mode", color_key=mode_color)
 
         if flag & Flag.TIME:
             ctime, color = format_duration(process.duration)
