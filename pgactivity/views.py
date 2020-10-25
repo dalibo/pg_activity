@@ -536,7 +536,7 @@ def processes_rows(
         query = format_query(process.query, process.is_parallel_worker)
 
         if verbose_mode == QueryDisplayMode.truncate:
-            cell(query[:dif], ui.column("query"), "query")
+            query_value = query[:dif]
         else:
             if verbose_mode == QueryDisplayMode.wrap_noindent:
                 if term.length(query.split(" ", 1)[0]) >= dif:
@@ -549,13 +549,15 @@ def processes_rows(
                     query_lines = [wrapped_lines[0]] + term.wrap(
                         " ".join(wrapped_lines[1:]), width=term.width
                     )
-                cell("\n".join(query_lines), ui.column("query"), "query")
+                query_value = "\n".join(query_lines)
             else:
                 assert (
                     verbose_mode == QueryDisplayMode.wrap
                 ), f"unexpected mode {verbose_mode}"
                 wrapped_lines = term.wrap(query, width=dif)
-                cell(f"\n{indent}".join(wrapped_lines), ui.column("query"), "query")
+                query_value = f"\n{indent}".join(wrapped_lines)
+
+        cell(query_value, ui.column("query"), "query")
 
         for line in ("".join(text) + term.normal).splitlines():
             yield line
