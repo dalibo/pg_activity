@@ -401,7 +401,7 @@ class UI:
                 max_width=16,
             )
         if Flag.IOWAIT & flag:
-            add_column(key="iowait", name="IOW", template_h="%4s ")
+            add_column(key="iowait", name="IOW", template_h="%4s ", transform=utils.yn)
         if Flag.MEM & flag:
             add_column(
                 key="mem",
@@ -443,7 +443,7 @@ class UI:
         if Flag.USER & flag:
             add_column(key="user", name="USER", template_h="%16s ", max_width=16)
         if Flag.WAIT & flag:
-            add_column(key="wait", name="W", template_h="%2s ")
+            add_column(key="wait", name="W", template_h="%2s ", transform=utils.yn)
         if Flag.WRITE & flag:
             add_column(
                 key="write",

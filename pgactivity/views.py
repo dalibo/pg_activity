@@ -450,6 +450,9 @@ def processes_rows(
     ) -> None:
         text_append(f"{color_for(color_key)}{column.render(value)}")
 
+    def wait_color(wait: bool) -> str:
+        return "wait_red" if wait else "wait_green"
+
     flag = ui.flag
     query_mode = ui.query_mode
 
@@ -502,22 +505,14 @@ def processes_rows(
 
         if query_mode == QueryMode.activities and flag & Flag.WAIT:
             assert isinstance(process, RunningProcess)
-            if process.wait:
-                wait_value, wait_color = "Y", "wait_red"
-            else:
-                wait_value, wait_color = "N", "wait_green"
-            cell(wait_value, ui.column("wait"), wait_color)
+            cell(process.wait, ui.column("wait"), wait_color(process.wait))
 
         if (
             isinstance(process, LocalRunningProcess)
             and query_mode == QueryMode.activities
             and flag & Flag.IOWAIT
         ):
-            if process.io_wait:
-                iowait_value, iowait_color = "Y", "wait_red"
-            else:
-                iowait_value, iowait_color = "N", "wait_green"
-            cell(iowait_value, ui.column("iowait"), iowait_color)
+            cell(process.io_wait, ui.column("iowait"), wait_color(process.io_wait))
 
         state = utils.short_state(process.state)
         if state == "active":
