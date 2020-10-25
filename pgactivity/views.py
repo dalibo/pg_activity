@@ -536,27 +536,26 @@ def processes_rows(
         query = format_query(process.query, process.is_parallel_worker)
 
         if verbose_mode == QueryDisplayMode.truncate:
-            text_append(" " + f"{color_for('query')}{query[:dif]}")
+            cell(query[:dif], ui.column("query"), "query")
         else:
-            query_r = f"{color_for('query')}{query}"
             if verbose_mode == QueryDisplayMode.wrap_noindent:
-                if term.length(query_r.split(" ", 1)[0]) >= dif:
+                if term.length(query.split(" ", 1)[0]) >= dif:
                     # Query too long to even start on the first line, wrap all
                     # lines.
-                    query_lines = term.wrap(query_r, width=term.width)
+                    query_lines = term.wrap(query, width=term.width)
                 else:
                     # Only wrap subsequent lines.
-                    wrapped_lines = term.wrap(query_r, width=dif)
-                    query_lines = [" " + wrapped_lines[0]] + term.wrap(
+                    wrapped_lines = term.wrap(query, width=dif)
+                    query_lines = [wrapped_lines[0]] + term.wrap(
                         " ".join(wrapped_lines[1:]), width=term.width
                     )
-                text_append("\n".join(query_lines))
+                cell("\n".join(query_lines), ui.column("query"), "query")
             else:
                 assert (
                     verbose_mode == QueryDisplayMode.wrap
                 ), f"unexpected mode {verbose_mode}"
-                wrapped_lines = term.wrap(" " + query_r, width=dif)
-                text_append(f"\n{indent}".join(wrapped_lines))
+                wrapped_lines = term.wrap(query, width=dif)
+                cell(f"\n{indent}".join(wrapped_lines), ui.column("query"), "query")
 
         for line in ("".join(text) + term.normal).splitlines():
             yield line
