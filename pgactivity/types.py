@@ -706,7 +706,7 @@ class SystemProcess(Deserializable):
     cpu_times: Tuple[float, ...]
     read_delta: float
     write_delta: float
-    io_wait: str
+    io_wait: bool
     psutil_proc: Optional[psutil.Process]
 
 
@@ -716,7 +716,7 @@ class LocalRunningProcess(RunningProcess):
     mem: float
     read: float
     write: float
-    io_wait: str
+    io_wait: bool
 
     @classmethod
     def from_process(

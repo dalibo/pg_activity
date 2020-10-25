@@ -513,8 +513,7 @@ def processes_rows(
             and query_mode == QueryMode.activities
             and flag & Flag.IOWAIT
         ):
-            assert process.io_wait in "YN", process.io_wait
-            if process.io_wait == "Y":
+            if process.io_wait:
                 iowait_value, iowait_color = "Y", "wait_red"
             else:
                 iowait_value, iowait_color = "N", "wait_green"

@@ -143,7 +143,7 @@ Tests for processes_rows()
 ...         query="UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;",
 ...         duration=0.0,
 ...         wait=False,
-...         io_wait="N",
+...         io_wait=False,
 ...         is_parallel_worker=False,
 ...     ),
 ...     LocalRunningProcess(
@@ -160,7 +160,7 @@ Tests for processes_rows()
 ...         query="UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;",
 ...         duration=0.000413,
 ...         wait=False,
-...         io_wait="Y",
+...         io_wait=True,
 ...         is_parallel_worker=True,
 ...     ),
 ...     LocalRunningProcess(
@@ -177,7 +177,7 @@ Tests for processes_rows()
 ...         query="SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id) WHERE s.date > CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name, p.price, p.cost HAVING sum(p.price * s.units) > 5000;",
 ...         duration=1234,
 ...         wait=True,
-...         io_wait="N",
+...         io_wait=False,
 ...         is_parallel_worker=False,
 ...     ),
 ... ]

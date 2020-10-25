@@ -9,6 +9,17 @@ import humanize
 naturalsize = functools.partial(humanize.naturalsize, gnu=True, format="%.2f")
 
 
+def yn(value: bool) -> str:
+    """Return 'Y' or 'N' for a boolean value.
+
+    >>> yn(True)
+    'Y'
+    >>> yn(False)
+    'N'
+    """
+    return "Y" if value else "N"
+
+
 def clean_str(string: str) -> str:
     r"""
     Strip and replace some special characters.
@@ -71,13 +82,13 @@ def csv_write(
     ...      'read': 0.0, 'write': 0.0, 'state': 'active',
     ...      'query': 'autovacuum: VACUUM ANALYZE public.pgbench_tellers',
     ...      'duration': 0.348789, 'wait': False,
-    ...      'io_wait': 'N', 'is_parallel_worker': False},
+    ...      'io_wait': False, 'is_parallel_worker': False},
     ...     {'pid': 25068, 'appname': 'pgbench', 'database': 'pgbench', 'user':
     ...      'postgres', 'client': 'local', 'cpu': 0.0, 'mem': 2.4694780629380646,
     ...      'read': 278536.76590087387, 'write': 835610.2977026217,
     ...      'state': 'idle in transaction',
     ...      'query': 'INSERT INTO pgbench_history (tid, bid, aid, delta, mtime) VALUES (625, 87, 4368910, -341, CURRENT_TIMESTAMP);',
-    ...      'duration': 0.000105, 'wait': False, 'io_wait': 'N',
+    ...      'duration': 0.000105, 'wait': False, 'io_wait': False,
     ...      'is_parallel_worker': False},
     ...     {'pid': 25379, 'appname': 'pgbench', 'database': 'pgbench',
     ...      'user': 'postgres', 'client': 'local', 'state': 'active',
@@ -95,10 +106,10 @@ def csv_write(
     ...     content = f.read()
     >>> print(content, end="")  # doctest: +ELLIPSIS
     datetimeutc;pid;database;appname;user;client;cpu;memory;read;write;duration;wait;io_wait;state;query
-    "...-...-...T...Z";"25199";"pgbench";"";"None";"local";"0.0";"0.6504979545924837";"0.0";"0.0";"0.348789";"False";"N";"active";"autovacuum: VACUUM ANALYZE public.pgbench_tellers"
-    "...-...-...T...Z";"25068";"pgbench";"pgbench";"postgres";"local";"0.0";"2.4694780629380646";"278536.76590087387";"835610.2977026217";"0.000105";"False";"N";"idle in transaction";"INSERT INTO pgbench_history (tid, bid, aid, delta, mtime) VALUES (625, 87, 4368910, -341, CURRENT_TIMESTAMP);"
-    "...-...-...T...Z";"25379";"pgbench";"pgbench";"postgres";"local";"N/A";"N/A";"N/A";"N/A";"0";"False";"N/A";"active";"UPDATE pgbench_branches SET bbalance = bbalance + -49 WHERE bid = 73;"
-    "...-...-...T...Z";"25392";"pgbench";"pgbench";"postgres";"local";"N/A";"N/A";"N/A";"N/A";"0";"False";"N/A";"active";"BEGIN;"
+    "...-...-...T...Z";"25199";"pgbench";"";"None";"local";"0.0";"0.6504979545924837";"0.0";"0.0";"0.348789";"N";"N";"active";"autovacuum: VACUUM ANALYZE public.pgbench_tellers"
+    "...-...-...T...Z";"25068";"pgbench";"pgbench";"postgres";"local";"0.0";"2.4694780629380646";"278536.76590087387";"835610.2977026217";"0.000105";"N";"N";"idle in transaction";"INSERT INTO pgbench_history (tid, bid, aid, delta, mtime) VALUES (625, 87, 4368910, -341, CURRENT_TIMESTAMP);"
+    "...-...-...T...Z";"25379";"pgbench";"pgbench";"postgres";"local";"N/A";"N/A";"N/A";"N/A";"0";"N";"N/A";"active";"UPDATE pgbench_branches SET bbalance = bbalance + -49 WHERE bid = 73;"
+    "...-...-...T...Z";"25392";"pgbench";"pgbench";"postgres";"local";"N/A";"N/A";"N/A";"N/A";"0";"N";"N/A";"active";"BEGIN;"
     """
 
     def clean_str_csv(s: str) -> str:
@@ -129,6 +140,11 @@ def csv_write(
             + "\n"
         )
 
+    def yn_na(value: Optional[bool]) -> str:
+        if value is None:
+            return "N/A"
+        return yn(value)
+
     for p in procs:
         dt = datetime.utcnow().strftime("%Y-%m-%dT%H:%m:%SZ")
         pid = p.get("pid", "N/A")
@@ -141,8 +157,8 @@ def csv_write(
         read = p.get("read", "N/A")
         write = p.get("write", "N/A")
         duration = p.get("duration", "N/A")
-        wait = p.get("wait", "N/A")
-        io_wait = p.get("io_wait", "N/A")
+        wait = yn_na(p.get("wait"))
+        io_wait = yn_na(p.get("io_wait"))
         state = p.get("state", "N/A")
         query = clean_str_csv(p.get("query", "N/A"))
         fobj.write(

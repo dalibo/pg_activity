@@ -51,7 +51,7 @@ def sys_get_proc(pid: int) -> Optional[SystemProcess]:
         cpu_times=cpu_times,
         read_delta=0,
         write_delta=0,
-        io_wait="Y" if status_iow == "disk sleep" else "N",
+        io_wait=status_iow == "disk sleep",
         psutil_proc=psproc,
     )
 
@@ -161,7 +161,7 @@ def sorted(processes: List[T], *, key: SortKey, reverse: bool = False) -> List[T
     ...         query="UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;",
     ...         duration=0,
     ...         wait=False,
-    ...         io_wait="N",
+    ...         io_wait=False,
     ...         is_parallel_worker=False,
     ...     ),
     ...     LocalRunningProcess(
@@ -178,7 +178,7 @@ def sorted(processes: List[T], *, key: SortKey, reverse: bool = False) -> List[T
     ...         query="UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;",
     ...         duration=0,
     ...         wait=False,
-    ...         io_wait="N",
+    ...         io_wait=False,
     ...         is_parallel_worker=True,
     ...     ),
     ... ]

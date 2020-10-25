@@ -22,7 +22,7 @@
                     "count": 830
                 },
                 "io_time": 1596806345.17328,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 4046848,
                     "chars": 4251702,
@@ -73,7 +73,7 @@
                     "count": 810
                 },
                 "io_time": 1596806345.17619,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 5177344,
                     "chars": 5357617,
@@ -124,7 +124,7 @@
                     "count": 815
                 },
                 "io_time": 1596806345.17112,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 4186112,
                     "chars": 4399155,
@@ -175,7 +175,7 @@
                     "count": 790
                 },
                 "io_time": 1596806345.17362,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 4792320,
                     "chars": 4988978,
@@ -226,7 +226,7 @@
                     "count": 784
                 },
                 "io_time": 1596806345.17073,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 5439488,
                     "chars": 5603374,
@@ -277,7 +277,7 @@
                     "count": 763
                 },
                 "io_time": 1596806345.17196,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 4792320,
                     "chars": 4964391,
@@ -328,7 +328,7 @@
                     "count": 770
                 },
                 "io_time": 1596806345.17287,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 5095424,
                     "chars": 5234725,
@@ -379,7 +379,7 @@
                     "count": 782
                 },
                 "io_time": 1596806345.17414,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 5259264,
                     "chars": 5496882,
@@ -430,7 +430,7 @@
                     "count": 805
                 },
                 "io_time": 1596806345.17465,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 4702208,
                     "chars": 4866103,
@@ -481,7 +481,7 @@
                     "count": 772
                 },
                 "io_time": 1596806345.17591,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 4374528,
                     "chars": 4489270,
@@ -532,7 +532,7 @@
                     "count": 770
                 },
                 "io_time": 1596806345.17499,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 4481024,
                     "chars": 4595765,
@@ -583,7 +583,7 @@
                     "count": 784
                 },
                 "io_time": 1596806345.16938,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 4718592,
                     "chars": 4890669,
@@ -634,7 +634,7 @@
                     "count": 762
                 },
                 "io_time": 1596806345.17035,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 4939776,
                     "chars": 5029940,
@@ -685,7 +685,7 @@
                     "count": 768
                 },
                 "io_time": 1596806345.17153,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 4177920,
                     "chars": 4358196,
@@ -736,7 +736,7 @@
                     "count": 757
                 },
                 "io_time": 1596806345.17238,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 4661248,
                     "chars": 4784178,
@@ -787,7 +787,7 @@
                     "count": 745
                 },
                 "io_time": 1596806345.17644,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 4669440,
                     "chars": 4792367,
@@ -838,7 +838,7 @@
                     "count": 753
                 },
                 "io_time": 1596806345.17561,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 4923392,
                     "chars": 5103656,
@@ -889,7 +889,7 @@
                     "count": 747
                 },
                 "io_time": 1596806345.1753,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 4382720,
                     "chars": 4546614,
@@ -940,7 +940,7 @@
                     "count": 726
                 },
                 "io_time": 1596806345.16992,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 3850240,
                     "chars": 4005915,
@@ -993,7 +993,7 @@
                     "count": 817
                 },
                 "io_time": 1596806345.13955,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 3915776,
                     "chars": 4112438,
@@ -1044,7 +1044,7 @@
                     "count": 799
                 },
                 "io_time": 1596806345.14185,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 5095424,
                     "chars": 5275695,
@@ -1095,7 +1095,7 @@
                     "count": 805
                 },
                 "io_time": 1596806345.1446,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 4145152,
                     "chars": 4358195,
@@ -1146,7 +1146,7 @@
                     "count": 777
                 },
                 "io_time": 1596806345.14246,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 4661248,
                     "chars": 4849713,
@@ -1197,7 +1197,7 @@
                     "count": 773
                 },
                 "io_time": 1596806345.14274,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 5365760,
                     "chars": 5529645,
@@ -1248,7 +1248,7 @@
                     "count": 755
                 },
                 "io_time": 1596806345.14365,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 4759552,
                     "chars": 4931622,
@@ -1299,7 +1299,7 @@
                     "count": 757
                 },
                 "io_time": 1596806345.13715,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 4915200,
                     "chars": 5054499,
@@ -1350,7 +1350,7 @@
                     "count": 775
                 },
                 "io_time": 1596806345.14492,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 5210112,
                     "chars": 5439538,
@@ -1401,7 +1401,7 @@
                     "count": 791
                 },
                 "io_time": 1596806345.14214,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 4653056,
                     "chars": 4808758,
@@ -1452,7 +1452,7 @@
                     "count": 752
                 },
                 "io_time": 1596806345.13785,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 4161536,
                     "chars": 4276275,
@@ -1503,7 +1503,7 @@
                     "count": 759
                 },
                 "io_time": 1596806345.13624,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 4374528,
                     "chars": 4489268,
@@ -1554,7 +1554,7 @@
                     "count": 776
                 },
                 "io_time": 1596806345.14397,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 4669440,
                     "chars": 4841517,
@@ -1605,7 +1605,7 @@
                     "count": 754
                 },
                 "io_time": 1596806345.14303,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 4857856,
                     "chars": 4948020,
@@ -1656,7 +1656,7 @@
                     "count": 759
                 },
                 "io_time": 1596806345.14158,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 4046848,
                     "chars": 4227123,
@@ -1707,7 +1707,7 @@
                     "count": 747
                 },
                 "io_time": 1596806345.14336,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 4587520,
                     "chars": 4710448,
@@ -1758,7 +1758,7 @@
                     "count": 724
                 },
                 "io_time": 1596806345.14033,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 4186112,
                     "chars": 4358178,
@@ -1809,7 +1809,7 @@
                     "count": 730
                 },
                 "io_time": 1596806345.13865,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 4505600,
                     "chars": 4612142,
@@ -1860,7 +1860,7 @@
                     "count": 740
                 },
                 "io_time": 1596806345.1443,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 4825088,
                     "chars": 4988967,
@@ -1911,7 +1911,7 @@
                     "count": 733
                 },
                 "io_time": 1596806345.14122,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 4259840,
                     "chars": 4423733,
@@ -1962,7 +1962,7 @@
                     "count": 717
                 },
                 "io_time": 1596806345.14523,
-                "io_wait": "N",
+                "io_wait": false,
                 "io_write": {
                     "bytes": 3809280,
                     "chars": 3964955,
