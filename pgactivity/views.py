@@ -1,6 +1,5 @@
 import functools
 import itertools
-from datetime import timedelta
 from textwrap import dedent
 from typing import (
     Any,
@@ -302,49 +301,6 @@ def format_query(query: str, is_parallel_worker: bool) -> str:
     return prefix + utils.clean_str(query)
 
 
-def format_duration(duration: Optional[float]) -> Tuple[str, str]:
-    """Return a string from 'duration' value along with the color for rendering.
-
-    >>> format_duration(None)
-    ('N/A     ', 'time_green')
-    >>> format_duration(-0.000062)
-    ('0.000000', 'time_green')
-    >>> format_duration(0.1)
-    ('0.100000', 'time_green')
-    >>> format_duration(1.2)
-    ('00:01.20', 'time_yellow')
-    >>> format_duration(12345)
-    ('205:45.00', 'time_red')
-    >>> format_duration(60001)
-    ('16 h', 'time_red')
-    """
-    if duration is None:
-        return "N/A".ljust(8), "time_green"
-
-    if duration < 1:
-        if duration < 0:
-            duration = 0
-        ctime = f"{duration:.6f}"
-        color = "time_green"
-    elif duration < 60000:
-        if duration < 3:
-            color = "time_yellow"
-        else:
-            color = "time_red"
-        duration_d = timedelta(seconds=float(duration))
-        mic = "%.6d" % duration_d.microseconds
-        ctime = "%s:%s.%s" % (
-            str((duration_d.seconds // 60)).zfill(2),
-            str((duration_d.seconds % 60)).zfill(2),
-            mic[:2],
-        )
-    else:
-        ctime = "%s h" % str(int(duration / 3600))
-        color = "time_red"
-
-    return ctime, color
-
-
 @limit
 def processes_rows(
     term: Terminal,
@@ -371,12 +327,8 @@ def processes_rows(
     def cell(
         value: Any,
         column: Column,
-        color_key: str,
     ) -> None:
-        text_append(f"{color_for(color_key)}{column.render(value)}")
-
-    def wait_color(wait: bool) -> str:
-        return "wait_red" if wait else "wait_green"
+        text_append(f"{color_for(column.color(value))}{column.render(value)}")
 
     flag = ui.flag
     query_mode = ui.query_mode
@@ -384,71 +336,52 @@ def processes_rows(
     for process in processes:
         text: List[str] = []
         if flag & Flag.PID:
-            cell(process.pid, ui.column("pid"), "pid")
+            cell(process.pid, ui.column("pid"))
         if flag & Flag.DATABASE:
-            cell(process.database, ui.column("database"), "database")
+            cell(process.database, ui.column("database"))
         if flag & Flag.APPNAME:
-            cell(process.appname, ui.column("appname"), "appname")
+            cell(process.appname, ui.column("appname"))
         if flag & Flag.USER:
-            cell(process.user, ui.column("user"), "user")
+            cell(process.user, ui.column("user"))
         if flag & Flag.CLIENT:
-            cell(process.client, ui.column("client"), "client")
+            cell(process.client, ui.column("client"))
         if query_mode == QueryMode.activities and isinstance(
             process, LocalRunningProcess
         ):
             if flag & Flag.CPU:
-                cell(process.cpu, ui.column("cpu"), "cpu")
+                cell(process.cpu, ui.column("cpu"))
             if flag & Flag.MEM:
-                cell(process.mem, ui.column("mem"), "mem")
+                cell(process.mem, ui.column("mem"))
             if flag & Flag.READ:
-                cell(process.read, ui.column("read"), "read")
+                cell(process.read, ui.column("read"))
             if flag & Flag.WRITE:
-                cell(process.write, ui.column("write"), "write")
+                cell(process.write, ui.column("write"))
 
         elif query_mode in (QueryMode.waiting, QueryMode.blocking):
             assert isinstance(process, BWProcess), process
             if flag & Flag.RELATION:
-                cell(process.relation, ui.column("relation"), "relation")
+                cell(process.relation, ui.column("relation"))
             if flag & Flag.TYPE:
-                cell(process.type, ui.column("type"), "type")
-
+                cell(process.type, ui.column("type"))
             if flag & Flag.MODE:
-                mode = process.mode
-                if mode in (
-                    "ExclusiveLock",
-                    "RowExclusiveLock",
-                    "AccessExclusiveLock",
-                ):
-                    mode_color = "mode_red"
-                else:
-                    mode_color = "mode_yellow"
-                cell(mode, ui.column("mode"), mode_color)
+                cell(process.mode, ui.column("mode"))
 
         if flag & Flag.TIME:
-            ctime, color = format_duration(process.duration)
-            cell(ctime, ui.column("time"), color)
+            cell(process.duration, ui.column("time"))
 
         if query_mode == QueryMode.activities and flag & Flag.WAIT:
             assert isinstance(process, RunningProcess)
-            cell(process.wait, ui.column("wait"), wait_color(process.wait))
+            cell(process.wait, ui.column("wait"))
 
         if (
             isinstance(process, LocalRunningProcess)
             and query_mode == QueryMode.activities
             and flag & Flag.IOWAIT
         ):
-            cell(process.io_wait, ui.column("iowait"), wait_color(process.io_wait))
+            cell(process.io_wait, ui.column("iowait"))
 
         state = utils.short_state(process.state)
-        if state == "active":
-            color_state = "state_green"
-        elif state == "idle in trans":
-            color_state = "state_yellow"
-        elif state == "idle in trans (a)":
-            color_state = "state_red"
-        else:
-            color_state = "state_default"
-        cell(state, ui.column("state"), color_state)
+        cell(state, ui.column("state"))
 
         indent = get_indent(ui) + " "
         dif = term.width - len(indent)
@@ -482,7 +415,7 @@ def processes_rows(
                 wrapped_lines = term.wrap(query, width=dif)
                 query_value = f"\n{indent}".join(wrapped_lines)
 
-        cell(query_value, ui.column("query"), "query")
+        cell(query_value, ui.column("query"))
 
         for line in ("".join(text) + term.normal).splitlines():
             yield line

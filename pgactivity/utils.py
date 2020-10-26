@@ -1,7 +1,7 @@
 import functools
 import re
-from datetime import datetime
-from typing import Any, IO, Iterable, Mapping, Optional
+from datetime import datetime, timedelta
+from typing import Any, IO, Iterable, Mapping, Optional, Tuple
 
 import humanize
 
@@ -50,6 +50,50 @@ def get_duration(duration: Optional[float]) -> float:
     if duration is None or float(duration) < 0:
         return 0
     return float(duration)
+
+
+@functools.lru_cache(maxsize=2)
+def format_duration(duration: Optional[float]) -> Tuple[str, str]:
+    """Return a string from 'duration' value along with the color for rendering.
+
+    >>> format_duration(None)
+    ('N/A     ', 'time_green')
+    >>> format_duration(-0.000062)
+    ('0.000000', 'time_green')
+    >>> format_duration(0.1)
+    ('0.100000', 'time_green')
+    >>> format_duration(1.2)
+    ('00:01.20', 'time_yellow')
+    >>> format_duration(12345)
+    ('205:45.00', 'time_red')
+    >>> format_duration(60001)
+    ('16 h', 'time_red')
+    """
+    if duration is None:
+        return "N/A".ljust(8), "time_green"
+
+    if duration < 1:
+        if duration < 0:
+            duration = 0
+        ctime = f"{duration:.6f}"
+        color = "time_green"
+    elif duration < 60000:
+        if duration < 3:
+            color = "time_yellow"
+        else:
+            color = "time_red"
+        duration_d = timedelta(seconds=float(duration))
+        mic = "%.6d" % duration_d.microseconds
+        ctime = "%s:%s.%s" % (
+            str((duration_d.seconds // 60)).zfill(2),
+            str((duration_d.seconds % 60)).zfill(2),
+            mic[:2],
+        )
+    else:
+        ctime = "%s h" % str(int(duration / 3600))
+        color = "time_red"
+
+    return ctime, color
 
 
 def short_state(state: str) -> str:

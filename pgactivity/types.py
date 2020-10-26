@@ -16,7 +16,7 @@ from typing import (
 import attr
 import psutil
 
-from . import utils
+from . import colors, utils
 
 
 T = TypeVar("T")
@@ -281,6 +281,9 @@ class DurationMode(enum.IntEnum):
     backend = 3
 
 
+_color_key_marker = f"{id(object())}"
+
+
 @attr.s(auto_attribs=True, frozen=True, slots=True)
 class Column:
     """A column in stats table.
@@ -297,6 +300,8 @@ class Column:
     '4321  '
     >>> c.render('12345678')
     '876543'
+    >>> c.color_key
+    'pid'
     """
 
     key: str = attr.ib(repr=False)
@@ -306,6 +311,9 @@ class Column:
     sort_key: Optional[SortKey] = None
     max_width: Optional[int] = attr.ib(default=None, repr=False)
     transform: Callable[[Any], str] = attr.ib(default=str, repr=False)
+    color_key: Union[str, Callable[[Any], str]] = attr.ib(
+        default=_color_key_marker, repr=False
+    )
 
     @template_h.validator
     def _template_h_is_a_format_string_(self, attribute: Any, value: str) -> None:
@@ -327,6 +335,10 @@ class Column:
                 f"{attribute.name} must be a format string with one placeholder"
             )
 
+    def __attrs_post_init__(self) -> None:
+        if self.color_key == _color_key_marker:
+            object.__setattr__(self, "color_key", self.key)
+
     def title_render(self) -> str:
         return self.template_h % self.name
 
@@ -337,6 +349,11 @@ class Column:
 
     def render(self, value: Any) -> str:
         return self.template_h % self.transform(value)[: self.max_width]
+
+    def color(self, value: Any) -> str:
+        if callable(self.color_key):
+            return self.color_key(value)
+        return self.color_key
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
@@ -401,7 +418,13 @@ class UI:
                 max_width=16,
             )
         if Flag.IOWAIT & flag:
-            add_column(key="iowait", name="IOW", template_h="%4s ", transform=utils.yn)
+            add_column(
+                key="iowait",
+                name="IOW",
+                template_h="%4s ",
+                transform=utils.yn,
+                color_key=colors.wait,
+            )
         if Flag.MEM & flag:
             add_column(
                 key="mem",
@@ -411,7 +434,13 @@ class UI:
                 transform=lambda v: str(round(v, 1)),
             )
         if Flag.MODE & flag:
-            add_column(key="mode", name="MODE", template_h="%16s ", max_width=16)
+            add_column(
+                key="mode",
+                name="MODE",
+                template_h="%16s ",
+                max_width=16,
+                color_key=colors.lock_mode,
+            )
         if Flag.PID & flag:
             add_column(key="pid", name="PID", template_h="%-6s ")
         add_column(key="query", name="Query", template_h=" %2s")
@@ -430,20 +459,33 @@ class UI:
                 template_h="%9s ",
                 max_width=9,
             )
-        add_column(key="state", name="state", template_h=" %17s  ")
+        add_column(
+            key="state",
+            name="state",
+            template_h=" %17s  ",
+            color_key=colors.short_state,
+        )
         if Flag.TIME & flag:
             add_column(
                 key="time",
                 name="TIME+",
                 template_h="%9s ",
                 sort_key=SortKey.duration,
+                transform=lambda v: utils.format_duration(v)[0],
+                color_key=lambda v: utils.format_duration(v)[1],
             )
         if Flag.TYPE & flag:
             add_column(key="type", name="TYPE", template_h="%16s ", max_width=16)
         if Flag.USER & flag:
             add_column(key="user", name="USER", template_h="%16s ", max_width=16)
         if Flag.WAIT & flag:
-            add_column(key="wait", name="W", template_h="%2s ", transform=utils.yn)
+            add_column(
+                key="wait",
+                name="W",
+                template_h="%2s ",
+                transform=utils.yn,
+                color_key=colors.wait,
+            )
         if Flag.WRITE & flag:
             add_column(
                 key="write",

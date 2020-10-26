@@ -71,3 +71,29 @@ FIELD_BY_MODE = {
         "yellow": "yellow_bold",
     },
 }
+
+
+def short_state(state: str) -> str:
+    if state == "active":
+        return "state_green"
+    elif state == "idle in trans":
+        return "state_yellow"
+    elif state == "idle in trans (a)":
+        return "state_red"
+    else:
+        return "state_default"
+
+
+def lock_mode(mode: str) -> str:
+    if mode in (
+        "ExclusiveLock",
+        "RowExclusiveLock",
+        "AccessExclusiveLock",
+    ):
+        return "mode_red"
+    else:
+        return "mode_yellow"
+
+
+def wait(value: bool) -> str:
+    return "wait_red" if value else "wait_green"
