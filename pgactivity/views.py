@@ -36,7 +36,6 @@ from .types import (
     LocalRunningProcess,
     MemoryInfo,
     QueryDisplayMode,
-    QueryMode,
     RunningProcess,
     SystemInfo,
     UI,
@@ -330,57 +329,12 @@ def processes_rows(
     ) -> None:
         text_append(f"{color_for(column.color(value))}{column.render(value)}")
 
-    flag = ui.flag
-    query_mode = ui.query_mode
-
     for process in processes:
         text: List[str] = []
-        if flag & Flag.PID:
-            cell(process.pid, ui.column("pid"))
-        if flag & Flag.DATABASE:
-            cell(process.database, ui.column("database"))
-        if flag & Flag.APPNAME:
-            cell(process.appname, ui.column("appname"))
-        if flag & Flag.USER:
-            cell(process.user, ui.column("user"))
-        if flag & Flag.CLIENT:
-            cell(process.client, ui.column("client"))
-        if query_mode == QueryMode.activities and isinstance(
-            process, LocalRunningProcess
-        ):
-            if flag & Flag.CPU:
-                cell(process.cpu, ui.column("cpu"))
-            if flag & Flag.MEM:
-                cell(process.mem, ui.column("mem"))
-            if flag & Flag.READ:
-                cell(process.read, ui.column("read"))
-            if flag & Flag.WRITE:
-                cell(process.write, ui.column("write"))
-
-        elif query_mode in (QueryMode.waiting, QueryMode.blocking):
-            assert isinstance(process, BWProcess), process
-            if flag & Flag.RELATION:
-                cell(process.relation, ui.column("relation"))
-            if flag & Flag.TYPE:
-                cell(process.type, ui.column("type"))
-            if flag & Flag.MODE:
-                cell(process.mode, ui.column("mode"))
-
-        if flag & Flag.TIME:
-            cell(process.duration, ui.column("duration"))
-
-        if query_mode == QueryMode.activities and flag & Flag.WAIT:
-            assert isinstance(process, RunningProcess)
-            cell(process.wait, ui.column("wait"))
-
-        if (
-            isinstance(process, LocalRunningProcess)
-            and query_mode == QueryMode.activities
-            and flag & Flag.IOWAIT
-        ):
-            cell(process.io_wait, ui.column("io_wait"))
-
-        cell(process.state, ui.column("state"))
+        for column in ui.columns():
+            field = column.key
+            if field != "query":
+                cell(getattr(process, field), column)
 
         indent = get_indent(ui) + " "
         dif = term.width - len(indent)
