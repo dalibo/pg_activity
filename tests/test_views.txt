@@ -336,7 +336,8 @@ p.price, p.cost HAVING sum(p.price * s.units) > 5000;
 ...         is_parallel_worker=False,
 ...     ),
 ... ]
->>> ui = ui.evolve(query_mode=QueryMode.activities)
+>>> all_but_local_flags = Flag.PID|Flag.DATABASE|Flag.APPNAME|Flag.USER|Flag.CLIENT|Flag.TIME|Flag.WAIT
+>>> ui = UI.make(query_mode=QueryMode.activities,flag=all_but_local_flags)
 >>> processes_rows(term, ui, processes1b)
 6239   pgbench                   pgbench         postgres            local  0.000000  N      idle in trans   UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
 6228   pgbench                      none         postgres            local  0.000413  N             active   \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
