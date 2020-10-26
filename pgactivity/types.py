@@ -715,6 +715,7 @@ class BaseProcess:
     duration: float
     state: str
     query: str
+    is_parallel_worker: bool
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
