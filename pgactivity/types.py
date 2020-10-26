@@ -419,7 +419,7 @@ class UI:
             )
         if Flag.IOWAIT & flag:
             add_column(
-                key="iowait",
+                key="io_wait",
                 name="IOW",
                 template_h="%4s ",
                 transform=utils.yn,
@@ -508,7 +508,7 @@ class UI:
                 "write",
                 "duration",
                 "wait",
-                "iowait",
+                "io_wait",
                 "state",
                 "query",
             ],

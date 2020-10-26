@@ -378,7 +378,7 @@ def processes_rows(
             and query_mode == QueryMode.activities
             and flag & Flag.IOWAIT
         ):
-            cell(process.io_wait, ui.column("iowait"))
+            cell(process.io_wait, ui.column("io_wait"))
 
         cell(process.state, ui.column("state"))
 
