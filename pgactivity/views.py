@@ -367,7 +367,7 @@ def processes_rows(
                 cell(process.mode, ui.column("mode"))
 
         if flag & Flag.TIME:
-            cell(process.duration, ui.column("time"))
+            cell(process.duration, ui.column("duration"))
 
         if query_mode == QueryMode.activities and flag & Flag.WAIT:
             assert isinstance(process, RunningProcess)

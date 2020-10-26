@@ -468,7 +468,7 @@ class UI:
         )
         if Flag.TIME & flag:
             add_column(
-                key="time",
+                key="duration",
                 name="TIME+",
                 template_h="%9s ",
                 sort_key=SortKey.duration,
@@ -506,7 +506,7 @@ class UI:
                 "mem",
                 "read",
                 "write",
-                "time",
+                "duration",
                 "wait",
                 "iowait",
                 "state",
@@ -521,7 +521,7 @@ class UI:
                 "relation",
                 "type",
                 "mode",
-                "time",
+                "duration",
                 "state",
                 "query",
             ],
@@ -534,7 +534,7 @@ class UI:
                 "relation",
                 "type",
                 "mode",
-                "time",
+                "duration",
                 "state",
                 "query",
             ],
