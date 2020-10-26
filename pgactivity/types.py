@@ -3,6 +3,7 @@ from typing import (
     Any,
     Callable,
     Dict,
+    Iterable,
     Iterator,
     List,
     Mapping,
@@ -768,7 +769,12 @@ class LocalRunningProcess(RunningProcess):
         return cls(**dict(attr.asdict(process), **kwargs))
 
 
-LocalProcesses = Tuple[Union[List[BWProcess], List[LocalRunningProcess]], SystemInfo]
-ActivityStats = Union[List[RunningProcess], List[BWProcess], LocalProcesses]
-
-ProcessSet = Union[List[LocalRunningProcess], List[RunningProcess], List[BWProcess]]
+ActivityStats = Union[
+    Iterable[BWProcess],
+    Iterable[RunningProcess],
+    Tuple[Iterable[BWProcess], SystemInfo],
+    Tuple[Iterable[LocalRunningProcess], SystemInfo],
+]
+ProcessSet = Union[
+    Iterable[LocalRunningProcess], Iterable[RunningProcess], Iterable[BWProcess]
+]

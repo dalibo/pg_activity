@@ -35,6 +35,7 @@ from .types import (
     IOCounter,
     LocalRunningProcess,
     MemoryInfo,
+    ProcessSet,
     QueryDisplayMode,
     RunningProcess,
     SystemInfo,
@@ -414,7 +415,7 @@ def screen(
 ) -> None:
     """Display the screen."""
 
-    processes: Union[List[RunningProcess], List[BWProcess], List[LocalRunningProcess]]
+    processes: ProcessSet
     system_info: Optional[SystemInfo]
     if isinstance(activity_stats, tuple):
         processes, system_info = activity_stats
