@@ -1,3 +1,6 @@
+from . import utils
+
+
 FIELD_BY_MODE = {
     "pid": {"default": "cyan", "cursor": "cyan_reverse", "yellow": "yellow_bold"},
     "database": {
@@ -74,6 +77,7 @@ FIELD_BY_MODE = {
 
 
 def short_state(state: str) -> str:
+    state = utils.short_state(state)
     if state == "active":
         return "state_green"
     elif state == "idle in trans":

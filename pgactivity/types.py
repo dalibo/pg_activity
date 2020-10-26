@@ -463,6 +463,7 @@ class UI:
             key="state",
             name="state",
             template_h=" %17s  ",
+            transform=utils.short_state,
             color_key=colors.short_state,
         )
         if Flag.TIME & flag:

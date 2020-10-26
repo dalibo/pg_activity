@@ -380,8 +380,7 @@ def processes_rows(
         ):
             cell(process.io_wait, ui.column("iowait"))
 
-        state = utils.short_state(process.state)
-        cell(state, ui.column("state"))
+        cell(process.state, ui.column("state"))
 
         indent = get_indent(ui) + " "
         dif = term.width - len(indent)
