@@ -76,7 +76,8 @@ def ps_complete(
     for pg_proc in pg_processes:
         pid = pg_proc.pid
         new_proc = sys_get_proc(pid)
-        assert new_proc is not None
+        if new_proc is None:
+            continue
         try:
             # Getting informations from the previous loop
             proc = processes[pid]
