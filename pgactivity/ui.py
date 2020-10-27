@@ -60,7 +60,7 @@ def main(
 
     msg_pile = utils.MessagePile(2)
 
-    with term.fullscreen(), term.cbreak():
+    with term.fullscreen(), term.cbreak(), term.hidden_cursor():
         while True:
             pg_db_info = data.pg_get_db_info(
                 pg_db_info, using_rds=options.rds, skip_sizes=skip_sizes
