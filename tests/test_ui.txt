@@ -43,13 +43,6 @@ Default CLI options, passed to ui.main():
 ... }
 >>> options = optparse.Values(defaults=defaults)
 
->>> def mk_inkey(keys):
-...     def inkey(*args, **kwargs):
-...         inkey.call_args_list.append((args, kwargs))
-...         return Keystroke(keys.pop(0))
-...     inkey.call_args_list = []
-...     return inkey
-
 >>> term = blessed.Terminal(force_styling=None)
 >>> term.width, term.height
 (80, 25)
