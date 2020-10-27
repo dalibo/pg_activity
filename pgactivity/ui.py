@@ -58,6 +58,8 @@ def main(
     pg_procs = types.SelectableProcesses([])
     activity_stats: types.ActivityStats
 
+    msg_pile = utils.MessagePile(2)
+
     with term.fullscreen(), term.cbreak():
         while True:
             pg_db_info = data.pg_get_db_info(
@@ -103,6 +105,19 @@ def main(
                     pg_procs.select_prev()
                     wait_for = 3
                 elif key.name == keys.CANCEL_SELECTION:
+                    pg_procs.selected = None
+                    wait_for = None
+                elif pg_procs.selected and key in (
+                    keys.PROCESS_CANCEL,
+                    keys.PROCESS_KILL,
+                ):
+                    pid = pg_procs.selected
+                    if key == keys.PROCESS_CANCEL:
+                        data.pg_cancel_backend(pid)
+                        msg_pile.send(term.orange(f"Process {pid} cancelled"))
+                    elif key == keys.PROCESS_KILL:
+                        data.pg_terminate_backend(pid)
+                        msg_pile.send(term.red(f"Process {pid} terminated"))
                     pg_procs.selected = None
                     wait_for = None
                 else:
@@ -169,6 +184,7 @@ def main(
                     tps=tps,
                     active_connections=active_connections,
                     activity_stats=activity_stats,
+                    message=msg_pile.get(),
                     render_footer=render_footer,
                 )
 

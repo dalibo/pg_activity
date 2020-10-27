@@ -368,8 +368,15 @@ def processes_rows(
             yield line
 
 
-def footer(term: Terminal) -> None:
+def footer(term: Terminal, message: Optional[str] = None) -> None:
     """Display footer line."""
+    if message is None:
+        return footer_help(term)
+    print(term.center(message) + term.normal, end="")
+
+
+def footer_help(term: Terminal) -> None:
+    """Footer line with help keys."""
     query_modes_help = [
         ("/".join(keys[:-1]), qm.value) for qm, keys in KEYS_BY_QUERYMODE.items()
     ]
@@ -404,6 +411,7 @@ def screen(
     tps: int,
     active_connections: int,
     activity_stats: ActivityStats,
+    message: Optional[str],
     render_footer: bool = True,
 ) -> None:
     """Display the screen."""
@@ -440,4 +448,4 @@ def screen(
     )
     if render_footer:
         with term.location(x=0, y=top_height):
-            footer(term)
+            footer(term, message)

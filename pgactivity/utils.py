@@ -1,12 +1,41 @@
 import functools
 import re
 from datetime import datetime, timedelta
-from typing import Any, IO, Iterable, Mapping, Optional, Tuple
+from typing import Any, IO, Iterable, List, Mapping, Optional, Tuple
 
+import attr
 import humanize
 
 
 naturalsize = functools.partial(humanize.naturalsize, gnu=True, format="%.2f")
+
+
+@attr.s(auto_attribs=True, frozen=True, slots=True)
+class MessagePile:
+    """A pile of message.
+
+    >>> p = MessagePile(2)
+    >>> p.send("hello")
+    >>> p.get()
+    'hello'
+    >>> p.send("world")
+    >>> p.get()
+    'world'
+    >>> p.get()
+    'world'
+    >>> p.get()
+    """
+
+    n: int
+    messages: List[str] = attr.ib(default=attr.Factory(list), init=False)
+
+    def send(self, message: str) -> None:
+        self.messages[:] = [message] * self.n
+
+    def get(self) -> Optional[str]:
+        if self.messages:
+            return self.messages.pop()
+        return None
 
 
 def yn(value: bool) -> str:

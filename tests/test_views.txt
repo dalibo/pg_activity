@@ -348,8 +348,11 @@ p.price, p.cost HAVING sum(p.price * s.units) > 5000;
 Tests for footer()
 ------------------
 
->>> footer(term)
+>>> footer(term, None)
 F1/1 Running queries  F2/2 Waiting queries  F3/3 Blocking queries Space Pause            q Quit             h Help            
+>>> footer(term, "process 123 cancelled")
+                             process 123 cancelled                              
+
 
 
 Tests for screen()
@@ -357,6 +360,8 @@ Tests for screen()
 
 >>> processes3 = [processes1[0], processes1[2]]
 
+>>> host = Host("PostgreSQL 13", "testhost", "pgadm", "server.prod.tld", 5433, "app")
+>>> dbinfo = DBInfo(10203040506070809, 9999)
 >>> vmem = MemoryInfo(total=4_220_876_001, percent=2.5, used=1_001_232_608)
 >>> swap = MemoryInfo(total=6_312_423_424, used=2_340, percent=1.0)
 >>> io_read = IOCounter(bytes=128, count=6)
@@ -376,11 +381,12 @@ Tests for screen()
 >>> screen(
 ...     term,
 ...     ui,
-...     host=Host("PostgreSQL 13", "testhost", "pgadm", "server.prod.tld", 5433, "app"),
-...     dbinfo=DBInfo(10203040506070809, 9999),
+...     host=host,
+...     dbinfo=dbinfo,
 ...     tps=5,
 ...     active_connections=7,
 ...     activity_stats=(SelectableProcesses(processes3), sysinfo),
+...     message=None,
 ... )
 PostgreSQL 13 - testhost - pgadm@server.prod.tld:5433/app - Ref.: 10s - Min. duration: 1s
  Size:         9.06P - 9.76K/s        | TPS:               5      | Active connections:               7      | Duration mode:     backend
@@ -392,3 +398,23 @@ PID    DATABASE           CPU% MEM%              state   Query
 1234   business            2.4  1.0             active   SELECT product_id, p.na
 6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts
 F1/1 Running queries  F2/2 Waiting queries  F3/3 Blocking queries Space Pause            q Quit             h Help            
+
+>>> screen(
+...     term,
+...     ui,
+...     host=host,
+...     dbinfo=dbinfo,
+...     tps=5,
+...     active_connections=7,
+...     activity_stats=(SelectableProcesses(processes3[:-1]), sysinfo),
+...     message=f"Process {processes3[-1].pid} killed",
+... )
+PostgreSQL 13 - testhost - pgadm@server.prod.tld:5433/app - Ref.: 10s - Min. duration: 1s
+ Size:         9.06P - 9.76K/s        | TPS:               5      | Active connections:               7      | Duration mode:     backend
+ Mem.:      2.5% - 954.85M/3.93G      | IO Max:       76/s
+ Swap:       1.0% - 2.29K/5.88G       | Read:          128B/s - 6/s
+ Load:         0.50 1.90 0.93         | Write:          8B/s - 9/s
+                                RUNNING QUERIES
+PID    DATABASE           CPU% MEM%              state   Query                  
+1234   business            2.4  1.0             active   SELECT product_id, p.na
+                              Process 6239 killed                               
