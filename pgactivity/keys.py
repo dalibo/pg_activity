@@ -42,7 +42,6 @@ PAUSE_KEY = Key(PAUSE, "pause", "Space")
 
 BINDINGS: List[Key] = [
     Key("Up/Down", "scroll process list"),
-    Key("C", "activate/deactivate colors"),
     PAUSE_KEY,
     Key(SORTBY_READ, "sort by READ/s desc. (activities)", local_only=True),
     Key(CHANGE_DISPLAY_MODE, "change display mode"),

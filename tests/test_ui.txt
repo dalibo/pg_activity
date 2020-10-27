@@ -107,7 +107,6 @@ pg_activity 1.6.2 - https://github.com/dalibo/pg_activity
 Released under PostgreSQL License.
 <BLANKLINE>
    Up/Down: scroll process list
-         C: activate/deactivate colors
      Space: pause
          r: sort by READ/s desc. (activities)
          v: change display mode

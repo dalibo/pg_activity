@@ -14,7 +14,6 @@ pg_activity 2.1 - https://github.com/dalibo/pg_activity
 Released under PostgreSQL License.
 <BLANKLINE>
    Up/Down: scroll process list
-         C: activate/deactivate colors
      Space: pause
          r: sort by READ/s desc. (activities)
          v: change display mode
@@ -40,7 +39,6 @@ pg_activity 5.0 - https://github.com/dalibo/pg_activity
 Released under PostgreSQL License.
 <BLANKLINE>
    Up/Down: scroll process list
-         C: activate/deactivate colors
      Space: pause
          v: change display mode
          q: quit
