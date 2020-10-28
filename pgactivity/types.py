@@ -860,4 +860,3 @@ ActivityStats = Union[
     Tuple[Iterable[BWProcess], SystemInfo],
     Tuple[Iterable[LocalRunningProcess], SystemInfo],
 ]
-Process = Union[LocalRunningProcess, RunningProcess, BWProcess]
