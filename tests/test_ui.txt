@@ -320,7 +320,11 @@ Interactive mode:
 ...         output=None,
 ...     ),
 ... )
->>> keys = [{"ucs": "KEY_DOWN", "name": "KEY_DOWN"}, "K", "q"]
+
+(Note: expected outputs assume that PID are 4-digits long, this is fragile... TODO)
+
+>>> key_down = {"ucs": "KEY_DOWN", "name": "KEY_DOWN"}
+>>> keys = [key_down, "C", "n", "K", "y", "q"]
 >>> run_ui(options, keys, render_footer=True)  # doctest: +ELLIPSIS,+NORMALIZE_WHITESPACE
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2.0s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
@@ -341,7 +345,11 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2.0s
 PID    DATABASE          IOW              state   Query                         
 ...    tests               N      idle in trans   SELECT 42
 F1/1 Running queries  F2/2 Waiting queries  F3/3 Blocking queries Space Pause            q Quit             h Help            
-------------------------------- sending key 'K' --------------------------------
+------------------------------- sending key 'C' --------------------------------
+                ┌──────────────────────────────────────────────┐                
+                │ Confirm cancel action on process  ...? (y/n) │                
+                └──────────────────────────────────────────────┘                
+------------------------------- sending key 'n' --------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2.0s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
  Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
@@ -349,5 +357,19 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2.0s
  Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                 RUNNING QUERIES
 PID    DATABASE          IOW              state   Query                         
-                            Process ... terminated                              
+...    tests               N      idle in trans   SELECT 42
+F1/1 Running queries  F2/2 Waiting queries  F3/3 Blocking queries Space Pause            q Quit             h Help            
+------------------------------- sending key 'K' --------------------------------
+              ┌─────────────────────────────────────────────────┐               
+              │ Confirm terminate action on process  ...? (y/n) │               
+              └─────────────────────────────────────────────────┘               
+------------------------------- sending key 'y' --------------------------------
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2.0s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                RUNNING QUERIES
+PID    DATABASE          IOW              state   Query                         
+                             Process ... terminated
 ------------------------------- sending key 'q' --------------------------------

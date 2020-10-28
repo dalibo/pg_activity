@@ -6,7 +6,7 @@ from typing import Dict, List, Optional, cast
 import attr
 from blessed import Terminal
 
-from . import __version__, activities, handlers, keys, types, utils, views
+from . import __version__, activities, handlers, keys, types, utils, views, widgets
 from .data import pg_connect
 
 
@@ -112,15 +112,32 @@ def main(
                     keys.PROCESS_CANCEL,
                     keys.PROCESS_KILL,
                 ):
+                    action, color = {
+                        keys.PROCESS_CANCEL: ("cancel", "orange"),
+                        keys.PROCESS_KILL: ("terminate", "red"),
+                    }[key]
+                    action_formatter = term.formatter(color)
                     pid = pg_procs.selected
-                    if key == keys.PROCESS_CANCEL:
-                        data.pg_cancel_backend(pid)
-                        msg_pile.send(term.orange(f"Process {pid} cancelled"))
-                    elif key == keys.PROCESS_KILL:
-                        data.pg_terminate_backend(pid)
-                        msg_pile.send(term.red(f"Process {pid} terminated"))
-                    pg_procs.selected = None
-                    wait_for = None
+                    with term.location(x=0, y=term.height // 3):
+                        print(
+                            widgets.boxed(
+                                term,
+                                f"Confirm {action_formatter(action)} action on process {pid}? (y/n)",
+                                border_color=color,
+                                center=True,
+                            ),
+                            end="",
+                        )
+                        confirm_key = term.inkey(timeout=None)
+                    if confirm_key.lower() == "y":
+                        if action == "cancel":
+                            data.pg_cancel_backend(pid)
+                            msg_pile.send(action_formatter(f"Process {pid} cancelled"))
+                        elif action == "terminate":
+                            data.pg_terminate_backend(pid)
+                            msg_pile.send(action_formatter(f"Process {pid} terminated"))
+                        pg_procs.selected = None
+                        wait_for = None
                 else:
                     ui = ui.evolve(
                         query_mode=handlers.query_mode(key) or ui.query_mode,
