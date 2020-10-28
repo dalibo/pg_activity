@@ -372,7 +372,7 @@ class UI:
     )
     sort_key: SortKey = attr.ib(default=SortKey.default(), converter=SortKey)
     query_mode: QueryMode = attr.ib(default=QueryMode.activities, converter=QueryMode)
-    refresh_time: float = 2.0
+    refresh_time: Union[float, int] = 2
     in_pause: bool = False
 
     @classmethod

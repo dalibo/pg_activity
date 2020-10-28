@@ -95,7 +95,7 @@ TODO: use a non-admin connection in order to avoid all these mocks!
 No activity, first screen followed by help screen:
 
 >>> run_ui(options, ["h", "z", "q"])  # doctest: +ELLIPSIS
-PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2.0s
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
  Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
@@ -127,7 +127,7 @@ Mode
 <BLANKLINE>
 Press any key to exit.
 ------------------------------- sending key 'z' --------------------------------
-PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2.0s
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
  Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
@@ -151,7 +151,7 @@ change query mode then quit:
 >>> keys = ["-", "-", "+", " ", "T", "c", " ", "2", "3", "1", "q"]
 >>> expected_timeouts = [2.0, 1.0, 0.5, 1, 1, 1, 1, 1, 1, 1, 1]
 >>> run_ui(options, keys, expected_timeouts=expected_timeouts)  # doctest: +ELLIPSIS
-PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2.0s
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
  Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
@@ -160,7 +160,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2.0s
 DATABASE                     USER           CLIENT  IOW              state   Query
 tests                    postgres     127.0.0.1/32    N      idle in trans   SELECT pg_sleep(0)
 ------------------------------- sending key '-' --------------------------------
-PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1.0s
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
  Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
@@ -269,7 +269,7 @@ Use another set of options:
 ...     ),
 ... )
 >>> run_ui(options, ["D", "v", "q"])  # doctest: +ELLIPSIS
-PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2.0s
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction
  Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
@@ -279,7 +279,7 @@ DATABASE          IOW              state   Query
 tests               N      idle in trans   CREATE TABLE persons (firstname text,
                                            lastname text, age int, address text)
 ------------------------------- sending key 'D' --------------------------------
-PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2.0s
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction
  Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
@@ -289,7 +289,7 @@ DATABASE          IOW              state   Query
 tests               N      idle in trans   CREATE TABLE persons (firstname text,
                                            lastname text, age int, address text)
 ------------------------------- sending key 'v' --------------------------------
-PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2.0s
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction
  Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
@@ -326,7 +326,7 @@ Interactive mode:
 >>> key_down = {"ucs": "KEY_DOWN", "name": "KEY_DOWN"}
 >>> keys = [key_down, "C", "n", "K", "y", "q"]
 >>> run_ui(options, keys, render_footer=True)  # doctest: +ELLIPSIS,+NORMALIZE_WHITESPACE
-PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2.0s
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
  Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
@@ -336,7 +336,7 @@ PID    DATABASE          IOW              state   Query
 ...    tests               N      idle in trans   SELECT 42
 F1/1 Running queries  F2/2 Waiting queries  F3/3 Blocking queries Space Pause            q Quit             h Help            
 ---------------------------- sending key 'KEY_DOWN' ----------------------------
-PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2.0s
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
  Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
@@ -350,7 +350,7 @@ F1/1 Running queries  F2/2 Waiting queries  F3/3 Blocking queries Space Pause   
                 │ Confirm cancel action on process  ...? (y/n) │                
                 └──────────────────────────────────────────────┘                
 ------------------------------- sending key 'n' --------------------------------
-PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2.0s
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
  Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
@@ -364,7 +364,7 @@ F1/1 Running queries  F2/2 Waiting queries  F3/3 Blocking queries Space Pause   
               │ Confirm terminate action on process  ...? (y/n) │               
               └─────────────────────────────────────────────────┘               
 ------------------------------- sending key 'y' --------------------------------
-PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2.0s
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
  Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
