@@ -3,6 +3,8 @@
 Command line tool for PostgreSQL server activity monitoring.
 
 [![Latest PyPI version](https://img.shields.io/pypi/v/pg_activity.svg)](https://pypi.python.org/pypi/pg_activity)
+[![Build Status](https://travis-ci.org/dalibo/pg_activity.svg?branch=master)](https://travis-ci.org/dalibo/pg_activity)
+
 
 Dependencies
 ------------
