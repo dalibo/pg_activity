@@ -99,10 +99,10 @@ def main(
             elif key in (keys.REFRESH_TIME_INCREASE, keys.REFRESH_TIME_DECREASE):
                 ui = ui.evolve(refresh_time=handlers.refresh_time(key, ui.refresh_time))
             elif key is not None:
-                if key.name == keys.PROCESS_NEXT:
+                if keys.is_process_next(key):
                     pg_procs.select_next()
                     wait_for = 3
-                elif key.name == keys.PROCESS_PREV:
+                elif keys.is_process_prev(key):
                     pg_procs.select_prev()
                     wait_for = 3
                 elif key.name == keys.CANCEL_SELECTION:

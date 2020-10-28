@@ -2,6 +2,7 @@ import curses
 from typing import Any, List, Optional, Tuple
 
 import attr
+from blessed.keyboard import Keystroke
 
 from .types import QueryMode
 
@@ -15,7 +16,9 @@ PAUSE = " "
 PROCESS_CANCEL = "C"
 PROCESS_KILL = "K"
 PROCESS_NEXT = "KEY_DOWN"
+PROCESS_NEXT_VI = "j"
 PROCESS_PREV = "KEY_UP"
+PROCESS_PREV_VI = "k"
 REFRESH_DB_SIZE = "D"
 REFRESH_TIME_INCREASE = "+"
 REFRESH_TIME_DECREASE = "-"
@@ -24,6 +27,22 @@ SORTBY_WRITE = "w"
 SORTBY_MEM = "m"
 SORTBY_TIME = "t"
 SORTBY_CPU = "c"
+
+
+def is_process_next(key: Keystroke) -> bool:
+    if key.name == PROCESS_NEXT:
+        return True
+    elif key == PROCESS_NEXT_VI:
+        return True
+    return False
+
+
+def is_process_prev(key: Keystroke) -> bool:
+    if key.name == PROCESS_PREV:
+        return True
+    elif key == PROCESS_PREV_VI:
+        return True
+    return False
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
