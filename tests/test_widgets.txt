@@ -1,0 +1,17 @@
+>>> from blessed import Terminal
+>>> from pgactivity import widgets
+
+>>> term = Terminal(force_styling=None)
+
+Tests for boxed()
+------------------
+
+>>> print(widgets.boxed(term, "hello, world"), end="")
+┌──────────────┐
+│ hello, world │
+└──────────────┘
+
+>>> print(widgets.boxed(term, "hello, world", center=True), end="")
+                                ┌──────────────┐                                
+                                │ hello, world │                                
+                                └──────────────┘                                
