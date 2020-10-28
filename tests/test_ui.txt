@@ -71,6 +71,7 @@ Default CLI options, passed to ui.main():
 ...         assert call_args_list == expected_timeouts
 
 Mock system statistics
+TODO: use a non-admin connection in order to avoid all these mocks!
 >>> get_mem_swap = patch(
 ...     "pgactivity.activities.get_mem_swap",
 ...     return_value=(1.2, 3_000_000, 4_000_000_000, 5.6, 7_000, 8_000_000_000),
