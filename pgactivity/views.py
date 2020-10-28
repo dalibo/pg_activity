@@ -31,7 +31,6 @@ from .types import (
     Host,
     IOCounter,
     MemoryInfo,
-    ProcessSet,
     QueryDisplayMode,
     SelectableProcesses,
     SystemInfo,
@@ -417,13 +416,12 @@ def screen(
 ) -> None:
     """Display the screen."""
 
-    processes: ProcessSet
     system_info: Optional[SystemInfo]
     if isinstance(activity_stats, tuple):
         processes, system_info = activity_stats
     else:
         processes, system_info = activity_stats, None
-    processes.set_items(sorted_processes(processes, key=ui.sort_key, reverse=True))  # type: ignore  # TODO: fixme
+    processes.set_items(sorted_processes(processes, key=ui.sort_key, reverse=True))
 
     print(term.clear + term.home, end="")
     top_height = term.height - 1
