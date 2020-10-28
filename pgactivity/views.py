@@ -412,6 +412,7 @@ def screen(
     active_connections: int,
     activity_stats: ActivityStats,
     message: Optional[str],
+    render_header: bool = True,
     render_footer: bool = True,
 ) -> None:
     """Display the screen."""
@@ -427,16 +428,18 @@ def screen(
     print(term.clear + term.home, end="")
     top_height = term.height - 1
     lines_counter = line_counter(top_height)
-    header(
-        term,
-        ui,
-        host=host,
-        dbinfo=dbinfo,
-        tps=tps,
-        active_connections=active_connections,
-        system_info=system_info,
-        lines_counter=lines_counter,
-    )
+
+    if render_header:
+        header(
+            term,
+            ui,
+            host=host,
+            dbinfo=dbinfo,
+            tps=tps,
+            active_connections=active_connections,
+            system_info=system_info,
+            lines_counter=lines_counter,
+        )
 
     query_mode(term, ui, lines_counter=lines_counter)
     columns_header(term, ui, lines_counter=lines_counter)

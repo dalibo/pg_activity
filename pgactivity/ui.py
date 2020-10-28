@@ -14,6 +14,7 @@ def main(
     options: optparse.Values,
     *,
     term: Optional[Terminal] = None,
+    render_header: bool = True,
     render_footer: bool = True,
 ) -> None:
     data = pg_connect(
@@ -185,6 +186,7 @@ def main(
                     active_connections=active_connections,
                     activity_stats=activity_stats,
                     message=msg_pile.get(),
+                    render_header=render_header,
                     render_footer=render_footer,
                 )
 

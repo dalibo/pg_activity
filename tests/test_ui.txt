@@ -47,7 +47,7 @@ Default CLI options, passed to ui.main():
 >>> term.width, term.height
 (80, 25)
 
->>> def run_ui(options, keys, expected_timeouts=None, render_footer=False):
+>>> def run_ui(options, keys, expected_timeouts=None, render_header=True, render_footer=False):
 ...     """Wrapper to ui.main() with a fake term.inkey()."""
 ...
 ...     call_args_list = []
