@@ -28,7 +28,6 @@ from .types import (
     ActivityStats,
     Column,
     DBInfo,
-    Flag,
     Host,
     IOCounter,
     MemoryInfo,
@@ -272,6 +271,7 @@ def columns_header(term: Terminal, ui: UI) -> Iterator[str]:
 def get_indent(ui: UI) -> str:
     """Return identation for Query column.
 
+    >>> from pgactivity.types import Flag, UI
     >>> ui = UI.make(flag=Flag.CPU)
     >>> get_indent(ui)
     '                           '

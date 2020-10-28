@@ -363,7 +363,6 @@ class UI:
     """State of the UI."""
 
     columns_by_querymode: Mapping[QueryMode, Tuple[Column, ...]]
-    flag: Flag
     min_duration: float = 0.0
     duration_mode: DurationMode = attr.ib(
         default=DurationMode.query, converter=DurationMode
@@ -550,7 +549,7 @@ class UI:
                     pass
 
         columns_by_querymode = {qm: tuple(make_columns_for(qm)) for qm in QueryMode}
-        return cls(columns_by_querymode=columns_by_querymode, flag=flag, **kwargs)
+        return cls(columns_by_querymode=columns_by_querymode, **kwargs)
 
     def evolve(self, **changes: Any) -> "UI":
         """Return a new UI with 'changes' applied.
