@@ -21,7 +21,12 @@ or directly from your Linux distribution, if available, e.g.:
 Usage
 -----
 
-`pg_activity` works localy or remotely. In local execution context, to obtain sufficient rights to display system informations, the system user running `pg_activity` must be the same user running postgresql server (`postgres` by default), or have more rights like `root`. Otherwise, `pg_activity` can fallback to a degraded mode without displaying system informations. On the same way, PostgreSQL user used to connect to the database must be super-user.
+`pg_activity` works localy or remotely. In local execution context, to obtain
+sufficient rights to display system informations, the system user running
+`pg_activity` must be the same user running postgresql server (`postgres` by
+default), or have more rights like `root`. Otherwise, `pg_activity` can fallback
+to a degraded mode without displaying system informations. On the same way,
+PostgreSQL user used to connect to the database must be super-user.
 ex:
 
     sudo -u postgres pg_activity -U postgres
@@ -73,7 +78,10 @@ Options
 Notes
 -----
 
-Length of SQL query text that pg_activity reports relies on PostgreSQL parameter `track_activity_query_size`. Default value is `1024` (expressed in bytes). If your SQL query text look truncated, you should increase `track_activity_query_size`.
+Length of SQL query text that `pg_activity` reports relies on PostgreSQL
+parameter `track_activity_query_size`. Default value is `1024` (expressed in
+bytes). If your SQL query text look truncated, you should increase
+`track_activity_query_size`.
 
 
 Interactives commands
@@ -113,7 +121,7 @@ Navigation mode
 | `Space`    | Tag or untag the process                      |
 | `q`        | Quit                                          |
 | `Other`    | Back to activity                              |
-			
+
 Screenshot
 ----------
 
