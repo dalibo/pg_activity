@@ -561,7 +561,6 @@ class UI:
         >>> new_ui.query_mode.value
         'blocking queries'
         """
-        assert "flag" not in changes, "cannot evolve with a new flag"
         return attr.evolve(self, **changes)
 
     def column(self, key: str) -> Column:
