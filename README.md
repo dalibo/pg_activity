@@ -5,27 +5,17 @@ Command line tool for PostgreSQL server activity monitoring.
 [![Latest PyPI version](https://img.shields.io/pypi/v/pg_activity.svg)](https://pypi.python.org/pypi/pg_activity)
 [![Build Status](https://travis-ci.com/dalibo/pg_activity.svg?branch=master)](https://travis-ci.com/dalibo/pg_activity)
 
-
-Dependencies
-------------
-
-  - `python` &ge; **3.6**
-  - `psycopg2` &ge; **2.5**
-  - `psutil` &ge;  **0.5.1**
-
-Installation from sources:
-`setuptools` &ge; **0.6.14**
-
-You have to install the package `psycopg2` from `pgdg` [APT](https://wiki.postgresql.org/wiki/Apt) or [YUM](https://yum.postgresql.org/) repositories. `psycopg2` can also been installed from `pip` with `pip install psycopg2` or `pip install psycopg2-binary` for the binary version.
-
 Installation
 ------------
 
-    sudo python setup.py install
+`pg_activity` requires Python 3.6 or later. It can be installed using pip
+(available, e.g., as `apt install python3-pip` on Debian-based distributions):
 
-### Installation with man page
+    $ python3 -m pip install pg_activity psycopg2-binary
 
-    sudo python setup.py install --with-man
+or directly from your Linux distribution, if available, e.g.:
+
+    $ sudo apt install pg-activity
 
 
 Usage
