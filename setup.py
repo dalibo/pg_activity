@@ -19,11 +19,12 @@ setup(
     scripts=["pg_activity"],
     packages=["pgactivity"],
     url="https://github.com/dalibo/pg_activity",
-    license="LICENSE.txt",
+    license="PostgreSQL",
     description="Command line tool for PostgreSQL server activity monitoring.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     classifiers=[
+        "License :: OSI Approved :: PostgreSQL License",
         "Programming Language :: Python :: 3",
     ],
     python_requires=">=3.6",
