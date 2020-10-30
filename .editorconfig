@@ -3,5 +3,8 @@ root = true
 [*.md]
 max_line_length = 80
 
+[LICENSE.txt]
+max_line_length = 78
+
 [*.py]
 max_line_length = 89
