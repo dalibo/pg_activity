@@ -24,8 +24,12 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     classifiers=[
+        "Development Status :: 5 - Production/Stable",
+        "Environment :: Console",
+        "Environment :: Console :: Curses",
         "License :: OSI Approved :: PostgreSQL License",
         "Programming Language :: Python :: 3",
+        "Topic :: Database",
     ],
     python_requires=">=3.6",
     install_requires=[
