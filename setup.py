@@ -31,6 +31,7 @@ setup(
         "Programming Language :: Python :: 3",
         "Topic :: Database",
     ],
+    keywords="postgresql activity monitoring cli sql top",
     python_requires=">=3.6",
     install_requires=[
         "attrs",
