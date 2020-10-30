@@ -33,5 +33,13 @@ setup(
         "humanize",
         "psutil >= 2.0.0",
     ],
+    extras_require={
+        "testing": [
+            "psycopg2-binary",
+            "pytest",
+            "pytest-datadir",
+            "pytest-postgresql",
+        ],
+    },
     data_files=data_files,
 )
