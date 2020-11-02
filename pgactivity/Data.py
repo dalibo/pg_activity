@@ -328,21 +328,21 @@ class Data:
         """
         if self.pg_num_version >= 110000:
             # PostgreSQL 11 and more
-            query = self.queries.get_pg_activity_110000.sql
+            query = self.queries.get_pg_activity_post_110000.sql
         elif self.pg_num_version >= 100000:
             # PostgreSQL 10
             # We assume a background_worker with a not null query is a parallel worker.
-            query = self.queries.get_pg_activity_100000.sql
+            query = self.queries.get_pg_activity_post_100000.sql
         elif self.pg_num_version >= 90600:
             # PostgreSQL prior to 10.0 and >= 9.6.0
             # There is no way to see parallel workers
-            query = self.queries.get_pg_activity_90600.sql
+            query = self.queries.get_pg_activity_post_90600.sql
         elif self.pg_num_version >= 90200:
             # PostgreSQL prior to 9.6.0 and >= 9.2.0
-            query = self.queries.get_pg_activity_90200_90500.sql
+            query = self.queries.get_pg_activity_post_90200.sql
         elif self.pg_num_version < 90200:
             # PostgreSQL prior to 9.2.0
-            ret = self.queries.get_pg_activity_90200.sql
+            ret = self.queries.get_pg_activity.sql
 
         duration_column = self.get_duration_column(duration_mode)
         query = query.format(duration_column=duration_column)
@@ -358,9 +358,9 @@ class Data:
         Get waiting queries.
         """
         if self.pg_num_version >= 90200:
-            query = self.queries.get_waiting_90200.sql
+            query = self.queries.get_waiting_post_90200.sql
         elif self.pg_num_version < 90200:
-            query = self.queries.get_waiting_before_90200.sql
+            query = self.queries.get_waiting.sql
 
         duration_column = self.get_duration_column(duration_mode)
         query = query.format(duration_column=duration_column)
@@ -375,196 +375,9 @@ class Data:
         Get blocking queries
         """
         if self.pg_num_version >= 90200:
-            query = """
-    SELECT
-        pid,
-        application_name AS appname,
-        CASE
-            WHEN LENGTH(datname) > 16
-            THEN SUBSTRING(datname FROM 0 FOR 6)||'...'||SUBSTRING(datname FROM '........$')
-            ELSE datname
-            END
-        AS database,
-        usename AS user,
-        relation,
-        mode,
-        locktype AS type,
-        duration,
-        state,
-        query
-    FROM
-        (
-        SELECT
-            blocking.pid,
-            pg_stat_activity.application_name,
-            pg_stat_activity.query,
-            blocking.mode,
-            pg_stat_activity.datname,
-            pg_stat_activity.usename,
-            blocking.locktype,
-            EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
-            pg_stat_activity.state as state,
-            blocking.relation::regclass AS relation
-        FROM
-            pg_locks AS blocking
-            JOIN (
-                SELECT
-                    transactionid
-                FROM
-                    pg_locks
-                WHERE
-                    NOT granted) AS blocked ON (blocking.transactionid = blocked.transactionid)
-            JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.pid)
-        WHERE
-            blocking.granted
-            AND CASE WHEN %(min_duration)s = 0 THEN true
-                ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
-                END
-        UNION ALL
-        SELECT
-            blocking.pid,
-            pg_stat_activity.application_name,
-            pg_stat_activity.query,
-            blocking.mode,
-            pg_stat_activity.datname,
-            pg_stat_activity.usename,
-            blocking.locktype,
-            EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
-            pg_stat_activity.state as state,
-            blocking.relation::regclass AS relation
-        FROM
-            pg_locks AS blocking
-            JOIN (
-                SELECT
-                    database,
-                    relation,
-                    mode
-                FROM
-                    pg_locks
-                WHERE
-                    NOT granted
-                    AND relation IS NOT NULL) AS blocked ON (blocking.database = blocked.database AND blocking.relation = blocked.relation)
-            JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.pid)
-        WHERE
-            blocking.granted
-            AND CASE WHEN %(min_duration)s = 0 THEN true
-                ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
-                END
-        ) AS sq
-    GROUP BY
-        pid,
-        application_name,
-        query,
-        mode,
-        locktype,
-        duration,
-        datname,
-        usename,
-        state,
-        relation
-    ORDER BY
-        duration DESC
-            """
+            query = self.queries.get_blocking_post_90200.sql
         elif self.pg_num_version < 90200:
-            query = """
-    SELECT
-        pid,
-        appname,
-        CASE
-            WHEN LENGTH(datname) > 16
-            THEN SUBSTRING(datname FROM 0 FOR 6)||'...'||SUBSTRING(datname FROM '........$')
-            ELSE datname
-            END
-        AS database,
-        usename AS user,
-        relation,
-        mode,
-        locktype AS type,
-        duration,
-        CASE
-           WHEN sq.query = '<IDLE> in transaction (aborted)' THEN 'idle in transaction (aborted)'
-           WHEN sq.query = '<IDLE> in transaction' THEN 'idle in transaction'
-           WHEN sq.query = '<IDLE>' THEN 'idle'
-           ELSE 'active'
-           END
-        AS state,
-        CASE
-           WHEN sq.query LIKE '<IDLE>%%' THEN 'None'
-           ELSE sq.query
-           END
-        AS query
-    FROM
-        (
-        SELECT
-            blocking.pid,
-            '<unknown>' AS appname,
-            pg_stat_activity.current_query AS query,
-            blocking.mode,
-            pg_stat_activity.datname,
-            pg_stat_activity.usename,
-            blocking.locktype,EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
-            NULL AS state,
-            blocking.relation::regclass AS relation
-        FROM
-            pg_locks AS blocking
-            JOIN (
-                SELECT
-                    transactionid
-                FROM
-                    pg_locks
-                WHERE
-                    NOT granted) AS blocked ON (blocking.transactionid = blocked.transactionid)
-            JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.procpid)
-        WHERE
-            blocking.granted
-            AND CASE WHEN %(min_duration)s = 0 THEN true
-                ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
-                END
-        UNION ALL
-        SELECT
-            blocking.pid,
-            '<unknown>' AS appname,
-            pg_stat_activity.current_query AS query,
-            blocking.mode,
-            pg_stat_activity.datname,
-            pg_stat_activity.usename,
-            blocking.locktype,
-            EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
-            NULL AS state,
-            blocking.relation::regclass AS relation
-        FROM
-            pg_locks AS blocking
-            JOIN (
-                SELECT
-                    database,
-                    relation,
-                    mode
-                FROM
-                    pg_locks
-                WHERE
-                    NOT granted
-                    AND relation IS NOT NULL) AS blocked ON (blocking.database = blocked.database AND blocking.relation = blocked.relation)
-            JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.procpid)
-        WHERE
-            blocking.granted
-            AND CASE WHEN %(min_duration)s = 0 THEN true
-                ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
-                END
-        ) AS sq
-    GROUP BY
-        pid,
-        appname,
-        query,
-        mode,
-        locktype,
-        duration,
-        datname,
-        usename,
-        state,
-        relation
-    ORDER BY
-        duration DESC
-            """
+            query = self.queries.get_blocking.sql
 
         duration_column = self.get_duration_column(duration_mode)
         query = query.format(duration_column=duration_column)

@@ -31,7 +31,7 @@ SELECT
       END AS total_size,
       MAX(LENGTH(datname)) AS max_length
   FROM pg_database
- WHERE datname <> 'rdsadmin' OR NOT :using_rds;
+ WHERE NOT (datname = 'rdsadmin' AND :using_rds);
 
 -- name : get_active_connections_90200?
 -- Get active connections from pg_stat_activity for pg >= 9.2
@@ -39,14 +39,13 @@ SELECT COUNT(*) as active_connections
   FROM pg_stat_activity
  WHERE state = 'active';
 
-
 -- name : get_active_connections?
 -- Get active connections from pg_stat_activity prior to 9.2
 SELECT COUNT(*) as active_connections
   FROM pg_stat_activity
  WHERE current_query NOT LIKE '<IDLE>%%';
 
--- name : get_pg_activity_110000
+-- name : get_pg_activity_post_110000
 -- Get data from pg_activity since pg 11
 SELECT
       pg_stat_activity.pid AS pid,
@@ -80,23 +79,23 @@ SELECT
 ORDER BY
       EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) DESC;
 
--- name : get_pg_activity_100000
--- Get data from pg_activity for pg 10
+-- name : get_pg_activity_post_100000
+-- Get data from pg_activity from pg 10 to pg 11
 SELECT
       pg_stat_activity.pid AS pid,
       pg_stat_activity.application_name AS application_name,
       CASE WHEN LENGTH(pg_stat_activity.datname) > 16
-          THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
-          ELSE pg_stat_activity.datname
+               THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
+           ELSE pg_stat_activity.datname
       END AS database,
       CASE WHEN pg_stat_activity.client_addr IS NULL
-          THEN 'local'
-          ELSE pg_stat_activity.client_addr::TEXT
+               THEN 'local'
+           ELSE pg_stat_activity.client_addr::TEXT
       END AS client,
       EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
       CASE WHEN pg_stat_activity.wait_event_type IN ('LWLock', 'Lock', 'BufferPin')
-          THEN true
-	  ELSE false
+               THEN true
+	   ELSE false
       END AS wait,
       pg_stat_activity.usename AS user,
       pg_stat_activity.state AS state,
@@ -116,8 +115,8 @@ SELECT
 ORDER BY
       EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) DESC;
 
--- name : get_pg_activity_90600
--- Get data from pg_activity for pg 9.6
+-- name : get_pg_activity_post_90600
+-- Get data from pg_activity from pg 9.6 to 10
 SELECT
       pg_stat_activity.pid AS pid,
       pg_stat_activity.application_name AS application_name,
@@ -147,7 +146,7 @@ SELECT
 ORDER BY
       EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) DESC;
 
--- name : get_pg_activity_90200_90500
+-- name : get_pg_activity_post_90200
 -- Get data from pg_activity from pg 9.2 to pg 9.5
 SELECT
       pg_stat_activity.pid AS pid,
@@ -178,7 +177,7 @@ SELECT
 ORDER BY
       EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) DESC;
 
--- name : get_pg_activity_90200
+-- name : get_pg_activity
 -- Get data from pg_activity before pg 9.2
 SELECT
       pg_stat_activity.procpid AS pid,
@@ -217,8 +216,8 @@ SELECT
 ORDER BY
       EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) DESC
 
--- name : get_waiting_90200
--- Get waiting queries for versions before 9.2
+-- name : get_waiting_post_90200
+-- Get waiting queries for versions >= 9.2
 SELECT
       pg_locks.pid AS pid,
       pg_stat_activity.application_name AS appname,
@@ -238,21 +237,21 @@ SELECT
       JOIN pg_catalog.pg_stat_activity ON(pg_catalog.pg_locks.pid = pg_catalog.pg_stat_activity.pid)
  WHERE
       NOT pg_catalog.pg_locks.granted
-      AND pg_catalog.pg_stat_activity.pid <> pg_backend_pid()
-      AND CASE WHEN %(min_duration)s = 0 THEN true
-               ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
-          END
+  AND pg_catalog.pg_stat_activity.pid <> pg_backend_pid()
+  AND CASE WHEN %(min_duration)s = 0 THEN true
+           ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
+      END
 ORDER BY
       EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) DESC;
 
 
--- name : get_waiting_before_90200
+-- name : get_waiting
 -- Get waiting queries for versions before 9.2
 SELECT
       pg_locks.pid AS pid,
       '<unknown>' AS appname,
       CASE WHEN LENGTH(pg_stat_activity.datname) > 16
-           THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
+               THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
            ELSE pg_stat_activity.datname
       END AS database,
       pg_stat_activity.usename AS user,
@@ -260,12 +259,9 @@ SELECT
       pg_locks.locktype AS type,
       pg_locks.relation::regclass AS relation,
       EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
-      CASE WHEN pg_stat_activity.current_query = '<IDLE> in transaction (aborted)'
-               THEN 'idle in transaction (aborted)'
-           WHEN pg_stat_activity.current_query = '<IDLE> in transaction'
-	       THEN 'idle in transaction'
-           WHEN pg_stat_activity.current_query = '<IDLE>'
-	       THEN 'idle'
+      CASE WHEN pg_stat_activity.current_query = '<IDLE> in transaction (aborted)' THEN 'idle in transaction (aborted)'
+           WHEN pg_stat_activity.current_query = '<IDLE> in transaction' THEN 'idle in transaction'
+           WHEN pg_stat_activity.current_query = '<IDLE>' THEN 'idle'
            ELSE 'active'
       END AS state,
       CASE WHEN pg_stat_activity.current_query LIKE '<IDLE>%%' THEN 'None'
@@ -276,13 +272,199 @@ SELECT
       JOIN pg_catalog.pg_stat_activity ON(pg_catalog.pg_locks.pid = pg_catalog.pg_stat_activity.procpid)
  WHERE
       NOT pg_catalog.pg_locks.granted
-      AND pg_catalog.pg_stat_activity.procpid <> pg_backend_pid()
-      AND CASE WHEN %(min_duration)s = 0 THEN true
-               ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
-          END
+  AND pg_catalog.pg_stat_activity.procpid <> pg_backend_pid()
+  AND CASE WHEN %(min_duration)s = 0 THEN true
+           ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
+      END
 ORDER BY
       EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) DESC;
 
+-- name : get_blocking_post_90200
+-- Get blocking queries >= 9.2
+SELECT
+      pid,
+      application_name AS appname,
+      CASE WHEN LENGTH(datname) > 16
+               THEN SUBSTRING(datname FROM 0 FOR 6)||'...'||SUBSTRING(datname FROM '........$')
+           ELSE datname
+      END AS database,
+      usename AS user,
+      relation,
+      mode,
+      locktype AS type,
+      duration,
+      state,
+      query
+  FROM
+      (
+      SELECT
+            blocking.pid,
+            pg_stat_activity.application_name,
+            pg_stat_activity.query,
+            blocking.mode,
+            pg_stat_activity.datname,
+            pg_stat_activity.usename,
+            blocking.locktype,
+            EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
+            pg_stat_activity.state as state,
+            blocking.relation::regclass AS relation
+        FROM
+            pg_locks AS blocking
+            JOIN (
+                SELECT
+                      transactionid
+                  FROM
+                      pg_locks
+                 WHERE
+                      NOT granted
+	    ) AS blocked ON (blocking.transactionid = blocked.transactionid)
+            JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.pid)
+       WHERE
+            blocking.granted
+        AND CASE WHEN %(min_duration)s = 0 THEN true
+                 ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
+            END
+      UNION ALL
+      SELECT
+            blocking.pid,
+            pg_stat_activity.application_name,
+            pg_stat_activity.query,
+            blocking.mode,
+            pg_stat_activity.datname,
+            pg_stat_activity.usename,
+            blocking.locktype,
+            EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
+            pg_stat_activity.state as state,
+            blocking.relation::regclass AS relation
+        FROM
+            pg_locks AS blocking
+            JOIN (
+                SELECT
+                      database,
+                      relation,
+                      mode
+                  FROM
+                      pg_locks
+                 WHERE
+                      NOT granted
+                  AND relation IS NOT NULL
+            ) AS blocked ON (blocking.database = blocked.database AND blocking.relation = blocked.relation)
+            JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.pid)
+       WHERE
+            blocking.granted
+        AND CASE WHEN %(min_duration)s = 0 THEN true
+                 ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
+            END
+      ) AS sq
+GROUP BY
+      pid,
+      application_name,
+      query,
+      mode,
+      locktype,
+      duration,
+      datname,
+      usename,
+      state,
+      relation
+ORDER BY
+      duration DESC;
+
+-- name : get_blocking
+-- Get blocking queries
+SELECT
+      pid,
+      appname,
+      CASE WHEN LENGTH(datname) > 16
+               THEN SUBSTRING(datname FROM 0 FOR 6)||'...'||SUBSTRING(datname FROM '........$')
+           ELSE datname
+      END AS database,
+      usename AS user,
+      relation,
+      mode,
+      locktype AS type,
+      duration,
+      CASE WHEN sq.query = '<IDLE> in transaction (aborted)' THEN 'idle in transaction (aborted)'
+           WHEN sq.query = '<IDLE> in transaction' THEN 'idle in transaction'
+           WHEN sq.query = '<IDLE>' THEN 'idle'
+           ELSE 'active'
+      END AS state,
+      CASE WHEN sq.query LIKE '<IDLE>%%' THEN 'None'
+           ELSE sq.query
+      END AS query
+  FROM
+      (
+      SELECT
+            blocking.pid,
+            '<unknown>' AS appname,
+            pg_stat_activity.current_query AS query,
+            blocking.mode,
+            pg_stat_activity.datname,
+            pg_stat_activity.usename,
+            blocking.locktype,
+            EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
+            NULL AS state,
+            blocking.relation::regclass AS relation
+        FROM
+            pg_locks AS blocking
+            JOIN (
+                SELECT
+                      transactionid
+                  FROM
+                      pg_locks
+                 WHERE
+                      NOT granted) AS blocked ON (blocking.transactionid = blocked.transactionid)
+            JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.procpid)
+       WHERE
+            blocking.granted
+        AND CASE WHEN %(min_duration)s = 0 THEN true
+                 ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
+            END
+      UNION ALL
+      SELECT
+            blocking.pid,
+            '<unknown>' AS appname,
+            pg_stat_activity.current_query AS query,
+            blocking.mode,
+            pg_stat_activity.datname,
+            pg_stat_activity.usename,
+            blocking.locktype,
+            EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
+            NULL AS state,
+            blocking.relation::regclass AS relation
+        FROM
+            pg_locks AS blocking
+            JOIN (
+                SELECT
+                      database,
+                      relation,
+                      mode
+                  FROM
+                      pg_locks
+                 WHERE
+                      NOT granted
+                  AND relation IS NOT NULL
+            ) AS blocked ON (blocking.database = blocked.database AND blocking.relation = blocked.relation)
+            JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.procpid)
+       WHERE
+            blocking.granted
+        AND CASE WHEN %(min_duration)s = 0 THEN true
+                 ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
+            END
+      ) AS sq
+GROUP BY
+      pid,
+      appname,
+      query,
+      mode,
+      locktype,
+      duration,
+      datname,
+      usename,
+      state,
+      relation
+ORDER BY
+      duration DESC;
 
 -- name : get_pga_inet_addresses?
 -- Get the inet address
