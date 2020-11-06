@@ -367,10 +367,7 @@ def processes_rows(
             yield line
 
 
-def footer(term: Terminal, message: Optional[str] = None) -> None:
-    """Display footer line."""
-    if message is None:
-        return footer_help(term)
+def footer_message(term: Terminal, message: str) -> None:
     print(term.center(message) + term.normal, end="")
 
 
@@ -449,4 +446,7 @@ def screen(
     )
     if render_footer:
         with term.location(x=0, y=top_height):
-            footer(term, message)
+            if message is not None:
+                footer_message(term, message)
+            else:
+                footer_help(term)

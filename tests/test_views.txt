@@ -345,12 +345,12 @@ p.price, p.cost HAVING sum(p.price * s.units) > 5000;
 
 
 
-Tests for footer()
-------------------
+Tests for footer_*()
+--------------------
 
->>> footer(term, None)
+>>> footer_help(term)
 F1/1 Running queries  F2/2 Waiting queries  F3/3 Blocking queries Space Pause            q Quit             h Help            
->>> footer(term, "process 123 cancelled")
+>>> footer_message(term, "process 123 cancelled")
                              process 123 cancelled                              
 
 
