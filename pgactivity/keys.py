@@ -64,18 +64,18 @@ PAUSE_KEY = Key(PAUSE, "pause", "Space")
 BINDINGS: List[Key] = [
     Key("Up/Down", "scroll process list"),
     PAUSE_KEY,
-    Key(SORTBY_READ, "sort by READ/s desc. (activities)", local_only=True),
-    Key(CHANGE_DISPLAY_MODE, "change display mode"),
-    Key(SORTBY_WRITE, "sort by WRITE/s desc. (activities)", local_only=True),
-    EXIT_KEY,
-    Key(REFRESH_TIME_INCREASE, "increase refresh time (max:5s)"),
     Key(SORTBY_CPU, "sort by CPU% desc. (activities)", local_only=True),
     Key(SORTBY_MEM, "sort by MEM% desc. (activities)", local_only=True),
-    Key(REFRESH_TIME_DECREASE, "decrease refresh time (min:0.5s)"),
+    Key(SORTBY_READ, "sort by READ/s desc. (activities)", local_only=True),
+    Key(SORTBY_WRITE, "sort by WRITE/s desc. (activities)", local_only=True),
     Key(SORTBY_TIME, "sort by TIME+ desc. (activities)", local_only=True),
-    Key("R", "force refresh"),
+    Key(REFRESH_TIME_INCREASE, "increase refresh time (max:5s)"),
+    Key(REFRESH_TIME_DECREASE, "decrease refresh time (min:0.5s)"),
+    Key(CHANGE_DISPLAY_MODE, "change display mode"),
     Key(CHANGE_DURATION_MODE, "change duration mode"),
     Key(REFRESH_DB_SIZE, "force refresh database size"),
+    Key("R", "force refresh"),
+    EXIT_KEY,
 ]
 
 

@@ -15,18 +15,18 @@ Released under PostgreSQL License.
 <BLANKLINE>
    Up/Down: scroll process list
      Space: pause
-         r: sort by READ/s desc. (activities)
-         v: change display mode
-         w: sort by WRITE/s desc. (activities)
-         q: quit
-         +: increase refresh time (max:5s)
          c: sort by CPU% desc. (activities)
          m: sort by MEM% desc. (activities)
-         -: decrease refresh time (min:0.5s)
+         r: sort by READ/s desc. (activities)
+         w: sort by WRITE/s desc. (activities)
          t: sort by TIME+ desc. (activities)
-         R: force refresh
+         +: increase refresh time (max:5s)
+         -: decrease refresh time (min:0.5s)
+         v: change display mode
          T: change duration mode
          D: force refresh database size
+         R: force refresh
+         q: quit
 Mode
       F1/1: running queries
       F2/2: waiting queries
@@ -40,13 +40,13 @@ Released under PostgreSQL License.
 <BLANKLINE>
    Up/Down: scroll process list
      Space: pause
-         v: change display mode
-         q: quit
          +: increase refresh time (max:5s)
          -: decrease refresh time (min:0.5s)
-         R: force refresh
+         v: change display mode
          T: change duration mode
          D: force refresh database size
+         R: force refresh
+         q: quit
 Mode
       F1/1: running queries
       F2/2: waiting queries
