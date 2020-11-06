@@ -141,15 +141,19 @@ def main(
                 else:
                     pg_procs.selected = None
                     wait_for = None
-                    ui = ui.evolve(
-                        query_mode=handlers.query_mode(key) or ui.query_mode,
-                        sort_key=(
-                            handlers.sort_key_for(key, ui.query_mode, is_local)
-                            or ui.sort_key
-                        ),
-                        duration_mode=handlers.duration_mode(key, ui.duration_mode),
-                        verbose_mode=handlers.verbose_mode(key, ui.verbose_mode),
-                    )
+                    changes = {
+                        "duration_mode": handlers.duration_mode(key, ui.duration_mode),
+                        "verbose_mode": handlers.verbose_mode(key, ui.verbose_mode),
+                    }
+                    query_mode = handlers.query_mode(key)
+                    if query_mode is not None:
+                        changes["query_mode"] = query_mode
+                    else:
+                        query_mode = ui.query_mode
+                    sort_key = handlers.sort_key_for(key, query_mode, is_local)
+                    if sort_key is not None:
+                        changes["sort_key"] = sort_key
+                    ui = ui.evolve(**changes)
             if not in_help:
                 if not ui.in_pause and wait_for is None:
                     if is_local:
