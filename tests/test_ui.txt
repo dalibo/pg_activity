@@ -372,7 +372,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
                                 RUNNING QUERIES
 PID    DATABASE          IOW              state   Query                         
 ...    tests               N      idle in trans   SELECT 42
-F1/1 Running queries  F2/2 Waiting queries  F3/3 Blocking queries Space Pause            q Quit             h Help            
+C Cancel current query    K Terminate current query Other Back to activities     
 ------------------------------- sending key '2' --------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
@@ -401,7 +401,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
                                 RUNNING QUERIES
 PID    DATABASE          IOW              state   Query                         
 ...    tests               N      idle in trans   SELECT 42
-F1/1 Running queries  F2/2 Waiting queries  F3/3 Blocking queries Space Pause            q Quit             h Help            
+C Cancel current query    K Terminate current query Other Back to activities     
 ------------------------------- sending key 'C' --------------------------------
                 ┌──────────────────────────────────────────────┐                
                 │ Confirm cancel action on process  ...? (y/n) │                
@@ -415,7 +415,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
                                 RUNNING QUERIES
 PID    DATABASE          IOW              state   Query                         
 ...    tests               N      idle in trans   SELECT 42
-F1/1 Running queries  F2/2 Waiting queries  F3/3 Blocking queries Space Pause            q Quit             h Help            
+C Cancel current query    K Terminate current query Other Back to activities     
 ------------------------------- sending key 'K' --------------------------------
               ┌─────────────────────────────────────────────────┐               
               │ Confirm terminate action on process  ...? (y/n) │               

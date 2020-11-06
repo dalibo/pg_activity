@@ -23,6 +23,8 @@ from .keys import (
     Key,
     MODES,
     PAUSE_KEY,
+    PROCESS_CANCEL,
+    PROCESS_KILL,
 )
 from .types import (
     ActivityStats,
@@ -382,6 +384,10 @@ def footer_help(term: Terminal) -> None:
         (EXIT_KEY.value, EXIT_KEY.description),
         (HELP_KEY, "help"),
     ]
+    render_footer(term, footer_values)
+
+
+def render_footer(term: Terminal, footer_values: List[Tuple[str, str]]) -> None:
     width = max(len(desc) for _, desc in footer_values)
     print(
         term.ljust(
@@ -396,6 +402,16 @@ def footer_help(term: Terminal) -> None:
         + term.normal,
         end="",
     )
+
+
+def footer_interative_help(term: Terminal) -> None:
+    """Footer line with help keys for interactive mode."""
+    footer_values = [
+        (PROCESS_CANCEL, "cancel current query"),
+        (PROCESS_KILL, "terminate current query"),
+        ("Other", "back to activities"),
+    ]
+    return render_footer(term, footer_values)
 
 
 def screen(
@@ -448,5 +464,7 @@ def screen(
         with term.location(x=0, y=top_height):
             if message is not None:
                 footer_message(term, message)
+            elif ui.interactive():
+                footer_interative_help(term)
             else:
                 footer_help(term)
