@@ -148,8 +148,9 @@ One query, idle in transaction:
 Change refresh time, pause, change duration mode, change sort order, unpause,
 change query mode then quit:
 
->>> keys = ["-", "-", "+", " ", "T", "c", " ", "2", "3", "1", "q"]
->>> expected_timeouts = [2.0, 1.0, 0.5, 1, 1, 1, 1, 1, 1, 1, 1]
+>>> keys = ["-", "-", "+", " ", "T", "3", "r", " ", "T", "c", "2", "1", "3", "q"]
+>>> expected_timeouts = [2.0, 1.0, 0.5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+>>> assert len(keys) == len(expected_timeouts)
 >>> run_ui(options, keys, expected_timeouts=expected_timeouts)  # doctest: +ELLIPSIS
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
@@ -197,16 +198,25 @@ DATABASE                     USER           CLIENT  IOW              state   Que
 tests                    postgres     127.0.0.1/32    N      idle in trans   SELECT pg_sleep(0)
 ------------------------------- sending key 'T' --------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
- Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
  Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
  Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                      PAUSE                                      
 DATABASE                     USER           CLIENT  IOW              state   Query
 tests                    postgres     127.0.0.1/32    N      idle in trans   SELECT pg_sleep(0)
-------------------------------- sending key 'c' --------------------------------
+------------------------------- sending key '3' --------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
- Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                     PAUSE                                      
+DATABASE                     USER           CLIENT  IOW              state   Query
+tests                    postgres     127.0.0.1/32    N      idle in trans   SELECT pg_sleep(0)
+------------------------------- sending key 'r' --------------------------------
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
  Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
  Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
@@ -214,6 +224,24 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
 DATABASE                     USER           CLIENT  IOW              state   Query
 tests                    postgres     127.0.0.1/32    N      idle in trans   SELECT pg_sleep(0)
 ------------------------------- sending key ' ' --------------------------------
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                RUNNING QUERIES
+DATABASE                     USER           CLIENT  IOW              state   Query
+tests                    postgres     127.0.0.1/32    N      idle in trans   SELECT pg_sleep(0)
+------------------------------- sending key 'T' --------------------------------
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                RUNNING QUERIES
+DATABASE                     USER           CLIENT  IOW              state   Query
+tests                    postgres     127.0.0.1/32    N      idle in trans   SELECT pg_sleep(0)
+------------------------------- sending key 'c' --------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction
  Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
@@ -230,14 +258,6 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                 WAITING QUERIES
 DATABASE                     USER           CLIENT  RELATION             TYPE             MODE              state   Query
-------------------------------- sending key '3' --------------------------------
-PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
- Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction
- Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
- Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
- Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
-                                BLOCKING QUERIES
-DATABASE                     USER           CLIENT  RELATION             TYPE             MODE              state   Query
 ------------------------------- sending key '1' --------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction
@@ -247,6 +267,14 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
                                 RUNNING QUERIES
 DATABASE                     USER           CLIENT  IOW              state   Query
 tests                    postgres     127.0.0.1/32    N      idle in trans   SELECT pg_sleep(0)
+------------------------------- sending key '3' --------------------------------
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                BLOCKING QUERIES
+DATABASE                     USER           CLIENT  RELATION             TYPE             MODE              state   Query
 ------------------------------- sending key 'q' --------------------------------
 
 

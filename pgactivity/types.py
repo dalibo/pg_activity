@@ -552,6 +552,19 @@ class UI:
         columns_by_querymode = {qm: tuple(make_columns_for(qm)) for qm in QueryMode}
         return cls(columns_by_querymode=columns_by_querymode, **kwargs)
 
+    def toggle_pause(self) -> "UI":
+        """Toggle 'in_pause' attribute.
+
+        >>> ui = UI.make()
+        >>> ui.in_pause
+        False
+        >>> ui.toggle_pause().in_pause
+        True
+        >>> ui.toggle_pause().toggle_pause().in_pause
+        False
+        """
+        return attr.evolve(self, in_pause=not self.in_pause)
+
     def evolve(self, **changes: Any) -> "UI":
         """Return a new UI with 'changes' applied.
 
@@ -564,6 +577,16 @@ class UI:
         >>> new_ui.sort_key.name
         'write'
         """
+        if self.in_pause:
+            return self
+        forbidden = set(changes) - {
+            "duration_mode",
+            "verbose_mode",
+            "sort_key",
+            "query_mode",
+            "refresh_time",
+        }
+        assert not forbidden, forbidden
         return attr.evolve(self, **changes)
 
     def column(self, key: str) -> Column:

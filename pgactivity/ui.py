@@ -93,7 +93,7 @@ def main(
             elif key == keys.EXIT:
                 break
             elif key == keys.PAUSE:
-                ui = ui.evolve(in_pause=not ui.in_pause)
+                ui = ui.toggle_pause()
             elif options.nodbsize and key == keys.REFRESH_DB_SIZE:
                 skip_sizes = False
             elif key in (keys.REFRESH_TIME_INCREASE, keys.REFRESH_TIME_DECREASE):
