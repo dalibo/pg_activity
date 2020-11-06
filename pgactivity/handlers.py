@@ -94,6 +94,8 @@ def sort_key_for(
     >>> sort_key_for(k("1"), QueryMode.activities, True)
     >>> sort_key_for(k("m"), QueryMode.activities, True)
     <SortKey.mem: 2>
+    >>> sort_key_for(k("w"), QueryMode.activities, True)
+    <SortKey.write: 4>
     >>> sort_key_for(k("t"), QueryMode.activities, True)
     <SortKey.duration: 5>
     >>> sort_key_for(k("m"), QueryMode.waiting, True)

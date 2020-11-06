@@ -557,9 +557,11 @@ class UI:
         >>> ui = UI.make()
         >>> ui.query_mode.value
         'running queries'
-        >>> new_ui = ui.evolve(query_mode=QueryMode.blocking)
+        >>> new_ui = ui.evolve(query_mode=QueryMode.blocking, sort_key=SortKey.write)
         >>> new_ui.query_mode.value
         'blocking queries'
+        >>> new_ui.sort_key.name
+        'write'
         """
         return attr.evolve(self, **changes)
 
