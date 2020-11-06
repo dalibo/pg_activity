@@ -139,6 +139,8 @@ def main(
                         pg_procs.selected = None
                         wait_for = None
                 else:
+                    pg_procs.selected = None
+                    wait_for = None
                     ui = ui.evolve(
                         query_mode=handlers.query_mode(key) or ui.query_mode,
                         sort_key=(
