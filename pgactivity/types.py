@@ -493,6 +493,7 @@ class UI:
                 key="write",
                 name="WRITE/s",
                 template_h="%8s ",
+                sort_key=SortKey.write,
                 transform=utils.naturalsize,
             )
 
