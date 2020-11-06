@@ -54,7 +54,7 @@ def main(
     if term is None:
         # Used in tests.
         term = Terminal()
-    key, in_help, wait_for = None, False, None
+    key, in_help = None, False
     sys_procs: Dict[int, types.SystemProcess] = {}
     pg_procs = types.SelectableProcesses([])
     activity_stats: types.ActivityStats
@@ -101,13 +101,13 @@ def main(
             elif key is not None:
                 if keys.is_process_next(key):
                     pg_procs.select_next()
-                    wait_for = 3
+                    ui.start_interactive()
                 elif keys.is_process_prev(key):
                     pg_procs.select_prev()
-                    wait_for = 3
+                    ui.start_interactive()
                 elif key.name == keys.CANCEL_SELECTION:
                     pg_procs.selected = None
-                    wait_for = None
+                    ui.end_interactive()
                 elif pg_procs.selected and key in (
                     keys.PROCESS_CANCEL,
                     keys.PROCESS_KILL,
@@ -137,10 +137,10 @@ def main(
                             data.pg_terminate_backend(pid)
                             msg_pile.send(action_formatter(f"Process {pid} terminated"))
                         pg_procs.selected = None
-                        wait_for = None
+                        ui.end_interactive()
                 else:
                     pg_procs.selected = None
-                    wait_for = None
+                    ui.end_interactive()
                     changes = {
                         "duration_mode": handlers.duration_mode(key, ui.duration_mode),
                         "verbose_mode": handlers.verbose_mode(key, ui.verbose_mode),
@@ -155,7 +155,7 @@ def main(
                         changes["sort_key"] = sort_key
                     ui = ui.evolve(**changes)
             if not in_help:
-                if not ui.in_pause and wait_for is None:
+                if not ui.in_pause and not ui.interactive():
                     if is_local:
                         memory, swap, load = activities.mem_swap_load()
                         system_info = attr.evolve(
@@ -213,9 +213,9 @@ def main(
                     render_footer=render_footer,
                 )
 
-                if wait_for is not None:
-                    wait_for -= 1
-                    if wait_for == 0:
-                        wait_for = None
+                if ui.interactive():
+                    ui.tick_interactive()
+                elif pg_procs.selected is not None:
+                    pg_procs.selected = None
 
             key = term.inkey(timeout=ui.refresh_time) or None

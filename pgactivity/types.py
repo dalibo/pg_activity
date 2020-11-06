@@ -374,6 +374,7 @@ class UI:
     query_mode: QueryMode = attr.ib(default=QueryMode.activities, converter=QueryMode)
     refresh_time: Union[float, int] = 2
     in_pause: bool = False
+    interactive_timeout: Optional[bool] = None
 
     @classmethod
     def make(
@@ -551,6 +552,61 @@ class UI:
 
         columns_by_querymode = {qm: tuple(make_columns_for(qm)) for qm in QueryMode}
         return cls(columns_by_querymode=columns_by_querymode, **kwargs)
+
+    def interactive(self) -> bool:
+        return self.interactive_timeout is not None
+
+    def start_interactive(self) -> None:
+        """Start interactive mode.
+
+        >>> ui = UI.make()
+        >>> ui.start_interactive()
+        >>> ui.interactive_timeout
+        3
+        """
+        object.__setattr__(self, "interactive_timeout", 3)
+
+    def end_interactive(self) -> None:
+        """End interactive mode.
+
+        >>> ui = UI.make()
+        >>> ui.start_interactive()
+        >>> ui.interactive_timeout
+        3
+        >>> ui.end_interactive()
+        >>> ui.interactive_timeout
+        """
+        object.__setattr__(self, "interactive_timeout", None)
+
+    def tick_interactive(self) -> None:
+        """End interactive mode.
+
+        >>> ui = UI.make()
+        >>> ui.tick_interactive()
+        Traceback (most recent call last):
+            ...
+        RuntimeError: cannot tick interactive mode
+        >>> ui.start_interactive()
+        >>> ui.interactive_timeout
+        3
+        >>> ui.tick_interactive()
+        >>> ui.interactive_timeout
+        2
+        >>> ui.tick_interactive()
+        >>> ui.interactive_timeout
+        1
+        >>> ui.tick_interactive()
+        >>> ui.interactive_timeout
+        >>> ui.tick_interactive()
+        Traceback (most recent call last):
+            ...
+        RuntimeError: cannot tick interactive mode
+        """
+        if self.interactive_timeout is None:
+            raise RuntimeError("cannot tick interactive mode")
+        assert self.interactive_timeout > 0, self.interactive_timeout
+        new_value = (self.interactive_timeout - 1) or None
+        object.__setattr__(self, "interactive_timeout", new_value)
 
     def toggle_pause(self) -> "UI":
         """Toggle 'in_pause' attribute.
