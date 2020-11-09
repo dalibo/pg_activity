@@ -96,8 +96,6 @@ def main(
                 ui = ui.toggle_pause()
             elif options.nodbsize and key == keys.REFRESH_DB_SIZE:
                 skip_sizes = False
-            elif key in (keys.REFRESH_TIME_INCREASE, keys.REFRESH_TIME_DECREASE):
-                ui = ui.evolve(refresh_time=handlers.refresh_time(key, ui.refresh_time))
             elif key is not None:
                 if keys.is_process_next(key):
                     pg_procs.select_next()
@@ -145,6 +143,10 @@ def main(
                         "duration_mode": handlers.duration_mode(key, ui.duration_mode),
                         "verbose_mode": handlers.verbose_mode(key, ui.verbose_mode),
                     }
+                    if key in (keys.REFRESH_TIME_INCREASE, keys.REFRESH_TIME_DECREASE):
+                        changes["refresh_time"] = handlers.refresh_time(
+                            key, ui.refresh_time
+                        )
                     query_mode = handlers.query_mode(key)
                     if query_mode is not None:
                         changes["query_mode"] = query_mode
