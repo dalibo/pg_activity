@@ -65,13 +65,6 @@ def main(
         while True:
             if key == keys.HELP:
                 in_help = True
-                print(term.clear + term.home, end="")
-                views.help(
-                    term,
-                    __version__,
-                    is_local,
-                    lines_counter=views.line_counter(term.height),
-                )
             elif in_help and key is not None:
                 in_help, key = False, None
             elif key == keys.EXIT:
@@ -140,8 +133,17 @@ def main(
                     if sort_key is not None:
                         changes["sort_key"] = sort_key
                     ui = ui.evolve(**changes)
-            if not in_help:
 
+            if in_help:
+                print(term.clear + term.home, end="")
+                views.help(
+                    term,
+                    __version__,
+                    is_local,
+                    lines_counter=views.line_counter(term.height),
+                )
+
+            else:
                 pg_db_info = data.pg_get_db_info(
                     pg_db_info, using_rds=options.rds, skip_sizes=skip_sizes
                 )
