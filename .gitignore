@@ -1,3 +1,4 @@
+build/
 htmlcov/
 pg_activity.egg-info
 pgactivity/__pycache__/
