@@ -76,15 +76,15 @@ def main(
                 skip_sizes = False
             elif key is not None:
                 if keys.is_process_next(key):
-                    pg_procs.select_next()
+                    pg_procs.focus_next()
                     ui.start_interactive()
                 elif keys.is_process_prev(key):
-                    pg_procs.select_prev()
+                    pg_procs.focus_prev()
                     ui.start_interactive()
                 elif key.name == keys.CANCEL_SELECTION:
-                    pg_procs.selected = None
+                    pg_procs.focused = None
                     ui.end_interactive()
-                elif pg_procs.selected and key in (
+                elif pg_procs.focused and key in (
                     keys.PROCESS_CANCEL,
                     keys.PROCESS_KILL,
                 ):
@@ -93,7 +93,7 @@ def main(
                         keys.PROCESS_KILL: ("terminate", "red"),
                     }[key]
                     action_formatter = term.formatter(color)
-                    pid = pg_procs.selected
+                    pid = pg_procs.focused
                     with term.location(x=0, y=term.height // 3):
                         print(
                             widgets.boxed(
@@ -112,10 +112,10 @@ def main(
                         elif action == "terminate":
                             data.pg_terminate_backend(pid)
                             msg_pile.send(action_formatter(f"Process {pid} terminated"))
-                        pg_procs.selected = None
+                        pg_procs.focused = None
                         ui.end_interactive()
                 else:
-                    pg_procs.selected = None
+                    pg_procs.focused = None
                     ui.end_interactive()
                     changes = {
                         "duration_mode": handlers.duration_mode(key, ui.duration_mode),
@@ -223,7 +223,7 @@ def main(
 
                 if ui.interactive():
                     ui.tick_interactive()
-                elif pg_procs.selected is not None:
-                    pg_procs.selected = None
+                elif pg_procs.focused is not None:
+                    pg_procs.focused = None
 
             key = term.inkey(timeout=ui.refresh_time) or None

@@ -321,7 +321,7 @@ def processes_rows(
     ) -> None:
         text_append(f"{color_for(column.color(value))}{column.render(value)}")
 
-    selected = processes.selected
+    selected = processes.focused
 
     for process in processes:
         color_type = "yellow" if process.pid == selected else "default"

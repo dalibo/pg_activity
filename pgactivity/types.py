@@ -863,41 +863,41 @@ class SelectableProcesses:
     >>> len(w)
     3
 
-    Nothing selected at initialization:
-    >>> w.selected
+    Nothing focused at initialization:
+    >>> w.focused
 
-    >>> w.select_next()
-    >>> w.selected
+    >>> w.focus_next()
+    >>> w.focused
     456
-    >>> w.select_next()
-    >>> w.selected
+    >>> w.focus_next()
+    >>> w.focused
     123
-    >>> w.select_prev()
-    >>> w.selected
+    >>> w.focus_prev()
+    >>> w.focused
     456
-    >>> w.select_prev()
-    >>> w.selected
+    >>> w.focus_prev()
+    >>> w.focused
     789
-    >>> w.selected = 789
-    >>> w.select_next()
-    >>> w.selected
+    >>> w.focused = 789
+    >>> w.focus_next()
+    >>> w.focused
     456
-    >>> w.select_prev()
-    >>> w.selected
+    >>> w.focus_prev()
+    >>> w.focused
     789
     >>> w.set_items(sorted(w.items))
-    >>> w.selected
+    >>> w.focused
     789
-    >>> w.select_prev()
-    >>> w.selected
+    >>> w.focus_prev()
+    >>> w.focused
     456
-    >>> w.select_next()
-    >>> w.selected
+    >>> w.focus_next()
+    >>> w.focused
     789
     """
 
     items: List[BaseProcess]
-    selected: Optional[int] = None
+    focused: Optional[int] = None
 
     def __len__(self) -> int:
         return len(self.items)
@@ -909,14 +909,14 @@ class SelectableProcesses:
         self.items[:] = list(new_items)
 
     def _position(self) -> Optional[int]:
-        if self.selected is None:
+        if self.focused is None:
             return None
         for idx, proc in enumerate(self.items):
-            if proc.pid == self.selected:
+            if proc.pid == self.focused:
                 return idx
         return None
 
-    def select_next(self) -> None:
+    def focus_next(self) -> None:
         if not self.items:
             return
         idx = self._position()
@@ -926,13 +926,13 @@ class SelectableProcesses:
             next_idx = 0
         else:
             next_idx = idx + 1
-        self.selected = self.items[next_idx].pid
+        self.focused = self.items[next_idx].pid
 
-    def select_prev(self) -> None:
+    def focus_prev(self) -> None:
         if not self.items:
             return
         idx = self._position() or 0
-        self.selected = self.items[idx - 1].pid
+        self.focused = self.items[idx - 1].pid
 
 
 ActivityStats = Union[
