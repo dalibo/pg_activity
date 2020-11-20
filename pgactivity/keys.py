@@ -7,6 +7,19 @@ from blessed.keyboard import Keystroke
 from .types import QueryMode
 
 
+@attr.s(auto_attribs=True, frozen=True, slots=True)
+class Key:
+    value: str
+    description: str
+    name: Optional[str] = None
+    local_only: bool = False
+
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, str):
+            return False
+        return self.value == other
+
+
 CANCEL_SELECTION = "KEY_ESCAPE"
 CHANGE_DURATION_MODE = "T"
 CHANGE_DISPLAY_MODE = "v"
@@ -43,19 +56,6 @@ def is_process_prev(key: Keystroke) -> bool:
     elif key == PROCESS_PREV_VI:
         return True
     return False
-
-
-@attr.s(auto_attribs=True, frozen=True, slots=True)
-class Key:
-    value: str
-    description: str
-    name: Optional[str] = None
-    local_only: bool = False
-
-    def __eq__(self, other: Any) -> bool:
-        if not isinstance(other, str):
-            return False
-        return self.value == other
 
 
 EXIT_KEY = Key(EXIT, "quit")
