@@ -25,7 +25,7 @@ CHANGE_DURATION_MODE = "T"
 CHANGE_DISPLAY_MODE = "v"
 EXIT = "q"
 HELP = "h"
-PAUSE = " "
+SPACE = " "
 PROCESS_CANCEL = "C"
 PROCESS_KILL = "K"
 PROCESS_NEXT = "KEY_DOWN"
@@ -59,7 +59,7 @@ def is_process_prev(key: Keystroke) -> bool:
 
 
 EXIT_KEY = Key(EXIT, "quit")
-PAUSE_KEY = Key(PAUSE, "pause", "Space")
+PAUSE_KEY = Key(SPACE, "pause", "Space")
 
 BINDINGS: List[Key] = [
     Key("Up/Down", "scroll process list"),
