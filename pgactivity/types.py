@@ -7,6 +7,7 @@ from typing import (
     Iterator,
     List,
     Mapping,
+    MutableSet,
     Optional,
     Sequence,
     Tuple,
@@ -894,16 +895,46 @@ class SelectableProcesses:
     >>> w.focus_next()
     >>> w.focused
     789
+
+    >>> w.selected, w.focused
+    ([789], 789)
+    >>> w.toggle_pin_focused()
+    >>> w.focus_next()
+    >>> w.toggle_pin_focused()
+    >>> w.selected, w.focused
+    ([123, 789], 123)
+    >>> w.toggle_pin_focused()
+    >>> w.focus_next()
+    >>> w.toggle_pin_focused()
+    >>> w.selected, w.focused
+    ([456, 789], 456)
+    >>> w.reset()
+    >>> w.selected, w.focused
+    ([], None)
     """
 
     items: List[BaseProcess]
     focused: Optional[int] = None
+    pinned: MutableSet[int] = attr.ib(default=attr.Factory(set))
 
     def __len__(self) -> int:
         return len(self.items)
 
     def __iter__(self) -> Iterator[BaseProcess]:
         return iter(self.items)
+
+    @property
+    def selected(self) -> List[int]:
+        if self.pinned:
+            return list(self.pinned)
+        elif self.focused:
+            return [self.focused]
+        else:
+            return []
+
+    def reset(self) -> None:
+        self.focused = None
+        self.pinned.clear()
 
     def set_items(self, new_items: Sequence[BaseProcess]) -> None:
         self.items[:] = list(new_items)
@@ -933,6 +964,13 @@ class SelectableProcesses:
             return
         idx = self._position() or 0
         self.focused = self.items[idx - 1].pid
+
+    def toggle_pin_focused(self) -> None:
+        assert self.focused is not None
+        try:
+            self.pinned.remove(self.focused)
+        except KeyError:
+            self.pinned.add(self.focused)
 
 
 ActivityStats = Union[

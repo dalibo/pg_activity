@@ -351,7 +351,7 @@ Tests for footer_*()
 >>> footer_help(term)
 F1/1 Running queries  F2/2 Waiting queries  F3/3 Blocking queries Space Pause            q Quit             h Help            
 >>> footer_interative_help(term)
-C Cancel current query    K Terminate current query Other Back to activities     
+C Cancel current query    K Terminate current query Space Tag/untag current query Other Back to activities     
 >>> footer_message(term, "process 123 cancelled")
                              process 123 cancelled                              
 

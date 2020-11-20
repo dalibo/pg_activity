@@ -81,10 +81,12 @@ def main(
                 elif keys.is_process_prev(key):
                     pg_procs.focus_prev()
                     ui.start_interactive()
+                elif key == keys.SPACE:
+                    pg_procs.toggle_pin_focused()
                 elif key.name == keys.CANCEL_SELECTION:
-                    pg_procs.focused = None
+                    pg_procs.reset()
                     ui.end_interactive()
-                elif pg_procs.focused and key in (
+                elif pg_procs.selected and key in (
                     keys.PROCESS_CANCEL,
                     keys.PROCESS_KILL,
                 ):
@@ -93,12 +95,16 @@ def main(
                         keys.PROCESS_KILL: ("terminate", "red"),
                     }[key]
                     action_formatter = term.formatter(color)
-                    pid = pg_procs.focused
+                    pids = pg_procs.selected
+                    if len(pids) > 1:
+                        ptitle = f"processes {', '.join((str(p) for p in pids))}"
+                    else:
+                        ptitle = f"process {pids[0]}"
                     with term.location(x=0, y=term.height // 3):
                         print(
                             widgets.boxed(
                                 term,
-                                f"Confirm {action_formatter(action)} action on process {pid}? (y/n)",
+                                f"Confirm {action_formatter(action)} action on {ptitle}? (y/n)",
                                 border_color=color,
                                 center=True,
                             ),
@@ -107,15 +113,21 @@ def main(
                         confirm_key = term.inkey(timeout=None)
                     if confirm_key.lower() == "y":
                         if action == "cancel":
-                            data.pg_cancel_backend(pid)
-                            msg_pile.send(action_formatter(f"Process {pid} cancelled"))
+                            for pid in pids:
+                                data.pg_cancel_backend(pid)
+                            msg_pile.send(
+                                action_formatter(f"{ptitle.capitalize()} cancelled")
+                            )
                         elif action == "terminate":
-                            data.pg_terminate_backend(pid)
-                            msg_pile.send(action_formatter(f"Process {pid} terminated"))
-                        pg_procs.focused = None
+                            for pid in pids:
+                                data.pg_terminate_backend(pid)
+                            msg_pile.send(
+                                action_formatter(f"{ptitle.capitalize()} terminated")
+                            )
+                        pg_procs.reset()
                         ui.end_interactive()
                 else:
-                    pg_procs.focused = None
+                    pg_procs.reset()
                     ui.end_interactive()
                     changes = {
                         "duration_mode": handlers.duration_mode(key, ui.duration_mode),
@@ -222,8 +234,9 @@ def main(
                 )
 
                 if ui.interactive():
-                    ui.tick_interactive()
-                elif pg_procs.focused is not None:
-                    pg_procs.focused = None
+                    if not pg_procs.pinned:
+                        ui.tick_interactive()
+                elif pg_procs.selected:
+                    pg_procs.reset()
 
             key = term.inkey(timeout=ui.refresh_time) or None

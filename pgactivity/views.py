@@ -25,6 +25,7 @@ from .keys import (
     PAUSE_KEY,
     PROCESS_CANCEL,
     PROCESS_KILL,
+    PROCESS_PIN,
 )
 from .types import (
     ActivityStats,
@@ -321,10 +322,15 @@ def processes_rows(
     ) -> None:
         text_append(f"{color_for(column.color(value))}{column.render(value)}")
 
-    selected = processes.focused
+    focused, pinned = processes.focused, processes.pinned
 
     for process in processes:
-        color_type = "yellow" if process.pid == selected else "default"
+        if process.pid == focused:
+            color_type = "cursor"
+        elif process.pid in pinned:
+            color_type = "yellow"
+        else:
+            color_type = "default"
         text: List[str] = []
         for column in ui.columns():
             field = column.key
@@ -406,9 +412,11 @@ def render_footer(term: Terminal, footer_values: List[Tuple[str, str]]) -> None:
 
 def footer_interative_help(term: Terminal) -> None:
     """Footer line with help keys for interactive mode."""
+    assert PROCESS_PIN.name is not None
     footer_values = [
         (PROCESS_CANCEL, "cancel current query"),
         (PROCESS_KILL, "terminate current query"),
+        (PROCESS_PIN.name, PROCESS_PIN.description),
         ("Other", "back to activities"),
     ]
     return render_footer(term, footer_values)
