@@ -7,14 +7,10 @@ Functional tests for 'ui' module
 
 >>> import blessed
 >>> from blessed.keyboard import Keystroke
->>> import psycopg2
 
 >>> from pgactivity import ui
 
 >>> postgres = getfixture("postgresql")
-
->>> def new_cnx():
-...     return psycopg2.connect(**postgres.info.dsn_parameters)
 
 Default CLI options, passed to ui.main():
 >>> defaults = {
@@ -341,16 +337,13 @@ tests               N      idle in trans   CREATE TABLE persons (firstname text,
 >>> postgres.commit()
 
 
+
 Interactive mode:
->>> conn1 = new_cnx()
->>> with conn1.cursor() as cur:
-...     cur.execute("SELECT 42")
->>> conn2 = new_cnx()
->>> with conn2.cursor() as cur:
-...     cur.execute("SELECT 43")
->>> conn3 = new_cnx()
->>> with conn3.cursor() as cur:
-...     cur.execute("UPDATE persons SET lastname = 'blocking'")
+
+>>> execute = getfixture("executor")
+>>> execute("SELECT 42")
+>>> execute("SELECT 43")
+>>> execute("UPDATE persons SET lastname = 'blocking'")
 
 >>> options = optparse.Values(
 ...     defaults=dict(
