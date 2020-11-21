@@ -333,8 +333,8 @@ tests               N      idle in trans   CREATE TABLE persons (firstname text,
 4
 
 >>> with postgres.cursor() as cur:
-...     cur.execute("INSERT INTO persons VALUES ('alice')")
-...     cur.execute("INSERT INTO persons VALUES ('bob')")
+...     cur.execute("CREATE TABLE t (s text)")
+...     cur.execute("INSERT INTO t VALUES ('init')")
 >>> postgres.commit()
 
 
@@ -344,8 +344,8 @@ Interactive mode:
 >>> execute = getfixture("executor")
 >>> execute("SELECT 42")
 >>> execute("SELECT 43")
->>> execute("UPDATE persons SET lastname = 'blocking'")
->>> execute("UPDATE persons SET lastname = 'waiting'", commit=True)
+>>> execute("UPDATE t SET s = 'blocking'")
+>>> execute("UPDATE t SET s = 'waiting'", commit=True)
 >>> time.sleep(1)
 
 >>> options = optparse.Values(
@@ -375,10 +375,8 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
 PID    DATABASE          IOW              state   Query                         
 ...    tests               N      idle in trans   SELECT 42
 ...    tests               N      idle in trans   SELECT 43
-...    tests               N      idle in trans   UPDATE persons SET lastname = 
-                                                  'blocking'
-...    tests               N             active   UPDATE persons SET lastname = 
-                                                  'waiting'
+...    tests               N      idle in trans   UPDATE t SET s = 'blocking'
+...    tests               N             active   UPDATE t SET s = 'waiting'
 F1/1 Running queries  F2/2 Waiting queries  F3/3 Blocking queries Space Pause            q Quit             h Help            
 ---------------------------- sending key 'KEY_DOWN' ----------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
@@ -390,10 +388,8 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
 PID    DATABASE          IOW              state   Query                         
 ...    tests               N      idle in trans   SELECT 42
 ...    tests               N      idle in trans   SELECT 43
-...    tests               N      idle in trans   UPDATE persons SET lastname = 
-                                                  'blocking'
-...    tests               N             active   UPDATE persons SET lastname = 
-                                                  'waiting'
+...    tests               N      idle in trans   UPDATE t SET s = 'blocking'
+...    tests               N             active   UPDATE t SET s = 'waiting'
 C Cancel current query    K Terminate current query Space Tag/untag current query Other Back to activities     
 ------------------------------- sending key '2' --------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
@@ -403,7 +399,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                 WAITING QUERIES
 PID    DATABASE          RELATION             TYPE             MODE              state   Query
-...    tests                 None    transactionid        ShareLock             active   UPDATE persons SET lastname = 'waiting'
+...    tests                 None    transactionid        ShareLock             active   UPDATE t SET s = 'waiting'
 F1/1 Running queries  F2/2 Waiting queries  F3/3 Blocking queries Space Pause            q Quit             h Help            
 ------------------------------- sending key '3' --------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
@@ -413,7 +409,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                 BLOCKING QUERIES
 PID    DATABASE          RELATION             TYPE             MODE              state   Query
-...    tests                 None    transactionid    ExclusiveLock      idle in trans   UPDATE persons SET lastname = 'blocking'
+...    tests                 None    transactionid    ExclusiveLock      idle in trans   UPDATE t SET s = 'blocking'
 F1/1 Running queries  F2/2 Waiting queries  F3/3 Blocking queries Space Pause            q Quit             h Help            
 ------------------------------- sending key '1' --------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
@@ -425,10 +421,8 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
 PID    DATABASE          IOW              state   Query                         
 ...    tests               N      idle in trans   SELECT 42
 ...    tests               N      idle in trans   SELECT 43
-...    tests               N      idle in trans   UPDATE persons SET lastname = 
-                                                  'blocking'
-...    tests               N             active   UPDATE persons SET lastname = 
-                                                  'waiting'
+...    tests               N      idle in trans   UPDATE t SET s = 'blocking'
+...    tests               N             active   UPDATE t SET s = 'waiting'
 F1/1 Running queries  F2/2 Waiting queries  F3/3 Blocking queries Space Pause            q Quit             h Help            
 ---------------------------- sending key 'KEY_DOWN' ----------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
@@ -440,10 +434,8 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
 PID    DATABASE          IOW              state   Query                         
 ...    tests               N      idle in trans   SELECT 42
 ...    tests               N      idle in trans   SELECT 43
-...    tests               N      idle in trans   UPDATE persons SET lastname = 
-                                                  'blocking'
-...    tests               N             active   UPDATE persons SET lastname = 
-                                                  'waiting'
+...    tests               N      idle in trans   UPDATE t SET s = 'blocking'
+...    tests               N             active   UPDATE t SET s = 'waiting'
 C Cancel current query    K Terminate current query Space Tag/untag current query Other Back to activities     
 ------------------------------- sending key 'C' --------------------------------
                 ┌──────────────────────────────────────────────┐                
@@ -459,10 +451,8 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
 PID    DATABASE          IOW              state   Query                         
 ...    tests               N      idle in trans   SELECT 42
 ...    tests               N      idle in trans   SELECT 43
-...    tests               N      idle in trans   UPDATE persons SET lastname = 
-                                                  'blocking'
-...    tests               N             active   UPDATE persons SET lastname = 
-                                                  'waiting'
+...    tests               N      idle in trans   UPDATE t SET s = 'blocking'
+...    tests               N             active   UPDATE t SET s = 'waiting'
 C Cancel current query    K Terminate current query Space Tag/untag current query Other Back to activities     
 ------------------------------- sending key 'K' --------------------------------
               ┌─────────────────────────────────────────────────┐               
@@ -477,10 +467,8 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
                                 RUNNING QUERIES
 PID    DATABASE          IOW              state   Query                         
 ...    tests               N      idle in trans   SELECT 43
-...    tests               N      idle in trans   UPDATE persons SET lastname = 
-                                                  'blocking'
-...    tests               N             active   UPDATE persons SET lastname = 
-                                                  'waiting'
+...    tests               N      idle in trans   UPDATE t SET s = 'blocking'
+...    tests               N             active   UPDATE t SET s = 'waiting'
                              Process ... terminated
 ---------------------------- sending key 'KEY_DOWN' ----------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
@@ -491,10 +479,8 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
                                 RUNNING QUERIES
 PID    DATABASE          IOW              state   Query                         
 ...    tests               N      idle in trans   SELECT 43
-...    tests               N      idle in trans   UPDATE persons SET lastname = 
-                                                  'blocking'
-...    tests               N             active   UPDATE persons SET lastname = 
-                                                  'waiting'
+...    tests               N      idle in trans   UPDATE t SET s = 'blocking'
+...    tests               N             active   UPDATE t SET s = 'waiting'
                              Process ... terminated
 ------------------------------- sending key ' ' --------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
@@ -505,10 +491,8 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
                                 RUNNING QUERIES
 PID    DATABASE          IOW              state   Query                         
 ...    tests               N      idle in trans   SELECT 43
-...    tests               N      idle in trans   UPDATE persons SET lastname = 
-                                                  'blocking'
-...    tests               N             active   UPDATE persons SET lastname = 
-                                                  'waiting'
+...    tests               N      idle in trans   UPDATE t SET s = 'blocking'
+...    tests               N             active   UPDATE t SET s = 'waiting'
 C Cancel current query    K Terminate current query Space Tag/untag current query Other Back to activities     
 ---------------------------- sending key 'KEY_DOWN' ----------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
@@ -519,10 +503,8 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
                                 RUNNING QUERIES
 PID    DATABASE          IOW              state   Query                         
 ...    tests               N      idle in trans   SELECT 43
-...    tests               N      idle in trans   UPDATE persons SET lastname = 
-                                                  'blocking'
-...    tests               N             active   UPDATE persons SET lastname = 
-                                                  'waiting'
+...    tests               N      idle in trans   UPDATE t SET s = 'blocking'
+...    tests               N             active   UPDATE t SET s = 'waiting'
 C Cancel current query    K Terminate current query Space Tag/untag current query Other Back to activities     
 ------------------------------- sending key ' ' --------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
@@ -533,10 +515,8 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
                                 RUNNING QUERIES
 PID    DATABASE          IOW              state   Query                         
 ...    tests               N      idle in trans   SELECT 43
-...    tests               N      idle in trans   UPDATE persons SET lastname = 
-                                                  'blocking'
-...    tests               N             active   UPDATE persons SET lastname = 
-                                                  'waiting'
+...    tests               N      idle in trans   UPDATE t SET s = 'blocking'
+...    tests               N             active   UPDATE t SET s = 'waiting'
 C Cancel current query    K Terminate current query Space Tag/untag current query Other Back to activities     
 ------------------------------- sending key 'K' --------------------------------
           ┌─────────────────────────────────────────────────────────┐
@@ -555,6 +535,6 @@ PID    DATABASE          IOW              state   Query
 
 Waiting query should be unblocked:
 >>> with postgres.cursor() as c:
-...     c.execute("SELECT * from persons")
+...     c.execute("SELECT s from t")
 ...     c.fetchall()
-[('alice', 'waiting', None, None), ('bob', 'waiting', None, None)]
+[('waiting',)]
