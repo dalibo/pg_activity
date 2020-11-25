@@ -220,7 +220,7 @@ HAVING sum(p.price * s.units) > 5000;
                                                          HAVING sum(p.price *
                                                          s.units) > 5000;
 
->>> allflags = sum(Flag)
+>>> allflags = Flag.all()
 >>> ui = UI.make(flag=allflags)
 >>> term.width
 80

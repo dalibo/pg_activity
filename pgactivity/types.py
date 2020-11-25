@@ -163,6 +163,10 @@ class Flag(enum.IntFlag):
     PID = 16384
 
     @classmethod
+    def all(cls) -> "Flag":
+        return cls(sum(cls))
+
+    @classmethod
     def from_options(
         cls,
         *,
@@ -205,7 +209,7 @@ class Flag(enum.IntFlag):
         >>> Flag.from_options(is_local=False, **options)
         <Flag.MODE|TYPE|RELATION|WAIT|USER|CLIENT|APPNAME: 7694>
         """
-        flag = cls(sum(cls))
+        flag = cls.all()
         if nodb:
             flag ^= cls.DATABASE
         if nouser:
@@ -380,7 +384,7 @@ class UI:
     @classmethod
     def make(
         cls,
-        flag: Flag = Flag(sum(Flag)),
+        flag: Flag = Flag.all(),
         *,
         max_db_length: int = 16,
         **kwargs: Any,
