@@ -401,19 +401,14 @@ def render_footer(term: Terminal, footer_values: List[Tuple[str, str]]) -> None:
         col_width = width - term.length(key) - 1
         if col_width <= 0:
             return ""
-        desc = term.cyan_reverse(
-            term.ljust(desc[:col_width], width=col_width, fillchar=" ")
-        )
-        return f"{key} {desc}"
+        desc = term.ljust(desc[:col_width], width=col_width, fillchar=" ")
+        return f"{key} {term.cyan_reverse(desc)}"
 
     row = " ".join(
         [render_column(key, desc.capitalize()) for key, desc in footer_values]
     )
     assert term.length(row) <= term.width, (term.length(row), term.width, ncols)
-    print(
-        term.ljust(row, fillchar=term.cyan_reverse(" ")) + term.normal,
-        end="",
-    )
+    print(term.ljust(row, fillchar=term.cyan_reverse(" ")), end="")
 
 
 def footer_interative_help(term: Terminal) -> None:
