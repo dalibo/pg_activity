@@ -91,7 +91,6 @@ Interactives commands
 
 | Key       | Action                                                           |
 |-----------|------------------------------------------------------------------|
-| `C`       | Activate/deactivate colors                                       |
 | `r`       | Sort by READ/s, descending                                       |
 | `w`       | Sort by WRITE/s, descending                                      |
 | `c`       | Sort by CPU%, descending                                         |
@@ -101,6 +100,7 @@ Interactives commands
 | `Space`   | Pause on/off                                                     |
 | `v`       | Change queries display mode: full, indented, truncated           |
 | `UP/DOWN` | Scroll processes list                                            |
+| `k/j`     | Scroll processes list                                            |
 | `q`       | Quit                                                             |
 | `+`       | Increase refresh time. Maximum value : 5s                        |
 | `-`       | Decrease refresh time. Minimum Value : 0.5s                      |
@@ -114,14 +114,15 @@ Interactives commands
 Navigation mode
 ---------------
 
-| Key     | Action                                        |
-|---------|-----------------------------------------------|
-| `UP`    | Move up the cursor                            |
-| `DOWN`  | Move down the cursor                          |
-| `k`     | Terminate the current backend/tagged backends |
-| `Space` | Tag or untag the process                      |
-| `q`     | Quit                                          |
-| `Other` | Back to activity                              |
+| Key        | Action                                        |
+|------------|-----------------------------------------------|
+| `UP`/`k`   | Move up the cursor                            |
+| `DOWN`/`j` | Move down the cursor                          |
+| `K`        | Terminate the current backend/tagged backends |
+| `C`        | Cancel the current backend/tagged backends    |
+| `Space`    | Tag or untag the process                      |
+| `q`        | Quit                                          |
+| `Other`    | Back to activity                              |
 			
 Screenshot
 ----------
