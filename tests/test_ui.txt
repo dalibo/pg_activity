@@ -66,7 +66,7 @@ Default CLI options, passed to ui.main():
 ...         return ks
 ...
 ...     with patch.object(term, "inkey", new=inkey) as patched_inkey:
-...         ui.main(options, term=term, render_footer=render_footer)
+...         ui.main(options, term=term, render_footer=render_footer, width=200)
 ...
 ...     if expected_timeouts is not None:
 ...         assert call_args_list == expected_timeouts
@@ -194,7 +194,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
  Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
-                                     PAUSE                                      
+                                     PAUSE
 DATABASE                     USER           CLIENT  IOW              state   Query
 tests                    postgres     127.0.0.1/32    N      idle in trans   SELECT pg_sleep(0)
 ------------------------------- sending key 'T' --------------------------------
@@ -203,7 +203,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
  Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
-                                     PAUSE                                      
+                                     PAUSE
 DATABASE                     USER           CLIENT  IOW              state   Query
 tests                    postgres     127.0.0.1/32    N      idle in trans   SELECT pg_sleep(0)
 ------------------------------- sending key '3' --------------------------------
@@ -212,7 +212,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
  Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
-                                     PAUSE                                      
+                                     PAUSE
 DATABASE                     USER           CLIENT  IOW              state   Query
 tests                    postgres     127.0.0.1/32    N      idle in trans   SELECT pg_sleep(0)
 ------------------------------- sending key 'r' --------------------------------
@@ -221,7 +221,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
  Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
-                                     PAUSE                                      
+                                     PAUSE
 DATABASE                     USER           CLIENT  IOW              state   Query
 tests                    postgres     127.0.0.1/32    N      idle in trans   SELECT pg_sleep(0)
 ------------------------------- sending key ' ' --------------------------------
@@ -304,7 +304,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
  Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                 RUNNING QUERIES
-DATABASE          IOW              state   Query                                
+DATABASE          IOW              state   Query
 tests               N      idle in trans   CREATE TABLE persons (firstname text,
                                            lastname text, age int, address text)
 ------------------------------- sending key 'D' --------------------------------
@@ -314,7 +314,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
  Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                 RUNNING QUERIES
-DATABASE          IOW              state   Query                                
+DATABASE          IOW              state   Query
 tests               N      idle in trans   CREATE TABLE persons (firstname text,
                                            lastname text, age int, address text)
 ------------------------------- sending key 'v' --------------------------------
@@ -324,7 +324,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
  Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                 RUNNING QUERIES
-DATABASE          IOW              state   Query                                
+DATABASE          IOW              state   Query
 tests               N      idle in trans   CREATE TABLE persons (firstname text,
 ------------------------------- sending key 'q' --------------------------------
 >>> with output.open() as f:

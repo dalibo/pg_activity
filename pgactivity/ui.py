@@ -16,6 +16,7 @@ def main(
     term: Optional[Terminal] = None,
     render_header: bool = True,
     render_footer: bool = True,
+    width: Optional[int] = None,
 ) -> None:
     data = pg_connect(
         options,
@@ -232,6 +233,7 @@ def main(
                     message=msg_pile.get(),
                     render_header=render_header,
                     render_footer=render_footer,
+                    width=width,
                 )
 
                 if ui.interactive():

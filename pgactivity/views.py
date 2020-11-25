@@ -45,6 +45,28 @@ from .activities import sorted as sorted_processes
 line_counter = functools.partial(itertools.count, step=-1)
 
 
+def shorten(term: Terminal, text: str, width: Optional[int] = None) -> str:
+    r"""Truncate 'text' to fit in the given 'width' (or term.width).
+
+    This is similar to textwrap.shorten() but sequence-aware.
+
+    >>> term = Terminal()
+    >>> text = f"{term.green('hello')}, world"
+    >>> text
+    'hello, world'
+    >>> shorten(term, text, 6)
+    'hello,'
+    >>> shorten(term, text, 3)
+    'hel'
+    >>> shorten(term, "", 3)
+    ''
+    """
+    if not text:
+        return ""
+    wrapped: List[str] = term.wrap(text, width=width, max_lines=1)
+    return wrapped[0] + term.normal  # type: ignore
+
+
 def limit(func: Callable[..., Iterable[str]]) -> Callable[..., int]:
     """View decorator handling screen height limit.
 
@@ -83,8 +105,9 @@ def limit(func: Callable[..., Iterable[str]]) -> Callable[..., int]:
     @functools.wraps(func)
     def wrapper(term: Terminal, *args: Any, **kwargs: Any) -> None:
         counter = kwargs.pop("lines_counter", None)
+        width = kwargs.pop("width", None)
         for line in func(term, *args, **kwargs):
-            print(line)
+            print(shorten(term, line, width))
             if counter is not None and next(counter) == 1:
                 break
 
@@ -435,6 +458,7 @@ def screen(
     message: Optional[str],
     render_header: bool = True,
     render_footer: bool = True,
+    width: Optional[int] = None,
 ) -> None:
     """Display the screen."""
 
@@ -459,15 +483,17 @@ def screen(
             active_connections=active_connections,
             system_info=system_info,
             lines_counter=lines_counter,
+            width=width,
         )
 
-    query_mode(term, ui, lines_counter=lines_counter)
-    columns_header(term, ui, lines_counter=lines_counter)
+    query_mode(term, ui, lines_counter=lines_counter, width=width)
+    columns_header(term, ui, lines_counter=lines_counter, width=width)
     processes_rows(
         term,
         ui,
         processes,
         lines_counter=lines_counter,
+        width=width,
     )
     if render_footer:
         with term.location(x=0, y=top_height):

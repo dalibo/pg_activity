@@ -66,9 +66,13 @@ Remote host:
 >>> host = Host("PostgreSQL 9.6", "server", "pgadm", "server.prod.tld", 5433, "app")
 >>> dbinfo = DBInfo(10203040506070809, 9999)
 
->>> header(term, ui, host=host, dbinfo=dbinfo, tps=12, active_connections=0)
+>>> header(term, ui, host=host, dbinfo=dbinfo, tps=12, active_connections=0,
+...        width=200)
 PostgreSQL 9.6 - server - pgadm@server.prod.tld:5433/app - Ref.: 10s
  Size:         9.06P - 9.76K/s        | TPS:              12      | Active connections:               0      | Duration mode:     backend
+>>> header(term, ui, host=host, dbinfo=dbinfo, tps=12, active_connections=0)
+PostgreSQL 9.6 - server - pgadm@server.prod.tld:5433/app - Ref.: 10s
+ Size:         9.06P - 9.76K/s        | TPS:              12      | Active
 
 Local host, with priviledged access:
 
@@ -83,7 +87,7 @@ Local host, with priviledged access:
 
 >>> ui = UI.make(refresh_time=2, min_duration=1.2)
 >>> header(term, ui, host=host, dbinfo=dbinfo, tps=1, active_connections=79,
-...        system_info=sysinfo)
+...        system_info=sysinfo, width=150)
 PostgreSQL 13.1 - localhost - tester@host:5432/postgres - Ref.: 2s - Min. duration: 1.2s
  Size:       117.74M - 12B/s          | TPS:               1      | Active connections:              79      | Duration mode:       query
  Mem.:      42.5% - 1.87G/5.75G       | IO Max:       12/s
@@ -97,29 +101,29 @@ Tests for columns_header()
 >>> ui = UI.make(query_mode=QueryMode.activities,
 ...              flag=Flag.PID | Flag.DATABASE,
 ...              sort_key=SortKey.cpu)
->>> columns_header(term, ui)
-PID    DATABASE                      state   Query                              
+>>> columns_header(term, ui, width=83)
+PID    DATABASE                      state   Query
 
 >>> ui = UI.make(query_mode=QueryMode.activities,
 ...              flag=Flag.CPU,
 ...              sort_key=SortKey.cpu)
 >>> columns_header(term, ui)
-  CPU%              state   Query                                               
+  CPU%              state   Query
 
 >>> ui = UI.make(query_mode=QueryMode.activities,
 ...              flag=Flag.MEM,
 ...              sort_key=SortKey.cpu)
 >>> columns_header(term, ui)
-MEM%              state   Query                                                 
+MEM%              state   Query
 
 >>> ui = UI.make(query_mode=QueryMode.blocking,
 ...              flag=Flag.PID | Flag.DATABASE | Flag.APPNAME | Flag.RELATION | Flag.CLIENT | Flag.WAIT,
 ...              sort_key=SortKey.duration)
->>> columns_header(term, ui)
+>>> columns_header(term, ui, width=150)
 PID    DATABASE                      APP           CLIENT  RELATION              state   Query
 
 >>> ui = ui.evolve(query_mode=QueryMode.activities)
->>> columns_header(term, ui)
+>>> columns_header(term, ui, width=150)
 PID    DATABASE                      APP           CLIENT  W              state   Query
 
 
@@ -227,7 +231,7 @@ HAVING sum(p.price * s.units) > 5000;
 
 Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 (TODO: this is buggy, the first line should be wrapped as well if too long)
->>> processes_rows(term, ui, SelectableProcesses(processes1))
+>>> processes_rows(term, ui, SelectableProcesses(processes1), width=250)
 6239   pgbench                   pgbench         postgres            local    0.1  1.0       7B      12B  0.000000  N    N      idle in trans   UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
 6228   pgbench                   pgbench         postgres            local    0.2  1.0       0B    1.08M  0.000413  N    Y             active   \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
 1234   business               accounting              bob            local    2.4  1.0    9.42M    1.21K  20:34.00  Y    N             active   SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id)
@@ -292,7 +296,7 @@ p.price, p.cost HAVING sum(p.price * s.units) > 5000;
                                              bbalance = bbalance + 1788 WHERE
                                              bid = 68;
 >>> ui = UI.make(query_mode=QueryMode.blocking, flag=allflags)
->>> processes_rows(term, ui, SelectableProcesses(processes2))
+>>> processes_rows(term, ui, SelectableProcesses(processes2), width=250)
 6239   pgbench                   pgbench         postgres          1.2.3.4      None    transactionid    ExclusiveLock  11:06.00             active   END;
 6228   pgbench                   pgbench         postgres            local      ahah            tuple RowExclusiveLock  0.000413      idle in trans   UPDATE pgbench_branches SET bbalance = bbalance + 1788 WHERE bid = 68;
 
@@ -336,7 +340,7 @@ p.price, p.cost HAVING sum(p.price * s.units) > 5000;
 ... ]
 >>> all_but_local_flags = Flag.PID|Flag.DATABASE|Flag.APPNAME|Flag.USER|Flag.CLIENT|Flag.TIME|Flag.WAIT
 >>> ui = UI.make(query_mode=QueryMode.activities,flag=all_but_local_flags)
->>> processes_rows(term, ui, SelectableProcesses(processes1b))
+>>> processes_rows(term, ui, SelectableProcesses(processes1b), width=250)
 6239   pgbench                   pgbench         postgres            local  0.000000  N      idle in trans   UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
 6228   pgbench                      none         postgres            local  0.000413  N             active   \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
 1234   business               accounting              bob     192.168.0.47  20:34.00  Y             active   SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id)
@@ -389,6 +393,7 @@ Tests for screen()
 ...     active_connections=7,
 ...     activity_stats=(SelectableProcesses(processes3), sysinfo),
 ...     message=None,
+...     width=150,
 ... )
 PostgreSQL 13 - testhost - pgadm@server.prod.tld:5433/app - Ref.: 10s - Min. duration: 1s
  Size:         9.06P - 9.76K/s        | TPS:               5      | Active connections:               7      | Duration mode:     backend
@@ -396,11 +401,12 @@ PostgreSQL 13 - testhost - pgadm@server.prod.tld:5433/app - Ref.: 10s - Min. dur
  Swap:       1.0% - 2.29K/5.88G       | Read:          128B/s - 6/s
  Load:         0.50 1.90 0.93         | Write:          8B/s - 9/s
                                 RUNNING QUERIES
-PID    DATABASE           CPU% MEM%              state   Query                  
+PID    DATABASE           CPU% MEM%              state   Query
 1234   business            2.4  1.0             active   SELECT product_id, p.na
 6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts
 F1/1 Running F2/2 Waiting F3/3 Blockin Space Pause  q Quit       h Help         
 
+(using terminal width)
 >>> screen(
 ...     term,
 ...     ui,
@@ -411,12 +417,12 @@ F1/1 Running F2/2 Waiting F3/3 Blockin Space Pause  q Quit       h Help
 ...     activity_stats=(SelectableProcesses(processes3[:-1]), sysinfo),
 ...     message=f"Process {processes3[-1].pid} killed",
 ... )
-PostgreSQL 13 - testhost - pgadm@server.prod.tld:5433/app - Ref.: 10s - Min. duration: 1s
- Size:         9.06P - 9.76K/s        | TPS:               5      | Active connections:               7      | Duration mode:     backend
+PostgreSQL 13 - testhost - pgadm@server.prod.tld:5433/app - Ref.: 10s - Min.
+ Size:         9.06P - 9.76K/s        | TPS:               5      | Active
  Mem.:      2.5% - 954.85M/3.93G      | IO Max:       76/s
  Swap:       1.0% - 2.29K/5.88G       | Read:          128B/s - 6/s
  Load:         0.50 1.90 0.93         | Write:          8B/s - 9/s
                                 RUNNING QUERIES
-PID    DATABASE           CPU% MEM%              state   Query                  
+PID    DATABASE           CPU% MEM%              state   Query
 1234   business            2.4  1.0             active   SELECT product_id, p.na
                               Process 6239 killed                               
