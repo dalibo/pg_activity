@@ -376,7 +376,7 @@ def processes_rows(
 
 
 def footer_message(term: Terminal, message: str) -> None:
-    print(term.center(message) + term.normal, end="")
+    print(term.center(message[: term.width]) + term.normal, end="")
 
 
 def footer_help(term: Terminal) -> None:
@@ -394,18 +394,24 @@ def footer_help(term: Terminal) -> None:
 
 
 def render_footer(term: Terminal, footer_values: List[Tuple[str, str]]) -> None:
-    width = max(len(desc) for _, desc in footer_values)
-    print(
-        term.ljust(
-            " ".join(
-                [
-                    f"{key} {term.cyan_reverse(term.ljust(desc.capitalize(), width=width, fillchar=' '))}"
-                    for key, desc in footer_values
-                ]
-            ),
-            fillchar=" ",
+    ncols = len(footer_values)
+    width = (term.width - ncols - 1) // ncols
+
+    def render_column(key: str, desc: str) -> str:
+        col_width = width - term.length(key) - 1
+        if col_width <= 0:
+            return ""
+        desc = term.cyan_reverse(
+            term.ljust(desc[:col_width], width=col_width, fillchar=" ")
         )
-        + term.normal,
+        return f"{key} {desc}"
+
+    row = " ".join(
+        [render_column(key, desc.capitalize()) for key, desc in footer_values]
+    )
+    assert term.length(row) <= term.width, (term.length(row), term.width, ncols)
+    print(
+        term.ljust(row, fillchar=term.cyan_reverse(" ")) + term.normal,
         end="",
     )
 

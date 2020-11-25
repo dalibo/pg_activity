@@ -349,9 +349,9 @@ Tests for footer_*()
 --------------------
 
 >>> footer_help(term)
-F1/1 Running queries  F2/2 Waiting queries  F3/3 Blocking queries Space Pause            q Quit             h Help            
+F1/1 Running F2/2 Waiting F3/3 Blockin Space Pause  q Quit       h Help         
 >>> footer_interative_help(term)
-C Cancel current query    K Terminate current query Space Tag/untag current query Other Back to activities     
+C Cancel current q K Terminate curren Space Tag/untag cu Other Back to acti     
 >>> footer_message(term, "process 123 cancelled")
                              process 123 cancelled                              
 
@@ -399,7 +399,7 @@ PostgreSQL 13 - testhost - pgadm@server.prod.tld:5433/app - Ref.: 10s - Min. dur
 PID    DATABASE           CPU% MEM%              state   Query                  
 1234   business            2.4  1.0             active   SELECT product_id, p.na
 6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts
-F1/1 Running queries  F2/2 Waiting queries  F3/3 Blocking queries Space Pause            q Quit             h Help            
+F1/1 Running F2/2 Waiting F3/3 Blockin Space Pause  q Quit       h Help         
 
 >>> screen(
 ...     term,
