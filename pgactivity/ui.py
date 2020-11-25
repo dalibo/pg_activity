@@ -43,8 +43,9 @@ def main(
         None, using_rds=options.rds, skip_sizes=options.nodbsize
     )
 
+    flag = types.Flag.from_options(is_local=is_local, **vars(options))
     ui = types.UI.make(
-        flag=types.Flag.from_options(is_local=is_local, **vars(options)),
+        flag=flag,
         min_duration=options.minduration,
         duration_mode=int(options.durationmode),
         verbose_mode=int(options.verbosemode),
@@ -142,7 +143,7 @@ def main(
                         changes["query_mode"] = query_mode
                     else:
                         query_mode = ui.query_mode
-                    sort_key = handlers.sort_key_for(key, query_mode, is_local)
+                    sort_key = handlers.sort_key_for(key, query_mode, flag)
                     if sort_key is not None:
                         changes["sort_key"] = sort_key
                     ui = ui.evolve(**changes)

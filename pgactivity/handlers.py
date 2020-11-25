@@ -3,7 +3,7 @@ from typing import Optional
 from blessed.keyboard import Keystroke
 
 from . import keys
-from .types import DurationMode, QueryDisplayMode, QueryMode, SortKey, enum_next
+from .types import DurationMode, Flag, QueryDisplayMode, QueryMode, SortKey, enum_next
 
 
 def refresh_time(
@@ -84,35 +84,52 @@ def query_mode(key: Keystroke) -> Optional[QueryMode]:
 
 
 def sort_key_for(
-    key: Keystroke, query_mode: QueryMode, is_local: bool
+    key: Keystroke, query_mode: QueryMode, flag: Flag
 ) -> Optional[SortKey]:
     """Return the sort key matching input key or None.
 
     >>> from blessed.keyboard import Keystroke as k
     >>> from pgactivity.types import QueryMode
 
-    >>> sort_key_for(k("1"), QueryMode.activities, True)
-    >>> sort_key_for(k("m"), QueryMode.activities, True)
+    >>> flag = Flag.all()
+
+    Unhandled key:
+    >>> sort_key_for(k("1"), QueryMode.activities, flag)
+
+    In activities mode, 'm', 'w', 't', ... keys are handled:
+    >>> sort_key_for(k("m"), QueryMode.activities, flag)
     <SortKey.mem: 2>
-    >>> sort_key_for(k("w"), QueryMode.activities, True)
+    >>> sort_key_for(k("w"), QueryMode.activities, flag)
     <SortKey.write: 4>
-    >>> sort_key_for(k("t"), QueryMode.activities, True)
+    >>> sort_key_for(k("t"), QueryMode.activities, flag)
     <SortKey.duration: 5>
-    >>> sort_key_for(k("m"), QueryMode.waiting, True)
-    <SortKey.duration: 5>
-    >>> sort_key_for(k("c"), QueryMode.activities, True)
+    >>> sort_key_for(k("c"), QueryMode.activities, flag)
     <SortKey.cpu: 1>
-    >>> sort_key_for(k("c"), QueryMode.activities, False)
+
+    In other modes, the default sort key is always returned:
+    >>> sort_key_for(k("m"), QueryMode.waiting, flag)
     <SortKey.duration: 5>
-    >>> sort_key_for(k("m"), QueryMode.blocking, False)
-    <SortKey.duration: 5>
+
+    When flag does not match given sort key, return None:
+    >>> flag ^= Flag.CPU
+    >>> sort_key_for(k("c"), QueryMode.activities, flag)
+    >>> sort_key_for(k("m"), QueryMode.activities, flag)
+    <SortKey.mem: 2>
+    >>> flag ^= Flag.MEM
+    >>> sort_key_for(k("m"), QueryMode.activities, flag)
     """
-    if not is_local or query_mode != QueryMode.activities:
+    if query_mode != QueryMode.activities:
         return SortKey.default()
-    return {
-        keys.SORTBY_CPU: SortKey.cpu,
-        keys.SORTBY_MEM: SortKey.mem,
-        keys.SORTBY_READ: SortKey.read,
-        keys.SORTBY_TIME: SortKey.duration,
-        keys.SORTBY_WRITE: SortKey.write,
-    }.get(key)
+    try:
+        sort_key, required_flag = {
+            keys.SORTBY_CPU: (SortKey.cpu, Flag.CPU),
+            keys.SORTBY_MEM: (SortKey.mem, Flag.MEM),
+            keys.SORTBY_READ: (SortKey.read, Flag.READ),
+            keys.SORTBY_TIME: (SortKey.duration, Flag.TIME),
+            keys.SORTBY_WRITE: (SortKey.write, Flag.WRITE),
+        }[key]
+    except KeyError:
+        return None
+    if flag & required_flag:
+        return sort_key
+    return None
