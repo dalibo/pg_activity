@@ -234,9 +234,8 @@ Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 >>> processes_rows(term, ui, SelectableProcesses(processes1), width=250)
 6239   pgbench                   pgbench         postgres            local    0.1  1.0       7B      12B  0.000000  N    N      idle in trans   UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
 6228   pgbench                   pgbench         postgres            local    0.2  1.0       0B    1.08M  0.000413  N    Y             active   \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
-1234   business               accounting              bob            local    2.4  1.0    9.42M    1.21K  20:34.00  Y    N             active   SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id)
-WHERE s.date > CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name,
-p.price, p.cost HAVING sum(p.price * s.units) > 5000;
+1234   business               accounting              bob            local    2.4  1.0    9.42M    1.21K  20:34.00  Y    N             active   SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id) WHERE s.date > CURRENT_DATE
+- INTERVAL '4 weeks' GROUP BY product_id, p.name, p.price, p.cost HAVING sum(p.price * s.units) > 5000;
 
 >>> ui = UI.make(flag=Flag.PID|Flag.DATABASE,
 ...              verbose_mode=QueryDisplayMode.truncate)
@@ -340,12 +339,11 @@ p.price, p.cost HAVING sum(p.price * s.units) > 5000;
 ... ]
 >>> all_but_local_flags = Flag.PID|Flag.DATABASE|Flag.APPNAME|Flag.USER|Flag.CLIENT|Flag.TIME|Flag.WAIT
 >>> ui = UI.make(query_mode=QueryMode.activities,flag=all_but_local_flags)
->>> processes_rows(term, ui, SelectableProcesses(processes1b), width=250)
+>>> processes_rows(term, ui, SelectableProcesses(processes1b), width=200)
 6239   pgbench                   pgbench         postgres            local  0.000000  N      idle in trans   UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
 6228   pgbench                      none         postgres            local  0.000413  N             active   \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
-1234   business               accounting              bob     192.168.0.47  20:34.00  Y             active   SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id)
-WHERE s.date > CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name,
-p.price, p.cost HAVING sum(p.price * s.units) > 5000;
+1234   business               accounting              bob     192.168.0.47  20:34.00  Y             active   SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id) WHERE s.date
+> CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name, p.price, p.cost HAVING sum(p.price * s.units) > 5000;
 
 
 
@@ -402,8 +400,8 @@ PostgreSQL 13 - testhost - pgadm@server.prod.tld:5433/app - Ref.: 10s - Min. dur
  Load:         0.50 1.90 0.93         | Write:          8B/s - 9/s
                                 RUNNING QUERIES
 PID    DATABASE           CPU% MEM%              state   Query
-1234   business            2.4  1.0             active   SELECT product_id, p.na
-6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts
+1234   business            2.4  1.0             active   SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id) WHERE s.date >
+6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
 F1/1 Running F2/2 Waiting F3/3 Blockin Space Pause/ q Quit       h Help         
 
 (using terminal width)

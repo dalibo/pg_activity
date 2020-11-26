@@ -48,7 +48,9 @@ Default CLI options, passed to ui.main():
 >>> term.width, term.height
 (80, 25)
 
->>> def run_ui(options, keys, expected_timeouts=None, render_header=True, render_footer=False):
+>>> def run_ui(options, keys, expected_timeouts=None,
+...            render_header=True, render_footer=False,
+...            width=200):
 ...     """Wrapper to ui.main() with a fake term.inkey()."""
 ...
 ...     call_args_list = []
@@ -66,8 +68,9 @@ Default CLI options, passed to ui.main():
 ...         return ks
 ...
 ...     with patch.object(term, "inkey", new=inkey):
-...         ui.main(options, term=term, render_footer=render_footer,
-...                 width=200, wait_on_actions=1)
+...         ui.main(options, term=term,
+...                 render_header=render_header, render_footer=render_footer,
+...                 width=width, wait_on_actions=1)
 ...
 ...     if expected_timeouts is not None:
 ...         assert call_args_list == expected_timeouts
@@ -298,35 +301,20 @@ Use another set of options:
 ...         output=str(output),
 ...     ),
 ... )
->>> run_ui(options, ["D", "v", "q"])  # doctest: +ELLIPSIS
-PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
- Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction
- Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
- Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
- Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+>>> run_ui(options, ["D", "v", "q"], width=100, render_header=False)
                                 RUNNING QUERIES
 DATABASE          IOW              state   Query
-tests               N      idle in trans   CREATE TABLE persons (firstname text,
-                                           lastname text, age int, address text)
+tests               N      idle in trans   CREATE TABLE persons (firstname text, lastname text, age
+                                           int, address text)
 ------------------------------- sending key 'D' --------------------------------
-PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
- Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction
- Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
- Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
- Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                 RUNNING QUERIES
 DATABASE          IOW              state   Query
-tests               N      idle in trans   CREATE TABLE persons (firstname text,
-                                           lastname text, age int, address text)
+tests               N      idle in trans   CREATE TABLE persons (firstname text, lastname text, age
+                                           int, address text)
 ------------------------------- sending key 'v' --------------------------------
-PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
- Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction
- Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
- Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
- Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                 RUNNING QUERIES
 DATABASE          IOW              state   Query
-tests               N      idle in trans   CREATE TABLE persons (firstname text,
+tests               N      idle in trans   CREATE TABLE persons (firstname text, lastname text, age
 ------------------------------- sending key 'q' --------------------------------
 >>> with output.open() as f:
 ...     lines = f.readlines()

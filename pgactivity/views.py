@@ -1,4 +1,5 @@
 import functools
+import inspect
 import itertools
 from textwrap import dedent
 from typing import (
@@ -106,6 +107,9 @@ def limit(func: Callable[..., Iterable[str]]) -> Callable[..., int]:
     def wrapper(term: Terminal, *args: Any, **kwargs: Any) -> None:
         counter = kwargs.pop("lines_counter", None)
         width = kwargs.pop("width", None)
+        signature = inspect.signature(func)
+        if "width" in signature.parameters:
+            kwargs["width"] = width
         for line in func(term, *args, **kwargs):
             print(shorten(term, line, width))
             if counter is not None and next(counter) == 1:
@@ -328,8 +332,12 @@ def processes_rows(
     term: Terminal,
     ui: UI,
     processes: SelectableProcesses,
+    width: Optional[int],
 ) -> Iterator[str]:
     """Display table rows with processes information."""
+
+    if width is None:
+        width = term.width
 
     def color_for(field: str) -> FormattingString:
         return getattr(term, colors.FIELD_BY_MODE[field][color_type])
@@ -361,7 +369,7 @@ def processes_rows(
                 cell(getattr(process, field), column)
 
         indent = get_indent(ui) + " "
-        dif = term.width - len(indent)
+        dif = width - len(indent)
 
         verbose_mode = ui.verbose_mode
         if dif < 0:
@@ -377,12 +385,12 @@ def processes_rows(
                 if term.length(query.split(" ", 1)[0]) >= dif:
                     # Query too long to even start on the first line, wrap all
                     # lines.
-                    query_lines = term.wrap(query, width=term.width)
+                    query_lines = term.wrap(query, width=width)
                 else:
                     # Only wrap subsequent lines.
                     wrapped_lines = term.wrap(query, width=dif)
                     query_lines = [wrapped_lines[0]] + term.wrap(
-                        " ".join(wrapped_lines[1:]), width=term.width
+                        " ".join(wrapped_lines[1:]), width=width
                     )
                 query_value = "\n".join(query_lines)
             else:
