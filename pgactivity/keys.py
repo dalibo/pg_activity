@@ -60,7 +60,7 @@ def is_process_prev(key: Keystroke) -> bool:
 
 
 EXIT_KEY = Key(EXIT, "quit")
-PAUSE_KEY = Key(SPACE, "pause", "Space")
+PAUSE_KEY = Key(SPACE, "pause/unpause", "Space")
 
 BINDINGS: List[Key] = [
     Key("Up/Down", "scroll process list"),

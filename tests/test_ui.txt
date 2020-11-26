@@ -108,7 +108,7 @@ pg_activity 1.6.2 - https://github.com/dalibo/pg_activity
 Released under PostgreSQL License.
 <BLANKLINE>
    Up/Down: scroll process list
-     Space: pause
+     Space: pause/unpause
          c: sort by CPU% desc. (activities)
          m: sort by MEM% desc. (activities)
          r: sort by READ/s desc. (activities)
@@ -377,7 +377,7 @@ PID    DATABASE          IOW              state   Query
 ...    tests               N      idle in trans   SELECT 43
 ...    tests               N      idle in trans   UPDATE t SET s = 'blocking'
 ...    tests               N             active   UPDATE t SET s = 'waiting'
-F1/1 Running F2/2 Waiting F3/3 Blockin Space Pause  q Quit       h Help         
+F1/1 Running F2/2 Waiting F3/3 Blockin Space Pause/ q Quit       h Help         
 ---------------------------- sending key 'KEY_DOWN' ----------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               2      | Duration mode:       query
@@ -400,7 +400,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
                                 WAITING QUERIES
 PID    DATABASE          RELATION             TYPE             MODE              state   Query
 ...    tests                 None    transactionid        ShareLock             active   UPDATE t SET s = 'waiting'
-F1/1 Running F2/2 Waiting F3/3 Blockin Space Pause  q Quit       h Help         
+F1/1 Running F2/2 Waiting F3/3 Blockin Space Pause/ q Quit       h Help         
 ------------------------------- sending key '3' --------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               2      | Duration mode:       query
@@ -410,7 +410,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
                                 BLOCKING QUERIES
 PID    DATABASE          RELATION             TYPE             MODE              state   Query
 ...    tests                 None    transactionid    ExclusiveLock      idle in trans   UPDATE t SET s = 'blocking'
-F1/1 Running F2/2 Waiting F3/3 Blockin Space Pause  q Quit       h Help         
+F1/1 Running F2/2 Waiting F3/3 Blockin Space Pause/ q Quit       h Help         
 ------------------------------- sending key '1' --------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               2      | Duration mode:       query
@@ -423,7 +423,7 @@ PID    DATABASE          IOW              state   Query
 ...    tests               N      idle in trans   SELECT 43
 ...    tests               N      idle in trans   UPDATE t SET s = 'blocking'
 ...    tests               N             active   UPDATE t SET s = 'waiting'
-F1/1 Running F2/2 Waiting F3/3 Blockin Space Pause  q Quit       h Help         
+F1/1 Running F2/2 Waiting F3/3 Blockin Space Pause/ q Quit       h Help         
 ---------------------------- sending key 'KEY_DOWN' ----------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               2      | Duration mode:       query
