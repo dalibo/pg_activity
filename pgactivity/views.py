@@ -442,6 +442,7 @@ def footer_interative_help(term: Terminal) -> None:
         (PROCESS_KILL, "terminate current query"),
         (PROCESS_PIN.name, PROCESS_PIN.description),
         ("Other", "back to activities"),
+        (EXIT_KEY.value, EXIT_KEY.description),
     ]
     return render_footer(term, footer_values)
 
