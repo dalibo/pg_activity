@@ -86,9 +86,9 @@ server activity monitoring.")
         '-d',
         '--dbname',
         dest = 'dbname',
-        help = "Database name to connect to (default: \"postgres\").",
+        help = "Database name to connect to (default: same as user).",
         metavar = 'DBNAME',
-        default = 'postgres')
+        default = os.environ.get('PGDATABASE') or os.environ.get('PGUSER') or getpass.getuser())
     # --blocksize
     parser.add_option(
         '--blocksize',
