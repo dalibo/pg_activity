@@ -3,12 +3,14 @@
 Command line tool for PostgreSQL server activity monitoring.
 
 [![Latest PyPI version](https://img.shields.io/pypi/v/pg_activity.svg)](https://pypi.python.org/pypi/pg_activity)
+[![Build Status](https://travis-ci.org/dalibo/pg_activity.svg?branch=master)](https://travis-ci.org/dalibo/pg_activity)
+
 
 Dependencies
 ------------
 
-  - `python` &ge; **2.6**
-  - `psycopg2` &ge; **2.2.1**
+  - `python` &ge; **3.6**
+  - `psycopg2` &ge; **2.5**
   - `psutil` &ge;  **0.5.1**
 
 Installation from sources:
@@ -49,7 +51,6 @@ Options
                               "localhost").
         -d DBNAME, --dbname=DBNAME
                               Database name to connect to (default: "postgres").
-        -C, --no-color        Disable color usage.
         --blocksize=BLOCKSIZE Filesystem blocksize (default: 4096).
         --rds                 Enable support for AWS RDS.
         --output=FILEPATH     Store running queries as CSV.
@@ -90,7 +91,6 @@ Interactives commands
 
 | Key       | Action                                                           |
 |-----------|------------------------------------------------------------------|
-| `C`       | Activate/deactivate colors                                       |
 | `r`       | Sort by READ/s, descending                                       |
 | `w`       | Sort by WRITE/s, descending                                      |
 | `c`       | Sort by CPU%, descending                                         |
@@ -100,6 +100,7 @@ Interactives commands
 | `Space`   | Pause on/off                                                     |
 | `v`       | Change queries display mode: full, indented, truncated           |
 | `UP/DOWN` | Scroll processes list                                            |
+| `k/j`     | Scroll processes list                                            |
 | `q`       | Quit                                                             |
 | `+`       | Increase refresh time. Maximum value : 5s                        |
 | `-`       | Decrease refresh time. Minimum Value : 0.5s                      |
@@ -113,14 +114,15 @@ Interactives commands
 Navigation mode
 ---------------
 
-| Key     | Action                                        |
-|---------|-----------------------------------------------|
-| `UP`    | Move up the cursor                            |
-| `DOWN`  | Move down the cursor                          |
-| `k`     | Terminate the current backend/tagged backends |
-| `Space` | Tag or untag the process                      |
-| `q`     | Quit                                          |
-| `Other` | Back to activity                              |
+| Key        | Action                                        |
+|------------|-----------------------------------------------|
+| `UP`/`k`   | Move up the cursor                            |
+| `DOWN`/`j` | Move down the cursor                          |
+| `K`        | Terminate the current backend/tagged backends |
+| `C`        | Cancel the current backend/tagged backends    |
+| `Space`    | Tag or untag the process                      |
+| `q`        | Quit                                          |
+| `Other`    | Back to activity                              |
 			
 Screenshot
 ----------

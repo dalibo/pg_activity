@@ -1,2 +1,14 @@
 recursive-include *.py
 include docs/man/pg_activity.1
+recursive-include docs *.png *.pod *.sh *.svg
+recursive-include tests *.py *.json *.txt
+include *.md
+include *.txt
+include .editorconfig
+include .coveragerc
+include .flake8
+include .travis.yml
+include mypy.ini
+include pyproject.toml
+include pytest.ini
+include tox.ini

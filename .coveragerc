@@ -1,0 +1,4 @@
+[run]
+include =
+  pg_activity
+  pgactivity/*

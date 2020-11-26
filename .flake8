@@ -1,0 +1,17 @@
+[flake8]
+doctests = True
+ignore =
+  E203, # whitespace before ‘:’
+  E501, # line too long
+  W503, # line break before binary operator
+exclude =
+  .git,
+  .mypy_cache,
+  .tox,
+  .venv,
+  pgactivity/Process.py,
+per-file-ignores =
+  pg_activity:E251
+  setup.py:E251,E402
+select = B,C,E,F,W,T4,B9
+mypy_config = mypy.ini

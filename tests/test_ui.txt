@@ -1,0 +1,541 @@
+Functional tests for 'ui' module
+--------------------------------
+
+>>> import functools
+>>> import optparse
+>>> import time
+>>> from unittest.mock import patch
+
+>>> import blessed
+>>> from blessed.keyboard import Keystroke
+
+>>> from pgactivity import ui
+
+>>> postgres = getfixture("postgresql")
+
+Default CLI options, passed to ui.main():
+>>> defaults = {
+...     "blocksize": 4096,
+...     "dbname": f"{postgres.info.dbname}",
+...     "debug": False,
+...     "durationmode": "1",
+...     "help": False,
+...     "host": f"{postgres.info.host}",
+...     "legacy_ui": False,
+...     "minduration": 0,
+...     "noappname": True,
+...     "noclient": False,
+...     "nocolor": False,
+...     "nocpu": True,
+...     "nodb": False,
+...     "nodbsize": False,
+...     "nomem": True,
+...     "nopid": False,
+...     "noread": True,
+...     "notime": True,
+...     "nouser": False,
+...     "nowait": True,
+...     "nowrite": True,
+...     "output": None,
+...     "port": f"{postgres.info.port}",
+...     "rds": False,
+...     "username": f"{postgres.info.user}",
+...     "verbosemode": "2",
+... }
+>>> options = optparse.Values(defaults=defaults)
+
+>>> term = blessed.Terminal(force_styling=None)
+>>> term.width, term.height
+(80, 25)
+
+>>> def run_ui(options, keys, expected_timeouts=None, render_header=True, render_footer=False):
+...     """Wrapper to ui.main() with a fake term.inkey()."""
+...
+...     call_args_list = []
+...
+...     def inkey(*, timeout):
+...         call_args_list.append(timeout)
+...         key = keys.pop(0)
+...         if isinstance(key, dict):
+...             ks = Keystroke(**key)
+...         else:
+...             ks = Keystroke(key)
+...         if render_footer:
+...             print()
+...         print(term.center(f" sending key '{ks}' ", fillchar="-"))
+...         return ks
+...
+...     with patch.object(term, "inkey", new=inkey):
+...         ui.main(options, term=term, render_footer=render_footer,
+...                 width=200, wait_on_actions=1)
+...
+...     if expected_timeouts is not None:
+...         assert call_args_list == expected_timeouts
+
+Mock system statistics
+TODO: use a non-admin connection in order to avoid all these mocks!
+>>> get_mem_swap = patch(
+...     "pgactivity.activities.get_mem_swap",
+...     return_value=(1.2, 3_000_000, 4_000_000_000, 5.6, 7_000, 8_000_000_000),
+... )
+>>> get_load_average = patch(
+...     "pgactivity.activities.get_load_average",
+...     return_value=(0.12, 0.14, 0.1),
+... )
+>>> pg_get_db_info = patch(
+...     "pgactivity.data.Data.pg_get_db_info",
+...     return_value={"total_size": 111_222_333, "size_ev": 0,
+...                   "tps": 0, "max_length": 27},
+... )
+>>> get_mem_swap.start()
+<MagicMock name='get_mem_swap' id='...'>
+>>> get_load_average.start()
+<MagicMock name='get_load_average' id='...'>
+>>> pg_get_db_info.start()
+<MagicMock name='pg_get_db_info' id='...'>
+
+No activity, first screen followed by help screen:
+
+>>> run_ui(options, ["h", "z", "q"])  # doctest: +ELLIPSIS
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                RUNNING QUERIES
+PID    DATABASE                     USER           CLIENT  IOW              state   Query
+------------------------------- sending key 'h' --------------------------------
+pg_activity 1.6.2 - https://github.com/dalibo/pg_activity
+Released under PostgreSQL License.
+<BLANKLINE>
+   Up/Down: scroll process list
+     Space: pause/unpause
+         c: sort by CPU% desc. (activities)
+         m: sort by MEM% desc. (activities)
+         r: sort by READ/s desc. (activities)
+         w: sort by WRITE/s desc. (activities)
+         t: sort by TIME+ desc. (activities)
+         +: increase refresh time (max:5s)
+         -: decrease refresh time (min:0.5s)
+         v: change display mode
+         T: change duration mode
+         D: force refresh database size
+         R: force refresh
+         q: quit
+Mode
+      F1/1: running queries
+      F2/2: waiting queries
+      F3/3: blocking queries
+<BLANKLINE>
+Press any key to exit.
+------------------------------- sending key 'z' --------------------------------
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                RUNNING QUERIES
+PID    DATABASE                     USER           CLIENT  IOW              state   Query
+------------------------------- sending key 'q' --------------------------------
+
+
+>>> defaults["nopid"] = True
+>>> options = optparse.Values(defaults=defaults)
+
+One query, idle in transaction:
+>>> cur = postgres.cursor()
+>>> cur.execute("SELECT pg_sleep(0)")
+>>> cur.close()
+
+Change refresh time, pause, change duration mode, change sort order, unpause,
+change query mode then quit:
+
+>>> keys = ["-", "-", "+", " ", "T", "3", "r", " ", "T", "c", "2", "1", "3", "q"]
+>>> expected_timeouts = [2.0, 1.0, 0.5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+>>> assert len(keys) == len(expected_timeouts)
+>>> run_ui(options, keys, expected_timeouts=expected_timeouts)  # doctest: +ELLIPSIS
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                RUNNING QUERIES
+DATABASE                     USER           CLIENT  IOW              state   Query
+tests                    postgres     127.0.0.1/32    N      idle in trans   SELECT pg_sleep(0)
+------------------------------- sending key '-' --------------------------------
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                RUNNING QUERIES
+DATABASE                     USER           CLIENT  IOW              state   Query
+tests                    postgres     127.0.0.1/32    N      idle in trans   SELECT pg_sleep(0)
+------------------------------- sending key '-' --------------------------------
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 0.5s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                RUNNING QUERIES
+DATABASE                     USER           CLIENT  IOW              state   Query
+tests                    postgres     127.0.0.1/32    N      idle in trans   SELECT pg_sleep(0)
+------------------------------- sending key '+' --------------------------------
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                RUNNING QUERIES
+DATABASE                     USER           CLIENT  IOW              state   Query
+tests                    postgres     127.0.0.1/32    N      idle in trans   SELECT pg_sleep(0)
+------------------------------- sending key ' ' --------------------------------
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                     PAUSE
+DATABASE                     USER           CLIENT  IOW              state   Query
+tests                    postgres     127.0.0.1/32    N      idle in trans   SELECT pg_sleep(0)
+------------------------------- sending key 'T' --------------------------------
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                     PAUSE
+DATABASE                     USER           CLIENT  IOW              state   Query
+tests                    postgres     127.0.0.1/32    N      idle in trans   SELECT pg_sleep(0)
+------------------------------- sending key '3' --------------------------------
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                     PAUSE
+DATABASE                     USER           CLIENT  IOW              state   Query
+tests                    postgres     127.0.0.1/32    N      idle in trans   SELECT pg_sleep(0)
+------------------------------- sending key 'r' --------------------------------
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                     PAUSE
+DATABASE                     USER           CLIENT  IOW              state   Query
+tests                    postgres     127.0.0.1/32    N      idle in trans   SELECT pg_sleep(0)
+------------------------------- sending key ' ' --------------------------------
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                RUNNING QUERIES
+DATABASE                     USER           CLIENT  IOW              state   Query
+tests                    postgres     127.0.0.1/32    N      idle in trans   SELECT pg_sleep(0)
+------------------------------- sending key 'T' --------------------------------
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                RUNNING QUERIES
+DATABASE                     USER           CLIENT  IOW              state   Query
+tests                    postgres     127.0.0.1/32    N      idle in trans   SELECT pg_sleep(0)
+------------------------------- sending key 'c' --------------------------------
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                RUNNING QUERIES
+DATABASE                     USER           CLIENT  IOW              state   Query
+tests                    postgres     127.0.0.1/32    N      idle in trans   SELECT pg_sleep(0)
+------------------------------- sending key '2' --------------------------------
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                WAITING QUERIES
+DATABASE                     USER           CLIENT  RELATION             TYPE             MODE              state   Query
+------------------------------- sending key '1' --------------------------------
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                RUNNING QUERIES
+DATABASE                     USER           CLIENT  IOW              state   Query
+tests                    postgres     127.0.0.1/32    N      idle in trans   SELECT pg_sleep(0)
+------------------------------- sending key '3' --------------------------------
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                BLOCKING QUERIES
+DATABASE                     USER           CLIENT  RELATION             TYPE             MODE              state   Query
+------------------------------- sending key 'q' --------------------------------
+
+
+Another idle transaction, with a long query:
+>>> cur = postgres.cursor()
+>>> cur.execute("CREATE TABLE persons (firstname text, lastname text, age int, address text)")
+>>> cur.close()
+
+Use another set of options:
+>>> output = getfixture("tmp_path") / "activities.csv"
+>>> options = optparse.Values(
+...     defaults=dict(
+...         defaults,
+...         durationmode="2",
+...         verbosemode="3",
+...         noclient=True,
+...         nouser=True,
+...         nodbsize=True,
+...         output=str(output),
+...     ),
+... )
+>>> run_ui(options, ["D", "v", "q"])  # doctest: +ELLIPSIS
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                RUNNING QUERIES
+DATABASE          IOW              state   Query
+tests               N      idle in trans   CREATE TABLE persons (firstname text,
+                                           lastname text, age int, address text)
+------------------------------- sending key 'D' --------------------------------
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                RUNNING QUERIES
+DATABASE          IOW              state   Query
+tests               N      idle in trans   CREATE TABLE persons (firstname text,
+                                           lastname text, age int, address text)
+------------------------------- sending key 'v' --------------------------------
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                RUNNING QUERIES
+DATABASE          IOW              state   Query
+tests               N      idle in trans   CREATE TABLE persons (firstname text,
+------------------------------- sending key 'q' --------------------------------
+>>> with output.open() as f:
+...     lines = f.readlines()
+>>> len(lines)
+4
+
+>>> with postgres.cursor() as cur:
+...     cur.execute("CREATE TABLE t (s text)")
+...     cur.execute("INSERT INTO t VALUES ('init')")
+>>> postgres.commit()
+
+
+
+Interactive mode:
+
+>>> execute = getfixture("executor")
+>>> execute("SELECT 42")
+>>> execute("SELECT 43")
+>>> execute("UPDATE t SET s = 'blocking'")
+>>> execute("UPDATE t SET s = 'waiting'", commit=True)
+>>> time.sleep(1)
+
+>>> options = optparse.Values(
+...     defaults=dict(
+...         defaults,
+...         durationmode="1",
+...         verbosemode="3",
+...         nopid=False,
+...         noclient=True,
+...         nouser=True,
+...         output=None,
+...     ),
+... )
+
+(Note: expected outputs assume that PID are 4-digits long, this is fragile... TODO)
+
+>>> key_down = {"ucs": "KEY_DOWN", "name": "KEY_DOWN"}
+>>> keys = [key_down, 2, 3, 1, key_down, "C", "n", "K", "y",
+...         key_down, " ", key_down, " ", "K", "y", "q"]
+>>> run_ui(options, keys, render_footer=True)  # doctest: +ELLIPSIS,+NORMALIZE_WHITESPACE
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               2      | Duration mode:       query
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                RUNNING QUERIES
+PID    DATABASE          IOW              state   Query
+...    tests               N      idle in trans   SELECT 42
+...    tests               N      idle in trans   SELECT 43
+...    tests               N      idle in trans   UPDATE t SET s = 'blocking'
+...    tests               N             active   UPDATE t SET s = 'waiting'
+F1/1 Running F2/2 Waiting F3/3 Blockin Space Pause/ q Quit       h Help         
+---------------------------- sending key 'KEY_DOWN' ----------------------------
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               2      | Duration mode:       query
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                RUNNING QUERIES
+PID    DATABASE          IOW              state   Query
+...    tests               N      idle in trans   SELECT 42
+...    tests               N      idle in trans   SELECT 43
+...    tests               N      idle in trans   UPDATE t SET s = 'blocking'
+...    tests               N             active   UPDATE t SET s = 'waiting'
+C Cancel curre K Terminate cu Space Tag/unta Other Back to  q Quit              
+------------------------------- sending key '2' --------------------------------
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               2      | Duration mode:       query
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                WAITING QUERIES
+PID    DATABASE          RELATION             TYPE             MODE              state   Query
+...    tests                 None    transactionid        ShareLock             active   UPDATE t SET s = 'waiting'
+F1/1 Running F2/2 Waiting F3/3 Blockin Space Pause/ q Quit       h Help         
+------------------------------- sending key '3' --------------------------------
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               2      | Duration mode:       query
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                BLOCKING QUERIES
+PID    DATABASE          RELATION             TYPE             MODE              state   Query
+...    tests                 None    transactionid    ExclusiveLock      idle in trans   UPDATE t SET s = 'blocking'
+F1/1 Running F2/2 Waiting F3/3 Blockin Space Pause/ q Quit       h Help         
+------------------------------- sending key '1' --------------------------------
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               2      | Duration mode:       query
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                RUNNING QUERIES
+PID    DATABASE          IOW              state   Query
+...    tests               N      idle in trans   SELECT 42
+...    tests               N      idle in trans   SELECT 43
+...    tests               N      idle in trans   UPDATE t SET s = 'blocking'
+...    tests               N             active   UPDATE t SET s = 'waiting'
+F1/1 Running F2/2 Waiting F3/3 Blockin Space Pause/ q Quit       h Help         
+---------------------------- sending key 'KEY_DOWN' ----------------------------
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               2      | Duration mode:       query
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                RUNNING QUERIES
+PID    DATABASE          IOW              state   Query
+...    tests               N      idle in trans   SELECT 42
+...    tests               N      idle in trans   SELECT 43
+...    tests               N      idle in trans   UPDATE t SET s = 'blocking'
+...    tests               N             active   UPDATE t SET s = 'waiting'
+C Cancel curre K Terminate cu Space Tag/unta Other Back to  q Quit              
+------------------------------- sending key 'C' --------------------------------
+                ┌──────────────────────────────────────────────┐                
+                │ Confirm cancel action on process  ...? (y/n) │                
+                └──────────────────────────────────────────────┘                
+------------------------------- sending key 'n' --------------------------------
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               2      | Duration mode:       query
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                RUNNING QUERIES
+PID    DATABASE          IOW              state   Query
+...    tests               N      idle in trans   SELECT 42
+...    tests               N      idle in trans   SELECT 43
+...    tests               N      idle in trans   UPDATE t SET s = 'blocking'
+...    tests               N             active   UPDATE t SET s = 'waiting'
+C Cancel curre K Terminate cu Space Tag/unta Other Back to  q Quit              
+------------------------------- sending key 'K' --------------------------------
+              ┌─────────────────────────────────────────────────┐               
+              │ Confirm terminate action on process  ...? (y/n) │               
+              └─────────────────────────────────────────────────┘               
+------------------------------- sending key 'y' --------------------------------
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               2      | Duration mode:       query
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                RUNNING QUERIES
+PID    DATABASE          IOW              state   Query
+...    tests               N      idle in trans   SELECT 43
+...    tests               N      idle in trans   UPDATE t SET s = 'blocking'
+...    tests               N             active   UPDATE t SET s = 'waiting'
+                             Process ... terminated
+---------------------------- sending key 'KEY_DOWN' ----------------------------
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               2      | Duration mode:       query
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                RUNNING QUERIES
+PID    DATABASE          IOW              state   Query
+...    tests               N      idle in trans   SELECT 43
+...    tests               N      idle in trans   UPDATE t SET s = 'blocking'
+...    tests               N             active   UPDATE t SET s = 'waiting'
+                             Process ... terminated
+------------------------------- sending key ' ' --------------------------------
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               2      | Duration mode:       query
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                RUNNING QUERIES
+PID    DATABASE          IOW              state   Query
+...    tests               N      idle in trans   SELECT 43
+...    tests               N      idle in trans   UPDATE t SET s = 'blocking'
+...    tests               N             active   UPDATE t SET s = 'waiting'
+C Cancel curre K Terminate cu Space Tag/unta Other Back to  q Quit              
+---------------------------- sending key 'KEY_DOWN' ----------------------------
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               2      | Duration mode:       query
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                RUNNING QUERIES
+PID    DATABASE          IOW              state   Query
+...    tests               N      idle in trans   SELECT 43
+...    tests               N      idle in trans   UPDATE t SET s = 'blocking'
+...    tests               N             active   UPDATE t SET s = 'waiting'
+C Cancel curre K Terminate cu Space Tag/unta Other Back to  q Quit              
+------------------------------- sending key ' ' --------------------------------
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               2      | Duration mode:       query
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                RUNNING QUERIES
+PID    DATABASE          IOW              state   Query
+...    tests               N      idle in trans   SELECT 43
+...    tests               N      idle in trans   UPDATE t SET s = 'blocking'
+...    tests               N             active   UPDATE t SET s = 'waiting'
+C Cancel curre K Terminate cu Space Tag/unta Other Back to  q Quit              
+------------------------------- sending key 'K' --------------------------------
+          ┌─────────────────────────────────────────────────────────┐
+          │ Confirm terminate action on processes ..., ...? (y/n)   │
+          └─────────────────────────────────────────────────────────┘
+------------------------------- sending key 'y' --------------------------------
+PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
+ Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
+ Mem.:       1.2% - 2.86M/3.73G       | IO Max:        0/s
+ Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
+ Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
+                                RUNNING QUERIES
+PID    DATABASE          IOW              state   Query
+                          Processes ..., ... terminated                         
+------------------------------- sending key 'q' --------------------------------
+
+Waiting query should be unblocked:
+>>> with postgres.cursor() as c:
+...     c.execute("SELECT s from t")
+...     c.fetchall()
+[('waiting',)]
