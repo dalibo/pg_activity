@@ -55,6 +55,12 @@ def get_parser():
     parser = ModifiedOptionParser(
         add_help_option = False,
         version = "%prog " + __version__,
+        usage = "%prog [options] [connection string]",
+        epilog = "The connection string can be in the form of a list of \
+Key/Value parameters or an URI as described in the PostgreSQL documentation. \
+The parsing is delegated to the libpq: different versions of the client library \
+may support different formats or parameters (for example, connection URIs are \
+only supported from libpq 9.2)",
         description = "htop like application for PostgreSQL \
 server activity monitoring.")
     # -U / --username
@@ -249,7 +255,14 @@ if __name__ == '__main__':
         sys.exit("FATAL: Platform not supported.")
     try:
         parser = get_parser()
-        (options, _) = parser.parse_args()
+        (options, args) = parser.parse_args()
+        if len(args) == 1:
+            dsn = args[0]
+        elif len(args) > 1:
+            raise OptionParsingError("at most one argument is expected")
+        else:
+            dsn = ''
+
     except OptionParsingError as err:
         print('pg_activity: error: %s' % err.msg)
         print('Try "pg_activity --help" for more information.')
@@ -259,11 +272,9 @@ if __name__ == '__main__':
         sys.exit(1)
 
     hostname = socket.gethostname()
-    host = types.Host(
+    host = types.Host.from_options(
+        options,
+        dsn,
         hostname,
-        options.username,
-        options.host,
-        options.port,
-        options.dbname,
     )
-    ui.main(host, options)
+    ui.main(host, options, dsn)

@@ -13,6 +13,7 @@ from .data import pg_connect
 def main(
     host: types.Host,
     options: optparse.Values,
+    dsn: str,
     *,
     term: Optional[Terminal] = None,
     render_header: bool = True,
@@ -22,6 +23,7 @@ def main(
 ) -> None:
     data = pg_connect(
         options,
+        dsn,
         password=os.environ.get("PGPASSWORD"),
         service=os.environ.get("PGSERVICE"),
         min_duration=options.minduration,

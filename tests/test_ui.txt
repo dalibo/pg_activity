@@ -75,7 +75,7 @@ Default CLI options, passed to ui.main():
 ...         return ks
 ...
 ...     with patch.object(term, "inkey", new=inkey):
-...         ui.main(host, options, term=term,
+...         ui.main(host, options, "", term=term,
 ...                 render_header=render_header, render_footer=render_footer,
 ...                 width=width, wait_on_actions=1)
 ...
