@@ -1,8 +1,15 @@
+from typing import Optional
+
 from blessed import Terminal
 
 
 def boxed(
-    term: Terminal, content: str, *, border_color: str = "white", center: bool = False
+    term: Terminal,
+    content: str,
+    *,
+    border_color: str = "white",
+    center: bool = False,
+    width: Optional[int] = None,
 ) -> str:
     border_width = term.length(content) + 2
     border_formatter = term.formatter(border_color)
@@ -12,5 +19,7 @@ def boxed(
         border_formatter("└" + "─" * border_width + "┘") + term.normal,
     ]
     if center:
-        lines = [term.center(line) for line in lines]
+        if width is None:
+            width = term.width
+        lines = [term.center(line, width=width) for line in lines]
     return "\n".join(lines)

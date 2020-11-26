@@ -110,6 +110,7 @@ def main(
                                 f"Confirm {action_formatter(action)} action on {ptitle}? (y/n)",
                                 border_color=color,
                                 center=True,
+                                width=width,
                             ),
                             end="",
                         )

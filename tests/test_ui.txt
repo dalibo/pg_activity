@@ -346,9 +346,9 @@ PID    DATABASE                      state   Query
 ...    tests                        active   UPDATE t SET s = 'waiting'
 C Cancel current query     K Terminate current query  Space Tag/untag current qu Other Back to activities   q Quit                          
 ------------------------------------------------------------- sending key 'C' --------------------------------------------------------------
-                ┌──────────────────────────────────────────────┐                
-                │ Confirm cancel action on process  ...? (y/n) │                
-                └──────────────────────────────────────────────┘                
+                                              ┌──────────────────────────────────────────────┐                                              
+                                              │ Confirm cancel action on process  ...? (y/n) │                                              
+                                              └──────────────────────────────────────────────┘                                              
 ------------------------------------------------------------- sending key 'n' --------------------------------------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               2      | Duration mode:       query
@@ -360,9 +360,9 @@ PID    DATABASE                      state   Query
 ...    tests                        active   UPDATE t SET s = 'waiting'
 C Cancel current query     K Terminate current query  Space Tag/untag current qu Other Back to activities   q Quit                          
 ------------------------------------------------------------- sending key 'K' --------------------------------------------------------------
-              ┌─────────────────────────────────────────────────┐               
-              │ Confirm terminate action on process  ...? (y/n) │               
-              └─────────────────────────────────────────────────┘               
+                                            ┌─────────────────────────────────────────────────┐                                             
+                                            │ Confirm terminate action on process  ...? (y/n) │                                             
+                                            └─────────────────────────────────────────────────┘                                             
 ------------------------------------------------------------- sending key 'y' --------------------------------------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               2      | Duration mode:       query
@@ -409,9 +409,9 @@ PID    DATABASE                      state   Query
 ...    tests                        active   UPDATE t SET s = 'waiting'
 C Cancel current query     K Terminate current query  Space Tag/untag current qu Other Back to activities   q Quit                          
 ------------------------------------------------------------- sending key 'K' --------------------------------------------------------------
-          ┌─────────────────────────────────────────────────────────┐
-          │ Confirm terminate action on processes ..., ...? (y/n)   │
-          └─────────────────────────────────────────────────────────┘
+                                        ┌─────────────────────────────────────────────────────────┐
+                                        │ Confirm terminate action on processes ..., ...? (y/n)   │
+                                        └─────────────────────────────────────────────────────────┘
 ------------------------------------------------------------- sending key 'y' --------------------------------------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
