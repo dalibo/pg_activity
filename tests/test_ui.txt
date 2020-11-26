@@ -372,7 +372,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
  Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                 RUNNING QUERIES
-PID    DATABASE          IOW              state   Query                         
+PID    DATABASE          IOW              state   Query
 ...    tests               N      idle in trans   SELECT 42
 ...    tests               N      idle in trans   SELECT 43
 ...    tests               N      idle in trans   UPDATE t SET s = 'blocking'
@@ -385,7 +385,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
  Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                 RUNNING QUERIES
-PID    DATABASE          IOW              state   Query                         
+PID    DATABASE          IOW              state   Query
 ...    tests               N      idle in trans   SELECT 42
 ...    tests               N      idle in trans   SELECT 43
 ...    tests               N      idle in trans   UPDATE t SET s = 'blocking'
@@ -418,7 +418,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
  Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                 RUNNING QUERIES
-PID    DATABASE          IOW              state   Query                         
+PID    DATABASE          IOW              state   Query
 ...    tests               N      idle in trans   SELECT 42
 ...    tests               N      idle in trans   SELECT 43
 ...    tests               N      idle in trans   UPDATE t SET s = 'blocking'
@@ -431,7 +431,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
  Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                 RUNNING QUERIES
-PID    DATABASE          IOW              state   Query                         
+PID    DATABASE          IOW              state   Query
 ...    tests               N      idle in trans   SELECT 42
 ...    tests               N      idle in trans   SELECT 43
 ...    tests               N      idle in trans   UPDATE t SET s = 'blocking'
@@ -448,7 +448,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
  Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                 RUNNING QUERIES
-PID    DATABASE          IOW              state   Query                         
+PID    DATABASE          IOW              state   Query
 ...    tests               N      idle in trans   SELECT 42
 ...    tests               N      idle in trans   SELECT 43
 ...    tests               N      idle in trans   UPDATE t SET s = 'blocking'
@@ -465,7 +465,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
  Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                 RUNNING QUERIES
-PID    DATABASE          IOW              state   Query                         
+PID    DATABASE          IOW              state   Query
 ...    tests               N      idle in trans   SELECT 43
 ...    tests               N      idle in trans   UPDATE t SET s = 'blocking'
 ...    tests               N             active   UPDATE t SET s = 'waiting'
@@ -477,7 +477,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
  Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                 RUNNING QUERIES
-PID    DATABASE          IOW              state   Query                         
+PID    DATABASE          IOW              state   Query
 ...    tests               N      idle in trans   SELECT 43
 ...    tests               N      idle in trans   UPDATE t SET s = 'blocking'
 ...    tests               N             active   UPDATE t SET s = 'waiting'
@@ -489,7 +489,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
  Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                 RUNNING QUERIES
-PID    DATABASE          IOW              state   Query                         
+PID    DATABASE          IOW              state   Query
 ...    tests               N      idle in trans   SELECT 43
 ...    tests               N      idle in trans   UPDATE t SET s = 'blocking'
 ...    tests               N             active   UPDATE t SET s = 'waiting'
@@ -501,7 +501,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
  Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                 RUNNING QUERIES
-PID    DATABASE          IOW              state   Query                         
+PID    DATABASE          IOW              state   Query
 ...    tests               N      idle in trans   SELECT 43
 ...    tests               N      idle in trans   UPDATE t SET s = 'blocking'
 ...    tests               N             active   UPDATE t SET s = 'waiting'
@@ -513,7 +513,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
  Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                 RUNNING QUERIES
-PID    DATABASE          IOW              state   Query                         
+PID    DATABASE          IOW              state   Query
 ...    tests               N      idle in trans   SELECT 43
 ...    tests               N      idle in trans   UPDATE t SET s = 'blocking'
 ...    tests               N             active   UPDATE t SET s = 'waiting'
@@ -529,7 +529,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Swap:       5.6% - 6.84K/7.45G       | Read:           0B/s - 0/s
  Load:         0.12 0.14 0.10         | Write:          0B/s - 0/s
                                 RUNNING QUERIES
-PID    DATABASE          IOW              state   Query                         
+PID    DATABASE          IOW              state   Query
                           Processes ..., ... terminated                         
 ------------------------------- sending key 'q' --------------------------------
 
