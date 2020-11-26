@@ -2,6 +2,7 @@ import asyncio
 import threading
 
 import psycopg2
+import psycopg2.errors
 import pytest
 
 
@@ -19,7 +20,13 @@ def executor(postgresql):
             conn = psycopg2.connect(**postgresql.info.dsn_parameters)
             cnx.append(conn)
             with conn.cursor() as c:
-                c.execute(query)
+                try:
+                    c.execute(query)
+                except (
+                    psycopg2.errors.AdminShutdown,
+                    psycopg2.errors.QueryCanceledError,
+                ):
+                    return
                 if commit:
                     conn.commit()
 
