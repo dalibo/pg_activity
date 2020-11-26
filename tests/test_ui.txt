@@ -65,8 +65,9 @@ Default CLI options, passed to ui.main():
 ...         print(term.center(f" sending key '{ks}' ", fillchar="-"))
 ...         return ks
 ...
-...     with patch.object(term, "inkey", new=inkey) as patched_inkey:
-...         ui.main(options, term=term, render_footer=render_footer, width=200)
+...     with patch.object(term, "inkey", new=inkey):
+...         ui.main(options, term=term, render_footer=render_footer,
+...                 width=200, wait_on_actions=1)
 ...
 ...     if expected_timeouts is not None:
 ...         assert call_args_list == expected_timeouts

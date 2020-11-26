@@ -1,6 +1,7 @@
 import optparse
 import os
 import socket
+import time
 from typing import Dict, List, Optional, cast
 
 import attr
@@ -17,6 +18,7 @@ def main(
     render_header: bool = True,
     render_footer: bool = True,
     width: Optional[int] = None,
+    wait_on_actions: Optional[float] = None,
 ) -> None:
     data = pg_connect(
         options,
@@ -127,6 +129,9 @@ def main(
                             )
                         pg_procs.reset()
                         ui.end_interactive()
+                        if wait_on_actions:
+                            # Used in tests.
+                            time.sleep(wait_on_actions)
                 else:
                     pg_procs.reset()
                     ui.end_interactive()
