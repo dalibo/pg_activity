@@ -406,11 +406,13 @@ def processes_rows(
             yield line
 
 
-def footer_message(term: Terminal, message: str) -> None:
-    print(term.center(message[: term.width]) + term.normal, end="")
+def footer_message(term: Terminal, message: str, width: Optional[int] = None) -> None:
+    if width is None:
+        width = term.width
+    print(term.center(message[:width]) + term.normal, end="")
 
 
-def footer_help(term: Terminal) -> None:
+def footer_help(term: Terminal, width: Optional[int] = None) -> None:
     """Footer line with help keys."""
     query_modes_help = [
         ("/".join(keys[:-1]), qm.value) for qm, keys in KEYS_BY_QUERYMODE.items()
@@ -421,15 +423,19 @@ def footer_help(term: Terminal) -> None:
         (EXIT_KEY.value, EXIT_KEY.description),
         (HELP_KEY, "help"),
     ]
-    render_footer(term, footer_values)
+    render_footer(term, footer_values, width)
 
 
-def render_footer(term: Terminal, footer_values: List[Tuple[str, str]]) -> None:
+def render_footer(
+    term: Terminal, footer_values: List[Tuple[str, str]], width: Optional[int]
+) -> None:
+    if width is None:
+        width = term.width
     ncols = len(footer_values)
-    width = (term.width - ncols - 1) // ncols
+    column_width = (width - ncols - 1) // ncols
 
     def render_column(key: str, desc: str) -> str:
-        col_width = width - term.length(key) - 1
+        col_width = column_width - term.length(key) - 1
         if col_width <= 0:
             return ""
         desc = term.ljust(desc[:col_width], width=col_width, fillchar=" ")
@@ -438,11 +444,11 @@ def render_footer(term: Terminal, footer_values: List[Tuple[str, str]]) -> None:
     row = " ".join(
         [render_column(key, desc.capitalize()) for key, desc in footer_values]
     )
-    assert term.length(row) <= term.width, (term.length(row), term.width, ncols)
-    print(term.ljust(row, fillchar=term.cyan_reverse(" ")), end="")
+    assert term.length(row) <= width, (term.length(row), width, ncols)
+    print(term.ljust(row, width=width, fillchar=term.cyan_reverse(" ")), end="")
 
 
-def footer_interative_help(term: Terminal) -> None:
+def footer_interative_help(term: Terminal, width: Optional[int] = None) -> None:
     """Footer line with help keys for interactive mode."""
     assert PROCESS_PIN.name is not None
     footer_values = [
@@ -452,7 +458,7 @@ def footer_interative_help(term: Terminal) -> None:
         ("Other", "back to activities"),
         (EXIT_KEY.value, EXIT_KEY.description),
     ]
-    return render_footer(term, footer_values)
+    return render_footer(term, footer_values, width)
 
 
 def screen(
@@ -507,8 +513,8 @@ def screen(
     if render_footer:
         with term.location(x=0, y=top_height):
             if message is not None:
-                footer_message(term, message)
+                footer_message(term, message, width)
             elif ui.interactive():
-                footer_interative_help(term)
+                footer_interative_help(term, width)
             else:
-                footer_help(term)
+                footer_help(term, width)

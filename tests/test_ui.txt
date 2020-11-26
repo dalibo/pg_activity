@@ -300,7 +300,7 @@ PID    DATABASE                      state   Query
 ...    tests                 idle in trans   SELECT 43
 ...    tests                 idle in trans   UPDATE t SET s = 'blocking'
 ...    tests                        active   UPDATE t SET s = 'waiting'
-F1/1 Running F2/2 Waiting F3/3 Blockin Space Pause/ q Quit       h Help         
+F1/1 Running queries   F2/2 Waiting queries   F3/3 Blocking queries  Space Pause/unpause    q Quit                 h Help                   
 ---------------------------------------------------------- sending key 'KEY_DOWN' ----------------------------------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               2      | Duration mode:       query
@@ -310,21 +310,21 @@ PID    DATABASE                      state   Query
 ...    tests                 idle in trans   SELECT 43
 ...    tests                 idle in trans   UPDATE t SET s = 'blocking'
 ...    tests                        active   UPDATE t SET s = 'waiting'
-C Cancel curre K Terminate cu Space Tag/unta Other Back to  q Quit              
+C Cancel current query     K Terminate current query  Space Tag/untag current qu Other Back to activities   q Quit                          
 ------------------------------------------------------------- sending key '2' --------------------------------------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               2      | Duration mode:       query
                                 WAITING QUERIES
 PID    DATABASE          RELATION             TYPE             MODE              state   Query
 ...    tests                 None    transactionid        ShareLock             active   UPDATE t SET s = 'waiting'
-F1/1 Running F2/2 Waiting F3/3 Blockin Space Pause/ q Quit       h Help         
+F1/1 Running queries   F2/2 Waiting queries   F3/3 Blocking queries  Space Pause/unpause    q Quit                 h Help                   
 ------------------------------------------------------------- sending key '3' --------------------------------------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               2      | Duration mode:       query
                                 BLOCKING QUERIES
 PID    DATABASE          RELATION             TYPE             MODE              state   Query
 ...    tests                 None    transactionid    ExclusiveLock      idle in trans   UPDATE t SET s = 'blocking'
-F1/1 Running F2/2 Waiting F3/3 Blockin Space Pause/ q Quit       h Help         
+F1/1 Running queries   F2/2 Waiting queries   F3/3 Blocking queries  Space Pause/unpause    q Quit                 h Help                   
 ------------------------------------------------------------- sending key '1' --------------------------------------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               2      | Duration mode:       query
@@ -334,7 +334,7 @@ PID    DATABASE                      state   Query
 ...    tests                 idle in trans   SELECT 43
 ...    tests                 idle in trans   UPDATE t SET s = 'blocking'
 ...    tests                        active   UPDATE t SET s = 'waiting'
-F1/1 Running F2/2 Waiting F3/3 Blockin Space Pause/ q Quit       h Help         
+F1/1 Running queries   F2/2 Waiting queries   F3/3 Blocking queries  Space Pause/unpause    q Quit                 h Help                   
 ---------------------------------------------------------- sending key 'KEY_DOWN' ----------------------------------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               2      | Duration mode:       query
@@ -344,7 +344,7 @@ PID    DATABASE                      state   Query
 ...    tests                 idle in trans   SELECT 43
 ...    tests                 idle in trans   UPDATE t SET s = 'blocking'
 ...    tests                        active   UPDATE t SET s = 'waiting'
-C Cancel curre K Terminate cu Space Tag/unta Other Back to  q Quit              
+C Cancel current query     K Terminate current query  Space Tag/untag current qu Other Back to activities   q Quit                          
 ------------------------------------------------------------- sending key 'C' --------------------------------------------------------------
                 ┌──────────────────────────────────────────────┐                
                 │ Confirm cancel action on process  ...? (y/n) │                
@@ -358,7 +358,7 @@ PID    DATABASE                      state   Query
 ...    tests                 idle in trans   SELECT 43
 ...    tests                 idle in trans   UPDATE t SET s = 'blocking'
 ...    tests                        active   UPDATE t SET s = 'waiting'
-C Cancel curre K Terminate cu Space Tag/unta Other Back to  q Quit              
+C Cancel current query     K Terminate current query  Space Tag/untag current qu Other Back to activities   q Quit                          
 ------------------------------------------------------------- sending key 'K' --------------------------------------------------------------
               ┌─────────────────────────────────────────────────┐               
               │ Confirm terminate action on process  ...? (y/n) │               
@@ -389,7 +389,7 @@ PID    DATABASE                      state   Query
 ...    tests                 idle in trans   SELECT 43
 ...    tests                 idle in trans   UPDATE t SET s = 'blocking'
 ...    tests                        active   UPDATE t SET s = 'waiting'
-C Cancel curre K Terminate cu Space Tag/unta Other Back to  q Quit              
+C Cancel current query     K Terminate current query  Space Tag/untag current qu Other Back to activities   q Quit                          
 ---------------------------------------------------------- sending key 'KEY_DOWN' ----------------------------------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               2      | Duration mode:       query
@@ -398,7 +398,7 @@ PID    DATABASE                      state   Query
 ...    tests                 idle in trans   SELECT 43
 ...    tests                 idle in trans   UPDATE t SET s = 'blocking'
 ...    tests                        active   UPDATE t SET s = 'waiting'
-C Cancel curre K Terminate cu Space Tag/unta Other Back to  q Quit              
+C Cancel current query     K Terminate current query  Space Tag/untag current qu Other Back to activities   q Quit                          
 ------------------------------------------------------------- sending key ' ' --------------------------------------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               2      | Duration mode:       query
@@ -407,7 +407,7 @@ PID    DATABASE                      state   Query
 ...    tests                 idle in trans   SELECT 43
 ...    tests                 idle in trans   UPDATE t SET s = 'blocking'
 ...    tests                        active   UPDATE t SET s = 'waiting'
-C Cancel curre K Terminate cu Space Tag/unta Other Back to  q Quit              
+C Cancel current query     K Terminate current query  Space Tag/untag current qu Other Back to activities   q Quit                          
 ------------------------------------------------------------- sending key 'K' --------------------------------------------------------------
           ┌─────────────────────────────────────────────────────────┐
           │ Confirm terminate action on processes ..., ...? (y/n)   │
