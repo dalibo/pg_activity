@@ -65,13 +65,12 @@ def main(
 
     with term.fullscreen(), term.cbreak(), term.hidden_cursor():
         while True:
-            if key == keys.EXIT:
-                break
-
             if key == keys.HELP:
                 in_help = True
             elif in_help and key is not None:
                 in_help, key = False, None
+            elif key == keys.EXIT:
+                break
             elif not ui.interactive() and key == keys.SPACE:
                 ui = ui.toggle_pause()
             elif options.nodbsize and key == keys.REFRESH_DB_SIZE:
