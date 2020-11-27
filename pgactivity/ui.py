@@ -31,7 +31,6 @@ def main(
     fs_blocksize = options.blocksize
 
     host = types.Host(
-        data.pg_version,
         hostname,
         options.username,
         options.host,
@@ -232,6 +231,7 @@ def main(
                     ui,
                     host=host,
                     dbinfo=dbinfo,
+                    pg_version=data.pg_version,
                     tps=tps,
                     active_connections=active_connections,
                     activity_stats=activity_stats,

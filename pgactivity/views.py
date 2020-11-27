@@ -180,6 +180,7 @@ def header(
     *,
     host: Host,
     dbinfo: DBInfo,
+    pg_version: str,
     tps: int,
     active_connections: int,
     system_info: Optional[SystemInfo] = None,
@@ -189,7 +190,7 @@ def header(
     yield (
         " - ".join(
             [
-                host.pg_version,
+                pg_version,
                 f"{term.bold}{host.hostname}{term.normal}",
                 f"{term.cyan}{pg_host}{term.normal}",
                 f"Ref.: {ui.refresh_time}s",
@@ -467,6 +468,7 @@ def screen(
     *,
     host: Host,
     dbinfo: DBInfo,
+    pg_version: str,
     tps: int,
     active_connections: int,
     activity_stats: ActivityStats,
@@ -494,6 +496,7 @@ def screen(
             ui,
             host=host,
             dbinfo=dbinfo,
+            pg_version=pg_version,
             tps=tps,
             active_connections=active_connections,
             system_info=system_info,

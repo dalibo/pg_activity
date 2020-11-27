@@ -680,7 +680,6 @@ class UI:
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
 class Host:
-    pg_version: str
     hostname: str
     user: str
     host: str
