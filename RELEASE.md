@@ -3,7 +3,7 @@
 ## Creating the pull request
 
 * Edit the following files and change the version :
-  + `pg_activity`
+  + `pgactivity/__init__.py`
   + `setup.py`
 * Prepare the release notes using the [commit
   list](https://github.com/dalibo/pg_activity/commits/master)
