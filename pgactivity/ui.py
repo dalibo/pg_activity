@@ -1,6 +1,5 @@
 import optparse
 import os
-import socket
 import time
 from typing import Dict, List, Optional, cast
 
@@ -12,6 +11,7 @@ from .data import pg_connect
 
 
 def main(
+    host: types.Host,
     options: optparse.Values,
     *,
     term: Optional[Terminal] = None,
@@ -27,16 +27,7 @@ def main(
         min_duration=options.minduration,
     )
 
-    hostname = socket.gethostname()
     fs_blocksize = options.blocksize
-
-    host = types.Host(
-        hostname,
-        options.username,
-        options.host,
-        options.port,
-        options.dbname,
-    )
 
     is_local = data.pg_is_local() and data.pg_is_local_access()
 

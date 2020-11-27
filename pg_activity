@@ -26,11 +26,12 @@ SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 """
 
 import os
+import socket
 import sys
 from optparse import OptionParser, OptionGroup
 import getpass
 
-from pgactivity import __version__, ui
+from pgactivity import __version__, types, ui
 
 
 # Customized OptionParser
@@ -257,4 +258,12 @@ if __name__ == '__main__':
         print(parser.format_help().strip())
         sys.exit(1)
 
-    ui.main(options)
+    hostname = socket.gethostname()
+    host = types.Host(
+        hostname,
+        options.username,
+        options.host,
+        options.port,
+        options.dbname,
+    )
+    ui.main(host, options)
