@@ -56,8 +56,16 @@ def pg_get_num_version(text_version: str) -> Tuple[str, int]:
     ('PostgreSQL 11.9', 110900)
     >>> pg_get_num_version('EnterpriseDB 11.9 (Debian 11.9-0+deb10u1)')
     ('EnterpriseDB 11.9', 110900)
-    >>> pg_get_num_version("PostgreSQL 13.0beta2")
-    ('PostgreSQL 13.0', 130000)
+    >>> pg_get_num_version("PostgreSQL 9.3.24 on x86_64-pc-linux-gnu (Debian 9.3.24-1.pgdg80+1), compiled by gcc (Debian 4.9.2-10+deb8u1) 4.9.2, 64-bit")
+    ('PostgreSQL 9.3.24', 90324)
+    >>> pg_get_num_version("PostgreSQL 9.1.24 on x86_64-unknown-linux-gnu, compiled by gcc (GCC) 4.8.5 20150623 (Red Hat 4.8.5-39), 64-bit")
+    ('PostgreSQL 9.1.24', 90124)
+    >>> pg_get_num_dev_version("PostgreSQL 14devel on x86_64-pc-linux-gnu, compiled by gcc (GCC) 9.3.1 20200408 (Red Hat 9.3.1-2), 64-bit")
+    ('PostgreSQL 14devel', 140000)
+    >>> pg_get_num_version("PostgreSQL 13beta1 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 9.3.1 20200408 (Red Hat 9.3.1-2), 64-bit")
+    ('PostgreSQL 13beta1', 130000)
+    >>> pg_get_num_version("PostgreSQL 13rc1 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 9.3.1 20200408 (Red Hat 9.3.1-2), 64-bit")
+    ('PostgreSQL 13rc1', 130000)
     """
     res = re.match(
         r"^(PostgreSQL|EnterpriseDB) ([0-9]+)\.([0-9]+)(?:\.([0-9]+))?",
@@ -84,8 +92,12 @@ def pg_get_num_dev_version(text_version: str) -> Tuple[str, int]:
     """Return PostgreSQL short & numeric devel. or beta version from a string
     (SELECT version()).
 
-    >>> pg_get_num_dev_version("PostgreSQL 11.9devel0")
-    ('PostgreSQL 11.9devel', 110900)
+    >>> pg_get_num_dev_version("PostgreSQL 14devel on x86_64-pc-linux-gnu, compiled by gcc (GCC) 9.3.1 20200408 (Red Hat 9.3.1-2), 64-bit")
+    ('PostgreSQL 14devel', 140000)
+    >>> pg_get_num_version("PostgreSQL 13beta1 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 9.3.1 20200408 (Red Hat 9.3.1-2), 64-bit")
+    ('PostgreSQL 13beta1', 130000)
+    >>> pg_get_num_version("PostgreSQL 13rc1 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 9.3.1 20200408 (Red Hat 9.3.1-2), 64-bit")
+    ('PostgreSQL 13rc1', 130000)
     """
     res = re.match(
         r"^(PostgreSQL|EnterpriseDB) ([0-9]+)(?:\.([0-9]+))?(devel|beta[0-9]+|rc[0-9]+)",
