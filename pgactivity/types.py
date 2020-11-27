@@ -712,7 +712,6 @@ class Host:
         Host(hostname='test', user='toto', host='localhost', port=5432, dbname='bench')
         """
 
-        # FIXME : gerer l'erreur de DSN et tester avec pg <= 9.2
         pdsn = parse_dsn(dsn)
 
         return cls(

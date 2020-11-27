@@ -31,6 +31,8 @@ import sys
 from optparse import OptionParser, OptionGroup
 import getpass
 
+import psycopg2
+
 from pgactivity import __version__, types, ui
 
 
@@ -249,6 +251,12 @@ server activity monitoring.")
     return parser
 
 
+def exit(msg: str) -> None:
+    print('pg_activity: error: %s' % msg)
+    print('Try "pg_activity --help" for more information.')
+    sys.exit(1)
+
+
 # Call the main function
 if __name__ == '__main__':
     if os.name != 'posix':
@@ -264,17 +272,18 @@ if __name__ == '__main__':
             dsn = ''
 
     except OptionParsingError as err:
-        print('pg_activity: error: %s' % err.msg)
-        print('Try "pg_activity --help" for more information.')
-        sys.exit(1)
+        exit(err.msg)
     if options.help:
         print(parser.format_help().strip())
         sys.exit(1)
 
     hostname = socket.gethostname()
-    host = types.Host.from_options(
-        options,
-        dsn,
-        hostname,
-    )
+    try:
+        host = types.Host.from_options(
+            options,
+            dsn,
+            hostname,
+        )
+    except psycopg2.ProgrammingError as err:
+        exit(err)
     ui.main(host, options, dsn)
