@@ -12,7 +12,7 @@ Command line tool for PostgreSQL server activity monitoring.
 
 pg_activity must run on the same server than the instance and
 as the user running the instance (or root) to show
-CPU, MEM, READ or WRITE columns and other system informations.
+CPU, MEM, READ or WRITE columns and other system information.
 
 =head1 COMMAND-LINE OPTIONS
 
