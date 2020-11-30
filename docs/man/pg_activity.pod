@@ -148,8 +148,6 @@ CPU, MEM, READ or WRITE columns and other system information.
 
 =over 2
 
-=item B<C>     Activate/deactivate colors.
-
 =item B<r>     Sort by READ/s, descending.
 
 =item B<w>     Sort by WRITE/s, descending.
