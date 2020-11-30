@@ -94,7 +94,7 @@ def main(
                     keys.PROCESS_KILL,
                 ):
                     action, color = {
-                        keys.PROCESS_CANCEL: ("cancel", "orange"),
+                        keys.PROCESS_CANCEL: ("cancel", "yellow"),
                         keys.PROCESS_KILL: ("terminate", "red"),
                     }[key]
                     action_formatter = term.formatter(color)
