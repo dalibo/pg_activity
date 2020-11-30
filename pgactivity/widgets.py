@@ -12,7 +12,7 @@ def boxed(
     width: Optional[int] = None,
 ) -> str:
     border_width = term.length(content) + 2
-    border_formatter = term.formatter(border_color)
+    border_formatter = getattr(term, border_color)
     lines = [
         border_formatter("┌" + "─" * border_width + "┐"),
         " ".join([border_formatter("│") + term.normal, content, border_formatter("│")]),

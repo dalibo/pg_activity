@@ -97,7 +97,7 @@ def main(
                         keys.PROCESS_CANCEL: ("cancel", "yellow"),
                         keys.PROCESS_KILL: ("terminate", "red"),
                     }[key]
-                    action_formatter = term.formatter(color)
+                    action_formatter = getattr(term, color)
                     pids = pg_procs.selected
                     if len(pids) > 1:
                         ptitle = f"processes {', '.join((str(p) for p in pids))}"
