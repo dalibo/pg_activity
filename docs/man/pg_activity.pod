@@ -162,11 +162,15 @@ CPU, MEM, READ or WRITE columns and other system information.
 
 =item B<t>     Sort by TIME+, descending.
 
+=item B<T>     Change duration mode: query, transaction, backend
+
 =item B<Space> Pause on/off.
 
 =item B<v>     Change queries display mode: full, truncated, indented
 
 =item B<UP / DOWN> Scroll process list.
+
+=item B<k / j> Scroll process list.
 
 =item B<q>     Quit
 
@@ -192,11 +196,13 @@ CPU, MEM, READ or WRITE columns and other system information.
 
 =over 2
 
-=item B<UP>    Move up the cursor.
+=item B<UP / k>    Move up the cursor.
 
-=item B<DOWN>  Move down the cursor.
+=item B<DOWN / j>  Move down the cursor.
 
-=item B<k>     Terminate the current backend/tagged backends.
+=item B<K>     Terminate the current backend/tagged backends.
+
+=item B<C>     Cancel the current backend/tagged backends.
 
 =item B<Space> Tag or untag the process.
 

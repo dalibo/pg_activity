@@ -310,12 +310,16 @@ as the user running the instance (or root) to show
 .IX Item "m Sort by MEM%, descending."
 .IP "\fBt\fR     Sort by \s-1TIME+,\s0 descending." 2
 .IX Item "t Sort by TIME+, descending."
+.IP "\fBT\fR     Change duration mode: query, transaction, backend" 2
+.IX Item "T Change duration mode: query, transaction, backend"
 .IP "\fBSpace\fR Pause on/off." 2
 .IX Item "Space Pause on/off."
 .IP "\fBv\fR     Change queries display mode: full, truncated, indented" 2
 .IX Item "v Change queries display mode: full, truncated, indented"
 .IP "\fB\s-1UP / DOWN\s0\fR Scroll process list." 2
 .IX Item "UP / DOWN Scroll process list."
+.IP "\fBk / j\fR Scroll process list." 2
+.IX Item "k / j Scroll process list."
 .IP "\fBq\fR     Quit" 2
 .IX Item "q Quit"
 .IP "\fB+\fR     Increase refresh time. Maximum value : 3s" 2
@@ -337,13 +341,15 @@ as the user running the instance (or root) to show
 .PD
 .SH "NAVIGATION MODE"
 .IX Header "NAVIGATION MODE"
-.IP "\fB\s-1UP\s0\fR    Move up the cursor." 2
-.IX Item "UP Move up the cursor."
+.IP "\fB\s-1UP /\s0 k\fR    Move up the cursor." 2
+.IX Item "UP / k Move up the cursor."
 .PD 0
-.IP "\fB\s-1DOWN\s0\fR  Move down the cursor." 2
-.IX Item "DOWN Move down the cursor."
-.IP "\fBk\fR     Terminate the current backend/tagged backends." 2
-.IX Item "k Terminate the current backend/tagged backends."
+.IP "\fB\s-1DOWN /\s0 j\fR  Move down the cursor." 2
+.IX Item "DOWN / j Move down the cursor."
+.IP "\fBK\fR     Terminate the current backend/tagged backends." 2
+.IX Item "K Terminate the current backend/tagged backends."
+.IP "\fBC\fR     Cancel the current backend/tagged backends." 2
+.IX Item "C Cancel the current backend/tagged backends."
 .IP "\fBSpace\fR Tag or untag the process." 2
 .IX Item "Space Tag or untag the process."
 .IP "\fBq\fR     Quit." 2
