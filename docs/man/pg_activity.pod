@@ -102,6 +102,10 @@ CPU, MEM, READ or WRITE columns and other system information.
 
 =over 2
 
+=item B<--no-pid>
+
+	Disable PID.
+
 =item B<--no-database>
 
 	Disable DATABASE.
