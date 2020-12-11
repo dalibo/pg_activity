@@ -379,7 +379,7 @@ class UI:
     query_mode: QueryMode = attr.ib(default=QueryMode.activities, converter=QueryMode)
     refresh_time: Union[float, int] = 2
     in_pause: bool = False
-    interactive_timeout: Optional[bool] = None
+    interactive_timeout: Optional[int] = None
 
     @classmethod
     def make(
