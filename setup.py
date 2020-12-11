@@ -13,7 +13,7 @@ with open("README.md") as fo:
 
 setup(
     name="pg_activity",
-    version="2.0.0a2",
+    version="2.0.0a3",
     author="Dalibo",
     author_email="contact@dalibo.com",
     scripts=["pg_activity"],

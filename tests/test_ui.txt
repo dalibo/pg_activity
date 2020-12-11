@@ -94,7 +94,7 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
                                 RUNNING QUERIES
 PID    DATABASE                     USER           CLIENT              state   Query
 ------------------------------------------------------------------------------------------- sending key 'h' --------------------------------------------------------------------------------------------
-pg_activity 2.0.0a2 - https://github.com/dalibo/pg_activity
+pg_activity 2.0.0a3 - https://github.com/dalibo/pg_activity
 Released under PostgreSQL License.
 <BLANKLINE>
    Up/Down: scroll process list
