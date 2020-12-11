@@ -122,7 +122,7 @@ MEM%              state   Query
 >>> columns_header(term, ui, width=150)
 PID    DATABASE                      APP           CLIENT  RELATION              state   Query
 
->>> ui = ui.evolve(query_mode=QueryMode.activities)
+>>> ui.evolve(query_mode=QueryMode.activities)
 >>> columns_header(term, ui, width=150)
 PID    DATABASE                      APP           CLIENT  W              state   Query
 
@@ -196,13 +196,13 @@ p.name FROM products p LEFT JOIN sales s USING (product_id) WHERE s.date >
 CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name, p.price, p.cost
 HAVING sum(p.price * s.units) > 5000;
 
->>> ui = ui.evolve(verbose_mode=QueryDisplayMode.truncate)
+>>> ui.evolve(verbose_mode=QueryDisplayMode.truncate)
 >>> processes_rows(term, ui, SelectableProcesses(processes1))
 6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts
 6228   pgbench             0.2  1.0             active   \_ UPDATE pgbench_accou
 1234   business            2.4  1.0             active   SELECT product_id, p.na
 
->>> ui = ui.evolve(verbose_mode=QueryDisplayMode.wrap)
+>>> ui.evolve(verbose_mode=QueryDisplayMode.wrap)
 >>> processes_rows(term, ui, SelectableProcesses(processes1))
 6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts
                                                          SET abalance = abalance
@@ -244,7 +244,7 @@ Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 6228   pgbench                      active   \_ UPDATE pgbench_accounts SET abal
 1234   business                     active   SELECT product_id, p.name FROM prod
 
->>> ui = ui.evolve(verbose_mode=QueryDisplayMode.wrap)
+>>> ui.evolve(verbose_mode=QueryDisplayMode.wrap)
 >>> processes_rows(term, ui, SelectableProcesses(processes1))
 6239   pgbench               idle in trans   UPDATE pgbench_accounts SET
                                              abalance = abalance + 141 WHERE aid
@@ -288,7 +288,7 @@ Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 ...         query="UPDATE pgbench_branches SET bbalance = bbalance + 1788 WHERE bid = 68;",
 ...     ),
 ... ]
->>> ui = ui.evolve(query_mode=QueryMode.waiting)
+>>> ui.evolve(query_mode=QueryMode.waiting)
 >>> processes_rows(term, ui, SelectableProcesses(processes2))
 6239   pgbench                      active   END;
 6228   pgbench               idle in trans   UPDATE pgbench_branches SET

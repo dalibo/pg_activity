@@ -363,7 +363,7 @@ class Column:
         return self.color_key
 
 
-@attr.s(auto_attribs=True, frozen=True, slots=True)
+@attr.s(auto_attribs=True, slots=True)
 class UI:
     """State of the UI."""
 
@@ -569,7 +569,7 @@ class UI:
         >>> ui.interactive_timeout
         3
         """
-        object.__setattr__(self, "interactive_timeout", 3)
+        self.interactive_timeout = 3
 
     def end_interactive(self) -> None:
         """End interactive mode.
@@ -581,7 +581,7 @@ class UI:
         >>> ui.end_interactive()
         >>> ui.interactive_timeout
         """
-        object.__setattr__(self, "interactive_timeout", None)
+        self.interactive_timeout = None
 
     def tick_interactive(self) -> None:
         """End interactive mode.
@@ -610,36 +610,37 @@ class UI:
         if self.interactive_timeout is None:
             raise RuntimeError("cannot tick interactive mode")
         assert self.interactive_timeout > 0, self.interactive_timeout
-        new_value = (self.interactive_timeout - 1) or None
-        object.__setattr__(self, "interactive_timeout", new_value)
+        self.interactive_timeout = (self.interactive_timeout - 1) or None
 
-    def toggle_pause(self) -> "UI":
+    def toggle_pause(self) -> None:
         """Toggle 'in_pause' attribute.
 
         >>> ui = UI.make()
         >>> ui.in_pause
         False
-        >>> ui.toggle_pause().in_pause
+        >>> ui.toggle_pause()
+        >>> ui.in_pause
         True
-        >>> ui.toggle_pause().toggle_pause().in_pause
+        >>> ui.toggle_pause()
+        >>> ui.in_pause
         False
         """
-        return attr.evolve(self, in_pause=not self.in_pause)
+        self.in_pause = not self.in_pause
 
-    def evolve(self, **changes: Any) -> "UI":
+    def evolve(self, **changes: Any) -> None:
         """Return a new UI with 'changes' applied.
 
         >>> ui = UI.make()
         >>> ui.query_mode.value
         'running queries'
-        >>> new_ui = ui.evolve(query_mode=QueryMode.blocking, sort_key=SortKey.write)
-        >>> new_ui.query_mode.value
+        >>> ui.evolve(query_mode=QueryMode.blocking, sort_key=SortKey.write)
+        >>> ui.query_mode.value
         'blocking queries'
-        >>> new_ui.sort_key.name
+        >>> ui.sort_key.name
         'write'
         """
         if self.in_pause:
-            return self
+            return
         forbidden = set(changes) - {
             "duration_mode",
             "verbose_mode",
@@ -648,7 +649,12 @@ class UI:
             "refresh_time",
         }
         assert not forbidden, forbidden
-        return attr.evolve(self, **changes)
+        fields = attr.fields(self.__class__)
+        for field_name, value in changes.items():
+            field = getattr(fields, field_name)
+            if field.converter:
+                value = field.converter(value)
+            setattr(self, field_name, value)
 
     def column(self, key: str) -> Column:
         """Return the column matching 'key'.
