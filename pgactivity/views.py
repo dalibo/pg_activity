@@ -1,6 +1,5 @@
 import functools
 import inspect
-import itertools
 from textwrap import dedent
 from typing import (
     Any,
@@ -44,7 +43,18 @@ from .types import (
 from . import colors, utils
 from .activities import sorted as sorted_processes
 
-line_counter = functools.partial(itertools.count, step=-1)
+
+class line_counter:
+    def __init__(self, start: int) -> None:
+        self.value = start
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self.value})"
+
+    def __next__(self) -> int:
+        current_value = self.value
+        self.value -= 1
+        return current_value
 
 
 def shorten(term: Terminal, text: str, width: Optional[int] = None) -> str:
@@ -83,13 +93,13 @@ def limit(func: Callable[..., Iterable[str]]) -> Callable[..., int]:
     line #0
     line #1
     >>> count
-    count(0, -1)
+    line_counter(0)
     >>> count = line_counter(3)
     >>> limit(view)(term, 2, lines_counter=count)
     line #0
     line #1
     >>> count
-    count(1, -1)
+    line_counter(1)
     >>> limit(view)(term, 3, prefix="row")
     row #0
     row #1
@@ -101,7 +111,7 @@ def limit(func: Callable[..., Iterable[str]]) -> Callable[..., int]:
     line #0
     <--
     >>> count
-    count(9, -1)
+    line_counter(9)
     """
 
     @functools.wraps(func)
