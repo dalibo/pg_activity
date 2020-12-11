@@ -155,13 +155,15 @@ def main(
                     ui = ui.evolve(**changes)
 
             if in_help:
-                print(term.clear + term.home, end="")
-                views.help(
-                    term,
-                    __version__,
-                    is_local,
-                    lines_counter=views.line_counter(term.height),
-                )
+                # Only draw help screen once.
+                if key is not None:
+                    print(term.clear + term.home, end="")
+                    views.help(
+                        term,
+                        __version__,
+                        is_local,
+                        lines_counter=views.line_counter(term.height),
+                    )
 
             else:
                 pg_db_info = data.pg_get_db_info(
