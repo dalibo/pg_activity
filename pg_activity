@@ -117,13 +117,6 @@ server activity monitoring.")
         action = 'store_true',
         help = "Show this help message and exit.",
         default = False)
-    # --debug
-    parser.add_option(
-        '--debug',
-        dest = 'debug',
-        action = 'store_true',
-        help = "Enable debug mode for traceback tracking.",
-        default = False)
     # --no-db-size
     parser.add_option(
         '--no-db-size',

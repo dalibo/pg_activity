@@ -17,7 +17,6 @@ Default CLI options, passed to ui.main():
 >>> defaults = {
 ...     "blocksize": 4096,
 ...     "dbname": f"{postgres.info.dbname}",
-...     "debug": False,
 ...     "durationmode": "1",
 ...     "help": False,
 ...     "host": f"{postgres.info.host}",

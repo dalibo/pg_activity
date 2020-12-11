@@ -50,7 +50,6 @@ Options
         --rds                 Enable support for AWS RDS.
         --output=FILEPATH     Store running queries as CSV.
         --help                Show this help message and exit.
-        --debug               Enable debug mode for traceback tracking.
         --no-db-size          Skip total size of DB.
         --min-duration        Don't display queries with smaller than specified
                               duration (in seconds).
