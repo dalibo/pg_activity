@@ -16,6 +16,7 @@ from typing import (
 from blessed import Terminal
 from blessed.formatters import FormattingString
 
+from .compat import link
 from .keys import (
     BINDINGS,
     EXIT_KEY,
@@ -148,7 +149,7 @@ def help(term: Terminal, version: str, is_local: bool) -> Iterable[str]:
     project_url = "https://github.com/dalibo/pg_activity"
     intro = dedent(
         f"""\
-    {term.bold_green}pg_activity {version} - {term.link(project_url, project_url)}
+    {term.bold_green}pg_activity {version} - {link(term, project_url, project_url)}
     {term.normal}Released under PostgreSQL License.
     """
     )
