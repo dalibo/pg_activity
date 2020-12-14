@@ -21,7 +21,7 @@ or directly from your Linux distribution, if available, e.g.:
 Usage
 -----
 
-`pg_activity` works localy or remotely. In local execution context, to obtain
+`pg_activity` works locally or remotely. In local execution context, to obtain
 sufficient rights to display system informations, the system user running
 `pg_activity` must be the same user running postgresql server (`postgres` by
 default), or have more rights like `root`. Otherwise, `pg_activity` can fallback
