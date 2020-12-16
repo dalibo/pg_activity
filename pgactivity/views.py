@@ -122,7 +122,7 @@ def limit(func: Callable[..., Iterable[str]]) -> Callable[..., int]:
         if "width" in signature.parameters:
             kwargs["width"] = width
         for line in func(term, *args, **kwargs):
-            print(shorten(term, line, width))
+            print(shorten(term, line, width) + term.clear_eol)
             if counter is not None and next(counter) == 1:
                 break
 
@@ -495,8 +495,8 @@ def screen(
         processes, system_info = activity_stats, None
     processes.set_items(sorted_processes(processes, key=ui.sort_key, reverse=True))
 
-    print(term.clear + term.home, end="")
-    top_height = term.height - 1
+    print(term.home, end="")
+    top_height = term.height - (1 if render_footer else 0)
     lines_counter = line_counter(top_height)
 
     if render_header:
@@ -521,6 +521,10 @@ def screen(
         lines_counter=lines_counter,
         width=width,
     )
+
+    # Clear remaining lines in screen until footer (or EOS)
+    print(f"{term.clear_eol}\n" * lines_counter.value, end="")
+
     if render_footer:
         with term.location(x=0, y=top_height):
             if message is not None:

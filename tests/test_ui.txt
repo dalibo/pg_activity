@@ -93,6 +93,27 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
                                 RUNNING QUERIES
 PID    DATABASE                     USER           CLIENT              state   Query
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
 ------------------------------------------------------------------------------------------- sending key 'h' --------------------------------------------------------------------------------------------
 pg_activity 2.0.0a3 - https://github.com/dalibo/pg_activity
 Released under PostgreSQL License.
@@ -117,6 +138,27 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
                                 RUNNING QUERIES
 PID    DATABASE                     USER           CLIENT              state   Query
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
 ------------------------------------------------------------------------------------------- sending key 'q' --------------------------------------------------------------------------------------------
 
 
@@ -140,82 +182,364 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
                                 RUNNING QUERIES
 DATABASE                     USER           CLIENT              state   Query
 tests                    postgres     127.0.0.1/32      idle in trans   SELECT pg_sleep(0)
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
 ------------------------------------------------------------------------------------------- sending key '-' --------------------------------------------------------------------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
                                 RUNNING QUERIES
 DATABASE                     USER           CLIENT              state   Query
 tests                    postgres     127.0.0.1/32      idle in trans   SELECT pg_sleep(0)
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
 ------------------------------------------------------------------------------------------- sending key '-' --------------------------------------------------------------------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 0.5s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
                                 RUNNING QUERIES
 DATABASE                     USER           CLIENT              state   Query
 tests                    postgres     127.0.0.1/32      idle in trans   SELECT pg_sleep(0)
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
 ------------------------------------------------------------------------------------------- sending key '+' --------------------------------------------------------------------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
                                 RUNNING QUERIES
 DATABASE                     USER           CLIENT              state   Query
 tests                    postgres     127.0.0.1/32      idle in trans   SELECT pg_sleep(0)
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
 ------------------------------------------------------------------------------------------- sending key ' ' --------------------------------------------------------------------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
                                      PAUSE
 DATABASE                     USER           CLIENT              state   Query
 tests                    postgres     127.0.0.1/32      idle in trans   SELECT pg_sleep(0)
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
 ------------------------------------------------------------------------------------------- sending key 'T' --------------------------------------------------------------------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
                                      PAUSE
 DATABASE                     USER           CLIENT              state   Query
 tests                    postgres     127.0.0.1/32      idle in trans   SELECT pg_sleep(0)
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
 ------------------------------------------------------------------------------------------- sending key '3' --------------------------------------------------------------------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
                                      PAUSE
 DATABASE                     USER           CLIENT              state   Query
 tests                    postgres     127.0.0.1/32      idle in trans   SELECT pg_sleep(0)
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
 ------------------------------------------------------------------------------------------- sending key 'r' --------------------------------------------------------------------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
                                      PAUSE
 DATABASE                     USER           CLIENT              state   Query
 tests                    postgres     127.0.0.1/32      idle in trans   SELECT pg_sleep(0)
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
 ------------------------------------------------------------------------------------------- sending key ' ' --------------------------------------------------------------------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
                                 RUNNING QUERIES
 DATABASE                     USER           CLIENT              state   Query
 tests                    postgres     127.0.0.1/32      idle in trans   SELECT pg_sleep(0)
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
 ------------------------------------------------------------------------------------------- sending key 'T' --------------------------------------------------------------------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction
                                 RUNNING QUERIES
 DATABASE                     USER           CLIENT              state   Query
 tests                    postgres     127.0.0.1/32      idle in trans   SELECT pg_sleep(0)
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
 ------------------------------------------------------------------------------------------- sending key 'c' --------------------------------------------------------------------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction
                                 RUNNING QUERIES
 DATABASE                     USER           CLIENT              state   Query
 tests                    postgres     127.0.0.1/32      idle in trans   SELECT pg_sleep(0)
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
 ------------------------------------------------------------------------------------------- sending key '2' --------------------------------------------------------------------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction
                                 WAITING QUERIES
 DATABASE                     USER           CLIENT  RELATION             TYPE             MODE              state   Query
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
 ------------------------------------------------------------------------------------------- sending key '1' --------------------------------------------------------------------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction
                                 RUNNING QUERIES
 DATABASE                     USER           CLIENT              state   Query
 tests                    postgres     127.0.0.1/32      idle in trans   SELECT pg_sleep(0)
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
 ------------------------------------------------------------------------------------------- sending key '3' --------------------------------------------------------------------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode: transaction
                                 BLOCKING QUERIES
 DATABASE                     USER           CLIENT  RELATION             TYPE             MODE              state   Query
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
 ------------------------------------------------------------------------------------------- sending key 'q' --------------------------------------------------------------------------------------------
 
 
@@ -242,15 +566,79 @@ Use another set of options:
 DATABASE                      state   Query
 tests                 idle in trans   CREATE TABLE persons (firstname text, lastname text, age int,
                                       address text)
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
 ----------------------------------------- sending key 'D' ------------------------------------------
                                 RUNNING QUERIES
 DATABASE                      state   Query
 tests                 idle in trans   CREATE TABLE persons (firstname text, lastname text, age int,
                                       address text)
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
 ----------------------------------------- sending key 'v' ------------------------------------------
                                 RUNNING QUERIES
 DATABASE                      state   Query
 tests                 idle in trans   CREATE TABLE persons (firstname text, lastname text, age int,
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
 ----------------------------------------- sending key 'q' ------------------------------------------
 >>> with output.open() as f:
 ...     lines = f.readlines()
@@ -299,6 +687,22 @@ PID    DATABASE                      state   Query
 ...    tests                 idle in trans   SELECT 43
 ...    tests                 idle in trans   UPDATE t SET s = 'blocking'
 ...    tests                        active   UPDATE t SET s = 'waiting'
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
 F1/1 Running queries   F2/2 Waiting queries   F3/3 Blocking queries  Space Pause/unpause    q Quit                 h Help                   
 ---------------------------------------------------------- sending key 'KEY_DOWN' ----------------------------------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
@@ -309,6 +713,22 @@ PID    DATABASE                      state   Query
 ...    tests                 idle in trans   SELECT 43
 ...    tests                 idle in trans   UPDATE t SET s = 'blocking'
 ...    tests                        active   UPDATE t SET s = 'waiting'
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
 C Cancel current query     K Terminate current query  Space Tag/untag current qu Other Back to activities   q Quit                          
 ------------------------------------------------------------- sending key '2' --------------------------------------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
@@ -316,6 +736,25 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
                                 WAITING QUERIES
 PID    DATABASE          RELATION             TYPE             MODE              state   Query
 ...    tests                 None    transactionid        ShareLock             active   UPDATE t SET s = 'waiting'
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
 F1/1 Running queries   F2/2 Waiting queries   F3/3 Blocking queries  Space Pause/unpause    q Quit                 h Help                   
 ------------------------------------------------------------- sending key '3' --------------------------------------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
@@ -323,6 +762,25 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
                                 BLOCKING QUERIES
 PID    DATABASE          RELATION             TYPE             MODE              state   Query
 ...    tests                 None    transactionid    ExclusiveLock      idle in trans   UPDATE t SET s = 'blocking'
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
 F1/1 Running queries   F2/2 Waiting queries   F3/3 Blocking queries  Space Pause/unpause    q Quit                 h Help                   
 ------------------------------------------------------------- sending key '1' --------------------------------------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
@@ -333,6 +791,22 @@ PID    DATABASE                      state   Query
 ...    tests                 idle in trans   SELECT 43
 ...    tests                 idle in trans   UPDATE t SET s = 'blocking'
 ...    tests                        active   UPDATE t SET s = 'waiting'
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
 F1/1 Running queries   F2/2 Waiting queries   F3/3 Blocking queries  Space Pause/unpause    q Quit                 h Help                   
 ---------------------------------------------------------- sending key 'KEY_DOWN' ----------------------------------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
@@ -343,6 +817,22 @@ PID    DATABASE                      state   Query
 ...    tests                 idle in trans   SELECT 43
 ...    tests                 idle in trans   UPDATE t SET s = 'blocking'
 ...    tests                        active   UPDATE t SET s = 'waiting'
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
 C Cancel current query     K Terminate current query  Space Tag/untag current qu Other Back to activities   q Quit                          
 ------------------------------------------------------------- sending key 'C' --------------------------------------------------------------
                                               ┌──────────────────────────────────────────────┐                                              
@@ -357,6 +847,22 @@ PID    DATABASE                      state   Query
 ...    tests                 idle in trans   SELECT 43
 ...    tests                 idle in trans   UPDATE t SET s = 'blocking'
 ...    tests                        active   UPDATE t SET s = 'waiting'
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
 C Cancel current query     K Terminate current query  Space Tag/untag current qu Other Back to activities   q Quit                          
 ------------------------------------------------------------- sending key 'K' --------------------------------------------------------------
                                             ┌─────────────────────────────────────────────────┐                                             
@@ -370,6 +876,23 @@ PID    DATABASE                      state   Query
 ...    tests                 idle in trans   SELECT 43
 ...    tests                 idle in trans   UPDATE t SET s = 'blocking'
 ...    tests                        active   UPDATE t SET s = 'waiting'
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
                              Process ... terminated
 ---------------------------------------------------------- sending key 'KEY_DOWN' ----------------------------------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
@@ -379,6 +902,23 @@ PID    DATABASE                      state   Query
 ...    tests                 idle in trans   SELECT 43
 ...    tests                 idle in trans   UPDATE t SET s = 'blocking'
 ...    tests                        active   UPDATE t SET s = 'waiting'
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
                              Process ... terminated
 ------------------------------------------------------------- sending key ' ' --------------------------------------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
@@ -388,6 +928,23 @@ PID    DATABASE                      state   Query
 ...    tests                 idle in trans   SELECT 43
 ...    tests                 idle in trans   UPDATE t SET s = 'blocking'
 ...    tests                        active   UPDATE t SET s = 'waiting'
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
 C Cancel current query     K Terminate current query  Space Tag/untag current qu Other Back to activities   q Quit                          
 ---------------------------------------------------------- sending key 'KEY_DOWN' ----------------------------------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
@@ -397,6 +954,23 @@ PID    DATABASE                      state   Query
 ...    tests                 idle in trans   SELECT 43
 ...    tests                 idle in trans   UPDATE t SET s = 'blocking'
 ...    tests                        active   UPDATE t SET s = 'waiting'
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
 C Cancel current query     K Terminate current query  Space Tag/untag current qu Other Back to activities   q Quit                          
 ------------------------------------------------------------- sending key ' ' --------------------------------------------------------------
 PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
@@ -406,6 +980,23 @@ PID    DATABASE                      state   Query
 ...    tests                 idle in trans   SELECT 43
 ...    tests                 idle in trans   UPDATE t SET s = 'blocking'
 ...    tests                        active   UPDATE t SET s = 'waiting'
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
 C Cancel current query     K Terminate current query  Space Tag/untag current qu Other Back to activities   q Quit                          
 ------------------------------------------------------------- sending key 'K' --------------------------------------------------------------
                                         ┌─────────────────────────────────────────────────────────┐
@@ -416,6 +1007,26 @@ PostgreSQL ... - ... - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
                                 RUNNING QUERIES
 PID    DATABASE                      state   Query
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
                           Processes ..., ... terminated                         
 ------------------------------------------------------------- sending key 'q' --------------------------------------------------------------
 
