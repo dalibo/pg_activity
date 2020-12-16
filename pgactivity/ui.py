@@ -71,6 +71,7 @@ def main(
                 in_help = True
             elif in_help and key is not None:
                 in_help, key = False, None
+                print(term.clear + term.home, end="")
             elif key == keys.EXIT:
                 break
             elif not ui.interactive() and key == keys.SPACE:
