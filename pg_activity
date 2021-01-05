@@ -33,8 +33,8 @@ import getpass
 from optparse import OptionParser, OptionGroup
 from typing import NoReturn
 
-from blessed import Terminal
 import psycopg2
+from blessed import Terminal
 
 from pgactivity import __version__, data, types, ui
 
@@ -281,14 +281,14 @@ if __name__ == '__main__':
         min_duration=options.minduration,
     )
     hostname = socket.gethostname()
-    try:
-        host = types.Host.from_options(
-            options,
-            dsn,
-            hostname,
-        )
-    except psycopg2.ProgrammingError as err:
-        exit(err)
+    conninfo = dataobj.pg_conn.info
+    host = types.Host(
+        hostname,
+        conninfo.user,
+        conninfo.host,
+        int(conninfo.port),
+        conninfo.dbname,
+    )
 
     term = Terminal()
     while True:
