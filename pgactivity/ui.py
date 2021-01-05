@@ -1,5 +1,4 @@
 import optparse
-import os
 import time
 from typing import Dict, List, Optional, cast
 
@@ -7,10 +6,11 @@ import attr
 from blessed import Terminal
 
 from . import __version__, activities, handlers, keys, types, utils, views, widgets
-from .data import pg_connect
+from .data import Data
 
 
 def main(
+    data: Data,
     host: types.Host,
     options: optparse.Values,
     dsn: str,
@@ -21,13 +21,6 @@ def main(
     width: Optional[int] = None,
     wait_on_actions: Optional[float] = None,
 ) -> None:
-    data = pg_connect(
-        options,
-        dsn,
-        password=os.environ.get("PGPASSWORD"),
-        service=os.environ.get("PGSERVICE"),
-        min_duration=options.minduration,
-    )
 
     fs_blocksize = options.blocksize
 

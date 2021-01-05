@@ -9,7 +9,7 @@ Functional tests for 'ui' module
 >>> import blessed
 >>> from blessed.keyboard import Keystroke
 
->>> from pgactivity import types, ui
+>>> from pgactivity import data, types, ui
 
 >>> postgres = getfixture("postgresql")
 
@@ -54,6 +54,14 @@ Default CLI options, passed to ui.main():
 ...     postgres.info.port,
 ...     postgres.info.dbname,
 ... )
+>>> dataobj = data.Data.pg_connect(
+...     host=postgres.info.host,
+...     port=postgres.info.port,
+...     user=postgres.info.user,
+...     database=postgres.info.dbname,
+...     min_duration=options.minduration,
+... )
+
 >>> def run_ui(options, keys, expected_timeouts=None,
 ...            render_header=True, render_footer=False,
 ...            width=200):
@@ -74,7 +82,7 @@ Default CLI options, passed to ui.main():
 ...         return ks
 ...
 ...     with patch.object(term, "inkey", new=inkey):
-...         ui.main(host, options, "", term=term,
+...         ui.main(dataobj, host, options, "", term=term,
 ...                 render_header=render_header, render_footer=render_footer,
 ...                 width=width, wait_on_actions=1)
 ...

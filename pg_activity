@@ -33,7 +33,7 @@ import getpass
 
 import psycopg2
 
-from pgactivity import __version__, types, ui
+from pgactivity import __version__, data, types, ui
 
 
 # Customized OptionParser
@@ -270,6 +270,13 @@ if __name__ == '__main__':
         print(parser.format_help().strip())
         sys.exit(1)
 
+    dataobj = data.pg_connect(
+        options,
+        dsn,
+        password=os.environ.get("PGPASSWORD"),
+        service=os.environ.get("PGSERVICE"),
+        min_duration=options.minduration,
+    )
     hostname = socket.gethostname()
     try:
         host = types.Host.from_options(
@@ -279,4 +286,4 @@ if __name__ == '__main__':
         )
     except psycopg2.ProgrammingError as err:
         exit(err)
-    ui.main(host, options, dsn)
+    ui.main(dataobj, host, options, dsn)
