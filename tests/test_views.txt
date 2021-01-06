@@ -63,20 +63,20 @@ Tests for header()
 
 Remote host:
 
->>> host = Host("PostgreSQL 9.6", "server", "pgadm", "server.prod.tld", 5433, "app")
+>>> host = Host("server", "pgadm", "server.prod.tld", 5433, "app")
 >>> dbinfo = DBInfo(10203040506070809, 9999)
 
->>> header(term, ui, host=host, dbinfo=dbinfo, tps=12, active_connections=0,
+>>> header(term, ui, host=host, dbinfo=dbinfo, pg_version="PostgreSQL 9.6", tps=12, active_connections=0,
 ...        width=200)
 PostgreSQL 9.6 - server - pgadm@server.prod.tld:5433/app - Ref.: 10s
  Size:         9.06P - 9.76K/s        | TPS:              12      | Active connections:               0      | Duration mode:     backend
->>> header(term, ui, host=host, dbinfo=dbinfo, tps=12, active_connections=0)
+>>> header(term, ui, host=host, dbinfo=dbinfo, pg_version="PostgreSQL 9.6", tps=12, active_connections=0)
 PostgreSQL 9.6 - server - pgadm@server.prod.tld:5433/app - Ref.: 10s
  Size:         9.06P - 9.76K/s        | TPS:              12      | Active
 
 Local host, with priviledged access:
 
->>> host = Host("PostgreSQL 13.1", "localhost", "tester", "host", 5432, "postgres")
+>>> host = Host("localhost", "tester", "host", 5432, "postgres")
 >>> dbinfo = DBInfo(123456789, 12)
 >>> vmem = MemoryInfo(total=6175825920, percent=42.5, used=2007146496)
 >>> swap = MemoryInfo(total=6312423424, used=2340, percent=0.0)
@@ -86,7 +86,7 @@ Local host, with priviledged access:
 >>> sysinfo = SystemInfo(vmem, swap, load, io_read, io_write, 12)
 
 >>> ui = UI.make(refresh_time=2, min_duration=1.2)
->>> header(term, ui, host=host, dbinfo=dbinfo, tps=1, active_connections=79,
+>>> header(term, ui, host=host, dbinfo=dbinfo, pg_version="PostgreSQL 13.1", tps=1, active_connections=79,
 ...        system_info=sysinfo, width=150)
 PostgreSQL 13.1 - localhost - tester@host:5432/postgres - Ref.: 2s - Min. duration: 1.2s
  Size:       117.74M - 12B/s          | TPS:               1      | Active connections:              79      | Duration mode:       query
@@ -364,7 +364,7 @@ Tests for screen()
 
 >>> processes3 = [processes1[0], processes1[2]]
 
->>> host = Host("PostgreSQL 13", "testhost", "pgadm", "server.prod.tld", 5433, "app")
+>>> host = Host("testhost", "pgadm", "server.prod.tld", 5433, "app")
 >>> dbinfo = DBInfo(10203040506070809, 9999)
 >>> vmem = MemoryInfo(total=4_220_876_001, percent=2.5, used=1_001_232_608)
 >>> swap = MemoryInfo(total=6_312_423_424, used=2_340, percent=1.0)
@@ -387,6 +387,7 @@ Tests for screen()
 ...     ui,
 ...     host=host,
 ...     dbinfo=dbinfo,
+...     pg_version="PostgreSQL 13",
 ...     tps=5,
 ...     active_connections=7,
 ...     activity_stats=(SelectableProcesses(processes3), sysinfo),
@@ -425,6 +426,7 @@ F1/1 Running queries    F2/2 Waiting queries    F3/3 Blocking queries   Space Pa
 ...     ui,
 ...     host=host,
 ...     dbinfo=dbinfo,
+...     pg_version="PostgreSQL 13",
 ...     tps=5,
 ...     active_connections=7,
 ...     activity_stats=(SelectableProcesses(processes3[:-1]), sysinfo),

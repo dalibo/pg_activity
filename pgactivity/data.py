@@ -125,6 +125,7 @@ class Data:
         database: str = "postgres",
         rds_mode: bool = False,
         service: Optional[str] = None,
+        dsn: str = "",
     ) -> "Data":
         """Create an instance by connecting to a PostgreSQL server."""
         pg_conn = None
@@ -134,6 +135,11 @@ class Data:
                 if service is not None:
                     pg_conn = psycopg2.connect(
                         service=service,
+                        cursor_factory=psycopg2.extras.DictCursor,
+                    )
+                elif dsn:
+                    pg_conn = psycopg2.connect(
+                        dsn=dsn,
                         cursor_factory=psycopg2.extras.DictCursor,
                     )
                 else:
@@ -151,6 +157,11 @@ class Data:
             if service is not None:
                 pg_conn = psycopg2.connect(
                     service=service,
+                    cursor_factory=psycopg2.extras.DictCursor,
+                )
+            elif dsn:
+                pg_conn = psycopg2.connect(
+                    dsn=dsn,
                     cursor_factory=psycopg2.extras.DictCursor,
                 )
             else:
@@ -850,6 +861,7 @@ class Data:
 
 def pg_connect(
     options: optparse.Values,
+    dsn: str,
     password: Optional[str] = None,
     service: Optional[str] = None,
     exit_on_failed: bool = True,
@@ -859,6 +871,7 @@ def pg_connect(
     for nb_try in range(2):
         try:
             data = Data.pg_connect(
+                dsn=dsn,
                 host=options.host,
                 port=options.port,
                 user=options.username,
