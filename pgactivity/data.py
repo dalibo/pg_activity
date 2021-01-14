@@ -112,6 +112,7 @@ class Data:
     pg_version: str
     pg_num_version: int
     min_duration: float
+    dsn_parameters: Dict[str, str]
 
     @classmethod
     def pg_connect(
@@ -181,7 +182,13 @@ class Data:
             if ret[0] != "on":
                 raise Exception("Must be run with database superuser privileges.")
         pg_version, pg_num_version = pg_get_num_version(pg_get_version(pg_conn))
-        return cls(pg_conn, pg_version, pg_num_version, min_duration=min_duration)
+        return cls(
+            pg_conn,
+            pg_version,
+            pg_num_version,
+            min_duration=min_duration,
+            dsn_parameters=pg_conn.info.dsn_parameters,
+        )
 
     def pg_is_local_access(self) -> bool:
         """
