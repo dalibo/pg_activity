@@ -31,6 +31,7 @@ import sys
 from optparse import OptionParser, OptionGroup
 import getpass
 
+from blessed import Terminal
 import psycopg2
 
 from pgactivity import __version__, data, types, ui
@@ -286,4 +287,6 @@ if __name__ == '__main__':
         )
     except psycopg2.ProgrammingError as err:
         exit(err)
-    ui.main(dataobj, host, options, dsn)
+
+    term = Terminal()
+    ui.main(term, dataobj, host, options, dsn)

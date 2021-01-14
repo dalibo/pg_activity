@@ -10,12 +10,12 @@ from .data import Data
 
 
 def main(
+    term: Terminal,
     data: Data,
     host: types.Host,
     options: optparse.Values,
     dsn: str,
     *,
-    term: Optional[Terminal] = None,
     render_header: bool = True,
     render_footer: bool = True,
     width: Optional[int] = None,
@@ -40,9 +40,6 @@ def main(
         max_db_length=min(max(int(pg_db_info["max_length"]), 8), 16),
     )
 
-    if term is None:
-        # Used in tests.
-        term = Terminal()
     key, in_help = None, False
     sys_procs: Dict[int, types.SystemProcess] = {}
     pg_procs = types.SelectableProcesses([])
