@@ -28,6 +28,7 @@ SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 import os
 import socket
 import sys
+import time
 from optparse import OptionParser, OptionGroup
 import getpass
 
@@ -289,4 +290,21 @@ if __name__ == '__main__':
         exit(err)
 
     term = Terminal()
-    ui.main(term, dataobj, host, options, dsn)
+    while True:
+        try:
+            ui.main(term, dataobj, host, options, dsn)
+        except psycopg2.OperationalError as err:
+            for attempt in range(3, 0, -1):
+                print(term.clear + term.home, end="")
+                print(f"Connection to PostgreSQL lost, retrying {attempt} times...")
+                time.sleep(5)
+                newdataobj = dataobj.try_reconnect()
+                if newdataobj is not None:
+                    dataobj = newdataobj
+                    print(term.clear + term.home, end="")
+                    break
+            else:
+                sys.exit(f"FATAL: connection lost: {err}")
+        else:
+            print(term.clear + term.home, end="")
+            break

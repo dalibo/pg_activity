@@ -190,6 +190,18 @@ class Data:
             dsn_parameters=pg_conn.info.dsn_parameters,
         )
 
+    def try_reconnect(self) -> Optional["Data"]:
+        try:
+            pg_conn = psycopg2.connect(
+                cursor_factory=psycopg2.extras.DictCursor, **self.dsn_parameters
+            )
+        except (psycopg2.InterfaceError, psycopg2.OperationalError):
+            return None
+        else:
+            return attr.evolve(
+                self, pg_conn=pg_conn, dsn_parameters=pg_conn.info.dsn_parameters
+            )
+
     def pg_is_local_access(self) -> bool:
         """
         Verify if the user running pg_activity can acces
