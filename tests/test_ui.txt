@@ -130,7 +130,7 @@ PID    DATABASE                     USER           CLIENT              state   Q
 <BLANKLINE>
 <BLANKLINE>
 ------------------------------------------------------------------------------------------- sending key 'h' --------------------------------------------------------------------------------------------
-pg_activity 2.0.0a3 - https://github.com/dalibo/pg_activity
+pg_activity 2.0.0 - https://github.com/dalibo/pg_activity
 Released under PostgreSQL License.
 <BLANKLINE>
    Up/Down: scroll process list
