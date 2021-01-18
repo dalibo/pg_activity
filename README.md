@@ -124,7 +124,7 @@ Navigation mode
 Screenshot
 ----------
 
-![pg_activity screenshot](https://raw.github.com/julmon/pg_activity/master/docs/imgs/screenshot.png)
+![pg_activity screenshot](https://raw.github.com/dalibo/pg_activity/master/docs/imgs/screenshot.png)
 
 FAQ
 ---
