@@ -4,7 +4,6 @@
 
 * Edit the following files and change the version :
   + `pgactivity/__init__.py`
-  + `setup.py`
 * Prepare the release notes using the [commit
   list](https://github.com/dalibo/pg_activity/commits/master)
 * Submit the PR with the release notes in the description.

@@ -14,9 +14,19 @@ HERE = os.path.dirname(__file__)
 with open(os.path.join(HERE, "README.md")) as fo:
     long_description = fo.read()
 
+
+def get_version() -> str:
+    fpath = os.path.join(HERE, "pgactivity", "__init__.py")
+    with open(fpath) as f:
+        for line in f:
+            if line.startswith("__version__"):
+                return line.split('"')[1]
+    raise Exception(f"version information not found in {fpath}")
+
+
 setup(
     name="pg_activity",
-    version="2.0.0a3",
+    version=get_version(),
     author="Dalibo",
     author_email="contact@dalibo.com",
     scripts=["pg_activity"],
