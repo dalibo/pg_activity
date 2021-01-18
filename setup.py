@@ -1,3 +1,4 @@
+import os.path
 import sys
 
 data_files = None
@@ -8,7 +9,9 @@ for opt in sys.argv:
 
 from setuptools import setup
 
-with open("README.md") as fo:
+HERE = os.path.dirname(__file__)
+
+with open(os.path.join(HERE, "README.md")) as fo:
     long_description = fo.read()
 
 setup(
