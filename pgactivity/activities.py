@@ -220,8 +220,9 @@ def get_mem_swap() -> Tuple[float, int, int, float, int, int]:
         simplefilter("ignore", RuntimeWarning)
         phymem = psutil.virtual_memory()
         vmem = psutil.swap_memory()
-    buffers = phymem.buffers
-    cached = phymem.cached
+    # 'buffers' and 'cached' attributes are not available on some systems (e.g. OSX)
+    buffers = getattr(phymem, "buffers", 0)
+    cached = getattr(phymem, "cached", 0)
     mem_used = phymem.total - (phymem.free + buffers + cached)
     return (phymem.percent, mem_used, phymem.total, vmem.percent, vmem.used, vmem.total)
 
