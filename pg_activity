@@ -29,8 +29,9 @@ import os
 import socket
 import sys
 import time
-from optparse import OptionParser, OptionGroup
 import getpass
+from optparse import OptionParser, OptionGroup
+from typing import NoReturn
 
 from blessed import Terminal
 import psycopg2
@@ -43,7 +44,7 @@ class ModifiedOptionParser(OptionParser):
     """
     ModifiedOptionParser
     """
-    def error(self, msg):
+    def error(self, msg: str) -> NoReturn:
         raise OptionParsingError(msg)
 
 
@@ -51,11 +52,11 @@ class OptionParsingError(RuntimeError):
     """
     OptionParsingError
     """
-    def __init__(self, msg):
+    def __init__(self, msg: str) -> None:
         self.msg = msg
 
 
-def get_parser():
+def get_parser() -> ModifiedOptionParser:
     parser = ModifiedOptionParser(
         add_help_option = False,
         version = "%prog " + __version__,
