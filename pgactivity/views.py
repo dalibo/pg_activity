@@ -401,9 +401,12 @@ def processes_rows(
                 else:
                     # Only wrap subsequent lines.
                     wrapped_lines = term.wrap(query, width=dif)
-                    query_lines = [wrapped_lines[0]] + term.wrap(
-                        " ".join(wrapped_lines[1:]), width=width
-                    )
+                    if wrapped_lines:
+                        query_lines = [wrapped_lines[0]] + term.wrap(
+                            " ".join(wrapped_lines[1:]), width=width
+                        )
+                    else:
+                        query_lines = []
                 query_value = "\n".join(query_lines)
             else:
                 assert (
