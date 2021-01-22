@@ -79,7 +79,7 @@ def shorten(term: Terminal, text: str, width: Optional[int] = None) -> str:
     return wrapped[0] + term.normal  # type: ignore
 
 
-def limit(func: Callable[..., Iterable[str]]) -> Callable[..., int]:
+def limit(func: Callable[..., Iterable[str]]) -> Callable[..., None]:
     """View decorator handling screen height limit.
 
     >>> term = Terminal()
