@@ -4,7 +4,7 @@ pg_activity - Realtime PostgreSQL database server monitoring tool
 
 =head1 SYNOPSIS
 
-B<pg_activity> [option..]
+B<pg_activity> [option..] [connection string]
 
 =head1 DESCRIPTION
 
