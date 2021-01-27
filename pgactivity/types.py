@@ -839,7 +839,7 @@ class BaseProcess:
     database: str
     user: str
     client: str
-    duration: float
+    duration: Optional[float]
     state: str
     query: str
     is_parallel_worker: bool

@@ -160,7 +160,7 @@ def sorted(processes: List[T], *, key: SortKey, reverse: bool = False) -> List[T
     ...         write=0.282_725_318_098_656_75,
     ...         state="idle in transaction",
     ...         query="UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;",
-    ...         duration=0,
+    ...         duration=0.1,
     ...         wait=False,
     ...         io_wait=False,
     ...         is_parallel_worker=False,
@@ -177,7 +177,7 @@ def sorted(processes: List[T], *, key: SortKey, reverse: bool = False) -> List[T
     ...         write=0.113_090_128_201_154_74,
     ...         state="active",
     ...         query="UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;",
-    ...         duration=0,
+    ...         duration=None,
     ...         wait=False,
     ...         io_wait=False,
     ...         is_parallel_worker=True,
@@ -190,10 +190,13 @@ def sorted(processes: List[T], *, key: SortKey, reverse: bool = False) -> List[T
     >>> processes = sorted(processes, key=SortKey.mem)
     >>> [p.pid for p in processes]
     ['6239', '6228']
+    >>> processes = sorted(processes, key=SortKey.duration, reverse=True)
+    >>> [p.pid for p in processes]
+    ['6239', '6228']
     """
     return builtins.sorted(
         processes,
-        key=lambda p: getattr(p, key.name),  # type: ignore  # TODO: avoid getattr()
+        key=lambda p: getattr(p, key.name) or 0,  # TODO: avoid getattr()
         reverse=reverse,
     )
 
