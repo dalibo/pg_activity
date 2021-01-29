@@ -1,9 +1,15 @@
 import asyncio
+import pathlib
 import threading
 
 import psycopg2
 import psycopg2.errors
 import pytest
+
+
+@pytest.fixture(scope="session")
+def datadir() -> pathlib.Path:
+    return pathlib.Path(__file__).parent / "data"
 
 
 @pytest.fixture

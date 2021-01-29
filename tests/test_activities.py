@@ -16,8 +16,8 @@ from pgactivity.types import (
 
 
 @pytest.fixture
-def system_processes(shared_datadir):
-    with (shared_datadir / "local-processes-input.json").open() as f:
+def system_processes(datadir):
+    with (datadir / "local-processes-input.json").open() as f:
         input_data = json.load(f)
 
     fs_blocksize = input_data["fs_blocksize"]

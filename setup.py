@@ -56,7 +56,6 @@ setup(
         "testing": [
             "psycopg2-binary",
             "pytest",
-            "pytest-datadir",
             "pytest-postgresql",
         ],
     },
