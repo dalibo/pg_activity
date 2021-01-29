@@ -292,7 +292,7 @@ def query_mode(term: Terminal, ui: UI) -> Iterator[str]:
                                     PAUSE
     """
     if ui.in_pause:
-        yield term.black_bold_on_orange(term.center("PAUSE", fillchar=" "))
+        yield term.black_on_yellow(term.center("PAUSE", fillchar=" "))
     else:
         yield term.green_bold(
             term.center(ui.query_mode.value.upper(), fillchar=" ").rstrip()
