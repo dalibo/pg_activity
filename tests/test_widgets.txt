@@ -10,6 +10,9 @@ Tests for boxed()
 ┌──────────────┐
 │ hello, world │
 └──────────────┘
+>>> print(widgets.boxed(term, "hello, world", border=False), end="")
+<BLANKLINE>
+hello, world
 
 >>> print(widgets.boxed(term, "hello, world", center=True), end="")
                                 ┌──────────────┐                                

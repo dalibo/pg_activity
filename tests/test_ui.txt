@@ -9,7 +9,7 @@ Functional tests for 'ui' module
 >>> import blessed
 >>> from blessed.keyboard import Keystroke
 
->>> from pgactivity import data, types, ui
+>>> from pgactivity import data, types, ui, widgets
 
 >>> postgres = getfixture("postgresql")
 
@@ -688,12 +688,16 @@ Interactive mode:
 ...     ),
 ... )
 
-(Note: expected outputs assume that PID are 4-digits long, this is fragile... TODO)
+(Note: we patch boxed() widget to disable border in order to make output
+independent of the number of digits in PIDs.)
 
 >>> key_down = {"ucs": "KEY_DOWN", "name": "KEY_DOWN"}
 >>> keys = [key_down, 2, 3, 1, key_down, "C", "n", "K", "y",
 ...         key_down, " ", key_down, " ", "K", "y", "q"]
->>> run_ui(options, keys, render_footer=True, width=140)  # doctest: +ELLIPSIS,+NORMALIZE_WHITESPACE
+>>> with patch.object(
+...     widgets, "boxed", new=functools.partial(widgets.boxed, border=False),
+... ):
+...     run_ui(options, keys, render_footer=True, width=140)  # doctest: +ELLIPSIS,+NORMALIZE_WHITESPACE
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               2      | Duration mode:       query
                                 RUNNING QUERIES
@@ -850,9 +854,9 @@ PID    DATABASE                      state   Query
 <BLANKLINE>
 C Cancel current query     K Terminate current query  Space Tag/untag current qu Other Back to activities   q Quit                          
 ------------------------------------------------------------- sending key 'C' --------------------------------------------------------------
-                                              ┌──────────────────────────────────────────────┐                                              
-                                              │ Confirm cancel action on process  ...? (y/n) │                                              
-                                              └──────────────────────────────────────────────┘                                              
+<BLANKLINE>
+                                                Confirm cancel action on process  ...? (y/n)
+<BLANKLINE>
 ------------------------------------------------------------- sending key 'n' --------------------------------------------------------------
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               2      | Duration mode:       query
@@ -880,9 +884,9 @@ PID    DATABASE                      state   Query
 <BLANKLINE>
 C Cancel current query     K Terminate current query  Space Tag/untag current qu Other Back to activities   q Quit                          
 ------------------------------------------------------------- sending key 'K' --------------------------------------------------------------
-                                            ┌─────────────────────────────────────────────────┐                                             
-                                            │ Confirm terminate action on process  ...? (y/n) │                                             
-                                            └─────────────────────────────────────────────────┘                                             
+<BLANKLINE>
+                                              Confirm terminate action on process  ...? (y/n)
+<BLANKLINE>
 ------------------------------------------------------------- sending key 'y' --------------------------------------------------------------
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               2      | Duration mode:       query
@@ -1014,9 +1018,9 @@ PID    DATABASE                      state   Query
 <BLANKLINE>
 C Cancel current query     K Terminate current query  Space Tag/untag current qu Other Back to activities   q Quit                          
 ------------------------------------------------------------- sending key 'K' --------------------------------------------------------------
-                                        ┌─────────────────────────────────────────────────────────┐
-                                        │ Confirm terminate action on processes ..., ...? (y/n)   │
-                                        └─────────────────────────────────────────────────────────┘
+<BLANKLINE>
+                                          Confirm terminate action on processes ..., ...? (y/n)
+<BLANKLINE>
 ------------------------------------------------------------- sending key 'y' --------------------------------------------------------------
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size:       106.07M - 0B/s           | TPS:               0      | Active connections:               1      | Duration mode:       query
