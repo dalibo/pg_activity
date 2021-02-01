@@ -1,5 +1,5 @@
 -- Get data from pg_activity from pg 9.6 to 10
--- Prior to this version there is no way to see parallel workers 
+-- In this versiosn there is no way to distinguish parallel workers from the rest
 SELECT
       pg_stat_activity.pid AS pid,
       pg_stat_activity.application_name AS appname,

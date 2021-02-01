@@ -3,8 +3,8 @@ SELECT
       pid,
       appname,
       CASE WHEN LENGTH(datname) > 16
-               THEN SUBSTRING(datname FROM 0 FOR 6)||'...'||SUBSTRING(datname FROM '........$')
-           ELSE datname
+          THEN SUBSTRING(datname FROM 0 FOR 6)||'...'||SUBSTRING(datname FROM '........$')
+          ELSE datname
       END AS database,
       usename AS user,
       client,
@@ -12,13 +12,15 @@ SELECT
       mode,
       locktype AS type,
       duration,
-      CASE WHEN sq.query = '<IDLE> in transaction (aborted)' THEN 'idle in transaction (aborted)'
-           WHEN sq.query = '<IDLE> in transaction' THEN 'idle in transaction'
-           WHEN sq.query = '<IDLE>' THEN 'idle'
-           ELSE 'active'
+      CASE
+          WHEN sq.query = '<IDLE> in transaction (aborted)' THEN 'idle in transaction (aborted)'
+          WHEN sq.query = '<IDLE> in transaction' THEN 'idle in transaction'
+          WHEN sq.query = '<IDLE>' THEN 'idle'
+          ELSE 'active'
       END AS state,
-      CASE WHEN sq.query LIKE '<IDLE>%%' THEN 'None'
-           ELSE sq.query
+      CASE WHEN sq.query LIKE '<IDLE>%%'
+          THEN 'None'
+          ELSE sq.query
       END AS query
   FROM
       (
@@ -32,8 +34,7 @@ SELECT
             CASE WHEN pg_stat_activity.client_addr IS NULL
                 THEN 'local'
                 ELSE pg_stat_activity.client_addr::TEXT
-                END
-            AS client,
+            END AS client,
             blocking.locktype,
             EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
             NULL AS state,
@@ -50,8 +51,9 @@ SELECT
             JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.procpid)
        WHERE
             blocking.granted
-        AND CASE WHEN %(min_duration)s = 0 THEN true
-                 ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
+        AND CASE WHEN %(min_duration)s = 0
+                THEN true
+                ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
             END
       UNION ALL
       SELECT
@@ -64,8 +66,7 @@ SELECT
             CASE WHEN pg_stat_activity.client_addr IS NULL
                 THEN 'local'
                 ELSE pg_stat_activity.client_addr::TEXT
-                END
-            AS client,
+            END AS client,
             blocking.locktype,
             EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
             NULL AS state,
@@ -86,8 +87,9 @@ SELECT
             JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.procpid)
        WHERE
             blocking.granted
-        AND CASE WHEN %(min_duration)s = 0 THEN true
-                 ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
+        AND CASE WHEN %(min_duration)s = 0
+                THEN true
+                ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
             END
       ) AS sq
 GROUP BY

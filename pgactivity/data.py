@@ -236,7 +236,7 @@ class Data:
         cur = self.pg_conn.cursor()
         cur.execute(query, {"pid": pid})
         ret: Dict[str, bool] = cur.fetchone()
-        return ret["cancelled"]
+        return ret["is_cancelled"]
 
     def pg_terminate_backend(self, pid: int) -> bool:
         """
@@ -249,7 +249,7 @@ class Data:
         cur = self.pg_conn.cursor()
         cur.execute(query, {"pid": pid})
         ret: Dict[str, bool] = cur.fetchone()
-        return ret["terminated"]
+        return ret[0]
 
     DbInfoDict = Dict[str, Union[str, int, float]]
 
