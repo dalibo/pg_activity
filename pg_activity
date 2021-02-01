@@ -44,6 +44,7 @@ class ModifiedOptionParser(OptionParser):
     """
     ModifiedOptionParser
     """
+
     def error(self, msg: str) -> NoReturn:
         raise OptionParsingError(msg)
 
@@ -52,194 +53,218 @@ class OptionParsingError(RuntimeError):
     """
     OptionParsingError
     """
+
     def __init__(self, msg: str) -> None:
         self.msg = msg
 
 
 def get_parser() -> ModifiedOptionParser:
     parser = ModifiedOptionParser(
-        add_help_option = False,
-        version = "%prog " + __version__,
-        usage = "%prog [options] [connection string]",
-        epilog = "The connection string can be in the form of a list of \
-Key/Value parameters or an URI as described in the PostgreSQL documentation. \
-The parsing is delegated to the libpq: different versions of the client library \
-may support different formats or parameters (for example, connection URIs are \
-only supported from libpq 9.2)",
-        description = "htop like application for PostgreSQL \
-server activity monitoring.")
+        add_help_option=False,
+        version="%prog " + __version__,
+        usage="%prog [options] [connection string]",
+        epilog=(
+            "The connection string can be in the form of a list of "
+            "Key/Value parameters or an URI as described in the PostgreSQL documentation. "
+            "The parsing is delegated to the libpq: different versions of the client library "
+            "may support different formats or parameters (for example, connection URIs are "
+            "only supported from libpq 9.2)"
+        ),
+        description=(
+            "htop like application for PostgreSQL " "server activity monitoring."
+        ),
+    )
     # -U / --username
     parser.add_option(
-        '-U',
-        '--username',
-        dest = 'username',
-        default = os.environ.get('PGUSER') or getpass.getuser(),
-        help = "Database user name (default: %default)",
-        metavar = 'USERNAME')
+        "-U",
+        "--username",
+        dest="username",
+        default=os.environ.get("PGUSER") or getpass.getuser(),
+        help="Database user name (default: %default)",
+        metavar="USERNAME",
+    )
     # -p / --port
     parser.add_option(
-        '-p',
-        '--port',
-        dest = 'port',
-        default = os.environ.get('PGPORT') or '5432',
-        help = "Database server port (default: %default)",
-        metavar = 'PORT')
+        "-p",
+        "--port",
+        dest="port",
+        default=os.environ.get("PGPORT") or "5432",
+        help="Database server port (default: %default)",
+        metavar="PORT",
+    )
     # -h / --host
     parser.add_option(
-        '-h',
-        '--host',
-        dest = 'host',
-        help = "Database server host or socket directory (default: %default)",
-        metavar = 'HOSTNAME',
-        default = os.environ.get('PGHOST') or 'localhost')
+        "-h",
+        "--host",
+        dest="host",
+        help="Database server host or socket directory (default: %default)",
+        metavar="HOSTNAME",
+        default=os.environ.get("PGHOST") or "localhost",
+    )
     # -d / --dbname
     parser.add_option(
-        '-d',
-        '--dbname',
-        dest = 'dbname',
-        help = "Database name to connect to (default: %default)",
-        metavar = 'DBNAME',
-        default = 'postgres')
+        "-d",
+        "--dbname",
+        dest="dbname",
+        help="Database name to connect to (default: %default)",
+        metavar="DBNAME",
+        default="postgres",
+    )
     # --blocksize
     parser.add_option(
-        '--blocksize',
-        dest = 'blocksize',
-        help = "Filesystem blocksize (default: %default)",
-        metavar = 'BLOCKSIZE',
-        default = 4096)
+        "--blocksize",
+        dest="blocksize",
+        help="Filesystem blocksize (default: %default)",
+        metavar="BLOCKSIZE",
+        default=4096,
+    )
     # --rds
     parser.add_option(
-        '--rds',
-        dest = 'rds',
-        action = 'store_true',
-        help = "Enable support for AWS RDS",
-        default = False)
+        "--rds",
+        dest="rds",
+        action="store_true",
+        help="Enable support for AWS RDS",
+        default=False,
+    )
     # --output
     parser.add_option(
-        '--output',
-        dest = 'output',
-        help = "Store running queries as CSV",
-        metavar = "FILEPATH",
-        default = None)
+        "--output",
+        dest="output",
+        help="Store running queries as CSV",
+        metavar="FILEPATH",
+        default=None,
+    )
     # --help
     parser.add_option(
-        '--help',
-        dest = 'help',
-        action = 'store_true',
-        help = "Show this help message and exit",
-        default = False)
+        "--help",
+        dest="help",
+        action="store_true",
+        help="Show this help message and exit",
+        default=False,
+    )
     # --no-db-size
     parser.add_option(
-        '--no-db-size',
-        dest = 'nodbsize',
-        action = 'store_true',
-        help = "Skip total size of DB",
-        default = False)
+        "--no-db-size",
+        dest="nodbsize",
+        action="store_true",
+        help="Skip total size of DB",
+        default=False,
+    )
     # --verbose-mode
     parser.add_option(
-        '--verbose-mode',
-        dest = 'verbosemode',
-        help = "Queries display mode. Values: 1-TRUNCATED, 2-FULL(default), 3-INDENTED",
-        metavar = 'VERBOSE_MODE',
-        choices = ['1', '2', '3'],
-        default = '2')
+        "--verbose-mode",
+        dest="verbosemode",
+        help="Queries display mode. Values: 1-TRUNCATED, 2-FULL(default), 3-INDENTED",
+        metavar="VERBOSE_MODE",
+        choices=["1", "2", "3"],
+        default="2",
+    )
     # --duration-mode
     parser.add_option(
-        '--duration-mode',
-        dest = 'durationmode',
-        help = "Duration mode. Values: 1-QUERY(default), 2-TRANSACTION, 3-BACKEND",
-        metavar = 'DURATION_MODE',
-        choices = ['1', '2', '3'],
-        default = '1')
+        "--duration-mode",
+        dest="durationmode",
+        help="Duration mode. Values: 1-QUERY(default), 2-TRANSACTION, 3-BACKEND",
+        metavar="DURATION_MODE",
+        choices=["1", "2", "3"],
+        default="1",
+    )
     # --min-duration
     parser.add_option(
-        '--min-duration',
-        dest = 'minduration',
-        help = "Don't display queries with smaller than specified duration (in seconds)",
-        metavar = "SECONDS",
-        type = float,
-        default = 0)
+        "--min-duration",
+        dest="minduration",
+        help="Don't display queries with smaller than specified duration (in seconds)",
+        metavar="SECONDS",
+        type=float,
+        default=0,
+    )
 
     group = OptionGroup(
-        parser,
-        "Display Options, you can exclude some columns by using them ")
+        parser, "Display Options, you can exclude some columns by using them "
+    )
     # --no-pid
     group.add_option(
-        '--no-pid',
-        dest = 'nopid',
-        action = 'store_true',
-        help = "Disable PID.",
-        default = False)
+        "--no-pid",
+        dest="nopid",
+        action="store_true",
+        help="Disable PID.",
+        default=False,
+    )
     # --no-database
     group.add_option(
-        '--no-database',
-        dest = 'nodb',
-        action = 'store_true',
-        help = "Disable DATABASE",
-        default = False)
+        "--no-database",
+        dest="nodb",
+        action="store_true",
+        help="Disable DATABASE",
+        default=False,
+    )
     # --no-user
     group.add_option(
-        '--no-user',
-        dest = 'nouser',
-        action = 'store_true',
-        help = "Disable USER",
-        default = False)
+        "--no-user",
+        dest="nouser",
+        action="store_true",
+        help="Disable USER",
+        default=False,
+    )
     # --no-client
     group.add_option(
-        '--no-client',
-        dest = 'noclient',
-        action = 'store_true',
-        help = "Disable CLIENT",
-        default = False)
+        "--no-client",
+        dest="noclient",
+        action="store_true",
+        help="Disable CLIENT",
+        default=False,
+    )
     # --no-cpu
     group.add_option(
-        '--no-cpu',
-        dest = 'nocpu',
-        action = 'store_true',
-        help = "Disable CPU%",
-        default = False)
+        "--no-cpu",
+        dest="nocpu",
+        action="store_true",
+        help="Disable CPU%",
+        default=False,
+    )
     # --no-mem
     group.add_option(
-        '--no-mem',
-        dest = 'nomem',
-        action = 'store_true',
-        help = "Disable MEM%",
-        default = False)
+        "--no-mem",
+        dest="nomem",
+        action="store_true",
+        help="Disable MEM%",
+        default=False,
+    )
     # --no-read
     group.add_option(
-        '--no-read',
-        dest = 'noread',
-        action = 'store_true',
-        help = "Disable READ/s",
-        default = False)
+        "--no-read",
+        dest="noread",
+        action="store_true",
+        help="Disable READ/s",
+        default=False,
+    )
     # --no-write
     group.add_option(
-        '--no-write',
-        dest = 'nowrite',
-        action = 'store_true',
-        help = "Disable WRITE/s",
-        default = False)
+        "--no-write",
+        dest="nowrite",
+        action="store_true",
+        help="Disable WRITE/s",
+        default=False,
+    )
     # --no-time
     group.add_option(
-        '--no-time',
-        dest = 'notime',
-        action = 'store_true',
-        help = "Disable TIME+",
-        default = False)
+        "--no-time",
+        dest="notime",
+        action="store_true",
+        help="Disable TIME+",
+        default=False,
+    )
     # --no-wait
     group.add_option(
-        '--no-wait',
-        dest = 'nowait',
-        action = 'store_true',
-        help = "Disable W",
-        default = False)
+        "--no-wait", dest="nowait", action="store_true", help="Disable W", default=False
+    )
     # --no-app-name
     group.add_option(
-        '--no-app-name',
-        dest = 'noappname',
-        action = 'store_true',
-        help = "Disable App",
-        default = False)
+        "--no-app-name",
+        dest="noappname",
+        action="store_true",
+        help="Disable App",
+        default=False,
+    )
 
     parser.add_option_group(group)
 
@@ -247,14 +272,14 @@ server activity monitoring.")
 
 
 def exit(msg: str) -> None:
-    print('pg_activity: error: %s' % msg)
+    print("pg_activity: error: %s" % msg)
     print('Try "pg_activity --help" for more information.')
     sys.exit(1)
 
 
 # Call the main function
-if __name__ == '__main__':
-    if os.name != 'posix':
+if __name__ == "__main__":
+    if os.name != "posix":
         sys.exit("FATAL: Platform not supported.")
     try:
         parser = get_parser()
@@ -264,7 +289,7 @@ if __name__ == '__main__':
         elif len(args) > 1:
             raise OptionParsingError("at most one argument is expected")
         else:
-            dsn = ''
+            dsn = ""
 
     except OptionParsingError as err:
         exit(err.msg)

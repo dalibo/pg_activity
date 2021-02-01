@@ -1,6 +1,6 @@
 [tool.black]
 line-length = 88
-include = '\.pyi?$'
+include = '/(pg_activity|\.pyi?)$'
 exclude = '''
 (
   /(
@@ -11,6 +11,5 @@ exclude = '''
     | \.venv
     | dist
   )/
-  | pg_activity
 )
 '''
