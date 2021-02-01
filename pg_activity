@@ -74,7 +74,7 @@ server activity monitoring.")
         '--username',
         dest = 'username',
         default = os.environ.get('PGUSER') or getpass.getuser(),
-        help = "Database user name (default: %default).",
+        help = "Database user name (default: %default)",
         metavar = 'USERNAME')
     # -p / --port
     parser.add_option(
@@ -82,14 +82,14 @@ server activity monitoring.")
         '--port',
         dest = 'port',
         default = os.environ.get('PGPORT') or '5432',
-        help = "Database server port (default: %default).",
+        help = "Database server port (default: %default)",
         metavar = 'PORT')
     # -h / --host
     parser.add_option(
         '-h',
         '--host',
         dest = 'host',
-        help = "Database server host or socket directory (default: %default).",
+        help = "Database server host or socket directory (default: %default)",
         metavar = 'HOSTNAME',
         default = os.environ.get('PGHOST') or 'localhost')
     # -d / --dbname
@@ -97,14 +97,14 @@ server activity monitoring.")
         '-d',
         '--dbname',
         dest = 'dbname',
-        help = "Database name to connect to (default: %default).",
+        help = "Database name to connect to (default: %default)",
         metavar = 'DBNAME',
         default = 'postgres')
     # --blocksize
     parser.add_option(
         '--blocksize',
         dest = 'blocksize',
-        help = "Filesystem blocksize (default: %default).",
+        help = "Filesystem blocksize (default: %default)",
         metavar = 'BLOCKSIZE',
         default = 4096)
     # --rds
@@ -118,7 +118,7 @@ server activity monitoring.")
     parser.add_option(
         '--output',
         dest = 'output',
-        help = "Store running queries as CSV.",
+        help = "Store running queries as CSV",
         metavar = "FILEPATH",
         default = None)
     # --help
@@ -126,14 +126,14 @@ server activity monitoring.")
         '--help',
         dest = 'help',
         action = 'store_true',
-        help = "Show this help message and exit.",
+        help = "Show this help message and exit",
         default = False)
     # --no-db-size
     parser.add_option(
         '--no-db-size',
         dest = 'nodbsize',
         action = 'store_true',
-        help = "Skip total size of DB.",
+        help = "Skip total size of DB",
         default = False)
     # --verbose-mode
     parser.add_option(
@@ -155,7 +155,7 @@ server activity monitoring.")
     parser.add_option(
         '--min-duration',
         dest = 'minduration',
-        help = "Don't display queries with smaller than specified duration (in seconds).",
+        help = "Don't display queries with smaller than specified duration (in seconds)",
         metavar = "SECONDS",
         type = float,
         default = 0)
@@ -175,70 +175,70 @@ server activity monitoring.")
         '--no-database',
         dest = 'nodb',
         action = 'store_true',
-        help = "Disable DATABASE.",
+        help = "Disable DATABASE",
         default = False)
     # --no-user
     group.add_option(
         '--no-user',
         dest = 'nouser',
         action = 'store_true',
-        help = "Disable USER.",
+        help = "Disable USER",
         default = False)
     # --no-client
     group.add_option(
         '--no-client',
         dest = 'noclient',
         action = 'store_true',
-        help = "Disable CLIENT.",
+        help = "Disable CLIENT",
         default = False)
     # --no-cpu
     group.add_option(
         '--no-cpu',
         dest = 'nocpu',
         action = 'store_true',
-        help = "Disable CPU%.",
+        help = "Disable CPU%",
         default = False)
     # --no-mem
     group.add_option(
         '--no-mem',
         dest = 'nomem',
         action = 'store_true',
-        help = "Disable MEM%.",
+        help = "Disable MEM%",
         default = False)
     # --no-read
     group.add_option(
         '--no-read',
         dest = 'noread',
         action = 'store_true',
-        help = "Disable READ/s.",
+        help = "Disable READ/s",
         default = False)
     # --no-write
     group.add_option(
         '--no-write',
         dest = 'nowrite',
         action = 'store_true',
-        help = "Disable WRITE/s.",
+        help = "Disable WRITE/s",
         default = False)
     # --no-time
     group.add_option(
         '--no-time',
         dest = 'notime',
         action = 'store_true',
-        help = "Disable TIME+.",
+        help = "Disable TIME+",
         default = False)
     # --no-wait
     group.add_option(
         '--no-wait',
         dest = 'nowait',
         action = 'store_true',
-        help = "Disable W.",
+        help = "Disable W",
         default = False)
     # --no-app-name
     group.add_option(
         '--no-app-name',
         dest = 'noappname',
         action = 'store_true',
-        help = "Disable App.",
+        help = "Disable App",
         default = False)
 
     parser.add_option_group(group)
