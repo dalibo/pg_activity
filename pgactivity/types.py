@@ -1,4 +1,5 @@
 import enum
+import functools
 from typing import (
     Any,
     Callable,
@@ -421,8 +422,10 @@ class UI:
                 key="database",
                 name="DATABASE",
                 template_h=f"%-{max_db_length}s ",
+                transform=functools.lru_cache()(
+                    functools.partial(utils.ellipsis, width=16)
+                ),
                 sort_key=None,
-                max_width=16,
             )
         if Flag.IOWAIT & flag:
             add_column(

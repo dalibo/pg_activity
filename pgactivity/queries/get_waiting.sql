@@ -2,10 +2,7 @@
 SELECT
       pg_locks.pid AS pid,
       '<unknown>' AS appname,
-      CASE WHEN LENGTH(pg_stat_activity.datname) > 16
-          THEN SUBSTRING(pg_stat_activity.datname FROM 0 FOR 6)||'...'||SUBSTRING(pg_stat_activity.datname FROM '........$')
-          ELSE pg_stat_activity.datname
-      END AS database,
+      pg_stat_activity.datname AS database,
       pg_stat_activity.usename AS user,
       CASE WHEN pg_stat_activity.client_addr IS NULL
           THEN 'local'

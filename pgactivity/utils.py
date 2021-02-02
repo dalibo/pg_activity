@@ -66,6 +66,24 @@ def clean_str(string: str) -> str:
     return msg
 
 
+def ellipsis(v: str, width: int) -> str:
+    """Shorten a string to specified width with '...' in the middle.
+
+    >>> ellipsis("loooooooooog", 7)
+    'lo...og'
+    >>> ellipsis("loooooooooog", 6)
+    'lo...g'
+    >>> ellipsis("short", 10)
+    'short'
+    """
+    lv = len(v)
+    if lv <= width:
+        return v
+    assert width >= 5
+    wl = (width - 3) // 2
+    return v[: wl + 1] + "..." + v[-wl:]
+
+
 def get_duration(duration: Optional[float]) -> float:
     """Return 0 if the given duration is negative else, return the duration.
 

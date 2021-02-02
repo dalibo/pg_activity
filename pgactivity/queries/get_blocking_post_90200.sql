@@ -2,10 +2,7 @@
 SELECT
       pid,
       application_name AS appname,
-      CASE WHEN LENGTH(datname) > 16
-          THEN SUBSTRING(datname FROM 0 FOR 6)||'...'||SUBSTRING(datname FROM '........$')
-          ELSE datname
-      END AS database,
+      datname AS database,
       usename AS user,
       client,
       relation,
