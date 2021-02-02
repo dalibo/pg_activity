@@ -28,4 +28,3 @@ SELECT
       END
 ORDER BY
       EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) DESC;
-
