@@ -388,34 +388,35 @@ def processes_rows(
             # Switch to wrap_noindent mode if terminal is too narrow.
             verbose_mode = QueryDisplayMode.wrap_noindent
 
-        query = format_query(process.query, process.is_parallel_worker)
+        if process.query is not None:
+            query = format_query(process.query, process.is_parallel_worker)
 
-        if verbose_mode == QueryDisplayMode.truncate:
-            query_value = query[:dif]
-        else:
-            if verbose_mode == QueryDisplayMode.wrap_noindent:
-                if term.length(query.split(" ", 1)[0]) >= dif:
-                    # Query too long to even start on the first line, wrap all
-                    # lines.
-                    query_lines = term.wrap(query, width=width)
-                else:
-                    # Only wrap subsequent lines.
-                    wrapped_lines = term.wrap(query, width=dif)
-                    if wrapped_lines:
-                        query_lines = [wrapped_lines[0]] + term.wrap(
-                            " ".join(wrapped_lines[1:]), width=width
-                        )
-                    else:
-                        query_lines = []
-                query_value = "\n".join(query_lines)
+            if verbose_mode == QueryDisplayMode.truncate:
+                query_value = query[:dif]
             else:
-                assert (
-                    verbose_mode == QueryDisplayMode.wrap
-                ), f"unexpected mode {verbose_mode}"
-                wrapped_lines = term.wrap(query, width=dif)
-                query_value = f"\n{indent}".join(wrapped_lines)
+                if verbose_mode == QueryDisplayMode.wrap_noindent:
+                    if term.length(query.split(" ", 1)[0]) >= dif:
+                        # Query too long to even start on the first line, wrap all
+                        # lines.
+                        query_lines = term.wrap(query, width=width)
+                    else:
+                        # Only wrap subsequent lines.
+                        wrapped_lines = term.wrap(query, width=dif)
+                        if wrapped_lines:
+                            query_lines = [wrapped_lines[0]] + term.wrap(
+                                " ".join(wrapped_lines[1:]), width=width
+                            )
+                        else:
+                            query_lines = []
+                    query_value = "\n".join(query_lines)
+                else:
+                    assert (
+                        verbose_mode == QueryDisplayMode.wrap
+                    ), f"unexpected mode {verbose_mode}"
+                    wrapped_lines = term.wrap(query, width=dif)
+                    query_value = f"\n{indent}".join(wrapped_lines)
 
-        cell(query_value, ui.column("query"))
+            cell(query_value, ui.column("query"))
 
         for line in ("".join(text) + term.normal).splitlines():
             yield line

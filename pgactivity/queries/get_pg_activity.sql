@@ -17,7 +17,7 @@ SELECT
           ELSE 'active'
       END AS state,
       CASE
-          WHEN pg_stat_activity.current_query LIKE '<IDLE>%%' THEN 'None'
+          WHEN pg_stat_activity.current_query LIKE '<IDLE>%%' THEN NULL
           ELSE pg_stat_activity.current_query
       END AS query,
       false AS is_parallel_worker

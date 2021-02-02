@@ -19,7 +19,7 @@ SELECT
           ELSE 'active'
       END AS state,
       CASE WHEN pg_stat_activity.current_query LIKE '<IDLE>%%'
-          THEN 'None'
+          THEN NULL
           ELSE pg_stat_activity.current_query
       END AS query
   FROM

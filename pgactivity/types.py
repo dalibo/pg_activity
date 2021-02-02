@@ -808,7 +808,7 @@ class BaseProcess:
     client: str
     duration: Optional[float]
     state: str
-    query: str
+    query: Optional[str]
     is_parallel_worker: bool
 
 

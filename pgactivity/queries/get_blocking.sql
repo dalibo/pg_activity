@@ -16,7 +16,7 @@ SELECT
           ELSE 'active'
       END AS state,
       CASE WHEN sq.query LIKE '<IDLE>%%'
-          THEN 'None'
+          THEN NULL
           ELSE sq.query
       END AS query
   FROM
