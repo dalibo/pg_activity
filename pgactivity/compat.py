@@ -13,4 +13,4 @@ if BLESSED_VERSION < (1, 17):
 else:
 
     def link(term: blessed.Terminal, url: str, text: str, url_id: str = "") -> str:
-        return term.link(url, text, url_id=url_id)  # type: ignore
+        return term.link(url, text, url_id=url_id)
