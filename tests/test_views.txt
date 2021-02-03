@@ -133,7 +133,7 @@ Tests for processes_rows()
 >>> processes1 = [
 ...     LocalRunningProcess(
 ...         pid="6239",
-...         appname="pgbench",
+...         application_name="pgbench",
 ...         database="pgbench",
 ...         user="postgres",
 ...         client="local",
@@ -150,7 +150,7 @@ Tests for processes_rows()
 ...     ),
 ...     LocalRunningProcess(
 ...         pid="6228",
-...         appname="pgbench",
+...         application_name="pgbench",
 ...         database="pgbench",
 ...         user="postgres",
 ...         client="local",
@@ -167,7 +167,7 @@ Tests for processes_rows()
 ...     ),
 ...     LocalRunningProcess(
 ...         pid="1234",
-...         appname="accounting",
+...         application_name="accounting",
 ...         database="business",
 ...         user="bob",
 ...         client="local",
@@ -263,7 +263,7 @@ Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 >>> processes2 = [
 ...     BWProcess(
 ...         pid="6239",
-...         appname="pgbench",
+...         application_name="pgbench",
 ...         database="pgbench",
 ...         user="postgres",
 ...         client="1.2.3.4",
@@ -276,7 +276,7 @@ Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 ...     ),
 ...     BWProcess(
 ...         pid="6228",
-...         appname="pgbench",
+...         application_name="pgbench",
 ...         database="pgbench",
 ...         user="postgres",
 ...         client="local",
@@ -302,7 +302,7 @@ Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 >>> processes1b = [
 ...     RunningProcess(
 ...         pid=6239,
-...         appname="pgbench",
+...         application_name="pgbench",
 ...         database="pgbench",
 ...         user="postgres",
 ...         client="local",
@@ -314,7 +314,7 @@ Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 ...     ),
 ...     RunningProcess(
 ...         pid=6228,
-...         appname="none",
+...         application_name="none",
 ...         database="pgbench",
 ...         user="postgres",
 ...         client="local",
@@ -326,7 +326,7 @@ Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 ...     ),
 ...     RunningProcess(
 ...         pid=1234,
-...         appname="accounting",
+...         application_name="accounting",
 ...         database="business",
 ...         user="bob",
 ...         client="192.168.0.47",

@@ -1,7 +1,7 @@
 -- Get blocking queries >= 9.2
 SELECT
       pid,
-      application_name AS appname,
+      application_name,
       datname AS database,
       usename AS user,
       client,

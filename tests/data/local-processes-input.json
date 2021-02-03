@@ -2,7 +2,7 @@
     "fs_blocksize": 4096,
     "new_processes": {
         "6221": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -53,7 +53,7 @@
             "write": null
         },
         "6222": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -104,7 +104,7 @@
             "write": null
         },
         "6223": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -155,7 +155,7 @@
             "write": null
         },
         "6224": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -206,7 +206,7 @@
             "write": null
         },
         "6225": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -257,7 +257,7 @@
             "write": null
         },
         "6226": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -308,7 +308,7 @@
             "write": null
         },
         "6227": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -359,7 +359,7 @@
             "write": null
         },
         "6228": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -410,7 +410,7 @@
             "write": null
         },
         "6229": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -461,7 +461,7 @@
             "write": null
         },
         "6230": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -512,7 +512,7 @@
             "write": null
         },
         "6231": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -563,7 +563,7 @@
             "write": null
         },
         "6232": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -614,7 +614,7 @@
             "write": null
         },
         "6233": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -665,7 +665,7 @@
             "write": null
         },
         "6234": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -716,7 +716,7 @@
             "write": null
         },
         "6235": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -767,7 +767,7 @@
             "write": null
         },
         "6237": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -818,7 +818,7 @@
             "write": null
         },
         "6238": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -869,7 +869,7 @@
             "write": null
         },
         "6239": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -920,7 +920,7 @@
             "write": null
         },
         "6240": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -973,7 +973,7 @@
     },
     "processes": {
         "6221": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -1024,7 +1024,7 @@
             "write": null
         },
         "6222": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -1075,7 +1075,7 @@
             "write": null
         },
         "6223": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -1126,7 +1126,7 @@
             "write": null
         },
         "6224": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -1177,7 +1177,7 @@
             "write": null
         },
         "6225": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -1228,7 +1228,7 @@
             "write": null
         },
         "6226": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -1279,7 +1279,7 @@
             "write": null
         },
         "6227": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -1330,7 +1330,7 @@
             "write": null
         },
         "6228": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -1381,7 +1381,7 @@
             "write": null
         },
         "6229": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -1432,7 +1432,7 @@
             "write": null
         },
         "6230": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -1483,7 +1483,7 @@
             "write": null
         },
         "6231": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -1534,7 +1534,7 @@
             "write": null
         },
         "6232": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -1585,7 +1585,7 @@
             "write": null
         },
         "6233": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -1636,7 +1636,7 @@
             "write": null
         },
         "6234": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -1687,7 +1687,7 @@
             "write": null
         },
         "6235": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -1738,7 +1738,7 @@
             "write": null
         },
         "6236": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -1789,7 +1789,7 @@
             "write": null
         },
         "6237": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -1840,7 +1840,7 @@
             "write": null
         },
         "6238": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -1891,7 +1891,7 @@
             "write": null
         },
         "6239": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",
@@ -1942,7 +1942,7 @@
             "write": null
         },
         "6240": {
-            "appname": "pgbench",
+            "application_name": "pgbench",
             "client": "local",
             "cpu": null,
             "database": "pgbench",

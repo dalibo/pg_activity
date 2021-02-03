@@ -150,7 +150,7 @@ def sorted(processes: List[T], *, key: SortKey, reverse: bool = False) -> List[T
     >>> processes = [
     ...     LocalRunningProcess(
     ...         pid="6239",
-    ...         appname="pgbench",
+    ...         application_name="pgbench",
     ...         database="pgbench",
     ...         user="postgres",
     ...         client="local",
@@ -167,7 +167,7 @@ def sorted(processes: List[T], *, key: SortKey, reverse: bool = False) -> List[T
     ...     ),
     ...     LocalRunningProcess(
     ...         pid="6228",
-    ...         appname="pgbench",
+    ...         application_name="pgbench",
     ...         database="pgbench",
     ...         user="postgres",
     ...         client="local",

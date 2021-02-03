@@ -2,7 +2,7 @@
 -- In this versiosn there is no way to distinguish parallel workers from the rest
 SELECT
       pg_stat_activity.pid AS pid,
-      pg_stat_activity.application_name AS appname,
+      pg_stat_activity.application_name AS application_name,
       pg_stat_activity.datname AS database,
       CASE WHEN pg_stat_activity.client_addr IS NULL
           THEN 'local'

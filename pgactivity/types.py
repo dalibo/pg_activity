@@ -398,7 +398,7 @@ class UI:
 
         if Flag.APPNAME & flag:
             add_column(
-                key="appname",
+                key="application_name",
                 name="APP",
                 template_h="%16s ",
                 max_width=16,
@@ -510,7 +510,7 @@ class UI:
             QueryMode.activities: [
                 "pid",
                 "database",
-                "appname",
+                "application_name",
                 "user",
                 "client",
                 "cpu",
@@ -526,7 +526,7 @@ class UI:
             QueryMode.waiting: [
                 "pid",
                 "database",
-                "appname",
+                "application_name",
                 "user",
                 "client",
                 "relation",
@@ -539,7 +539,7 @@ class UI:
             QueryMode.blocking: [
                 "pid",
                 "database",
-                "appname",
+                "application_name",
                 "user",
                 "client",
                 "relation",
@@ -802,7 +802,7 @@ def locktype(value: str) -> LockType:
 @attr.s(auto_attribs=True, slots=True)
 class BaseProcess:
     pid: int
-    appname: str
+    application_name: str
     database: str
     user: str
     client: str

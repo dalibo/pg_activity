@@ -8,7 +8,7 @@ FIELD_BY_MODE = {
         "cursor": "cyan_reverse",
         "yellow": "yellow_bold",
     },
-    "appname": {
+    "application_name": {
         "default": "black_bold",
         "cursor": "cyan_reverse",
         "yellow": "yellow_bold",

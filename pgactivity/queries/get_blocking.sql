@@ -1,7 +1,7 @@
 -- Get blocking queries
 SELECT
       pid,
-      appname,
+      application_name,
       datname AS database,
       usename AS user,
       client,
@@ -23,7 +23,7 @@ SELECT
       (
       SELECT
             blocking.pid,
-            '<unknown>' AS appname,
+            '<unknown>' AS application_name,
             pg_stat_activity.current_query AS query,
             blocking.mode,
             pg_stat_activity.datname,
@@ -55,7 +55,7 @@ SELECT
       UNION ALL
       SELECT
             blocking.pid,
-            '<unknown>' AS appname,
+            '<unknown>' AS application_name,
             pg_stat_activity.current_query AS query,
             blocking.mode,
             pg_stat_activity.datname,
@@ -91,7 +91,7 @@ SELECT
       ) AS sq
 GROUP BY
       pid,
-      appname,
+      application_name,
       query,
       mode,
       locktype,

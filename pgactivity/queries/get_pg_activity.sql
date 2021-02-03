@@ -1,7 +1,7 @@
 -- Get data from pg_activity before pg 9.2
 SELECT
       pg_stat_activity.procpid AS pid,
-      '<unknown>' AS appname,
+      '<unknown>' AS application_name,
       pg_stat_activity.datname AS database,
       CASE WHEN pg_stat_activity.client_addr IS NULL
           THEN 'local'

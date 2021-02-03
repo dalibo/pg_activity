@@ -168,24 +168,24 @@ def csv_write(
     """Store process list into CSV file.
 
     >>> processes = [
-    ...     {'pid': 25199, 'appname': '', 'database': 'pgbench', 'user': None,
+    ...     {'pid': 25199, 'application_name': '', 'database': 'pgbench', 'user': None,
     ...      'client': 'local', 'cpu': 0.0, 'mem': 0.6504979545924837,
     ...      'read': 0.0, 'write': 0.0, 'state': 'active',
     ...      'query': 'autovacuum: VACUUM ANALYZE public.pgbench_tellers',
     ...      'duration': 0.348789, 'wait': False,
     ...      'io_wait': False, 'is_parallel_worker': False},
-    ...     {'pid': 25068, 'appname': 'pgbench', 'database': 'pgbench', 'user':
-    ...      'postgres', 'client': 'local', 'cpu': 0.0, 'mem': 2.4694780629380646,
+    ...     {'pid': 25068, 'application_name': 'pgbench', 'database': 'pgbench',
+    ...      'user': 'postgres', 'client': 'local', 'cpu': 0.0, 'mem': 2.4694780629380646,
     ...      'read': 278536.76590087387, 'write': 835610.2977026217,
     ...      'state': 'idle in transaction',
     ...      'query': 'INSERT INTO pgbench_history (tid, bid, aid, delta, mtime) VALUES (625, 87, 4368910, -341, CURRENT_TIMESTAMP);',
     ...      'duration': 0.000105, 'wait': False, 'io_wait': False,
     ...      'is_parallel_worker': False},
-    ...     {'pid': 25379, 'appname': 'pgbench', 'database': 'pgbench',
+    ...     {'pid': 25379, 'application_name': 'pgbench', 'database': 'pgbench',
     ...      'user': 'postgres', 'client': 'local', 'state': 'active',
     ...      'query': 'UPDATE pgbench_branches SET bbalance = bbalance + -49 WHERE bid = 73;',
     ...      'duration': 0, 'wait': False},
-    ...     {'pid': 25392, 'appname': 'pgbench', 'database': 'pgbench',
+    ...     {'pid': 25392, 'application_name': 'pgbench', 'database': 'pgbench',
     ...      'user': 'postgres', 'client': 'local', 'state': 'active',
     ...      'query': 'BEGIN;', 'duration': 0, 'wait': False}
     ... ]
@@ -240,7 +240,7 @@ def csv_write(
         dt = datetime.utcnow().strftime("%Y-%m-%dT%H:%m:%SZ")
         pid = p.get("pid", "N/A")
         database = p.get("database", "N/A")
-        appname = p.get("appname", "N/A")
+        appname = p.get("application_name", "N/A")
         user = p.get("user", "N/A")
         client = p.get("client", "N/A")
         cpu = p.get("cpu", "N/A")

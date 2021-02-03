@@ -1,7 +1,7 @@
 -- Get waiting queries for versions >= 9.2
 SELECT
       pg_locks.pid AS pid,
-      pg_stat_activity.application_name AS appname,
+      pg_stat_activity.application_name AS application_name,
       pg_stat_activity.datname AS database,
       pg_stat_activity.usename AS user,
       CASE WHEN pg_stat_activity.client_addr IS NULL
