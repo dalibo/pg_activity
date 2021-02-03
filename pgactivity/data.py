@@ -43,9 +43,9 @@ from .utils import clean_str
 def pg_get_version(pg_conn: connection) -> str:
     """Get PostgreSQL server version."""
     query = queries.get("get_version")
-    cur = pg_conn.cursor()
-    cur.execute(query)
-    ret: Dict[str, str] = cur.fetchone()
+    with pg_conn.cursor() as cur:
+        cur.execute(query)
+        ret: Dict[str, str] = cur.fetchone()
     return ret["pg_version"]
 
 
@@ -177,9 +177,9 @@ class Data:
                 )
         pg_conn.set_isolation_level(0)
         if not rds_mode:  # Make sure we are using superuser if not on RDS
-            cur = pg_conn.cursor()
-            cur.execute(queries.get("is_superuser"))
-            ret = cur.fetchone()
+            with pg_conn.cursor() as cur:
+                cur.execute(queries.get("is_superuser"))
+                ret = cur.fetchone()
             if ret[0] != "on":
                 raise Exception("Must be run with database superuser privileges.")
         pg_version, pg_num_version = pg_get_num_version(pg_get_version(pg_conn))
@@ -210,9 +210,9 @@ class Data:
         """
         try:
             query = queries.get("get_pid_file")
-            cur = self.pg_conn.cursor()
-            cur.execute(query)
-            ret = cur.fetchone()
+            with self.pg_conn.cursor() as cur:
+                cur.execute(query)
+                ret = cur.fetchone()
             pid_file = ret["pid_file"]
             with open(pid_file, "r") as fd:
                 pid = fd.readlines()[0].strip()
@@ -233,9 +233,9 @@ class Data:
         Cancel a backend
         """
         query = queries.get("do_pg_cancel_backend")
-        cur = self.pg_conn.cursor()
-        cur.execute(query, {"pid": pid})
-        ret: Dict[str, bool] = cur.fetchone()
+        with self.pg_conn.cursor() as cur:
+            cur.execute(query, {"pid": pid})
+            ret: Dict[str, bool] = cur.fetchone()
         return ret["is_stopped"]
 
     def pg_terminate_backend(self, pid: int) -> bool:
@@ -246,9 +246,9 @@ class Data:
             query = queries.get("do_pg_terminate_backend")
         else:
             query = queries.get("do_pg_cancel_backend")
-        cur = self.pg_conn.cursor()
-        cur.execute(query, {"pid": pid})
-        ret: Dict[str, bool] = cur.fetchone()
+        with self.pg_conn.cursor() as cur:
+            cur.execute(query, {"pid": pid})
+            ret: Dict[str, bool] = cur.fetchone()
         return ret["is_stopped"]
 
     DbInfoDict = Dict[str, Union[str, int, float]]
@@ -267,16 +267,16 @@ class Data:
             prev_total_size = prev_db_infos["total_size"]  # type: ignore
 
         query = queries.get("get_db_info")
-        cur = self.pg_conn.cursor()
-        cur.execute(
-            query,
-            {
-                "skip_db_size": skip_sizes,
-                "prev_total_size": prev_total_size,
-                "using_rds": using_rds,
-            },
-        )
-        ret = cur.fetchone()
+        with self.pg_conn.cursor() as cur:
+            cur.execute(
+                query,
+                {
+                    "skip_db_size": skip_sizes,
+                    "prev_total_size": prev_total_size,
+                    "using_rds": using_rds,
+                },
+            )
+            ret = cur.fetchone()
         tps = 0
         size_ev = 0.0
         if prev_db_infos is not None:
@@ -310,9 +310,9 @@ class Data:
         else:
             query = queries.get("get_active_connections_post_90200")
 
-        cur = self.pg_conn.cursor()
-        cur.execute(query)
-        ret = cur.fetchone()
+        with self.pg_conn.cursor() as cur:
+            cur.execute(query)
+            ret = cur.fetchone()
         active_connections = int(ret["active_connections"])
         return active_connections
 
@@ -334,9 +334,9 @@ class Data:
         duration_column = self.get_duration_column(duration_mode)
         query = query.format(duration_column=duration_column)
 
-        cur = self.pg_conn.cursor()
-        cur.execute(query, {"min_duration": self.min_duration})
-        ret = cur.fetchall()
+        with self.pg_conn.cursor() as cur:
+            cur.execute(query, {"min_duration": self.min_duration})
+            ret = cur.fetchall()
 
         return [RunningProcess(**row) for row in ret]
 
@@ -352,9 +352,9 @@ class Data:
         duration_column = self.get_duration_column(duration_mode)
         query = query.format(duration_column=duration_column)
 
-        cur = self.pg_conn.cursor()
-        cur.execute(query, {"min_duration": self.min_duration})
-        ret = cur.fetchall()
+        with self.pg_conn.cursor() as cur:
+            cur.execute(query, {"min_duration": self.min_duration})
+            ret = cur.fetchall()
         return [BWProcess(**row) for row in ret]
 
     def pg_get_blocking(self, duration_mode: int = 1) -> List[BWProcess]:
@@ -369,9 +369,9 @@ class Data:
         duration_column = self.get_duration_column(duration_mode)
         query = query.format(duration_column=duration_column)
 
-        cur = self.pg_conn.cursor()
-        cur.execute(query, {"min_duration": self.min_duration})
-        ret = cur.fetchall()
+        with self.pg_conn.cursor() as cur:
+            cur.execute(query, {"min_duration": self.min_duration})
+            ret = cur.fetchall()
         return [BWProcess(**row) for row in ret]
 
     def pg_is_local(self) -> bool:
@@ -379,9 +379,9 @@ class Data:
         Is pg_activity connected localy ?
         """
         query = queries.get("get_pga_inet_addresses")
-        cur = self.pg_conn.cursor()
-        cur.execute(query)
-        ret = cur.fetchone()
+        with self.pg_conn.cursor() as cur:
+            cur.execute(query)
+            ret = cur.fetchone()
         if ret["inet_server_addr"] == ret["inet_client_addr"]:
             return True
         return False
