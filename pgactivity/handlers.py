@@ -78,8 +78,11 @@ def query_mode(key: Keystroke) -> Optional[QueryMode]:
     >>> query_mode(k(code=curses.KEY_F3))
     <QueryMode.blocking: 'blocking queries'>
     """
-    if key.is_sequence and key.code in keys.QUERYMODE_FROM_KEYS:
-        key = key.code
+    if key.is_sequence:
+        try:
+            return keys.QUERYMODE_FROM_KEYS[key.code]
+        except KeyError:
+            pass
     return keys.QUERYMODE_FROM_KEYS.get(key)
 
 
