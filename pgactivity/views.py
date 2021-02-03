@@ -13,7 +13,6 @@ from typing import (
 )
 
 from blessed import Terminal
-from blessed.formatters import FormattingString
 
 from .compat import link
 from .keys import (
@@ -351,9 +350,6 @@ def processes_rows(
     if width is None:
         width = term.width
 
-    def color_for(field: str) -> FormattingString:
-        return getattr(term, colors.FIELD_BY_MODE[field][color_type])
-
     def text_append(value: str) -> None:
         # We also restore 'normal' style so that the next item does not
         # inherit previous one's style.
@@ -363,7 +359,8 @@ def processes_rows(
         value: Any,
         column: Column,
     ) -> None:
-        text_append(f"{color_for(column.color(value))}{column.render(value)}")
+        color = getattr(term, colors.FIELD_BY_MODE[column.color(value)][color_type])
+        text_append(f"{color}{column.render(value)}")
 
     focused, pinned = processes.focused, processes.pinned
 
