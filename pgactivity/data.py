@@ -32,7 +32,7 @@ import attr
 import psutil
 import psycopg2
 import psycopg2.extras
-from psycopg2 import errorcodes
+from psycopg2.errors import Error, InterfaceError, InvalidPassword, OperationalError
 from psycopg2.extensions import connection
 
 from . import queries
@@ -152,7 +152,7 @@ class Data:
                         password=password,
                         cursor_factory=psycopg2.extras.DictCursor,
                     )
-            except psycopg2.Error as psy_err:
+            except Error as psy_err:
                 if host is None:
                     raise psy_err
         if pg_conn is None:  # fallback on TCP/IP connection
@@ -196,7 +196,7 @@ class Data:
             pg_conn = psycopg2.connect(
                 cursor_factory=psycopg2.extras.DictCursor, **self.dsn_parameters
             )
-        except (psycopg2.InterfaceError, psycopg2.OperationalError):
+        except (InterfaceError, OperationalError):
             return None
         else:
             return attr.evolve(
@@ -426,13 +426,8 @@ def pg_connect(
                 service=service,
                 min_duration=min_duration,
             )
-        except psycopg2.OperationalError as err:
-            errmsg = str(err).strip()
-            if nb_try < 1 and (
-                err.pgcode == errorcodes.INVALID_PASSWORD
-                or errmsg.startswith("FATAL:  password authentication failed for user")
-                or errmsg == "fe_sendauth: no password supplied"
-            ):
+        except OperationalError as err:
+            if nb_try < 1 and isinstance(err, InvalidPassword):
                 password = getpass.getpass()
             elif exit_on_failed:
                 msg = str(err).replace("FATAL:", "")
