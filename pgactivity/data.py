@@ -199,6 +199,7 @@ class Data:
         except (InterfaceError, OperationalError):
             return None
         else:
+            pg_conn.autocommit = True
             return attr.evolve(
                 self, pg_conn=pg_conn, dsn_parameters=pg_conn.info.dsn_parameters
             )
