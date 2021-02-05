@@ -175,7 +175,7 @@ class Data:
                     password=password,
                     cursor_factory=psycopg2.extras.DictCursor,
                 )
-        pg_conn.set_isolation_level(0)
+        pg_conn.autocommit = True
         if not rds_mode:  # Make sure we are using superuser if not on RDS
             with pg_conn.cursor() as cur:
                 cur.execute(queries.get("is_superuser"))
