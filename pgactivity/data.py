@@ -141,7 +141,7 @@ class Data:
                     )
                 elif dsn:
                     pg_conn = psycopg2.connect(
-                        dsn=dsn,
+                        dsn,
                         cursor_factory=psycopg2.extras.DictCursor,
                     )
                 else:
@@ -163,7 +163,7 @@ class Data:
                 )
             elif dsn:
                 pg_conn = psycopg2.connect(
-                    dsn=dsn,
+                    dsn,
                     cursor_factory=psycopg2.extras.DictCursor,
                 )
             else:
