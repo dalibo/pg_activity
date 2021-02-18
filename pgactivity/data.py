@@ -32,7 +32,7 @@ import attr
 import psutil
 import psycopg2
 import psycopg2.extras
-from psycopg2.errors import Error, InterfaceError, InvalidPassword, OperationalError
+from psycopg2.errors import InterfaceError, InvalidPassword, OperationalError
 from psycopg2.extensions import connection
 
 from . import queries
@@ -138,55 +138,18 @@ class Data:
         password: Optional[str] = None,
         database: str = "postgres",
         rds_mode: bool = False,
-        service: Optional[str] = None,
         dsn: str = "",
     ) -> "Data":
         """Create an instance by connecting to a PostgreSQL server."""
-        pg_conn = None
-        if host is None or host == "localhost":
-            # try to connect using UNIX socket
-            try:
-                if service is not None:
-                    pg_conn = psycopg2.connect(
-                        service=service,
-                        cursor_factory=psycopg2.extras.DictCursor,
-                    )
-                elif dsn:
-                    pg_conn = psycopg2.connect(
-                        dsn,
-                        cursor_factory=psycopg2.extras.DictCursor,
-                    )
-                else:
-                    pg_conn = psycopg2.connect(
-                        database=database,
-                        user=user,
-                        port=port,
-                        password=password,
-                        cursor_factory=psycopg2.extras.DictCursor,
-                    )
-            except Error as psy_err:
-                if host is None:
-                    raise psy_err
-        if pg_conn is None:  # fallback on TCP/IP connection
-            if service is not None:
-                pg_conn = psycopg2.connect(
-                    service=service,
-                    cursor_factory=psycopg2.extras.DictCursor,
-                )
-            elif dsn:
-                pg_conn = psycopg2.connect(
-                    dsn,
-                    cursor_factory=psycopg2.extras.DictCursor,
-                )
-            else:
-                pg_conn = psycopg2.connect(
-                    database=database,
-                    host=host,
-                    port=port,
-                    user=user,
-                    password=password,
-                    cursor_factory=psycopg2.extras.DictCursor,
-                )
+        pg_conn = psycopg2.connect(
+            dsn=dsn,
+            host=host,
+            port=port,
+            user=user,
+            database=database,
+            password=password,
+            cursor_factory=psycopg2.extras.DictCursor,
+        )
         pg_conn.autocommit = True
         if not rds_mode:  # Make sure we are using superuser if not on RDS
             with pg_conn.cursor() as cur:
@@ -420,12 +383,11 @@ class Data:
 def pg_connect(
     options: optparse.Values,
     dsn: str,
-    password: Optional[str] = None,
-    service: Optional[str] = None,
     exit_on_failed: bool = True,
     min_duration: float = 0.0,
 ) -> Data:
     """Try to build a Data instance by to connecting to postgres."""
+    password = None
     for nb_try in range(2):
         try:
             data = Data.pg_connect(
@@ -436,7 +398,6 @@ def pg_connect(
                 password=password,
                 database=options.dbname,
                 rds_mode=options.rds,
-                service=service,
                 min_duration=min_duration,
             )
         except OperationalError as err:
