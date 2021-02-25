@@ -401,7 +401,12 @@ def pg_connect(
                 min_duration=min_duration,
             )
         except OperationalError as err:
-            if nb_try < 1 and isinstance(err, InvalidPassword):
+            errmsg = str(err).strip()
+            if nb_try < 1 and (
+                isinstance(err, InvalidPassword)
+                or errmsg.startswith("FATAL:  password authentication failed for user")
+                or errmsg == "fe_sendauth: no password supplied"
+            ):
                 password = getpass.getpass()
             elif exit_on_failed:
                 msg = str(err).replace("FATAL:", "")
