@@ -240,7 +240,7 @@ class Data:
         """
         prev_total_size = "0"
         if prev_db_infos is not None:
-            prev_total_size = prev_db_infos["total_size"]  # type: ignore
+            prev_total_size = prev_db_infos["total_size"]  # type: ignore[assignment]
 
         query = queries.get("get_db_info")
         with self.pg_conn.cursor() as cur:

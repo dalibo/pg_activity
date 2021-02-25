@@ -206,7 +206,7 @@ def main(
                         else:
                             assert False  # help type checking
 
-                    activity_stats = (pg_procs, system_info) if is_local else pg_procs  # type: ignore
+                    activity_stats = (pg_procs, system_info) if is_local else pg_procs  # type: ignore[assignment]
 
                 if options.output is not None:
                     with open(options.output, "a") as f:

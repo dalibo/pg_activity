@@ -108,7 +108,7 @@ class Deserializable:
                 f"unknown field(s): {', '.join(sorted(unknown))}"
             ) from None
 
-        return cls(**args)  # type: ignore
+        return cls(**args)  # type: ignore[call-arg]
 
 
 E = TypeVar("E", bound=enum.IntEnum)
