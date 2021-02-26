@@ -261,6 +261,14 @@ def get_parser() -> ModifiedOptionParser:
         help="Disable App",
         default=False,
     )
+    # --hide-queries-in-logs
+    group.add_option(
+        "--hide-queries-in-logs",
+        dest="hidequeriesinlogs",
+        action="store_true",
+        help="Disable log_min_duration_statements and log_min_duration_sample for pg_activity",
+        default=False,
+    )
 
     parser.add_option_group(group)
 

@@ -139,6 +139,7 @@ class Data:
         database: str = "postgres",
         rds_mode: bool = False,
         dsn: str = "",
+        hide_queries_in_logs: bool = False,
     ) -> "Data":
         """Create an instance by connecting to a PostgreSQL server."""
         pg_conn = psycopg2.connect(
@@ -151,6 +152,11 @@ class Data:
             cursor_factory=psycopg2.extras.DictCursor,
         )
         pg_conn.autocommit = True
+        with pg_conn.cursor() as cur:
+            if hide_queries_in_logs:
+                cur.execute(queries.get("disable_log_min_duration_statement"))
+                if pg_conn.server_version >= 130000:
+                    cur.execute(queries.get("disable_log_min_duration_sadmple"))
         if not rds_mode:  # Make sure we are using superuser if not on RDS
             with pg_conn.cursor() as cur:
                 cur.execute(queries.get("is_superuser"))
@@ -399,6 +405,7 @@ def pg_connect(
                 database=options.dbname,
                 rds_mode=options.rds,
                 min_duration=min_duration,
+                hide_queries_in_logs=options.hidequeriesinlogs,
             )
         except OperationalError as err:
             if nb_try < 1 and isinstance(err, InvalidPassword):
