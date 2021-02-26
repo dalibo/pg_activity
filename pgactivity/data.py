@@ -157,6 +157,7 @@ class Data:
                 cur.execute(queries.get("disable_log_min_duration_statement"))
                 if pg_conn.server_version >= 130000:
                     cur.execute(queries.get("disable_log_min_duration_sadmple"))
+            cur.execute(queries.get("set_application_name"))
         if not rds_mode:  # Make sure we are using superuser if not on RDS
             with pg_conn.cursor() as cur:
                 cur.execute(queries.get("is_superuser"))
