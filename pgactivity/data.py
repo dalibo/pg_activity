@@ -149,6 +149,7 @@ class Data:
             user=user,
             database=database,
             password=password,
+            application_name="pg_activity",
             cursor_factory=psycopg2.extras.DictCursor,
         )
         pg_conn.autocommit = True
