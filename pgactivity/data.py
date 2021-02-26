@@ -158,12 +158,11 @@ class Data:
                 cur.execute(queries.get("disable_log_min_duration_statement"))
                 if pg_conn.server_version >= 130000:
                     cur.execute(queries.get("disable_log_min_duration_sample"))
-        if not rds_mode:  # Make sure we are using superuser if not on RDS
-            with pg_conn.cursor() as cur:
+            if not rds_mode:  # Make sure we are using superuser if not on RDS
                 cur.execute(queries.get("is_superuser"))
                 ret = cur.fetchone()
-            if ret[0] != "on":
-                raise Exception("Must be run with database superuser privileges.")
+                if ret[0] != "on":
+                    raise Exception("Must be run with database superuser privileges.")
         pg_version, pg_num_version = pg_get_num_version(pg_get_version(pg_conn))
         return cls(
             pg_conn,
