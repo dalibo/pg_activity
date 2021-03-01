@@ -405,7 +405,7 @@ def pg_connect(
                 database=options.dbname,
                 rds_mode=options.rds,
                 min_duration=min_duration,
-                hide_queries_in_logs=options.hidequeriesinlogs,
+                hide_queries_in_logs=options.hide_queries_in_logs,
             )
         except OperationalError as err:
             if nb_try < 1 and isinstance(err, InvalidPassword):
