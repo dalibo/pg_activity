@@ -9,7 +9,6 @@ exclude =
   .mypy_cache,
   .tox,
   .venv,
-  pgactivity/Process.py,
 per-file-ignores =
   pg_activity:E251
   setup.py:E251,E402
