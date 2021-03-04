@@ -319,18 +319,19 @@ if __name__ == "__main__":
     while True:
         try:
             ui.main(term, dataobj, host, options, dsn)
-        except OperationalError as err:
-            for attempt in range(3, 0, -1):
+        except OperationalError:
+            while True:
                 print(term.clear + term.home, end="")
-                print(f"Connection to PostgreSQL lost, retrying {attempt} times...")
-                time.sleep(5)
+                print("Connection to PostgreSQL lost, trying to reconnect...")
+                try:
+                    time.sleep(5)
+                except KeyboardInterrupt:
+                    sys.exit(1)
                 newdataobj = dataobj.try_reconnect()
                 if newdataobj is not None:
                     dataobj = newdataobj
                     print(term.clear + term.home, end="")
                     break
-            else:
-                sys.exit(f"FATAL: connection lost: {err}")
         else:
             print(term.clear + term.home, end="")
             break
