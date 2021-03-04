@@ -7,7 +7,7 @@ for opt in sys.argv:
         data_files = [("/usr/share/man/man1", ["docs/man/pg_activity.1"])]
         sys.argv.remove(opt)
 
-from setuptools import setup
+from setuptools import find_packages, setup
 
 HERE = os.path.dirname(__file__)
 
@@ -30,7 +30,8 @@ setup(
     author="Dalibo",
     author_email="contact@dalibo.com",
     scripts=["pg_activity"],
-    packages=["pgactivity"],
+    packages=find_packages("."),
+    include_package_data=True,
     url="https://github.com/dalibo/pg_activity",
     license="PostgreSQL",
     description="Command line tool for PostgreSQL server activity monitoring.",
