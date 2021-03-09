@@ -55,7 +55,7 @@ setup(
     ],
     extras_require={
         "testing": [
-            "psycopg2-binary",
+            "psycopg2-binary >= 2.8",
             "pytest",
             "pytest-postgresql",
         ],

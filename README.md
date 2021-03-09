@@ -19,6 +19,7 @@ or directly from your Linux distribution, if available, e.g.:
 
     $ sudo apt install pg-activity
 
+`pg_activity` requires psycopg2 version 2.8 or higher.
 
 Usage
 -----
