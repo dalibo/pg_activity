@@ -288,7 +288,7 @@ class Data:
         """
 
         if self.pg_num_version < 90200:
-            query = queries.get("get_active_connections.sql")
+            query = queries.get("get_active_connections")
         else:
             query = queries.get("get_active_connections_post_90200")
 
