@@ -32,7 +32,7 @@ import attr
 import psutil
 import psycopg2
 import psycopg2.extras
-from psycopg2.errors import InterfaceError, InvalidPassword, OperationalError
+from psycopg2.errors import InterfaceError, InvalidPassword, OperationalError, ProgrammingError
 from psycopg2.extensions import connection
 
 from . import queries
@@ -420,6 +420,11 @@ def pg_connect(
                 raise SystemExit("pg_activity: FATAL: %s" % clean_str(msg))
             else:
                 raise Exception("Could not connect to PostgreSQL")
+        except ProgrammingError as err:
+            errmsg = str(err).strip()
+            if errmsg.startswith("invalid dsn"):
+                raise SystemExit(f"ERROR: {errmsg}\nPlease refer to the 'Connection Control Functions' section of the PostgreSQL documentation")
+            raise
         else:
             break
     return data
