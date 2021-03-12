@@ -28,18 +28,24 @@ def system_processes(datadir):
 
     running_process_fields = {a.name for a in attr.fields(RunningProcess)}
 
+    def system_process(extras):
+        for k in ("io_read", "io_write"):
+            try:
+                extras[k] = IOCounter(**extras.pop(k))
+            except KeyError:
+                pass
+        return SystemProcess(**extras)
+
     for new_proc in input_data["new_processes"].values():
-        new_system_procs[new_proc["pid"]] = SystemProcess.deserialize(
-            new_proc["extras"]
-        )
+        new_system_procs[new_proc["pid"]] = system_process(new_proc["extras"])
         pg_processes.append(
-            RunningProcess.deserialize(
-                {k: v for k, v in new_proc.items() if k in running_process_fields}
+            RunningProcess(
+                **{k: v for k, v in new_proc.items() if k in running_process_fields}
             )
         )
 
     system_procs = {
-        proc["pid"]: SystemProcess.deserialize(proc["extras"])
+        proc["pid"]: system_process(proc["extras"])
         for proc in input_data["processes"].values()
     }
 
