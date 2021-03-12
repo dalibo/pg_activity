@@ -49,17 +49,7 @@ def enum_next(e: E) -> E:
 
 @enum.unique
 class Flag(enum.IntFlag):
-    """Column flag.
-
-    >>> f = Flag(3)
-    >>> f
-    <Flag.APPNAME|DATABASE: 3>
-    >>> f | Flag.CLIENT
-    <Flag.CLIENT|APPNAME|DATABASE: 7>
-    >>> f ^= Flag.APPNAME
-    >>> f
-    <Flag.DATABASE: 1>
-    """
+    """Column flag."""
 
     DATABASE = 1
     APPNAME = 2
@@ -99,31 +89,7 @@ class Flag(enum.IntFlag):
         nowrite: bool,
         **kwargs: Any,
     ) -> "Flag":
-        """Build a Flag value from command line options.
-
-        >>> options = {
-        ... 'noappname': False,
-        ... 'noclient': False,
-        ... 'nocpu': False,
-        ... 'nodb': False,
-        ... 'nomem': False,
-        ... 'nopid': False,
-        ... 'noread': False,
-        ... 'notime': False,
-        ... 'nouser': False,
-        ... 'nowait': False,
-        ... 'nowrite': False,
-        ... }
-        >>> Flag.from_options(is_local=True, **options)
-        <Flag.PID|IOWAIT|MODE|TYPE|RELATION|WAIT|TIME|WRITE|READ|MEM|CPU|USER|CLIENT|APPNAME|DATABASE: 32767>
-        >>> Flag.from_options(is_local=False, **options)
-        <Flag.PID|MODE|TYPE|RELATION|WAIT|TIME|USER|CLIENT|APPNAME|DATABASE: 24335>
-        >>> options['nodb'] = True
-        >>> options['notime'] = True
-        >>> options['nopid'] = True
-        >>> Flag.from_options(is_local=False, **options)
-        <Flag.MODE|TYPE|RELATION|WAIT|USER|CLIENT|APPNAME: 7694>
-        """
+        """Build a Flag value from command line options."""
         flag = cls.all()
         if nodb:
             flag ^= cls.DATABASE
