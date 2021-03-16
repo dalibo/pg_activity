@@ -1,6 +1,6 @@
 [tool.black]
 line-length = 88
-include = '/(pg_activity|\.pyi?)$'
+include = '\.pyi?$'
 exclude = '''
 (
   /(

@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import os
 import socket
 import sys
@@ -10,7 +8,7 @@ from typing import NoReturn
 from blessed import Terminal
 from psycopg2.errors import OperationalError
 
-from pgactivity import __version__, data, types, ui
+from . import __version__, data, types, ui
 
 
 # Customized OptionParser
@@ -255,8 +253,7 @@ def exit(msg: str) -> None:
     sys.exit(1)
 
 
-# Call the main function
-if __name__ == "__main__":
+def main() -> None:
     if os.name != "posix":
         sys.exit("FATAL: Platform not supported.")
     try:

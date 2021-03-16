@@ -29,7 +29,6 @@ setup(
     version=get_version(),
     author="Dalibo",
     author_email="contact@dalibo.com",
-    scripts=["pg_activity"],
     packages=find_packages("."),
     include_package_data=True,
     url="https://github.com/dalibo/pg_activity",
@@ -61,4 +60,9 @@ setup(
         ],
     },
     data_files=data_files,
+    entry_points={
+        "console_scripts": [
+            "pg_activity=pgactivity.cli:main",
+        ],
+    },
 )
