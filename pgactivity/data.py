@@ -7,7 +7,12 @@ import attr
 import psutil
 import psycopg2
 import psycopg2.extras
-from psycopg2.errors import InterfaceError, InvalidPassword, OperationalError, ProgrammingError
+from psycopg2.errors import (
+    InterfaceError,
+    InvalidPassword,
+    OperationalError,
+    ProgrammingError,
+)
 from psycopg2.extensions import connection
 
 from . import queries
@@ -398,7 +403,10 @@ def pg_connect(
         except ProgrammingError as err:
             errmsg = str(err).strip()
             if errmsg.startswith("invalid dsn"):
-                raise SystemExit(f"ERROR: {errmsg}\nPlease refer to the 'Connection Control Functions' section of the PostgreSQL documentation")
+                raise SystemExit(
+                    f"ERROR: {errmsg}\n"
+                    "Please refer to the 'Connection Control Functions' section of the PostgreSQL documentation"
+                )
             raise
         else:
             break
