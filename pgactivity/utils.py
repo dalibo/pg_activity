@@ -174,7 +174,7 @@ def csv_write(
     ...      'query': 'autovacuum: VACUUM ANALYZE public.pgbench_tellers',
     ...      'duration': 0.348789, 'wait': False,
     ...      'io_wait': False, 'is_parallel_worker': False},
-    ...     {'pid': 25068, 'application_name': 'pgbench', 'database': 'pgbench',
+    ...     {'pid': 25068, 'application_name': 'pgbench', 'database': None,
     ...      'user': 'postgres', 'client': 'local', 'cpu': 0.0, 'mem': 2.4694780629380646,
     ...      'read': 278536.76590087387, 'write': 835610.2977026217,
     ...      'state': 'idle in transaction',
@@ -198,7 +198,7 @@ def csv_write(
     >>> print(content, end="")  # doctest: +ELLIPSIS
     datetimeutc;pid;database;appname;user;client;cpu;memory;read;write;duration;wait;io_wait;state;query
     "...-...-...T...Z";"25199";"pgbench";"";"None";"local";"0.0";"0.6504979545924837";"0.0";"0.0";"0.348789";"N";"N";"active";"autovacuum: VACUUM ANALYZE public.pgbench_tellers"
-    "...-...-...T...Z";"25068";"pgbench";"pgbench";"postgres";"local";"0.0";"2.4694780629380646";"278536.76590087387";"835610.2977026217";"0.000105";"N";"N";"idle in transaction";"INSERT INTO pgbench_history (tid, bid, aid, delta, mtime) VALUES (625, 87, 4368910, -341, CURRENT_TIMESTAMP);"
+    "...-...-...T...Z";"25068";"";"pgbench";"postgres";"local";"0.0";"2.4694780629380646";"278536.76590087387";"835610.2977026217";"0.000105";"N";"N";"idle in transaction";"INSERT INTO pgbench_history (tid, bid, aid, delta, mtime) VALUES (625, 87, 4368910, -341, CURRENT_TIMESTAMP);"
     "...-...-...T...Z";"25379";"pgbench";"pgbench";"postgres";"local";"N/A";"N/A";"N/A";"N/A";"0";"N";"N/A";"active";"UPDATE pgbench_branches SET bbalance = bbalance + -49 WHERE bid = 73;"
     "...-...-...T...Z";"25392";"pgbench";"pgbench";"postgres";"local";"N/A";"N/A";"N/A";"N/A";"0";"N";"N/A";"active";"BEGIN;"
     """
@@ -239,7 +239,7 @@ def csv_write(
     for p in procs:
         dt = datetime.utcnow().strftime("%Y-%m-%dT%H:%m:%SZ")
         pid = p.get("pid", "N/A")
-        database = p.get("database", "N/A")
+        database = p.get("database", "N/A") or ""
         appname = p.get("application_name", "N/A")
         user = p.get("user", "N/A")
         client = p.get("client", "N/A")

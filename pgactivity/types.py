@@ -303,7 +303,7 @@ class UI:
                 name="DATABASE",
                 template_h=f"%-{max_db_length}s ",
                 transform=functools.lru_cache()(
-                    functools.partial(utils.ellipsis, width=16)
+                    lambda v: utils.ellipsis(v, width=16) if v else "",
                 ),
                 sort_key=None,
             )
@@ -683,7 +683,7 @@ def locktype(value: str) -> LockType:
 class BaseProcess:
     pid: int
     application_name: str
-    database: str
+    database: Optional[str]
     user: str
     client: str
     duration: Optional[float]
