@@ -8,8 +8,9 @@ include *.txt
 include .editorconfig
 include .coveragerc
 include .flake8
-include .travis.yml
 include mypy.ini
 include pyproject.toml
 include pytest.ini
 include tox.ini
+
+prune .github
