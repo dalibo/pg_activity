@@ -37,12 +37,12 @@ def enum_next(e: E) -> E:
     ...     summer = 3
     ...     autumn = 4
 
-    >>> enum_next(Seasons.winter)
-    <Seasons.spring: 2>
-    >>> enum_next(Seasons.spring)
-    <Seasons.summer: 3>
-    >>> enum_next(Seasons.autumn)
-    <Seasons.winter: 1>
+    >>> enum_next(Seasons.winter).name
+    'spring'
+    >>> enum_next(Seasons.spring).name
+    'summer'
+    >>> enum_next(Seasons.autumn).name
+    'winter'
     """
     return e.__class__((e.value % max(e.__class__)) + 1)
 
@@ -543,8 +543,8 @@ class UI:
         """Return the column matching 'key'.
 
         >>> ui = UI.make()
-        >>> ui.column("cpu")
-        Column(name='CPU%', template_h='%6s ', mandatory=False, sort_key=<SortKey.cpu: 1>)
+        >>> ui.column("cpu")  # doctest: +ELLIPSIS
+        Column(name='CPU%', template_h='%6s ', mandatory=False, sort_key=...)
         >>> ui.column("gloups")
         Traceback (most recent call last):
           ...

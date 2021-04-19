@@ -40,10 +40,10 @@ def duration_mode(key: Keystroke, mode: DurationMode) -> DurationMode:
 
     >>> from blessed.keyboard import Keystroke as k
 
-    >>> duration_mode(k("42"), DurationMode.query)
-    <DurationMode.query: 1>
-    >>> duration_mode(k("T"), DurationMode.transaction)
-    <DurationMode.backend: 3>
+    >>> duration_mode(k("42"), DurationMode.query).name
+    'query'
+    >>> duration_mode(k("T"), DurationMode.transaction).name
+    'backend'
     """
     if key == keys.CHANGE_DURATION_MODE:
         return enum_next(mode)
@@ -56,10 +56,10 @@ def verbose_mode(key: Keystroke, mode: QueryDisplayMode) -> QueryDisplayMode:
 
     >>> from blessed.keyboard import Keystroke as k
 
-    >>> verbose_mode(k("42"), QueryDisplayMode.truncate)
-    <QueryDisplayMode.truncate: 1>
-    >>> verbose_mode(k("v"), QueryDisplayMode.wrap_noindent)
-    <QueryDisplayMode.wrap: 3>
+    >>> verbose_mode(k("42"), QueryDisplayMode.truncate).name
+    'truncate'
+    >>> verbose_mode(k("v"), QueryDisplayMode.wrap_noindent).name
+    'wrap'
     """
     if key == keys.CHANGE_DISPLAY_MODE:
         return enum_next(mode)
@@ -73,10 +73,10 @@ def query_mode(key: Keystroke) -> Optional[QueryMode]:
     >>> from blessed.keyboard import Keystroke as k
 
     >>> query_mode(k("42"))
-    >>> query_mode(k("1"))
-    <QueryMode.activities: 'running queries'>
-    >>> query_mode(k(code=curses.KEY_F3))
-    <QueryMode.blocking: 'blocking queries'>
+    >>> query_mode(k("1")).name
+    'activities'
+    >>> query_mode(k(code=curses.KEY_F3)).name
+    'blocking'
     """
     if key.is_sequence:
         try:
@@ -100,24 +100,24 @@ def sort_key_for(
     >>> sort_key_for(k("1"), QueryMode.activities, flag)
 
     In activities mode, 'm', 'w', 't', ... keys are handled:
-    >>> sort_key_for(k("m"), QueryMode.activities, flag)
-    <SortKey.mem: 2>
-    >>> sort_key_for(k("w"), QueryMode.activities, flag)
-    <SortKey.write: 4>
-    >>> sort_key_for(k("t"), QueryMode.activities, flag)
-    <SortKey.duration: 5>
-    >>> sort_key_for(k("c"), QueryMode.activities, flag)
-    <SortKey.cpu: 1>
+    >>> sort_key_for(k("m"), QueryMode.activities, flag).name
+    'mem'
+    >>> sort_key_for(k("w"), QueryMode.activities, flag).name
+    'write'
+    >>> sort_key_for(k("t"), QueryMode.activities, flag).name
+    'duration'
+    >>> sort_key_for(k("c"), QueryMode.activities, flag).name
+    'cpu'
 
     In other modes, the default sort key is always returned:
-    >>> sort_key_for(k("m"), QueryMode.waiting, flag)
-    <SortKey.duration: 5>
+    >>> sort_key_for(k("m"), QueryMode.waiting, flag).name
+    'duration'
 
     When flag does not match given sort key, return None:
     >>> flag ^= Flag.CPU
     >>> sort_key_for(k("c"), QueryMode.activities, flag)
-    >>> sort_key_for(k("m"), QueryMode.activities, flag)
-    <SortKey.mem: 2>
+    >>> sort_key_for(k("m"), QueryMode.activities, flag).name
+    'mem'
     >>> flag ^= Flag.MEM
     >>> sort_key_for(k("m"), QueryMode.activities, flag)
     """
