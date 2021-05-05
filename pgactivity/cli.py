@@ -304,6 +304,8 @@ def main() -> None:
                     dataobj = newdataobj
                     print(term.clear + term.home, end="")
                     break
+        except KeyboardInterrupt:
+            sys.exit(1)
         else:
             print(term.clear + term.home, end="")
             break
