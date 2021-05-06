@@ -53,6 +53,12 @@ setup(
         "psutil >= 2.0.0",
     ],
     extras_require={
+        "dev": [
+            "black",
+            "check-manifest",
+            "flake8",
+            "mypy",
+        ],
         "testing": [
             "psycopg2-binary >= 2.8",
             "pytest",
