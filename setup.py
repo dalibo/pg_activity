@@ -47,7 +47,7 @@ setup(
     keywords="postgresql activity monitoring cli sql top",
     python_requires=">=3.6",
     install_requires=[
-        "attrs >= 17, < 21",
+        "attrs >= 17, !=21.1",
         "blessed",
         "humanize",
         "psutil >= 2.0.0",
