@@ -161,7 +161,7 @@ def sorted(processes: List[T], *, key: SortKey, reverse: bool = False) -> List[T
     ...         state="idle in transaction",
     ...         query="UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;",
     ...         duration=0.1,
-    ...         wait=False,
+    ...         wait="ClientRead",
     ...         io_wait=False,
     ...         is_parallel_worker=False,
     ...     ),

@@ -9,7 +9,7 @@ SELECT
           ELSE pg_stat_activity.client_addr::TEXT
       END AS client,
       EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
-      pg_stat_activity.wait_event IS NOT NULL AS wait,
+      pg_stat_activity.wait_event AS wait,
       pg_stat_activity.usename AS user,
       pg_stat_activity.state AS state,
       pg_stat_activity.query AS query,

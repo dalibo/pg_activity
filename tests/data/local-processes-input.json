@@ -100,7 +100,7 @@
             "read": null,
             "state": "active",
             "user": "postgres",
-            "wait": false,
+            "wait": null,
             "write": null
         },
         "6223": {
@@ -253,7 +253,7 @@
             "read": null,
             "state": "active",
             "user": "postgres",
-            "wait": true,
+            "wait": "ClientRead",
             "write": null
         },
         "6226": {
@@ -304,7 +304,7 @@
             "read": null,
             "state": "active",
             "user": "postgres",
-            "wait": true,
+            "wait": "LogicalRepWorkerLock",
             "write": null
         },
         "6227": {

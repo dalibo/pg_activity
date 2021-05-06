@@ -9,10 +9,7 @@ SELECT
           ELSE pg_stat_activity.client_addr::TEXT
       END AS client,
       EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
-      CASE WHEN pg_stat_activity.wait_event_type IN ('LWLock', 'Lock', 'BufferPin')
-          THEN true
-          ELSE false
-      END AS wait,
+      pg_stat_activity.wait_event as wait,
       pg_stat_activity.usename AS user,
       pg_stat_activity.state AS state,
       pg_stat_activity.query AS query,

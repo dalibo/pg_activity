@@ -1,7 +1,7 @@
 import functools
 import re
 from datetime import datetime, timedelta
-from typing import Any, IO, Iterable, List, Mapping, Optional, Tuple
+from typing import Any, IO, Iterable, List, Mapping, Optional, Tuple, Union
 
 import attr
 import humanize
@@ -141,6 +141,25 @@ def format_duration(duration: Optional[float]) -> Tuple[str, str]:
         color = "time_red"
 
     return ctime, color
+
+
+def wait_status(value: Union[None, bool, str]) -> str:
+    """Display the waiting status of query.
+
+    >>> wait_status(None)
+    ''
+    >>> wait_status(False)
+    'N'
+    >>> wait_status(True)
+    'Y'
+    >>> wait_status("MultiXactTruncationLock")
+    'MultiXactTruncationLock'
+    """
+    if isinstance(value, str):
+        return value
+    if isinstance(value, bool):
+        return yn(value)
+    return ""
 
 
 def short_state(state: str) -> str:

@@ -372,10 +372,11 @@ class UI:
         if Flag.WAIT & flag:
             add_column(
                 key="wait",
-                name="W",
-                template_h="%2s ",
-                transform=utils.yn,
+                name="Waiting",
+                template_h="%16s ",
+                transform=utils.wait_status,
                 color_key=colors.wait,
+                max_width=16,
             )
         if Flag.WRITE & flag:
             add_column(
@@ -696,7 +697,7 @@ class BaseProcess:
 class RunningProcess(BaseProcess):
     """Process for a running query."""
 
-    wait: bool
+    wait: Union[bool, None, str]
     is_parallel_worker: bool
 
 
