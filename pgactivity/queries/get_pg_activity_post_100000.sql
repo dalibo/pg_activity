@@ -1,23 +1,24 @@
 -- Get data from pg_activity from pg 10 to pg 11
 -- We assume a background_worker with a not null query is a parallel worker.
 SELECT
-      pg_stat_activity.pid AS pid,
-      pg_stat_activity.application_name AS application_name,
-      pg_stat_activity.datname AS database,
-      CASE WHEN pg_stat_activity.client_addr IS NULL
+      a.pid AS pid,
+      a.application_name AS application_name,
+      a.datname AS database,
+      CASE WHEN a.client_addr IS NULL
           THEN 'local'
-          ELSE pg_stat_activity.client_addr::TEXT
+          ELSE a.client_addr::TEXT
       END AS client,
-      EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
-      pg_stat_activity.wait_event as wait,
-      pg_stat_activity.usename AS user,
-      pg_stat_activity.state AS state,
-      pg_stat_activity.query AS query,
-      (   pg_stat_activity.backend_type = 'background worker'
-          AND pg_stat_activity.query IS NOT NULL
+      EXTRACT(epoch FROM (NOW() - a.{duration_column})) AS duration,
+      a.wait_event as wait,
+      a.usename AS user,
+      a.state AS state,
+      convert_from(a.query::bytea, coalesce(pg_catalog.pg_encoding_to_char(b.encoding), 'UTF8')) AS query,
+      (   a.backend_type = 'background worker'
+          AND a.query IS NOT NULL
       ) AS is_parallel_worker
   FROM
-      pg_stat_activity
+      pg_stat_activity a
+      LEFT OUTER JOIN pg_database b ON a.datid = b.oid
  WHERE
       state <> 'idle'
   AND pid <> pg_backend_pid()
@@ -26,4 +27,4 @@ SELECT
           ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
       END
 ORDER BY
-      EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) DESC;
+      EXTRACT(epoch FROM (NOW() - a.{duration_column})) DESC;
