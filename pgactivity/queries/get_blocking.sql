@@ -2,7 +2,7 @@
 SELECT
       pid,
       application_name,
-      datname AS database,
+      sq.datname AS database,
       usename AS user,
       client,
       relation,
@@ -17,17 +17,19 @@ SELECT
       END AS state,
       CASE WHEN sq.query LIKE '<IDLE>%%'
           THEN NULL
-          ELSE sq.query
+          ELSE convert_from(sq.query::bytea, coalesce(pg_catalog.pg_encoding_to_char(b.encoding), 'UTF8'))
       END AS query,
       waiting AS wait
   FROM
       (
+      -- Transaction id lock
       SELECT
             blocking.pid,
             '<unknown>' AS application_name,
             pg_stat_activity.current_query AS query,
             blocking.mode,
             pg_stat_activity.datname,
+            pg_stat_activity.datid,
             pg_stat_activity.usename,
             CASE WHEN pg_stat_activity.client_addr IS NULL
                 THEN 'local'
@@ -55,12 +57,14 @@ SELECT
                 ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
             END
       UNION ALL
+      -- VirtualXid Lock
       SELECT
             blocking.pid,
             '<unknown>' AS application_name,
             pg_stat_activity.current_query AS query,
             blocking.mode,
             pg_stat_activity.datname,
+            pg_stat_activity.datid,
             pg_stat_activity.usename,
             CASE WHEN pg_stat_activity.client_addr IS NULL
                 THEN 'local'
@@ -88,12 +92,14 @@ SELECT
                 ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
             END
       UNION ALL
+      -- Relation Lock
       SELECT
             blocking.pid,
             '<unknown>' AS application_name,
             pg_stat_activity.current_query AS query,
             blocking.mode,
             pg_stat_activity.datname,
+            pg_stat_activity.datid,
             pg_stat_activity.usename,
             CASE WHEN pg_stat_activity.client_addr IS NULL
                 THEN 'local'
@@ -125,18 +131,20 @@ SELECT
                 ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
             END
       ) AS sq
+      LEFT OUTER JOIN pg_database b ON sq.datid = b.oid
 GROUP BY
       pid,
       application_name,
-      query,
+      database,
+      usename,
+      client,
+      relation,
       mode,
       locktype,
       duration,
-      datname,
-      usename,
-      client,
       state,
-      relation,
-      wait
+      query,
+      encoding,
+      wait_event
 ORDER BY
       duration DESC;
