@@ -1,7 +1,7 @@
 import getpass
 import optparse
 import re
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Union
 
 import attr
 import psutil
@@ -29,74 +29,35 @@ def pg_get_version(pg_conn: connection) -> str:
     return ret["pg_version"]
 
 
-def pg_get_num_version(text_version: str) -> Tuple[str, int]:
-    """Return PostgreSQL short & numeric version from a string (SELECT
-    version()).
+def pg_get_short_version(text_version: str) -> str:
+    """Return PostgreSQL short version from a string (SELECT version()).
 
-    >>> pg_get_num_version('PostgreSQL 11.9')
-    ('PostgreSQL 11.9', 110900)
-    >>> pg_get_num_version('EnterpriseDB 11.9 (Debian 11.9-0+deb10u1)')
-    ('EnterpriseDB 11.9', 110900)
-    >>> pg_get_num_version("PostgreSQL 9.3.24 on x86_64-pc-linux-gnu (Debian 9.3.24-1.pgdg80+1), compiled by gcc (Debian 4.9.2-10+deb8u1) 4.9.2, 64-bit")
-    ('PostgreSQL 9.3.24', 90324)
-    >>> pg_get_num_version("PostgreSQL 9.1.24 on x86_64-unknown-linux-gnu, compiled by gcc (GCC) 4.8.5 20150623 (Red Hat 4.8.5-39), 64-bit")
-    ('PostgreSQL 9.1.24', 90124)
-    >>> pg_get_num_dev_version("PostgreSQL 14devel on x86_64-pc-linux-gnu, compiled by gcc (GCC) 9.3.1 20200408 (Red Hat 9.3.1-2), 64-bit")
-    ('PostgreSQL 14devel', 140000)
-    >>> pg_get_num_version("PostgreSQL 13beta1 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 9.3.1 20200408 (Red Hat 9.3.1-2), 64-bit")
-    ('PostgreSQL 13beta1', 130000)
-    >>> pg_get_num_version("PostgreSQL 13rc1 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 9.3.1 20200408 (Red Hat 9.3.1-2), 64-bit")
-    ('PostgreSQL 13rc1', 130000)
+    >>> pg_get_short_version('PostgreSQL 11.9')
+    'PostgreSQL 11.9'
+    >>> pg_get_short_version('EnterpriseDB 11.9 (Debian 11.9-0+deb10u1)')
+    'EnterpriseDB 11.9'
+    >>> pg_get_short_version("PostgreSQL 9.3.24 on x86_64-pc-linux-gnu (Debian 9.3.24-1.pgdg80+1), compiled by gcc (Debian 4.9.2-10+deb8u1) 4.9.2, 64-bit")
+    'PostgreSQL 9.3.24'
+    >>> pg_get_short_version("PostgreSQL 9.1.4 on x86_64-unknown-linux-gnu, compiled by gcc (GCC) 4.8.5 20150623 (Red Hat 4.8.5-39), 64-bit")
+    'PostgreSQL 9.1.4'
+    >>> pg_get_short_version("PostgreSQL 14devel on x86_64-pc-linux-gnu, compiled by gcc (GCC) 9.3.1 20200408 (Red Hat 9.3.1-2), 64-bit")
+    'PostgreSQL 14devel'
+    >>> pg_get_short_version("PostgreSQL 13beta1 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 9.3.1 20200408 (Red Hat 9.3.1-2), 64-bit")
+    'PostgreSQL 13beta1'
+    >>> pg_get_short_version("PostgreSQL 13rc1 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 9.3.1 20200408 (Red Hat 9.3.1-2), 64-bit")
+    'PostgreSQL 13rc1'
+    >>> pg_get_short_version("PostgreSQL 9.6rc1 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 9.3.1 20200408 (Red Hat 9.3.1-2), 64-bit")
+    'PostgreSQL 9.6rc1'
     """
+
     res = re.match(
-        r"^(PostgreSQL|EnterpriseDB) ([0-9]+)\.([0-9]+)(?:\.([0-9]+))?",
-        text_version,
-    )
-    if res is not None:
-        rmatch = res.group(2)
-        if int(res.group(3)) < 10:
-            rmatch += "0"
-        rmatch += res.group(3)
-        if res.group(4) is not None:
-            if int(res.group(4)) < 10:
-                rmatch += "0"
-            rmatch += res.group(4)
-        else:
-            rmatch += "00"
-        pg_version = str(res.group(0))
-        pg_num_version = int(rmatch)
-        return pg_version, pg_num_version
-    return pg_get_num_dev_version(text_version)
-
-
-def pg_get_num_dev_version(text_version: str) -> Tuple[str, int]:
-    """Return PostgreSQL short & numeric devel. or beta version from a string
-    (SELECT version()).
-
-    >>> pg_get_num_dev_version("PostgreSQL 14devel on x86_64-pc-linux-gnu, compiled by gcc (GCC) 9.3.1 20200408 (Red Hat 9.3.1-2), 64-bit")
-    ('PostgreSQL 14devel', 140000)
-    >>> pg_get_num_version("PostgreSQL 13beta1 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 9.3.1 20200408 (Red Hat 9.3.1-2), 64-bit")
-    ('PostgreSQL 13beta1', 130000)
-    >>> pg_get_num_version("PostgreSQL 13rc1 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 9.3.1 20200408 (Red Hat 9.3.1-2), 64-bit")
-    ('PostgreSQL 13rc1', 130000)
-    """
-    res = re.match(
-        r"^(PostgreSQL|EnterpriseDB) ([0-9]+)(?:\.([0-9]+))?(devel|beta[0-9]+|rc[0-9]+)",
+        r"^\w+ [\d\.]+(devel|beta[0-9]+|rc[0-9]+)?",
         text_version,
     )
     if not res:
         raise Exception(f"Undefined PostgreSQL version: {text_version}")
-    rmatch = res.group(2)
-    if res.group(3) is not None:
-        if int(res.group(3)) < 10:
-            rmatch += "0"
-        rmatch += res.group(3)
-    else:
-        rmatch += "00"
-    rmatch += "00"
-    pg_version = str(res.group(0))
-    pg_num_version = int(rmatch)
-    return pg_version, pg_num_version
+
+    return res.group(0)
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
@@ -143,11 +104,11 @@ class Data:
                 ret = cur.fetchone()
                 if ret[0] != "on":
                     raise Exception("Must be run with database superuser privileges.")
-        pg_version, pg_num_version = pg_get_num_version(pg_get_version(pg_conn))
+        pg_version = pg_get_short_version(pg_get_version(pg_conn))
         return cls(
             pg_conn,
             pg_version,
-            pg_num_version,
+            pg_conn.server_version,
             min_duration=min_duration,
             dsn_parameters=pg_conn.info.dsn_parameters,
         )
