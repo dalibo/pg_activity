@@ -13,7 +13,7 @@ def datadir() -> pathlib.Path:
 
 
 @pytest.fixture
-def executor(postgresql):
+def execute(postgresql):
     """Create a thread and return an execute() function that will run SQL queries in that
     thread.
     """

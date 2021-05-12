@@ -669,7 +669,7 @@ tests                 idle in trans   CREATE TABLE persons (firstname text, last
 
 Interactive mode:
 
->>> execute = getfixture("executor")
+>>> execute = getfixture("execute")
 >>> execute("SELECT 42")
 >>> execute("SELECT 43")
 >>> execute("UPDATE t SET s = 'blocking'")
