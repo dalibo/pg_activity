@@ -8,7 +8,8 @@ import attr
 import psutil
 
 from .types import (
-    BWProcess,
+    BlockingProcess,
+    WaitingProcess,
     IOCounter,
     LoadAverage,
     LocalRunningProcess,
@@ -141,7 +142,7 @@ def ps_complete(
     return local_procs, io_read, io_write
 
 
-T = TypeVar("T", RunningProcess, BWProcess, LocalRunningProcess)
+T = TypeVar("T", RunningProcess, WaitingProcess, BlockingProcess, LocalRunningProcess)
 
 
 def sorted(processes: List[T], *, key: SortKey, reverse: bool = False) -> List[T]:

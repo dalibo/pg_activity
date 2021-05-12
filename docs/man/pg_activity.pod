@@ -73,7 +73,7 @@ B<min duration> seconds. It displays the following information:
 
 =item - B<TIME>: time since the beginning of the query / transaction / backend start depending on the B<DURATION_MODE> currently in use;
 
-=item - B<Waiting>: specific wait event if available. Otherwise, a boolean indicating that we are waiting for a Lock;
+=item - B<Waiting>: for PostgreSQL 9.6+: a specific wait event or nothing. Otherwise, a boolean indicating if we are waiting for a Lock;
 
 =item - B<IOW>: boolean indicating that the process is waiting for IO as reported by the psutil library;
 
@@ -138,6 +138,8 @@ requiered by another session. It shows following information:
 =item - B<MODE>: the mode of the lock;
 
 =item - B<TIME+>: the duration of the query, transaction or session depending on the B<DURATION_MODE> setting;
+
+=item - B<Waiting>: for PostgreSQL 9.6+: a specific wait event or nothing. Otherwise, a boolean indicating if we are waiting for a Lock;
 
 =item - B<state>: the state of the transaction;
 

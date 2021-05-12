@@ -1,4 +1,4 @@
--- Get blocking queries >= 9.2
+-- Get blocking queries >= 9.6
 SELECT
       pid,
       application_name,
@@ -11,7 +11,7 @@ SELECT
       duration,
       state,
       query,
-      waiting as wait
+      wait_event as wait
   FROM
       (
       SELECT
@@ -29,7 +29,7 @@ SELECT
             EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
             pg_stat_activity.state as state,
             blocking.relation::regclass AS relation,
-            pg_stat_activity.waiting
+            pg_stat_activity.wait_event
         FROM
             pg_locks AS blocking
             JOIN (
@@ -63,7 +63,7 @@ SELECT
             EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
             pg_stat_activity.state as state,
             blocking.relation::regclass AS relation,
-            pg_stat_activity.waiting
+            pg_stat_activity.wait_event
         FROM
             pg_locks AS blocking
             JOIN (

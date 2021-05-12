@@ -120,7 +120,7 @@ MEM%              state   Query
 ...              flag=Flag.PID | Flag.DATABASE | Flag.APPNAME | Flag.RELATION | Flag.CLIENT | Flag.WAIT,
 ...              sort_key=SortKey.duration)
 >>> columns_header(term, ui, width=150)
-PID    DATABASE                      APP           CLIENT  RELATION              state   Query
+PID    DATABASE                      APP           CLIENT  RELATION          Waiting              state   Query
 
 >>> ui.evolve(query_mode=QueryMode.activities)
 >>> columns_header(term, ui, width=150)
@@ -261,7 +261,7 @@ Terminal is too narrow given selected flags, we switch to wrap_noindent mode
                                              * s.units) > 5000;
 
 >>> processes2 = [
-...     BWProcess(
+...     BlockingProcess(
 ...         pid="6239",
 ...         application_name="pgbench",
 ...         database="pgbench",
@@ -271,10 +271,11 @@ Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 ...         type="transactionid",
 ...         relation="None",
 ...         duration=666,
+...         wait="Client Read",
 ...         state="active",
 ...         query="END;"
 ...     ),
-...     BWProcess(
+...     BlockingProcess(
 ...         pid="6228",
 ...         application_name="pgbench",
 ...         database="pgbench",
@@ -284,6 +285,7 @@ Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 ...         type="tuple",
 ...         relation="ahah",
 ...         duration=0.000413,
+...         wait="Client Read",
 ...         state="idle in transaction",
 ...         query="UPDATE pgbench_branches SET bbalance = bbalance + 1788 WHERE bid = 68;",
 ...     ),
@@ -296,8 +298,8 @@ Terminal is too narrow given selected flags, we switch to wrap_noindent mode
                                              bid = 68;
 >>> ui = UI.make(query_mode=QueryMode.blocking, flag=allflags)
 >>> processes_rows(term, ui, SelectableProcesses(processes2), width=250)
-6239   pgbench                   pgbench         postgres          1.2.3.4      None    transactionid    ExclusiveLock  11:06.00             active   END;
-6228   pgbench                   pgbench         postgres            local      ahah            tuple RowExclusiveLock  0.000413      idle in trans   UPDATE pgbench_branches SET bbalance = bbalance + 1788 WHERE bid = 68;
+6239   pgbench                   pgbench         postgres          1.2.3.4      None    transactionid    ExclusiveLock  11:06.00      Client Read             active   END;
+6228   pgbench                   pgbench         postgres            local      ahah            tuple RowExclusiveLock  0.000413      Client Read      idle in trans   UPDATE pgbench_branches SET bbalance = bbalance + 1788 WHERE bid = 68;
 
 >>> processes1b = [
 ...     RunningProcess(

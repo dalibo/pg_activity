@@ -427,6 +427,7 @@ class UI:
                 "type",
                 "mode",
                 "duration",
+                "wait",
                 "state",
                 "query",
             ],
@@ -702,14 +703,29 @@ class RunningProcess(BaseProcess):
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
-class BWProcess(BaseProcess):
-    """Process for a blocking or waiting query."""
+class WaitingProcess(BaseProcess):
+    """Process for a waiting query."""
 
     # Lock information from pg_locks view
     # https://www.postgresql.org/docs/current/view-pg-locks.html
     mode: str
     type: LockType = attr.ib(converter=locktype)
     relation: str
+
+    # TODO: update queries to select/compute this column.
+    is_parallel_worker: bool = attr.ib(default=False, init=False)
+
+
+@attr.s(auto_attribs=True, frozen=True, slots=True)
+class BlockingProcess(BaseProcess):
+    """Process for a blocking query."""
+
+    # Lock information from pg_locks view
+    # https://www.postgresql.org/docs/current/view-pg-locks.html
+    mode: str
+    type: LockType = attr.ib(converter=locktype)
+    relation: str
+    wait: Union[bool, None, str]
 
     # TODO: update queries to select/compute this column.
     is_parallel_worker: bool = attr.ib(default=False, init=False)
@@ -867,8 +883,9 @@ class SelectableProcesses:
 
 
 ActivityStats = Union[
-    Iterable[BWProcess],
+    Iterable[WaitingProcess],
     Iterable[RunningProcess],
-    Tuple[Iterable[BWProcess], SystemInfo],
+    Tuple[Iterable[WaitingProcess], SystemInfo],
+    Tuple[Iterable[BlockingProcess], SystemInfo],
     Tuple[Iterable[LocalRunningProcess], SystemInfo],
 ]

@@ -68,6 +68,8 @@ def test_blocking_waiting(postgresql, data, execute):
     (waiting,) = data.pg_get_waiting()
     assert "blocking" in blocking.query
     assert "waiting" in waiting.query
+    if postgresql.server_version >= 100000:
+        assert blocking.wait == "ClientRead"
 
 
 def test_cancel_backend(postgresql, data, execute):
