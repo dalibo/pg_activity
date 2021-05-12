@@ -10,9 +10,140 @@ B<pg_activity> [option..] [connection string]
 
 Command line tool for PostgreSQL server activity monitoring.
 
-pg_activity must run on the same server than the instance and
+pg_activity must run on the same server as the instance and
 as the user running the instance (or root) to show
 CPU, MEM, READ or WRITE columns and other system information.
+
+=head2 THE HEADER
+
+The first line of the header displays PostgreSQL's version, the host name, the
+connection string and the refresh rate.
+
+The rest of the header displays the following information: 
+
+=over 2
+
+=item - B<Size>: size of the database you are connected to - Growth in B/s;
+
+=item - B<Mem.>: percentage of memory used - memory used / memory available;
+
+=item - B<Swap>: percentage of  swap used - swap used / swap available;
+
+=item - B<Load>: CPU load;
+
+=item - B<TPS>: transaction per second (sum of commit & rollback for all databases / time elapsed since last snap);
+
+=item - B<IO Max>: the number of IO per second (aggregated data gathered with the psutil library);
+
+=item - B<Read>: current Read throughput (aggregated data gathered with the psutil library);
+
+=item - B<Write>: current Write throughput (aggregated data gathered with the psutil library);
+
+=item - B<Active connections>: number of active connections;
+
+=item - B<Duration mode>: query, transaction or backend.
+
+=back
+
+=head2 THE RUNNING QUERIES PANEL
+
+The running queries panel shows all running queries, transactions or backends 
+(depending on the B<DURATION_MODE> setting) which have lasted for more than
+B<min duration> seconds. It displays the following information:
+
+=over 2
+
+=item - B<PID>: process id of the backend which executes the query;
+
+=item - B<DATABASE>: database specified in the connection string;
+
+=item - B<APP>: application name specified in the connection string;
+
+=item - B<USER>: user name specified in the connection string;
+
+=item - B<CLIENT>: client address or "local" in case of linux socker connection;
+
+=item - B<CPU%>: percentage of CPU used by the backend as reported by the psutil library;
+
+=item - B<MEM%>: percentage of memory used by the backend as reported by the psutil library;
+
+=item - B<READ/s>:  read thruput as reported by the psutil library;
+
+=item - B<WRITE/s>: write thruput as reported by the psutil library;
+
+=item - B<TIME>: time since the beginning of the query / transaction / backend start depending on the B<DURATION_MODE> currently in use;
+
+=item - B<Waiting>: specific wait event if available. Otherwise, a boolean indicating that we are waiting for a Lock;
+
+=item - B<IOW>: boolean indicating that the process is waiting for IO as reported by the psutil library;
+
+=item - B<state>: state of the backend;
+
+=item - B<Query>: the query.
+
+=back
+
+=head2 THE WAITING QUERIES PANNEL
+
+The waiting queries view displays queries that are wainting for a lock. It
+shows the following information:
+
+=over 2
+
+=item - B<PID>: process id of the backend which executes the query;
+
+=item - B<DATABASE>: database specified in the connection string;
+
+=item - B<APP>: application name specified in the connection string;
+
+=item - B<USER>: user name specified in the connection string;
+
+=item - B<CLIENT>: client address or "local" in case of linux socker connection;
+
+=item - B<RELATION>: the name of the relation being locked if applicable;
+
+=item - B<TYPE>: the type of lock;
+
+=item - B<MODE>: the mode of the lock;
+
+=item - B<TIME+>: the duration of the query, transaction or session depending on the B<DURATION_MODE> setting;
+
+=item - B<state>: the state of the transaction;
+
+=item - B<Query>: the query.
+
+=back
+
+=head2 THE BLOCKING QUERIES PANNEL
+
+The blocking queries view displays the queries that lock an object which is
+requiered by another session. It shows following information:
+
+=over 2
+
+=item - B<PID>: process id of the backend which executes the query;
+
+=item - B<DATABASE>: database specified in the connection string;
+
+=item - B<APP>: application name specified in the connection string;
+
+=item - B<USER>: user name specified in the connection string;
+
+=item - B<CLIENT>: client address or "local" in case of linux socker connection;
+
+=item - B<RELATION>: the name of the relation being locked if applicable;
+
+=item - B<TYPE>: the type of lock;
+
+=item - B<MODE>: the mode of the lock;
+
+=item - B<TIME+>: the duration of the query, transaction or session depending on the B<DURATION_MODE> setting;
+
+=item - B<state>: the state of the transaction;
+
+=item - B<Query>: the query.
+
+=back
 
 =head1 COMMAND-LINE OPTIONS
 
@@ -20,19 +151,19 @@ CPU, MEM, READ or WRITE columns and other system information.
 
 =item B<-U USERNAME>, B<--username=USERNAME>
 
-	Database user name (default: $USER).
+	Database user name.
 
 =item B<-p PORT>, B<--port=PORT>
 
-	Database server port (default: "5432").
+	Database server port.
 
 =item B<-h HOSTNAME>, B<--host=HOSTNAME>
 
-	Database server host or socket directory (default: "localhost").
+	Database server host or socket directory.
 
 =item B<-d DBNAME>, B<--dbname=DBNAME>
 
-    Database name to connect to (default: "postgres").
+    Database name to connect to.
 
 =item B<--blocksize=BLOCKSIZE>
 
@@ -50,10 +181,6 @@ CPU, MEM, READ or WRITE columns and other system information.
 
 	Skip total size of DB.
 
-=item B<--min-duration=SECONDS>
-
-	Don't display queries with smaller than specified duration (in seconds).
-
 =item B<--verbose-mode=VERBOSE_MODE>
 
 	Queries display mode. Values: 1-TRUNCATED, 2-FULL(default), 3-INDENTED
@@ -61,6 +188,10 @@ CPU, MEM, READ or WRITE columns and other system information.
 =item B<--duration-mode=DURATION_MODE>
 
 	Duration mode. Values: 1-QUERY(default), 2-TRANSACTION, 3-BACKEND
+
+=item B<--min-duration=SECONDS>
+
+	Don't display queries with smaller than specified duration (in seconds).
 
 =item B<--help>
 
@@ -76,25 +207,10 @@ CPU, MEM, READ or WRITE columns and other system information.
 
 =over 2
 
-=item B<PGPASSWORD>
+All the environnement variables supported by libpq (PostgreSQL's query
+protocol) are supported by pg_activity.
 
-    PostgreSQL password.
-
-=item B<PGPORT>
-
-	Database server port.
-
-=item B<PGUSER>
-
-	Database user name.
-
-=item B<PGHOST>
-
-	Database server host or socket directory.
-
-=item B<PGPASSFILE>
-
-    Path to .pgpass file (default is ~/.pgpass)
+See: https://www.postgresql.org/docs/current/libpq-envars.html
 
 =back
 
@@ -174,9 +290,9 @@ CPU, MEM, READ or WRITE columns and other system information.
 
 =item B<q>     Quit
 
-=item B<+>     Increase refresh time. Maximum value : 3s
+=item B<+>     Increase refresh time. Maximum value: 3s
 
-=item B<->     Decrease refresh time. Minimum Value : 1s
+=item B<->     Decrease refresh time. Minimum Value: 1s
 
 =item B<F1/1>  Running queries monitoring.
 
