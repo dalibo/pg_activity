@@ -1,6 +1,6 @@
 import functools
 import inspect
-from textwrap import dedent
+from textwrap import TextWrapper, dedent
 from typing import (
     Any,
     Callable,
@@ -395,13 +395,13 @@ def processes_rows(
                     if term.length(query.split(" ", 1)[0]) >= dif:
                         # Query too long to even start on the first line, wrap all
                         # lines.
-                        query_lines = term.wrap(query, width=width)
+                        query_lines = TextWrapper(width).wrap(query)
                     else:
                         # Only wrap subsequent lines.
-                        wrapped_lines = term.wrap(query, width=dif)
+                        wrapped_lines = TextWrapper(dif).wrap(query)
                         if wrapped_lines:
-                            query_lines = [wrapped_lines[0]] + term.wrap(
-                                " ".join(wrapped_lines[1:]), width=width
+                            query_lines = [wrapped_lines[0]] + TextWrapper(width).wrap(
+                                " ".join(wrapped_lines[1:])
                             )
                         else:
                             query_lines = []
@@ -410,7 +410,7 @@ def processes_rows(
                     assert (
                         verbose_mode == QueryDisplayMode.wrap
                     ), f"unexpected mode {verbose_mode}"
-                    wrapped_lines = term.wrap(query, width=dif)
+                    wrapped_lines = TextWrapper(dif).wrap(query)
                     query_value = f"\n{indent}".join(wrapped_lines)
 
             cell(query_value, ui.column("query"))
