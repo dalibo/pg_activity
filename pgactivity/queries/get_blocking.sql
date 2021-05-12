@@ -18,7 +18,8 @@ SELECT
       CASE WHEN sq.query LIKE '<IDLE>%%'
           THEN NULL
           ELSE sq.query
-      END AS query
+      END AS query,
+      waiting AS wait
   FROM
       (
       SELECT
@@ -35,7 +36,8 @@ SELECT
             blocking.locktype,
             EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
             NULL AS state,
-            blocking.relation::regclass AS relation
+            blocking.relation::regclass AS relation,
+            pg_stat_activity.waiting
         FROM
             pg_locks AS blocking
             JOIN (
@@ -67,7 +69,8 @@ SELECT
             blocking.locktype,
             EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
             NULL AS state,
-            blocking.relation::regclass AS relation
+            blocking.relation::regclass AS relation,
+            pg_stat_activity.waiting
         FROM
             pg_locks AS blocking
             JOIN (
@@ -100,6 +103,7 @@ GROUP BY
       usename,
       client,
       state,
-      relation
+      relation,
+      wait
 ORDER BY
       duration DESC;

@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "PG_ACTIVITY 1"
-.TH PG_ACTIVITY 1 "2021-05-17" "pg_activity 2.1.5" "Command line tool for PostgreSQL server activity monitoring."
+.TH PG_ACTIVITY 1 "2021-05-21" "pg_activity 2.1.5" "Command line tool for PostgreSQL server activity monitoring."
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -205,8 +205,8 @@ The running queries panel shows all running queries, transactions or backends
 .IX Item "- WRITE/s: write thruput as reported by the psutil library;"
 .IP "\- \fB\s-1TIME\s0\fR: time since the beginning of the query / transaction / backend start depending on the \fB\s-1DURATION_MODE\s0\fR currently in use;" 2
 .IX Item "- TIME: time since the beginning of the query / transaction / backend start depending on the DURATION_MODE currently in use;"
-.IP "\- \fBWaiting\fR: specific wait event if available. Otherwise, a boolean indicating that we are waiting for a Lock;" 2
-.IX Item "- Waiting: specific wait event if available. Otherwise, a boolean indicating that we are waiting for a Lock;"
+.IP "\- \fBWaiting\fR: for PostgreSQL 9.6+: a specific wait event or nothing. Otherwise, a boolean indicating if we are waiting for a Lock;" 2
+.IX Item "- Waiting: for PostgreSQL 9.6+: a specific wait event or nothing. Otherwise, a boolean indicating if we are waiting for a Lock;"
 .IP "\- \fB\s-1IOW\s0\fR: boolean indicating that the process is waiting for \s-1IO\s0 as reported by the psutil library;" 2
 .IX Item "- IOW: boolean indicating that the process is waiting for IO as reported by the psutil library;"
 .IP "\- \fBstate\fR: state of the backend;" 2
@@ -267,6 +267,8 @@ requiered by another session. It shows following information:
 .IX Item "- MODE: the mode of the lock;"
 .IP "\- \fB\s-1TIME+\s0\fR: the duration of the query, transaction or session depending on the \fB\s-1DURATION_MODE\s0\fR setting;" 2
 .IX Item "- TIME+: the duration of the query, transaction or session depending on the DURATION_MODE setting;"
+.IP "\- \fBWaiting\fR: for PostgreSQL 9.6+: a specific wait event or nothing. Otherwise, a boolean indicating if we are waiting for a Lock;" 2
+.IX Item "- Waiting: for PostgreSQL 9.6+: a specific wait event or nothing. Otherwise, a boolean indicating if we are waiting for a Lock;"
 .IP "\- \fBstate\fR: the state of the transaction;" 2
 .IX Item "- state: the state of the transaction;"
 .IP "\- \fBQuery\fR: the query." 2

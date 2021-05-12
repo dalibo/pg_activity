@@ -16,7 +16,7 @@ from psycopg2.errors import (
 from psycopg2.extensions import connection
 
 from . import queries
-from .types import BWProcess, RunningProcess
+from .types import BlockingProcess, WaitingProcess, RunningProcess
 from .utils import clean_str
 
 
@@ -263,7 +263,7 @@ class Data:
 
         return [RunningProcess(**row) for row in ret]
 
-    def pg_get_waiting(self, duration_mode: int = 1) -> List[BWProcess]:
+    def pg_get_waiting(self, duration_mode: int = 1) -> List[WaitingProcess]:
         """
         Get waiting queries.
         """
@@ -278,15 +278,17 @@ class Data:
         with self.pg_conn.cursor() as cur:
             cur.execute(query, {"min_duration": self.min_duration})
             ret = cur.fetchall()
-        return [BWProcess(**row) for row in ret]
+        return [WaitingProcess(**row) for row in ret]
 
-    def pg_get_blocking(self, duration_mode: int = 1) -> List[BWProcess]:
+    def pg_get_blocking(self, duration_mode: int = 1) -> List[BlockingProcess]:
         """
         Get blocking queries
         """
-        if self.pg_num_version >= 90200:
+        if self.pg_num_version >= 90600:
+            query = queries.get("get_blocking_post_90600")
+        elif self.pg_num_version >= 90200:
             query = queries.get("get_blocking_post_90200")
-        elif self.pg_num_version < 90200:
+        else:
             query = queries.get("get_blocking")
 
         duration_column = self.get_duration_column(duration_mode)
@@ -295,7 +297,7 @@ class Data:
         with self.pg_conn.cursor() as cur:
             cur.execute(query, {"min_duration": self.min_duration})
             ret = cur.fetchall()
-        return [BWProcess(**row) for row in ret]
+        return [BlockingProcess(**row) for row in ret]
 
     def pg_is_local(self) -> bool:
         """
