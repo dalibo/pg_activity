@@ -398,10 +398,12 @@ def processes_rows(
                         query_lines = TextWrapper(width).wrap(query)
                     else:
                         # Only wrap subsequent lines.
-                        wrapped_lines = TextWrapper(dif).wrap(query)
+                        wrapped_lines = TextWrapper(dif, drop_whitespace=False).wrap(
+                            query
+                        )
                         if wrapped_lines:
                             query_lines = [wrapped_lines[0]] + TextWrapper(width).wrap(
-                                " ".join(wrapped_lines[1:])
+                                "".join(wrapped_lines[1:]).lstrip()
                             )
                         else:
                             query_lines = []
