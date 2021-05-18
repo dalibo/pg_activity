@@ -1,5 +1,6 @@
 import functools
 import inspect
+import itertools
 from textwrap import TextWrapper, dedent
 from typing import (
     Any,
@@ -129,27 +130,20 @@ def limit(func: Callable[..., Iterable[str]]) -> Callable[..., None]:
 
 
 @functools.singledispatch
-def render(x: NoReturn, column_width: int) -> str:
+def render(x: NoReturn) -> str:
     raise AssertionError(f"not implemented for type '{type(x).__name__}'")
 
 
 @render.register(MemoryInfo)
-def render_meminfo(m: MemoryInfo, column_width: int) -> str:
+def render_meminfo(m: MemoryInfo) -> str:
     used, total = utils.naturalsize(m.used), utils.naturalsize(m.total)
-    return _columns(f"{m.percent}%", f"{used}/{total}", column_width)
+    return f"{m.percent}% - {used}/{total}"
 
 
 @render.register(IOCounter)
-def render_iocounter(i: IOCounter, column_width: int) -> str:
+def render_iocounter(i: IOCounter) -> str:
     hbytes = utils.naturalsize(i.bytes)
-    return _columns(f"{hbytes}/s", f"{i.count}/s", column_width)
-
-
-def _columns(left: str, right: str, total_width: int) -> str:
-    column_width, r = divmod(total_width, 2)
-    if r:
-        column_width -= 1
-    return " - ".join([left.rjust(column_width - 1), right.ljust(column_width - 1)])
+    return f"{hbytes}/s - {i.count}/s"
 
 
 @limit
@@ -209,71 +203,50 @@ def header(
         )
     )
 
-    def row(*columns: Tuple[str, str, int]) -> str:
-        return " | ".join(
-            f"{title}: {value.center(width)}" for title, value, width in columns
-        ).rstrip()
-
-    def indent(text: str, indent: int = 1) -> str:
-        return " " * indent + text
-
-    col_width = 30  # TODO: use screen size
-
     total_size = utils.naturalsize(dbinfo.total_size)
     size_ev = utils.naturalsize(dbinfo.size_ev)
-    yield indent(
-        row(
-            (
-                "Size",
-                _columns(total_size, f"{size_ev}/s", 20),
-                col_width,
-            ),
-            ("TPS", f"{term.bold_green}{str(tps).rjust(11)}{term.normal}", 20),
-            (
-                "Active connections",
-                f"{term.bold_green}{str(active_connections).rjust(11)}{term.normal}",
-                20,
-            ),
-            (
-                "Duration mode",
-                f"{term.bold_green}{ui.duration_mode.name.rjust(11)}{term.normal}",
-                5,
-            ),
-        )
-    )
 
+    def render_columns(columns: List[List[str]], *, delimiter: str) -> Iterator[str]:
+        column_widths = [
+            max(len(column_row) for column_row in column) for column in columns
+        ]
+
+        def indent(text: str) -> str:
+            return " " + text
+
+        for row in itertools.zip_longest(*columns, fillvalue=""):
+            yield indent(
+                "".join(
+                    (cell + delimiter).ljust(width + len(delimiter))
+                    for width, cell in zip(column_widths, row)
+                )
+            ).rstrip().rstrip(delimiter.strip())
+
+    # First row is always displayed, as underlying data is always available.
+    columns = [
+        [f"Size: {total_size} - {size_ev}/s"],
+        [f"TPS: {term.bold_green(str(tps))}"],
+        [f"Active connections: {term.bold_green(str(active_connections))}"],
+        [f"Duration mode: {term.bold_green(ui.duration_mode.name)}"],
+    ]
+    yield from render_columns(columns, delimiter=f" {term.bold_blue('⋅')} ")
+
+    # System information, only available in "local" mode.
     if system_info is not None:
-        yield indent(
-            row(
-                ("Mem.", render(system_info.memory, col_width // 2), col_width),
-                ("IO Max", f"{system_info.max_iops:8}/s", col_width // 4),
-            )
-        )
-        yield indent(
-            row(
-                ("Swap", render(system_info.swap, col_width // 2), col_width),
-                (
-                    "Read",
-                    render(system_info.io_read, col_width // 2 - len("Read")),
-                    col_width,
-                ),
-            )
-        )
         load = system_info.load
-        yield indent(
-            row(
-                (
-                    "Load",
-                    f"{load.avg1:.2f} {load.avg5:.2f} {load.avg15:.2f}",
-                    col_width,
-                ),
-                (
-                    "Write",
-                    render(system_info.io_write, col_width // 2 - len("Write")),
-                    col_width,
-                ),
-            )
-        )
+        system_columns = [
+            [
+                f"Mem.: {render(system_info.memory)}",
+                f"Swap: {render(system_info.swap)}",
+                f"Load: {load.avg1:.2f} {load.avg5:.2f} {load.avg15:.2f}",
+            ],
+            [
+                f"IO Max: {system_info.max_iops}/s",
+                f"Read:   {render(system_info.io_read)}",
+                f"Write:  {render(system_info.io_write)}",
+            ],
+        ]
+        yield from render_columns(system_columns, delimiter=",   ")
 
 
 @limit

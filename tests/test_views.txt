@@ -69,10 +69,10 @@ Remote host:
 >>> header(term, ui, host=host, dbinfo=dbinfo, pg_version="PostgreSQL 9.6", tps=12, active_connections=0,
 ...        width=200)
 PostgreSQL 9.6 - server - pgadm@server.prod.tld:5433/app - Ref.: 10s
- Size:         9.06P - 9.76K/s        | TPS:              12      | Active connections:               0      | Duration mode:     backend
+ Size: 9.06P - 9.76K/s ⋅ TPS: 12 ⋅ Active connections: 0 ⋅ Duration mode: backend
 >>> header(term, ui, host=host, dbinfo=dbinfo, pg_version="PostgreSQL 9.6", tps=12, active_connections=0)
 PostgreSQL 9.6 - server - pgadm@server.prod.tld:5433/app - Ref.: 10s
- Size:         9.06P - 9.76K/s        | TPS:              12      | Active
+ Size: 9.06P - 9.76K/s ⋅ TPS: 12 ⋅ Active connections: 0 ⋅ Duration mode:
 
 Local host, with priviledged access:
 
@@ -89,10 +89,10 @@ Local host, with priviledged access:
 >>> header(term, ui, host=host, dbinfo=dbinfo, pg_version="PostgreSQL 13.1", tps=1, active_connections=79,
 ...        system_info=sysinfo, width=150)
 PostgreSQL 13.1 - localhost - tester@host:5432/postgres - Ref.: 2s - Min. duration: 1.2s
- Size:       117.74M - 12B/s          | TPS:               1      | Active connections:              79      | Duration mode:       query
- Mem.:      42.5% - 1.87G/5.75G       | IO Max:       12/s
- Swap:       0.0% - 2.29K/5.88G       | Read:          128B/s - 6/s
- Load:        25.00 0.19 0.39         | Write:          8B/s - 9/s
+ Size: 117.74M - 12B/s ⋅ TPS: 1 ⋅ Active connections: 79 ⋅ Duration mode: query
+ Mem.: 42.5% - 1.87G/5.75G,   IO Max: 12/s
+ Swap: 0.0% - 2.29K/5.88G,    Read:   128B/s - 6/s
+ Load: 25.00 0.19 0.39,       Write:  8B/s - 9/s
 
 
 Tests for columns_header()
@@ -395,10 +395,10 @@ Tests for screen()
 ...     width=150,
 ... )
 PostgreSQL 13 - testhost - pgadm@server.prod.tld:5433/app - Ref.: 10s - Min. duration: 1s
- Size:         9.06P - 9.76K/s        | TPS:               5      | Active connections:               7      | Duration mode:     backend
- Mem.:      2.5% - 954.85M/3.93G      | IO Max:       76/s
- Swap:       1.0% - 2.29K/5.88G       | Read:          128B/s - 6/s
- Load:         0.50 1.90 0.93         | Write:          8B/s - 9/s
+ Size: 9.06P - 9.76K/s ⋅ TPS: 5 ⋅ Active connections: 7 ⋅ Duration mode: backend
+ Mem.: 2.5% - 954.85M/3.93G,   IO Max: 76/s
+ Swap: 1.0% - 2.29K/5.88G,     Read:   128B/s - 6/s
+ Load: 0.50 1.90 0.93,         Write:  8B/s - 9/s
                                 RUNNING QUERIES
 PID    DATABASE           CPU% MEM%              state   Query
 1234   business            2.4  1.0             active   SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id) WHERE s.date >
@@ -433,10 +433,10 @@ F1/1 Running queries    F2/2 Waiting queries    F3/3 Blocking queries   Space Pa
 ...     message=f"Process {processes3[-1].pid} killed",
 ... )
 PostgreSQL 13 - testhost - pgadm@server.prod.tld:5433/app - Ref.: 10s - Min.
- Size:         9.06P - 9.76K/s        | TPS:               5      | Active
- Mem.:      2.5% - 954.85M/3.93G      | IO Max:       76/s
- Swap:       1.0% - 2.29K/5.88G       | Read:          128B/s - 6/s
- Load:         0.50 1.90 0.93         | Write:          8B/s - 9/s
+ Size: 9.06P - 9.76K/s ⋅ TPS: 5 ⋅ Active connections: 7 ⋅ Duration mode: backend
+ Mem.: 2.5% - 954.85M/3.93G,   IO Max: 76/s
+ Swap: 1.0% - 2.29K/5.88G,     Read:   128B/s - 6/s
+ Load: 0.50 1.90 0.93,         Write:  8B/s - 9/s
                                 RUNNING QUERIES
 PID    DATABASE           CPU% MEM%              state   Query
 1234   business            2.4  1.0             active   SELECT product_id, p.na
