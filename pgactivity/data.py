@@ -251,7 +251,7 @@ class Data:
             query = queries.get("get_pg_activity_post_90600")
         elif self.pg_num_version >= 90200:
             query = queries.get("get_pg_activity_post_90200")
-        elif self.pg_num_version < 90200:
+        else:
             query = queries.get("get_pg_activity")
 
         duration_column = self.get_duration_column(duration_mode)
@@ -269,7 +269,7 @@ class Data:
         """
         if self.pg_num_version >= 90200:
             query = queries.get("get_waiting_post_90200")
-        elif self.pg_num_version < 90200:
+        else:
             query = queries.get("get_waiting")
 
         duration_column = self.get_duration_column(duration_mode)
