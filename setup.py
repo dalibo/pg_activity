@@ -1,4 +1,4 @@
-import os.path
+import pathlib
 import sys
 
 data_files = None
@@ -9,15 +9,14 @@ for opt in sys.argv:
 
 from setuptools import find_packages, setup
 
-HERE = os.path.dirname(__file__)
+HERE = pathlib.Path(__file__).parent
 
-with open(os.path.join(HERE, "README.md")) as fo:
-    long_description = fo.read()
+long_description = (HERE / "README.md").read_text()
 
 
 def get_version() -> str:
-    fpath = os.path.join(HERE, "pgactivity", "__init__.py")
-    with open(fpath) as f:
+    fpath = HERE / "pgactivity" / "__init__.py"
+    with fpath.open() as f:
         for line in f:
             if line.startswith("__version__"):
                 return line.split('"')[1]
