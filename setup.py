@@ -71,4 +71,5 @@ setup(
             "pg_activity=pgactivity.cli:main",
         ],
     },
+    zip_safe=False,
 )
