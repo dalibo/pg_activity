@@ -1,11 +1,4 @@
 import pathlib
-import sys
-
-data_files = None
-for opt in sys.argv:
-    if opt == "--with-man":
-        data_files = [("/usr/share/man/man1", ["docs/man/pg_activity.1"])]
-        sys.argv.remove(opt)
 
 from setuptools import find_packages, setup
 
@@ -64,7 +57,9 @@ setup(
             "pytest-postgresql",
         ],
     },
-    data_files=data_files,
+    data_files=[
+        ("share/man/man1", ["docs/man/pg_activity.1"]),
+    ],
     entry_points={
         "console_scripts": [
             "pg_activity=pgactivity.cli:main",
