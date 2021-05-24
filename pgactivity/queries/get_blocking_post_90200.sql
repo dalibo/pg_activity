@@ -21,7 +21,7 @@ SELECT
             blocking.mode,
             pg_stat_activity.datname,
             pg_stat_activity.usename,
-	    CASE WHEN pg_stat_activity.client_addr IS NULL
+            CASE WHEN pg_stat_activity.client_addr IS NULL
                 THEN 'local'
                 ELSE pg_stat_activity.client_addr::TEXT
             END AS client,
@@ -39,7 +39,41 @@ SELECT
                       pg_locks
                  WHERE
                       NOT granted
-	    ) AS blocked ON (blocking.transactionid = blocked.transactionid)
+            ) AS blocked ON (blocking.transactionid = blocked.transactionid)
+            JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.pid)
+       WHERE
+            blocking.granted
+        AND CASE WHEN %(min_duration)s = 0
+                THEN true
+                ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
+            END
+      UNION ALL
+      SELECT
+            blocking.pid,
+            pg_stat_activity.application_name,
+            pg_stat_activity.query,
+            blocking.mode,
+            pg_stat_activity.datname,
+            pg_stat_activity.usename,
+            CASE WHEN pg_stat_activity.client_addr IS NULL
+                THEN 'local'
+                ELSE pg_stat_activity.client_addr::TEXT
+            END AS client,
+            blocking.locktype,
+            EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
+            pg_stat_activity.state as state,
+            blocking.relation::regclass AS relation,
+            pg_stat_activity.waiting
+        FROM
+            pg_locks AS blocking
+            JOIN (
+                SELECT
+                      virtualxid
+                  FROM
+                      pg_locks
+                 WHERE
+                      NOT granted
+            ) AS blocked ON (blocking.virtualxid = blocked.virtualxid)
             JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.pid)
        WHERE
             blocking.granted
