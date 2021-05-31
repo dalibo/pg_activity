@@ -21,9 +21,10 @@ def execute(postgresql):
 
     loop = asyncio.new_event_loop()
 
-    def execute(query: str, commit: bool = False) -> None:
+    def execute(query: str, commit: bool = False, autocommit: bool = False) -> None:
         def _execute() -> None:
             conn = psycopg2.connect(**postgresql.info.dsn_parameters)
+            conn.autocommit = autocommit
             cnx.append(conn)
             with conn.cursor() as c:
                 try:
@@ -33,7 +34,7 @@ def execute(postgresql):
                     psycopg2.errors.QueryCanceledError,
                 ):
                     return
-                if commit:
+                if not autocommit and commit:
                     conn.commit()
 
         loop.call_soon_threadsafe(_execute)
