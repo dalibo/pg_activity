@@ -70,6 +70,29 @@ def test_blocking_waiting(postgresql, data, execute):
     assert "waiting" in waiting.query
     if postgresql.server_version >= 100000:
         assert blocking.wait == "ClientRead"
+    assert str(blocking.type) == "transactionid"
+
+
+def test_pg_get_blocking_virtualxid(postgresql, data, execute):
+    with postgresql.cursor() as cur:
+        cur.execute("CREATE TABLE t(s text)")
+    postgresql.commit()
+    execute("INSERT INTO t VALUES ('init')", commit=True)
+    execute("UPDATE t SET s = 'blocking'")
+    execute("CREATE INDEX CONCURRENTLY ON t(s)", autocommit=True)
+    for _ in range(10):
+        time.sleep(0.1)
+        try:
+            (blocking,) = data.pg_get_blocking()
+        except ValueError:
+            continue
+        break
+    else:
+        raise AssertionError("timeout")
+    (waiting,) = data.pg_get_waiting()
+    assert "blocking" in blocking.query
+    assert "CREATE INDEX CONCURRENTLY ON t(s)" in waiting.query
+    assert str(blocking.type) == "virtualxid"
 
 
 def test_cancel_backend(postgresql, data, execute):
