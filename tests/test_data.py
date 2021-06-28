@@ -36,7 +36,7 @@ def test_pg_get_db_info(data):
     }
 
 
-def test_activities(postgresql, data, execute):
+def test_activities(postgresql, data):
     with postgresql.cursor() as cur:
         cur.execute("SELECT pg_sleep(1)")
     (running,) = data.pg_get_activities()
@@ -95,14 +95,14 @@ def test_pg_get_blocking_virtualxid(postgresql, data, execute):
     assert str(blocking.type) == "virtualxid"
 
 
-def test_cancel_backend(postgresql, data, execute):
+def test_cancel_backend(postgresql, data):
     with postgresql.cursor() as cur:
         cur.execute("SELECT pg_sleep(1)")
     (running,) = data.pg_get_activities()
     assert data.pg_cancel_backend(running.pid)
 
 
-def test_terminate_backend(postgresql, data, execute):
+def test_terminate_backend(postgresql, data):
     with postgresql.cursor() as cur:
         cur.execute("SELECT pg_sleep(1)")
     (running,) = data.pg_get_activities()
