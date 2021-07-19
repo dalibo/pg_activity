@@ -269,7 +269,7 @@ def main() -> None:
     except OptionParsingError as err:
         exit(err.msg)
     if options.help:
-        print(parser.format_help().strip())
+        parser.print_help()
         sys.exit(1)
 
     dataobj = data.pg_connect(
