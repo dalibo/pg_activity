@@ -98,12 +98,13 @@ def get_parser() -> OptionParser:
         help="Skip total size of DB",
         default=False,
     )
-    # --verbose-mode
+    # --query-display-mode
     parser.add_option(
-        "--verbose-mode",
-        dest="verbosemode",
+        "-w",
+        "--query-display-mode",
+        dest="querydisplaymode",
         help="Queries display mode. Values: 1-TRUNCATED, 2-FULL(default), 3-INDENTED",
-        metavar="VERBOSE_MODE",
+        metavar="DISPLAY_MODE",
         choices=["1", "2", "3"],
         default="2",
     )
@@ -124,6 +125,15 @@ def get_parser() -> OptionParser:
         metavar="SECONDS",
         type=float,
         default=0,
+    )
+    # --verbose-mode
+    parser.add_option(
+        "--verbose-mode",
+        dest="querydisplaymode",
+        help="DEPRECATED, use --query-display-mode instead",
+        metavar="VERBOSE_MODE",
+        choices=["1", "2", "3"],
+        default="2",
     )
 
     group = OptionGroup(

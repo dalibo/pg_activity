@@ -183,7 +183,7 @@ requiered by another session. It shows following information:
 
 	Skip total size of DB.
 
-=item B<--verbose-mode=VERBOSE_MODE>
+=item B<-w DISPLAY_MODE, --query-display-mode=DISPLAY_MODE>
 
 	Queries display mode. Values: 1-TRUNCATED, 2-FULL(default), 3-INDENTED
 

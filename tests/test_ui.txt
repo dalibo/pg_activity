@@ -39,7 +39,7 @@ Default CLI options, passed to ui.main():
 ...     "port": f"{postgres.info.port}",
 ...     "rds": False,
 ...     "username": f"{postgres.info.user}",
-...     "verbosemode": "2",
+...     "querydisplaymode": "2",
 ... }
 >>> options = optparse.Values(defaults=defaults)
 
@@ -569,7 +569,7 @@ Use another set of options:
 ...     defaults=dict(
 ...         defaults,
 ...         durationmode="2",
-...         verbosemode="3",
+...         querydisplaymode="3",
 ...         noclient=True,
 ...         nouser=True,
 ...         nodbsize=True,
@@ -680,7 +680,7 @@ Interactive mode:
 ...     defaults=dict(
 ...         defaults,
 ...         durationmode="1",
-...         verbosemode="3",
+...         querydisplaymode="3",
 ...         nopid=False,
 ...         noclient=True,
 ...         nouser=True,

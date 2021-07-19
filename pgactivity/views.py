@@ -353,18 +353,18 @@ def processes_rows(
         indent = get_indent(ui) + " "
         dif = width - len(indent)
 
-        verbose_mode = ui.verbose_mode
+        query_display_mode = ui.query_display_mode
         if dif < 0:
             # Switch to wrap_noindent mode if terminal is too narrow.
-            verbose_mode = QueryDisplayMode.wrap_noindent
+            query_display_mode = QueryDisplayMode.wrap_noindent
 
         if process.query is not None:
             query = format_query(process.query, process.is_parallel_worker)
 
-            if verbose_mode == QueryDisplayMode.truncate:
+            if query_display_mode == QueryDisplayMode.truncate:
                 query_value = query[:dif]
             else:
-                if verbose_mode == QueryDisplayMode.wrap_noindent:
+                if query_display_mode == QueryDisplayMode.wrap_noindent:
                     if term.length(query.split(" ", 1)[0]) >= dif:
                         # Query too long to even start on the first line, wrap all
                         # lines.
@@ -383,8 +383,8 @@ def processes_rows(
                     query_value = "\n".join(query_lines)
                 else:
                     assert (
-                        verbose_mode == QueryDisplayMode.wrap
-                    ), f"unexpected mode {verbose_mode}"
+                        query_display_mode == QueryDisplayMode.wrap
+                    ), f"unexpected mode {query_display_mode}"
                     wrapped_lines = TextWrapper(dif).wrap(query)
                     query_value = f"\n{indent}".join(wrapped_lines)
 

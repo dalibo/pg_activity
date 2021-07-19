@@ -36,7 +36,7 @@ def main(
         flag=flag,
         min_duration=options.minduration,
         duration_mode=int(options.durationmode),
-        verbose_mode=int(options.verbosemode),
+        query_display_mode=int(options.querydisplaymode),
         max_db_length=min(max(int(pg_db_info["max_length"]), 8), 16),
     )
 
@@ -121,7 +121,9 @@ def main(
                     ui.end_interactive()
                     changes = {
                         "duration_mode": handlers.duration_mode(key, ui.duration_mode),
-                        "verbose_mode": handlers.verbose_mode(key, ui.verbose_mode),
+                        "query_display_mode": handlers.query_display_mode(
+                            key, ui.query_display_mode
+                        ),
                     }
                     if key in (keys.REFRESH_TIME_INCREASE, keys.REFRESH_TIME_DECREASE):
                         changes["refresh_time"] = handlers.refresh_time(

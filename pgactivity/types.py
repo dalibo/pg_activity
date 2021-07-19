@@ -253,7 +253,7 @@ class UI:
     duration_mode: DurationMode = attr.ib(
         default=DurationMode.query, converter=DurationMode
     )
-    verbose_mode: QueryDisplayMode = attr.ib(
+    query_display_mode: QueryDisplayMode = attr.ib(
         default=QueryDisplayMode.default(), converter=QueryDisplayMode
     )
     sort_key: SortKey = attr.ib(default=SortKey.default(), converter=SortKey)
@@ -528,7 +528,7 @@ class UI:
             return
         forbidden = set(changes) - {
             "duration_mode",
-            "verbose_mode",
+            "query_display_mode",
             "sort_key",
             "query_mode",
             "refresh_time",

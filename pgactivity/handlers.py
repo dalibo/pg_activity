@@ -50,15 +50,14 @@ def duration_mode(key: Keystroke, mode: DurationMode) -> DurationMode:
     return mode
 
 
-def verbose_mode(key: Keystroke, mode: QueryDisplayMode) -> QueryDisplayMode:
-    """Return the updated query display mode (aka verbose mode) matching input
-    key.
+def query_display_mode(key: Keystroke, mode: QueryDisplayMode) -> QueryDisplayMode:
+    """Return the updated query display mode matching input key.
 
     >>> from blessed.keyboard import Keystroke as k
 
-    >>> verbose_mode(k("42"), QueryDisplayMode.truncate).name
+    >>> query_display_mode(k("42"), QueryDisplayMode.truncate).name
     'truncate'
-    >>> verbose_mode(k("v"), QueryDisplayMode.wrap_noindent).name
+    >>> query_display_mode(k("v"), QueryDisplayMode.wrap_noindent).name
     'wrap'
     """
     if key == keys.CHANGE_DISPLAY_MODE:
