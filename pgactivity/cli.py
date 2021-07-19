@@ -3,7 +3,6 @@ import socket
 import sys
 import time
 from optparse import OptionParser, OptionGroup
-from typing import NoReturn
 
 from blessed import Terminal
 from psycopg2.errors import OperationalError
@@ -11,27 +10,8 @@ from psycopg2.errors import OperationalError
 from . import __version__, data, types, ui
 
 
-# Customized OptionParser
-class ModifiedOptionParser(OptionParser):
-    """
-    ModifiedOptionParser
-    """
-
-    def error(self, msg: str) -> NoReturn:
-        raise OptionParsingError(msg)
-
-
-class OptionParsingError(RuntimeError):
-    """
-    OptionParsingError
-    """
-
-    def __init__(self, msg: str) -> None:
-        self.msg = msg
-
-
-def get_parser() -> ModifiedOptionParser:
-    parser = ModifiedOptionParser(
+def get_parser() -> OptionParser:
+    parser = OptionParser(
         add_help_option=False,
         version="%prog " + __version__,
         usage="%prog [options] [connection string]",
@@ -256,18 +236,16 @@ def exit(msg: str) -> None:
 def main() -> None:
     if os.name != "posix":
         sys.exit("FATAL: Platform not supported.")
-    try:
-        parser = get_parser()
-        (options, args) = parser.parse_args()
-        if len(args) == 1:
-            dsn = args[0]
-        elif len(args) > 1:
-            raise OptionParsingError("at most one argument is expected")
-        else:
-            dsn = ""
 
-    except OptionParsingError as err:
-        exit(err.msg)
+    parser = get_parser()
+    (options, args) = parser.parse_args()
+    if len(args) == 1:
+        dsn = args[0]
+    elif len(args) > 1:
+        parser.error("at most one argument is expected")
+    else:
+        dsn = ""
+
     if options.help:
         parser.print_help()
         sys.exit(1)
