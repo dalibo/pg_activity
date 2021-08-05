@@ -203,15 +203,10 @@ class Data:
         tps = 0
         size_ev = 0.0
         if prev_db_infos is not None:
+            dt = float(ret["timestamp"] - prev_db_infos["timestamp"])
             try:
-                tps = int(
-                    (ret["no_xact"] - prev_db_infos["no_xact"])
-                    / (ret["timestamp"] - prev_db_infos["timestamp"])
-                )
-                size_ev = float(
-                    float(ret["total_size"] - prev_db_infos["total_size"])
-                    / (ret["timestamp"] - prev_db_infos["timestamp"])
-                )
+                tps = int((ret["no_xact"] - prev_db_infos["no_xact"]) / dt)
+                size_ev = float(ret["total_size"] - prev_db_infos["total_size"]) / dt
             except ZeroDivisionError:
                 pass
         return {
