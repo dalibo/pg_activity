@@ -11,16 +11,16 @@ Command line tool for PostgreSQL server activity monitoring.
 Installation
 ------------
 
-`pg_activity` requires Python 3.6 or later. It can be installed using pip
-(available, e.g., as `apt install python3-pip` on Debian-based distributions):
+pg\_activity is available in many Linux distributions; the PostgreSQL Global
+Development Group (PGDG) also provides packages for RPM-based
+(https://yum.postgresql.org/) and Debian-based distributions
+(https://wiki.postgresql.org/wiki/Apt). Using distribution packages is the
+recommended way to install pg\_activity.
+
+Alternatively, pg\_activity can be installed using pip on Python 3.6 or later
+along with psycopg2 (version 2.8 or higher):
 
     $ python3 -m pip install pg_activity psycopg2-binary
-
-or directly from your Linux distribution, if available, e.g.:
-
-    $ sudo apt install pg-activity
-
-`pg_activity` requires psycopg2 version 2.8 or higher.
 
 Usage
 -----
