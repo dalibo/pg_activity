@@ -1,5 +1,6 @@
 build/
 htmlcov/
+dist/
 pg_activity.egg-info
 pgactivity/__pycache__/
 .coverage
