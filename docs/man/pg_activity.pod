@@ -117,7 +117,7 @@ shows the following information:
 =head2 THE BLOCKING QUERIES PANNEL
 
 The blocking queries view displays the queries that lock an object which is
-requiered by another session. It shows following information:
+required by another session. It shows following information:
 
 =over 2
 
