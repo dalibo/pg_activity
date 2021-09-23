@@ -5,6 +5,7 @@ Functional tests for 'ui' module
 >>> import optparse
 >>> import time
 >>> from unittest.mock import patch
+>>> from conftest import PgThreadCoord
 
 >>> import blessed
 >>> from blessed.keyboard import Keystroke
@@ -669,12 +670,11 @@ tests                 idle in trans   CREATE TABLE persons (firstname text, last
 
 Interactive mode:
 
->>> execute = getfixture("execute")
->>> execute("SELECT 42")
->>> execute("SELECT 43")
->>> execute("UPDATE t SET s = 'blocking'")
->>> execute("UPDATE t SET s = 'waiting'", commit=True)
->>> time.sleep(1)
+>>> tc = PgThreadCoord(postgres.info.dsn_parameters)
+>>> tc.execute_thread("SELECT 42", idle_in_transaction=True)
+>>> tc.execute_thread("SELECT 43", idle_in_transaction=True)
+>>> tc.execute_thread("UPDATE t SET s = 'blocking'", idle_in_transaction=True)
+>>> tc.execute_thread("UPDATE t SET s = 'waiting'", wait_locked=True)
 
 >>> options = optparse.Values(
 ...     defaults=dict(
@@ -1054,3 +1054,4 @@ Waiting query should be unblocked:
 ...     c.execute("SELECT s from t")
 ...     c.fetchall()
 [('waiting',)]
+>>> tc.cleanup()

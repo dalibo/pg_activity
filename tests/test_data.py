@@ -1,29 +1,14 @@
-import time
-
 import pytest
 from psycopg2.errors import WrongObjectType
 
 from pgactivity.data import Data
-
-
-def wait_for_data(fct, msg: str, timeout: int = 2):
-    count = int(timeout / 0.1)
-    for _ in range(count):
-        time.sleep(0.1)
-        data = fct()
-
-        if not data:
-            continue
-        break
-    else:
-        raise AssertionError(msg)
-    return data
+from conftest import PgThreadCoord
 
 
 @pytest.fixture
 def data(postgresql):
     return Data.pg_connect(
-        1,
+        min_duration=0.0,
         host=postgresql.info.host,
         port=postgresql.info.port,
         database=postgresql.info.dbname,
@@ -64,38 +49,50 @@ def test_activities(postgresql, data):
     assert not running.is_parallel_worker
 
 
-def test_blocking_waiting(postgresql, data, execute):
+def test_blocking_waiting(postgresql, data):
+    tc = PgThreadCoord(postgresql.info.dsn_parameters)
     with postgresql.cursor() as cur:
         cur.execute("CREATE TABLE t (s text)")
+        cur.execute("INSERT INTO t VALUES ('init')")
     postgresql.commit()
-    execute("INSERT INTO t VALUES ('init')", commit=True)
-    execute("UPDATE t SET s = 'blocking'")
-    execute("UPDATE t SET s = 'waiting'", commit=True)
-    (blocking,) = wait_for_data(
-        data.pg_get_blocking, msg="could not fetch blocking queries"
-    )
-    (waiting,) = data.pg_get_waiting()
-    assert "blocking" in blocking.query
-    assert "waiting" in waiting.query
+
+    tc.execute_thread("UPDATE t SET s = 'blocking'", idle_in_transaction=True)
+    tc.execute_thread("UPDATE t SET s = 'waiting 1'", wait_locked=True)
+    tc.execute_thread("UPDATE t SET s = 'waiting 2'", wait_locked=True)
+
+    blocking = data.pg_get_blocking()
+    waiting = data.pg_get_waiting()
+
+    assert len(blocking) == 2
+    assert len(waiting) == 2
+    assert "blocking" in blocking[0].query
+    assert "waiting" in waiting[0].query
+    assert "waiting" in waiting[1].query
     if postgresql.server_version >= 100000:
-        assert blocking.wait == "ClientRead"
-    assert str(blocking.type) == "transactionid"
+        assert blocking[0].wait == "ClientRead"
+    assert str(blocking[0].type) == "transactionid"
+    tc.cleanup()
 
 
-def test_pg_get_blocking_virtualxid(postgresql, data, execute):
+def test_pg_get_blocking_virtualxid(postgresql, data):
+    tc = PgThreadCoord(postgresql.info.dsn_parameters)
     with postgresql.cursor() as cur:
         cur.execute("CREATE TABLE t(s text)")
+        cur.execute("INSERT INTO t VALUES ('init')")
     postgresql.commit()
-    execute("INSERT INTO t VALUES ('init')", commit=True)
-    execute("UPDATE t SET s = 'blocking'")
-    execute("CREATE INDEX CONCURRENTLY ON t(s)", autocommit=True)
-    (blocking,) = wait_for_data(
-        data.pg_get_blocking, msg="could not fetch blocking queries"
+
+    tc.execute_thread("UPDATE t SET s = 'blocking'", idle_in_transaction=True)
+    tc.execute_thread(
+        "CREATE INDEX CONCURRENTLY ON t(s)", autocommit=True, wait_locked=True
     )
+
+    (blocking,) = data.pg_get_blocking()
     (waiting,) = data.pg_get_waiting()
+
     assert "blocking" in blocking.query
     assert "CREATE INDEX CONCURRENTLY ON t(s)" in waiting.query
     assert str(blocking.type) == "virtualxid"
+    tc.cleanup()
 
 
 def test_cancel_backend(postgresql, data):
@@ -113,18 +110,17 @@ def test_terminate_backend(postgresql, data):
     assert not data.pg_get_activities()
 
 
-def test_pg_get_active_connections(data, execute):
+def test_pg_get_active_connections(data, postgresql):
+    tc = PgThreadCoord(postgresql.info.dsn_parameters)
     assert data.pg_get_active_connections() == 1
-    execute("select pg_sleep(2)")
-    nbconn = wait_for_data(
-        data.pg_get_active_connections,
-        msg="could not get active connections",
-    )
-    assert nbconn == 2
+    tc.execute_thread("select pg_sleep(2)")
+    assert data.pg_get_active_connections() == 2
+    tc.cleanup()
 
 
-def test_encoding(postgresql, data, execute):
+def test_encoding(postgresql, data):
     """Test for issue #149"""
+    tc = PgThreadCoord(postgresql.info.dsn_parameters)
     postgresql.set_session(autocommit=True)
     with postgresql.cursor() as cur:
         # plateform specific locales (,Centos, Ubuntu)
@@ -138,28 +134,28 @@ def test_encoding(postgresql, data, execute):
             else:
                 break
 
-    postgresql.set_session(autocommit=False)
-    execute("CREATE TABLE tbl(s text)", dbname="latin1", commit=True)
-    execute(
-        "INSERT INTO tbl(s) VALUES ('initilialized éléphant')",
-        dbname="latin1",
-        commit=True,
+    tc.execute_thread(
+        "CREATE TABLE tbl(s text)", database="latin1", wait_completion=True
     )
-    execute("UPDATE tbl SET s = 'blocking éléphant'", dbname="latin1")
-    execute("UPDATE tbl SET s = 'waiting éléphant'", dbname="latin1", commit=True)
-    running = wait_for_data(data.pg_get_activities, msg="could not fetch activities")
-    assert "blocking éléphant" in running[0].query
-    (waiting,) = data.pg_get_waiting()
-    assert "waiting éléphant" in waiting.query
-    (blocking,) = data.pg_get_blocking()
-    assert "blocking éléphant" in blocking.query
+    tc.execute_thread(
+        "INSERT INTO tbl(s) VALUES ('initilialized éléphant')",
+        database="latin1",
+        wait_completion=True,
+    )
+    tc.execute_thread(
+        "UPDATE tbl SET s = 'blocking éléphant'",
+        database="latin1",
+        idle_in_transaction=True,
+    )
+    tc.execute_thread(
+        "UPDATE tbl SET s = 'waiting éléphant'", database="latin1", wait_locked=True
+    )
 
-    # Terminate blocking backend in order to avoid side effects in following tests (e.g.
-    # test_ui.txt).
-    data.pg_terminate_backend(blocking.pid)
-    for __ in range(10):
-        if not data.pg_get_waiting():
-            break
-        time.sleep(1)
-    else:
-        raise AssertionError("could not terminate blocking backend")
+    running = data.pg_get_activities()
+    (waiting,) = data.pg_get_waiting()
+    (blocking,) = data.pg_get_blocking()
+
+    assert "éléphant" in running[0].query  # could be any éléphant first with threads
+    assert "waiting éléphant" in waiting.query
+    assert "blocking éléphant" in blocking.query
+    tc.cleanup()
