@@ -42,16 +42,11 @@ SELECT
             pg_stat_activity.waiting
         FROM
             pg_locks AS blocking
-            JOIN (
-                SELECT
-                      transactionid
-                  FROM
-                      pg_locks
-                 WHERE
-                      NOT granted) AS blocked ON (blocking.transactionid = blocked.transactionid)
+            JOIN pg_locks AS blocked ON (blocking.transactionid = blocked.transactionid AND blocking.locktype = blocked.locktype)
             JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.procpid)
        WHERE
             blocking.granted
+        AND NOT blocked.granted
         AND CASE WHEN %(min_duration)s = 0
                 THEN true
                 ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
@@ -77,22 +72,17 @@ SELECT
             pg_stat_activity.waiting
         FROM
             pg_locks AS blocking
-            JOIN (
-                SELECT
-                      virtualxid
-                  FROM
-                      pg_locks
-                 WHERE
-                      NOT granted) AS blocked ON (blocking.virtualxid = blocked.virtualxid)
+            JOIN pg_locks AS blocked ON (blocking.virtualxid = blocked.virtualxid AND blocking.locktype = blocked.locktype)
             JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.procpid)
        WHERE
             blocking.granted
+        AND NOT blocked.granted
         AND CASE WHEN %(min_duration)s = 0
                 THEN true
                 ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
             END
       UNION ALL
-      -- Relation Lock
+      -- Relation or tuple Lock
       SELECT
             blocking.pid,
             '<unknown>' AS application_name,
@@ -112,20 +102,12 @@ SELECT
             pg_stat_activity.waiting
         FROM
             pg_locks AS blocking
-            JOIN (
-                SELECT
-                      database,
-                      relation,
-                      mode
-                  FROM
-                      pg_locks
-                 WHERE
-                      NOT granted
-                  AND relation IS NOT NULL
-            ) AS blocked ON (blocking.database = blocked.database AND blocking.relation = blocked.relation)
+            JOIN pg_locks AS blocked ON (blocking.database = blocked.database AND blocking.relation = blocked.relation AND blocking.locktype = blocked.locktype)
             JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.procpid)
        WHERE
             blocking.granted
+        AND NOT blocked.granted
+        AND blocked.relation IS NOT NULL
         AND CASE WHEN %(min_duration)s = 0
                 THEN true
                 ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
@@ -145,6 +127,6 @@ GROUP BY
       state,
       query,
       encoding,
-      wait_event
+      waiting
 ORDER BY
       duration DESC;

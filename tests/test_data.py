@@ -70,16 +70,21 @@ def test_blocking_waiting(postgresql, data, execute):
         cur.execute("CREATE TABLE t AS (SELECT 'init' s)")
     postgresql.commit()
     execute("UPDATE t SET s = 'blocking'")
-    execute("UPDATE t SET s = 'waiting'", commit=True)
-    (blocking,) = wait_for_data(
+    execute("UPDATE t SET s = 'waiting 1'", commit=True)
+    execute("UPDATE t SET s = 'waiting 2'", commit=True)
+    blocking = wait_for_data(
         data.pg_get_blocking, msg="could not fetch blocking queries"
     )
-    (waiting,) = data.pg_get_waiting()
-    assert "blocking" in blocking.query
-    assert "waiting" in waiting.query
+    waiting = data.pg_get_waiting()
+    assert len(blocking) == 2
+    assert len(waiting) == 2
+    assert "blocking" in blocking[0].query
+    assert "waiting 1" in waiting[0].query and "waiting 2" in waiting[1].query
     if postgresql.server_version >= 100000:
-        assert blocking.wait == "ClientRead"
-    assert str(blocking.type) == "transactionid"
+        assert blocking[0].wait == "ClientRead"
+        assert blocking[1].wait == "transactionid"
+    assert str(blocking[0].type) == "transactionid"
+    assert str(blocking[1].type) == "tuple"
 
 
 def test_pg_get_blocking_virtualxid(postgresql, data, execute):
