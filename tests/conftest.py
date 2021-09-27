@@ -1,4 +1,3 @@
-import asyncio
 import pathlib
 import threading
 from typing import Optional
@@ -18,9 +17,7 @@ def execute(postgresql):
     """Create a thread and return an execute() function that will run SQL queries in that
     thread.
     """
-    cnx = []
-
-    loop = asyncio.new_event_loop()
+    threads_and_cnx = []
 
     def execute(
         query: str,
@@ -33,7 +30,6 @@ def execute(postgresql):
             connection_parms["dbname"] = dbname
         conn = psycopg2.connect(**connection_parms)
         conn.autocommit = autocommit
-        cnx.append(conn)
 
         def _execute() -> None:
             with conn.cursor() as c:
@@ -47,19 +43,12 @@ def execute(postgresql):
                 if not autocommit and commit:
                     conn.commit()
 
-        loop.call_soon_threadsafe(_execute)
-
-    def run_loop() -> None:
-        asyncio.set_event_loop(loop)
-        loop.run_forever()
-
-    thread = threading.Thread(target=run_loop, daemon=True)
-    thread.start()
+        thread = threading.Thread(target=_execute, daemon=True)
+        thread.start()
+        threads_and_cnx.append((thread, conn))
 
     yield execute
 
-    for conn in cnx:
-        loop.call_soon_threadsafe(conn.close)
-    loop.call_soon_threadsafe(loop.stop)
-
-    thread.join(timeout=2)
+    for thread, conn in threads_and_cnx:
+        thread.join(timeout=2)
+        conn.close()

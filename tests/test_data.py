@@ -153,13 +153,3 @@ def test_encoding(postgresql, data, execute):
     assert "waiting éléphant" in waiting.query
     (blocking,) = data.pg_get_blocking()
     assert "blocking éléphant" in blocking.query
-
-    # Terminate blocking backend in order to avoid side effects in following tests (e.g.
-    # test_ui.txt).
-    data.pg_terminate_backend(blocking.pid)
-    for __ in range(10):
-        if not data.pg_get_waiting():
-            break
-        time.sleep(1)
-    else:
-        raise AssertionError("could not terminate blocking backend")
