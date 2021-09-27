@@ -7,6 +7,7 @@ import attr
 import psutil
 import psycopg2
 import psycopg2.extras
+from psycopg2 import sql
 from psycopg2.errors import (
     InterfaceError,
     InvalidPassword,
@@ -239,18 +240,18 @@ class Data:
         Get activity from pg_stat_activity view.
         """
         if self.pg_num_version >= 110000:
-            query = queries.get("get_pg_activity_post_110000")
+            qs = queries.get("get_pg_activity_post_110000")
         elif self.pg_num_version >= 100000:
-            query = queries.get("get_pg_activity_post_100000")
+            qs = queries.get("get_pg_activity_post_100000")
         elif self.pg_num_version >= 90600:
-            query = queries.get("get_pg_activity_post_90600")
+            qs = queries.get("get_pg_activity_post_90600")
         elif self.pg_num_version >= 90200:
-            query = queries.get("get_pg_activity_post_90200")
+            qs = queries.get("get_pg_activity_post_90200")
         else:
-            query = queries.get("get_pg_activity")
+            qs = queries.get("get_pg_activity")
 
         duration_column = self.get_duration_column(duration_mode)
-        query = query.format(duration_column=duration_column)
+        query = sql.SQL(qs).format(duration_column=sql.Identifier(duration_column))
 
         with self.pg_conn.cursor() as cur:
             cur.execute(query, {"min_duration": self.min_duration})
@@ -263,12 +264,12 @@ class Data:
         Get waiting queries.
         """
         if self.pg_num_version >= 90200:
-            query = queries.get("get_waiting_post_90200")
+            qs = queries.get("get_waiting_post_90200")
         else:
-            query = queries.get("get_waiting")
+            qs = queries.get("get_waiting")
 
         duration_column = self.get_duration_column(duration_mode)
-        query = query.format(duration_column=duration_column)
+        query = sql.SQL(qs).format(duration_column=sql.Identifier(duration_column))
 
         with self.pg_conn.cursor() as cur:
             cur.execute(query, {"min_duration": self.min_duration})
@@ -280,14 +281,14 @@ class Data:
         Get blocking queries
         """
         if self.pg_num_version >= 90600:
-            query = queries.get("get_blocking_post_90600")
+            qs = queries.get("get_blocking_post_90600")
         elif self.pg_num_version >= 90200:
-            query = queries.get("get_blocking_post_90200")
+            qs = queries.get("get_blocking_post_90200")
         else:
-            query = queries.get("get_blocking")
+            qs = queries.get("get_blocking")
 
         duration_column = self.get_duration_column(duration_mode)
-        query = query.format(duration_column=duration_column)
+        query = sql.SQL(qs).format(duration_column=sql.Identifier(duration_column))
 
         with self.pg_conn.cursor() as cur:
             cur.execute(query, {"min_duration": self.min_duration})
