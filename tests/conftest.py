@@ -28,13 +28,14 @@ def execute(postgresql):
         autocommit: bool = False,
         dbname: Optional[str] = None,
     ) -> None:
+        connection_parms = postgresql.info.dsn_parameters
+        if dbname:
+            connection_parms["dbname"] = dbname
+        conn = psycopg2.connect(**connection_parms)
+        conn.autocommit = autocommit
+        cnx.append(conn)
+
         def _execute() -> None:
-            connection_parms = postgresql.info.dsn_parameters
-            if dbname:
-                connection_parms["dbname"] = dbname
-            conn = psycopg2.connect(**connection_parms)
-            conn.autocommit = autocommit
-            cnx.append(conn)
             with conn.cursor() as c:
                 try:
                     c.execute(query)
