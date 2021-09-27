@@ -190,9 +190,9 @@ class PgThreadCoord:
         # thread idle in transation need to we released before finishing
         for t in self.idle_in_transaction_threads:
             t.stop_idle_in_transactioning()
-            t.join()
+            t.join(timeout=2)
 
         # other thread shoud be released because there is no more idle in transaction
         # threads and finish gracefully
         for t in self.others_threads:
-            t.join()
+            t.join(timeout=2)
