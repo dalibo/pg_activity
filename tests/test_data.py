@@ -1,6 +1,7 @@
 import time
 
 import pytest
+import psycopg2
 from psycopg2.errors import WrongObjectType
 
 from pgactivity.data import Data
@@ -66,9 +67,8 @@ def test_activities(postgresql, data):
 
 def test_blocking_waiting(postgresql, data, execute):
     with postgresql.cursor() as cur:
-        cur.execute("CREATE TABLE t (s text)")
+        cur.execute("CREATE TABLE t AS (SELECT 'init' s)")
     postgresql.commit()
-    execute("INSERT INTO t VALUES ('init')", commit=True)
     execute("UPDATE t SET s = 'blocking'")
     execute("UPDATE t SET s = 'waiting'", commit=True)
     (blocking,) = wait_for_data(
@@ -84,9 +84,8 @@ def test_blocking_waiting(postgresql, data, execute):
 
 def test_pg_get_blocking_virtualxid(postgresql, data, execute):
     with postgresql.cursor() as cur:
-        cur.execute("CREATE TABLE t(s text)")
+        cur.execute("CREATE TABLE t AS (SELECT 'init' s)")
     postgresql.commit()
-    execute("INSERT INTO t VALUES ('init')", commit=True)
     execute("UPDATE t SET s = 'blocking'")
     execute("CREATE INDEX CONCURRENTLY ON t(s)", autocommit=True)
     (blocking,) = wait_for_data(
@@ -125,8 +124,10 @@ def test_pg_get_active_connections(data, execute):
 
 def test_encoding(postgresql, data, execute):
     """Test for issue #149"""
-    postgresql.set_session(autocommit=True)
-    with postgresql.cursor() as cur:
+    conninfo = postgresql.info.dsn_parameters
+    conn = psycopg2.connect(**conninfo)
+    conn.autocommit = True
+    with conn.cursor() as cur:
         # plateform specific locales (,Centos, Ubuntu)
         for encoding in ["fr_FR.latin1", "fr_FR.88591", "fr_FR.8859-1"]:
             try:
@@ -138,13 +139,12 @@ def test_encoding(postgresql, data, execute):
             else:
                 break
 
-    postgresql.set_session(autocommit=False)
-    execute("CREATE TABLE tbl(s text)", dbname="latin1", commit=True)
-    execute(
-        "INSERT INTO tbl(s) VALUES ('initilialized éléphant')",
-        dbname="latin1",
-        commit=True,
-    )
+    conninfo = conninfo.copy()
+    conninfo["dbname"] = "latin1"
+    with psycopg2.connect(**conninfo) as conn, conn.cursor() as cur:
+        cur.execute("CREATE TABLE tbl AS (SELECT 'initilialized éléphant' s)")
+        conn.commit()
+
     execute("UPDATE tbl SET s = 'blocking éléphant'", dbname="latin1")
     execute("UPDATE tbl SET s = 'waiting éléphant'", dbname="latin1", commit=True)
     running = wait_for_data(data.pg_get_activities, msg="could not fetch activities")
