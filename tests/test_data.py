@@ -162,7 +162,9 @@ def test_encoding(postgresql, data):
         (waiting,) = data.pg_get_waiting()
         (blocking,) = data.pg_get_blocking()
 
-        assert "éléphant" in running[0].query  # could be any éléphant first with threads
+        assert (
+            "éléphant" in running[0].query
+        )  # could be any éléphant first with threads
         assert "waiting éléphant" in waiting.query
         assert "blocking éléphant" in blocking.query
     finally:
