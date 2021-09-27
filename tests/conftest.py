@@ -1,3 +1,4 @@
+import logging
 import pathlib
 import threading
 from typing import Optional
@@ -5,6 +6,9 @@ from typing import Optional
 import psycopg2
 import psycopg2.errors
 import pytest
+
+LOGGER = logging.getLogger(__name__)
+LOGGER.setLevel(logging.DEBUG)
 
 
 @pytest.fixture(scope="session")
@@ -32,6 +36,13 @@ def execute(postgresql):
         conn.autocommit = autocommit
 
         def _execute() -> None:
+            LOGGER.info(
+                "running query %s (commit=%s, autocommit=%s) using connection <%s>",
+                query,
+                commit,
+                autocommit,
+                id(conn),
+            )
             with conn.cursor() as c:
                 try:
                     c.execute(query)
@@ -42,6 +53,7 @@ def execute(postgresql):
                     return
                 if not autocommit and commit:
                     conn.commit()
+            LOGGER.info("query %s finished", query)
 
         thread = threading.Thread(target=_execute, daemon=True)
         thread.start()
@@ -51,4 +63,5 @@ def execute(postgresql):
 
     for thread, conn in threads_and_cnx:
         thread.join(timeout=2)
+        LOGGER.info("closing connection <%s>", id(conn))
         conn.close()
