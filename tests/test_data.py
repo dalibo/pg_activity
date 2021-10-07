@@ -67,7 +67,7 @@ def test_activities(postgresql, data):
 
 def test_blocking_waiting(postgresql, data, execute):
     with postgresql.cursor() as cur:
-        cur.execute("CREATE TABLE t AS (SELECT 'init' s)")
+        cur.execute("CREATE TABLE t AS (SELECT 'init'::text s)")
     postgresql.commit()
     execute("UPDATE t SET s = 'blocking'")
     execute("UPDATE t SET s = 'waiting 1'", commit=True)
@@ -89,7 +89,7 @@ def test_blocking_waiting(postgresql, data, execute):
 
 def test_pg_get_blocking_virtualxid(postgresql, data, execute):
     with postgresql.cursor() as cur:
-        cur.execute("CREATE TABLE t AS (SELECT 'init' s)")
+        cur.execute("CREATE TABLE t AS (SELECT 'init'::text s)")
     postgresql.commit()
     execute("UPDATE t SET s = 'blocking'")
     execute("CREATE INDEX CONCURRENTLY ON t(s)", autocommit=True)
