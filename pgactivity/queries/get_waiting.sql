@@ -28,7 +28,7 @@ SELECT
       LEFT OUTER JOIN pg_database b ON a.datid = b.oid
  WHERE
       NOT pg_catalog.pg_locks.granted
-  AND pg_catalog.a.procpid <> pg_backend_pid()
+  AND a.procpid <> pg_backend_pid()
   AND CASE WHEN %(min_duration)s = 0
           THEN true
           ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
