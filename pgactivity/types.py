@@ -469,7 +469,7 @@ class UI:
         self.interactive_timeout = None
 
     def tick_interactive(self) -> None:
-        """End interactive mode.
+        """Tick timeout of interactive mode.
 
         >>> ui = UI.make()
         >>> ui.tick_interactive()
