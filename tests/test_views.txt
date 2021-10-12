@@ -1,10 +1,13 @@
+>>> import attr
 >>> from blessed import Terminal
+>>> import os
 >>> from pgactivity.types import *
 >>> from pgactivity.views import *
 
+>>> os.environ["LINES"] = "26"
 >>> term = Terminal(force_styling=None)
->>> term.width
-80
+>>> term.width, term.height
+(80, 26)
 
 Tests for help()
 ----------------
@@ -26,6 +29,9 @@ Released under PostgreSQL License.
          T: change duration mode
          D: force refresh database size
          R: force refresh
+         s: Display system information in header
+         i: Display general instance information in header
+         o: Display worker information in header
          q: quit
 Mode
       F1/1: running queries
@@ -46,6 +52,8 @@ Released under PostgreSQL License.
          T: change duration mode
          D: force refresh database size
          R: force refresh
+         i: Display general instance information in header
+         o: Display worker information in header
          q: quit
 Mode
       F1/1: running queries
@@ -54,6 +62,10 @@ Mode
 <BLANKLINE>
 Press any key to exit.
 
+>>> os.environ["LINES"] = "25"
+>>> term = Terminal(force_styling=None)
+>>> term.width, term.height
+(80, 25)
 
 Tests for header()
 ------------------
@@ -64,36 +76,109 @@ Tests for header()
 Remote host:
 
 >>> host = Host("server", "pgadm", "server.prod.tld", 5433, "app")
->>> dbinfo = DBInfo(10203040506070809, 9999)
+>>> serverinfo = ServerInformation(
+...     active_connections=1,
+...     idle=1,
+...     idle_in_transaction=10,
+...     idle_in_transaction_aborted=0,
+...     total=6,
+...     max_connections=100,
+...     autovacuum_workers=3,
+...     autovacuum_max_workers=3,
+...     logical_replication_workers=1,
+...     parallel_workers=2,
+...     wal_senders=1,
+...     wal_receivers=0,
+...     max_logical_replication_workers=8,
+...     max_parallel_workers=8,
+...     max_worker_processes=8,
+...     max_wal_senders=10,
+...     max_replication_slots=10,
+...     replication_slots=10,
+...     xact_count=1000,
+...     total_size=20480000,
+...     size_evolution=1024,
+...     cache_hit_ratio=90.1222,
+...     epoch=10000,
+...     uptime=timedelta(days=125, seconds=25, minutes=21, hours=3, weeks=1),
+...     tps=15,
+...     insert=100,
+...     update=200,
+...     delete=300,
+...     tuples_returned=400,
+...     insert_per_second=10,
+...     update_per_second=20,
+...     delete_per_second=30,
+...     tuples_returned_per_second=40,
+...     temp_files=5,
+...     temp_bytes=12054865,
+...     max_dbname_length=27,
+...     waiting=3,)
 
->>> header(term, ui, host=host, dbinfo=dbinfo, pg_version="PostgreSQL 9.6", tps=12, active_connections=0,
+>>> header(term, ui, host=host, server_information=serverinfo,
+...        system_info=None, pg_version="PostgreSQL 9.6",
 ...        width=200)
-PostgreSQL 9.6 - server - pgadm@server.prod.tld:5433/app - Ref.: 10s
- Size: 9.06P - 9.76K/s ⋅ TPS: 12 ⋅ Active connections: 0 ⋅ Duration mode: backend
->>> header(term, ui, host=host, dbinfo=dbinfo, pg_version="PostgreSQL 9.6", tps=12, active_connections=0)
-PostgreSQL 9.6 - server - pgadm@server.prod.tld:5433/app - Ref.: 10s
- Size: 9.06P - 9.76K/s ⋅ TPS: 12 ⋅ Active connections: 0 ⋅ Duration mode:
+PostgreSQL 9.6 - server - pgadm@server.prod.tld:5433/app - Ref.: 10s - Duration mode: backend
+ * Global: 132 days, 3 hours and 21 minutes uptime ⋅ 19.53M dbs size - 1.00K/s growth ⋅ 90.12% cache hit ratio
+   Sessions: 6/100 total ⋅ 1 active ⋅ 1 idle ⋅ 10 idle in txn ⋅ 0 idle in txn abrt ⋅ 3 waiting
+   Activity: 15 tps ⋅ 10 insert/s ⋅ 20 update/s ⋅ 30 delete/s ⋅ 40 tuples returned/s ⋅ 5 temp files ⋅ 11.50M temp size
+ * Worker processes: 3/8 total ⋅ 1/8 logical workers ⋅ 2/8 parallel workers
+   Other processes & info: 3/3 autovacuum workers ⋅ 1/10 wal senders ⋅ 0 wal receivers ⋅ 10/10 repl. slots
 
 Local host, with priviledged access:
 
 >>> host = Host("localhost", "tester", "host", 5432, "postgres")
->>> dbinfo = DBInfo(123456789, 12)
->>> vmem = MemoryInfo(total=6175825920, percent=42.5, used=2007146496)
->>> swap = MemoryInfo(total=6312423424, used=2340, percent=0.0)
->>> io_read = IOCounter(bytes=128, count=6)
->>> io_write = IOCounter(bytes=8, count=9)
->>> load = LoadAverage(25.0, 0.19, 0.39)
->>> sysinfo = SystemInfo(vmem, swap, load, io_read, io_write, 12)
+>>> sysinfo = SystemInfo(
+...     MemoryInfo(used=2, buff_cached=4, free=2, total=8),
+...     SwapInfo(used=1, free=1, total=2),
+...     LoadAverage(avg1=1, avg5=5, avg15=15),
+...     io_read=IOCounter(100,200),
+...     io_write=IOCounter(200,300),
+...     max_iops=300)
+>>> header(term, ui, host=host, server_information=serverinfo,
+...        system_info=sysinfo, pg_version="PostgreSQL 9.6",
+...        width=200)
+PostgreSQL 9.6 - localhost - tester@host:5432/postgres - Ref.: 10s - Duration mode: backend
+ * Global: 132 days, 3 hours and 21 minutes uptime ⋅ 19.53M dbs size - 1.00K/s growth ⋅ 90.12% cache hit ratio
+   Sessions: 6/100 total ⋅ 1 active ⋅ 1 idle ⋅ 10 idle in txn ⋅ 0 idle in txn abrt ⋅ 3 waiting
+   Activity: 15 tps ⋅ 10 insert/s ⋅ 20 update/s ⋅ 30 delete/s ⋅ 40 tuples returned/s ⋅ 5 temp files ⋅ 11.50M temp size
+ * Worker processes: 3/8 total ⋅ 1/8 logical workers ⋅ 2/8 parallel workers
+   Other processes & info: 3/3 autovacuum workers ⋅ 1/10 wal senders ⋅ 0 wal receivers ⋅ 10/10 repl. slots
+ * Mem.: 8B total ⋅ 2B (25.00%) free ⋅ 2B (25.00%) used ⋅ 4B (50.00%) buff+cached
+   Swap: 2B total ⋅ 1B (50.00%) free ⋅ 1B (50.00%) used
+   IO: 300/s max iops ⋅ 200B/s - 100/s read ⋅ 300B/s - 200/s write
+   Load average: 1 5 15
 
->>> ui = UI.make(refresh_time=2, min_duration=1.2)
->>> header(term, ui, host=host, dbinfo=dbinfo, pg_version="PostgreSQL 13.1", tps=1, active_connections=79,
-...        system_info=sysinfo, width=150)
-PostgreSQL 13.1 - localhost - tester@host:5432/postgres - Ref.: 2s - Min. duration: 1.2s
- Size: 117.74M - 12B/s ⋅ TPS: 1 ⋅ Active connections: 79 ⋅ Duration mode: query
- Mem.: 42.5% - 1.87G/5.75G    IO Max: 12/s
- Swap: 0.0% - 2.29K/5.88G     Read:   128B/s - 6/s
- Load: 25.00 0.19 0.39        Write:  8B/s - 9/s
+>>> ui.toggle_system_info_in_header()
+>>> header(term, ui, host=host, server_information=serverinfo,
+...        system_info=sysinfo, pg_version="PostgreSQL 9.6",
+...        width=200)
+PostgreSQL 9.6 - localhost - tester@host:5432/postgres - Ref.: 10s - Duration mode: backend
+ * Global: 132 days, 3 hours and 21 minutes uptime ⋅ 19.53M dbs size - 1.00K/s growth ⋅ 90.12% cache hit ratio
+   Sessions: 6/100 total ⋅ 1 active ⋅ 1 idle ⋅ 10 idle in txn ⋅ 0 idle in txn abrt ⋅ 3 waiting
+   Activity: 15 tps ⋅ 10 insert/s ⋅ 20 update/s ⋅ 30 delete/s ⋅ 40 tuples returned/s ⋅ 5 temp files ⋅ 11.50M temp size
+ * Worker processes: 3/8 total ⋅ 1/8 logical workers ⋅ 2/8 parallel workers
+   Other processes & info: 3/3 autovacuum workers ⋅ 1/10 wal senders ⋅ 0 wal receivers ⋅ 10/10 repl. slots
 
+>>> ui = UI.make(refresh_time=10, duration_mode=DurationMode.query)
+>>> ui.toggle_system_info_in_header()
+>>> ui.toggle_worker_info_in_header()
+>>> header(term, ui, host=host, server_information=serverinfo,
+...        system_info=sysinfo, pg_version="PostgreSQL 9.6",
+...        width=200)
+PostgreSQL 9.6 - localhost - tester@host:5432/postgres - Ref.: 10s - Duration mode: query
+ * Global: 132 days, 3 hours and 21 minutes uptime ⋅ 19.53M dbs size - 1.00K/s growth ⋅ 90.12% cache hit ratio
+   Sessions: 6/100 total ⋅ 1 active ⋅ 1 idle ⋅ 10 idle in txn ⋅ 0 idle in txn abrt ⋅ 3 waiting
+   Activity: 15 tps ⋅ 10 insert/s ⋅ 20 update/s ⋅ 30 delete/s ⋅ 40 tuples returned/s ⋅ 5 temp files ⋅ 11.50M temp size
+
+>>> ui = UI.make(refresh_time=2, min_duration=1.2, duration_mode=DurationMode.transaction)
+>>> ui.toggle_system_info_in_header()
+>>> ui.toggle_worker_info_in_header()
+>>> ui.toggle_instance_info_in_header()
+>>> header(term, ui, host=host, server_information=serverinfo,
+...        system_info=sysinfo, pg_version="PostgreSQL 9.6",
+...        width=200)
+PostgreSQL 9.6 - localhost - tester@host:5432/postgres - Ref.: 2s - Duration mode: transaction - Min. duration: 1.2s
 
 Tests for processes_rows()
 --------------------------
@@ -314,14 +399,45 @@ Tests for screen()
 
 >>> processes3 = [processes1[0], processes1[2]]
 
->>> host = Host("testhost", "pgadm", "server.prod.tld", 5433, "app")
->>> dbinfo = DBInfo(10203040506070809, 9999)
->>> vmem = MemoryInfo(total=4_220_876_001, percent=2.5, used=1_001_232_608)
->>> swap = MemoryInfo(total=6_312_423_424, used=2_340, percent=1.0)
->>> io_read = IOCounter(bytes=128, count=6)
->>> io_write = IOCounter(bytes=8, count=9)
->>> load = LoadAverage(0.5, 1.9, 0.93)
->>> sysinfo = SystemInfo(vmem, swap, load, io_read, io_write, 76)
+>>> host = Host("localhost", "tester", "host", 5432, "postgres")
+>>> serverinfo = ServerInformation(
+...     active_connections=1,
+...     idle=1,
+...     idle_in_transaction=10,
+...     idle_in_transaction_aborted=0,
+...     total=6,
+...     max_connections=100,
+...     autovacuum_workers=3,
+...     autovacuum_max_workers=3,
+...     logical_replication_workers=1,
+...     parallel_workers=2,
+...     wal_senders=1,
+...     wal_receivers=0,
+...     max_logical_replication_workers=8,
+...     max_parallel_workers=8,
+...     max_worker_processes=8,
+...     max_wal_senders=10,
+...     max_replication_slots=10,
+...     replication_slots=10,
+...     xact_count=1000,
+...     total_size=20480000,
+...     size_evolution=1024,
+...     cache_hit_ratio=90.1222,
+...     epoch=10000,
+...     uptime=timedelta(days=125, seconds=25, minutes=21, hours=3, weeks=1),
+...     tps=15,
+...     insert=100,
+...     update=200,
+...     delete=300,
+...     tuples_returned=400,
+...     insert_per_second=10,
+...     update_per_second=20,
+...     delete_per_second=30,
+...     tuples_returned_per_second=40,
+...     temp_files=5,
+...     temp_bytes=12054865,
+...     max_dbname_length=27,
+...     waiting=3,)
 >>> ui = UI.make(
 ...     duration_mode=DurationMode.backend,
 ...     refresh_time=10,
@@ -332,32 +448,38 @@ Tests for screen()
 ...     wrap_query=False,
 ...     in_pause=False,
 ... )
+>>> sysinfo = SystemInfo(
+...     MemoryInfo(used=2, buff_cached=4, free=2, total=8),
+...     SwapInfo(used=1, free=1, total=2),
+...     LoadAverage(avg1=1, avg5=5, avg15=15),
+...     io_read=IOCounter(100,200),
+...     io_write=IOCounter(200,300),
+...     max_iops=300)
+
 >>> screen(
 ...     term,
 ...     ui,
 ...     host=host,
-...     dbinfo=dbinfo,
+...     server_information=serverinfo,
 ...     pg_version="PostgreSQL 13",
-...     tps=5,
-...     active_connections=7,
 ...     activity_stats=(SelectableProcesses(processes3), sysinfo),
 ...     message=None,
 ...     width=150,
 ... )
-PostgreSQL 13 - testhost - pgadm@server.prod.tld:5433/app - Ref.: 10s - Min. duration: 1s
- Size: 9.06P - 9.76K/s ⋅ TPS: 5 ⋅ Active connections: 7 ⋅ Duration mode: backend
- Mem.: 2.5% - 954.85M/3.93G    IO Max: 76/s
- Swap: 1.0% - 2.29K/5.88G      Read:   128B/s - 6/s
- Load: 0.50 1.90 0.93          Write:  8B/s - 9/s
+PostgreSQL 13 - localhost - tester@host:5432/postgres - Ref.: 10s - Duration mode: backend - Min. duration: 1s
+ * Global: 132 days, 3 hours and 21 minutes uptime ⋅ 19.53M dbs size - 1.00K/s growth ⋅ 90.12% cache hit ratio
+   Sessions: 6/100 total ⋅ 1 active ⋅ 1 idle ⋅ 10 idle in txn ⋅ 0 idle in txn abrt ⋅ 3 waiting
+   Activity: 15 tps ⋅ 10 insert/s ⋅ 20 update/s ⋅ 30 delete/s ⋅ 40 tuples returned/s ⋅ 5 temp files ⋅ 11.50M temp size
+ * Worker processes: 3/8 total ⋅ 1/8 logical workers ⋅ 2/8 parallel workers
+   Other processes & info: 3/3 autovacuum workers ⋅ 1/10 wal senders ⋅ 0 wal receivers ⋅ 10/10 repl. slots
+ * Mem.: 8B total ⋅ 2B (25.00%) free ⋅ 2B (25.00%) used ⋅ 4B (50.00%) buff+cached
+   Swap: 2B total ⋅ 1B (50.00%) free ⋅ 1B (50.00%) used
+   IO: 300/s max iops ⋅ 200B/s - 100/s read ⋅ 300B/s - 200/s write
+   Load average: 1 5 15
                                 RUNNING QUERIES
 PID    DATABASE         CPU%   MEM%             state Query
 1234   business         2.4    1.0             active SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id) WHERE s.date > C
 6239   pgbench          0.1    1.0      idle in trans UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
-<BLANKLINE>
-<BLANKLINE>
-<BLANKLINE>
-<BLANKLINE>
-<BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -375,26 +497,24 @@ F1/1 Running queries    F2/2 Waiting queries    F3/3 Blocking queries   Space Pa
 ...     term,
 ...     ui,
 ...     host=host,
-...     dbinfo=dbinfo,
+...     server_information=serverinfo,
 ...     pg_version="PostgreSQL 13",
-...     tps=5,
-...     active_connections=7,
 ...     activity_stats=(SelectableProcesses(processes3[:-1]), sysinfo),
 ...     message=f"Process {processes3[-1].pid} killed",
 ... )
-PostgreSQL 13 - testhost - pgadm@server.prod.tld:5433/app - Ref.: 10s - Min.
- Size: 9.06P - 9.76K/s ⋅ TPS: 5 ⋅ Active connections: 7 ⋅ Duration mode: backend
- Mem.: 2.5% - 954.85M/3.93G    IO Max: 76/s
- Swap: 1.0% - 2.29K/5.88G      Read:   128B/s - 6/s
- Load: 0.50 1.90 0.93          Write:  8B/s - 9/s
+PostgreSQL 13 - localhost - tester@host:5432/postgres - Ref.: 10s - Duration
+ * Global: 132 days, 3 hours and 21 minutes uptime ⋅ 19.53M dbs size - 1.00K/s
+   Sessions: 6/100 total ⋅ 1 active ⋅ 1 idle ⋅ 10 idle in txn ⋅ 0 idle in txn
+   Activity: 15 tps ⋅ 10 insert/s ⋅ 20 update/s ⋅ 30 delete/s ⋅ 40 tuples
+ * Worker processes: 3/8 total ⋅ 1/8 logical workers ⋅ 2/8 parallel workers
+   Other processes & info: 3/3 autovacuum workers ⋅ 1/10 wal senders ⋅ 0 wal
+ * Mem.: 8B total ⋅ 2B (25.00%) free ⋅ 2B (25.00%) used ⋅ 4B (50.00%)
+   Swap: 2B total ⋅ 1B (50.00%) free ⋅ 1B (50.00%) used
+   IO: 300/s max iops ⋅ 200B/s - 100/s read ⋅ 300B/s - 200/s write
+   Load average: 1 5 15
                                 RUNNING QUERIES
 PID    DATABASE         CPU%   MEM%             state Query
 1234   business         2.4    1.0             active SELECT product_id, p.name
-<BLANKLINE>
-<BLANKLINE>
-<BLANKLINE>
-<BLANKLINE>
-<BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>

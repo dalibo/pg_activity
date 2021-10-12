@@ -41,16 +41,8 @@ def test_pg_is_local_access(postgresql, data):
     assert data.pg_is_local_access()
 
 
-def test_pg_get_db_info(data):
-    dbinfo = data.pg_get_db_info(None)
-    assert set(dbinfo) == {
-        "timestamp",
-        "no_xact",
-        "total_size",
-        "max_length",
-        "tps",
-        "size_ev",
-    }
+def test_pg_get_server_information(data):
+    data.pg_get_server_information(None)
 
 
 def test_activities(postgresql, data):
@@ -118,16 +110,6 @@ def test_terminate_backend(postgresql, data):
     assert not data.pg_get_activities()
 
 
-def test_pg_get_active_connections(data, execute):
-    assert data.pg_get_active_connections() == 1
-    execute("select pg_sleep(2)")
-    nbconn = wait_for_data(
-        data.pg_get_active_connections,
-        msg="could not get active connections",
-    )
-    assert nbconn == 2
-
-
 def test_encoding(postgresql, data, execute):
     """Test for issue #149"""
     conninfo = postgresql.info.dsn_parameters
@@ -165,12 +147,12 @@ def test_filters_dbname(data, execute):
     data_filtered = attr.evolve(data, filters=types.Filters(dbname="temp"))
     execute("SELECT pg_sleep(2)", dbname="template1", autocommit=True)
     nbconn = wait_for_data(
-        data.pg_get_active_connections,
+        data.pg_get_server_information,
         msg="could not get active connections for filtered DBNAME",
     )
     nbconn_filtered = wait_for_data(
-        data_filtered.pg_get_active_connections,
+        data_filtered.pg_get_server_information,
         msg="could not get active connections for filtered DBNAME",
     )
-    assert nbconn == 2
-    assert nbconn_filtered == 1
+    assert nbconn.active_connections == 2
+    assert nbconn_filtered.active_connections == 1

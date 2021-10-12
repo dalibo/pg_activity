@@ -17,7 +17,14 @@ from psycopg2.errors import (
 from psycopg2.extensions import connection
 
 from . import queries
-from .types import BlockingProcess, Filters, WaitingProcess, RunningProcess, NO_FILTER
+from .types import (
+    BlockingProcess,
+    Filters,
+    WaitingProcess,
+    RunningProcess,
+    ServerInformation,
+    NO_FILTER,
+)
 from .utils import clean_str
 
 
@@ -133,7 +140,7 @@ class Data:
     def pg_is_local_access(self) -> bool:
         """
         Verify if the user running pg_activity can acces
-        system informations for the postmaster process.
+        system information for the postmaster process.
         """
         try:
             query = queries.get("get_pid_file")
@@ -180,64 +187,74 @@ class Data:
 
     DbInfoDict = Dict[str, Union[str, int, float]]
 
-    def pg_get_db_info(
+    def pg_get_server_information(
         self,
-        prev_db_infos: Optional[DbInfoDict],
+        prev_server_info: Optional[ServerInformation] = None,
         using_rds: bool = False,
         skip_sizes: bool = False,
-    ) -> DbInfoDict:
+    ) -> ServerInformation:
         """
-        Get current sum of transactions, total size and  timestamp.
+        Get the server information (session, workers, cache hit ratio etc..)
         """
-        prev_total_size = "0"
-        if prev_db_infos is not None:
-            prev_total_size = prev_db_infos["total_size"]  # type: ignore[assignment]
 
-        query = queries.get("get_db_info")
+        prev_total_size = 0
+        if prev_server_info is not None:
+            prev_total_size = prev_server_info.total_size
+
+        if self.pg_num_version >= 140000:
+            query = queries.get("get_server_info_post_140000")
+        elif self.pg_num_version >= 110000:
+            query = queries.get("get_server_info_post_110000")
+        elif self.pg_num_version >= 100000:
+            query = queries.get("get_server_info_post_100000")
+        elif self.pg_num_version >= 90600:
+            query = queries.get("get_server_info_post_90600")
+        elif self.pg_num_version >= 90400:
+            query = queries.get("get_server_info_post_90400")
+        elif self.pg_num_version >= 90200:
+            query = queries.get("get_server_info_post_90200")
+        elif self.pg_num_version >= 90000:
+            query = queries.get("get_server_info_post_90000")
+        else:
+            query = queries.get("get_server_info")
+
         with self.pg_conn.cursor() as cur:
             cur.execute(
                 query,
                 {
+                    "dbname_filter": self.filters.dbname,
                     "skip_db_size": skip_sizes,
                     "prev_total_size": prev_total_size,
                     "using_rds": using_rds,
-                    "dbname_filter": self.filters.dbname,
                 },
             )
             ret = cur.fetchone()
-        tps = 0
+
+        tps, ips, ups, dps, rps = 0, 0, 0, 0, 0
         size_ev = 0.0
-        if prev_db_infos is not None:
-            dt = float(ret["timestamp"] - prev_db_infos["timestamp"])
+        if prev_server_info is not None:
+            dt = float(ret["epoch"] - prev_server_info.epoch)
             try:
-                tps = int((ret["no_xact"] - prev_db_infos["no_xact"]) / dt)
-                size_ev = float(ret["total_size"] - prev_db_infos["total_size"]) / dt
+                tps = int((ret["xact_count"] - prev_server_info.xact_count) / dt)
+                size_ev = float(ret["total_size"] - prev_server_info.total_size) / dt
+                ips = int((ret["insert"] - prev_server_info.insert) / dt)
+                ups = int((ret["update"] - prev_server_info.update) / dt)
+                dps = int((ret["delete"] - prev_server_info.delete) / dt)
+                rps = int(
+                    (ret["tuples_returned"] - prev_server_info.tuples_returned) / dt
+                )
             except ZeroDivisionError:
                 pass
-        return {
-            "timestamp": ret["timestamp"],
-            "no_xact": ret["no_xact"],
-            "total_size": ret["total_size"],
-            "max_length": ret["max_length"],
-            "tps": tps,
-            "size_ev": size_ev,
-        }
 
-    def pg_get_active_connections(self) -> int:
-        """
-        Get total of active connections.
-        """
-
-        if self.pg_num_version < 90200:
-            query = queries.get("get_active_connections")
-        else:
-            query = queries.get("get_active_connections_post_90200")
-
-        with self.pg_conn.cursor() as cur:
-            cur.execute(query, {"dbname_filter": self.filters.dbname})
-            ret = cur.fetchone()
-        active_connections = int(ret["active_connections"])
-        return active_connections
+        return ServerInformation(
+            size_evolution=size_ev,
+            tps=tps,
+            insert_per_second=ips,
+            update_per_second=ups,
+            delete_per_second=dps,
+            tuples_returned_per_second=rps,
+            **ret,
+        )
 
     def pg_get_activities(self, duration_mode: int = 1) -> List[RunningProcess]:
         """

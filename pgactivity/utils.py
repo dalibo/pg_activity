@@ -8,6 +8,12 @@ import humanize
 
 
 naturalsize = functools.partial(humanize.naturalsize, gnu=True, format="%.2f")
+naturaltimedelta = functools.partial(
+    humanize.precisedelta,
+    minimum_unit="minutes",
+    format="%.0f",
+    suppress=["months", "years"],
+)
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)

@@ -17,31 +17,112 @@ CPU, MEM, READ or WRITE columns and other system information.
 =head2 THE HEADER
 
 The first line of the header displays PostgreSQL's version, the host name, the
-connection string and the refresh rate.
+connection string, the refresh rate and the duration mode.
 
-The rest of the header displays the following information: 
+The header is then divided in tree groups: B<instance>, B<worker processes>,
+B<system>.  The information is filtered according to the filter parameters when
+appropriate. This is shown in the following descriptions with the "(filtered)"
+mention. Depending on the version you are on, some information might not be
+available. In that case, it will be replaced by a dash.
+
+The B<instance> group displays information aubout the PostgreSQL instance (or
+cluster). This group can be displayed or hidden with the I Key.
+
+Global :
 
 =over 2
 
-=item - B<Size>: size of the database you are connected to - Growth in B/s;
+=item - B<uptime>: since when is the instance running;
 
-=item - B<Mem.>: percentage of memory used - memory used / memory available;
+=item - B<dbs size>: total size of the databases (filtered);
 
-=item - B<Swap>: percentage of  swap used - swap used / swap available;
+=item - B<growth>: groth in B/s of the databases (filtered);
 
-=item - B<Load>: CPU load;
+=item - B<cache hit ratio>: the percentage of page read from the PostgreSQL's cache (filtered).
 
-=item - B<TPS>: transaction per second (sum of commit & rollback for all databases / time elapsed since last snap);
+=back
 
-=item - B<IO Max>: the number of IO per second (aggregated data gathered with the psutil library);
+Sessions :
 
-=item - B<Read>: current Read throughput (aggregated data gathered with the psutil library);
+=over 2
 
-=item - B<Write>: current Write throughput (aggregated data gathered with the psutil library);
+=item - B<total>: session count (filtered) / max_connections;
 
-=item - B<Active connections>: number of active connections;
+=item - B<active>: number of active sessions (filtered);
 
-=item - B<Duration mode>: query, transaction or backend.
+=item - B<idle>: number of idle sessions (filtered);
+
+=item - B<idle in txn>: number of sessions who are in the idle in transaction state (filtered);
+
+=item - B<idle in txn abrt>: number of sessions who are in the idle in transaction aborted state (filtered);
+
+=item - B<waiting>: number of sessions that are waiting for a lock (filtered).
+
+=back
+
+Activity :
+
+=over 2
+
+=item - B<tps>: transaction per second (sum of commit & rollback for all databases / time elapsed since last snapshot) (filtered);
+
+=item - B<insert/s>: number of inserts per second (filtered);
+
+=item - B<updates/s>: number of updates per second (filtered);
+
+=item - B<delete/s>: number of deletes per second (filtered);
+
+=item - B<tuples returned/s>: number of tuples returned per second (filtered);
+
+=item - B<temp files>: number of temporary files created on the instance;
+
+=item - B<temp size>: total temporary file size on the instance.
+
+=back
+
+The B<worker processes> group displays information about backgroup workers,
+autovacuum processes, wal senders and wal receivers. It also gives information
+about replication slots. Except for the autovacuum workers count, most of this
+information is not related to a specific database, therefore their values will
+be zero when the data is filtered.
+
+Worker processes:
+
+=over 2
+
+=item - B<total>: total worker count / maximum number of worker slots, parallel workers and logical replication wokers are taken from this amount (filtered);
+
+=item - B<logical wokers>: logical replication worker count / maximum number of logical replication wokers (filtered);
+
+=item - B<parallel workers>: parallel worker count for maintenance & queries / maximum number of parallel workers (filtered).
+
+=back
+
+Other processes & information:
+
+=over 2
+
+=item - B<autovacuum workers>: number of autovacuum worker in action / maximum number of autovacuum workers (filtered);
+
+=item - B<wal senders>: number of wal senders / maximum number of wal senders processes (filtered);
+
+=item - B<wal receivers>: number of wal receivers / maximum number of wal receiver processes (filtered);
+
+=item - B<repl. slots>: number of replication slots / maximum number of replication slots (filtered).
+
+=back
+
+The last group displays B<system information>:
+
+=over 2
+
+=item - B<Mem.>: total / free / used and buff+cached memory with the related percentages;
+
+=item - B<Swap>: total / free / used swap;
+
+=item - B<IO>: the number of IO per second, current Read and Write thoughput (aggregated data gathered with the psutil library);
+
+=item - B<Load>: CPU load for the last 1, 5, 15 minutes;
 
 =back
 
@@ -267,6 +348,18 @@ See: https://www.postgresql.org/docs/current/libpq-envars.html
 =item B<--no-app-name>
 
 	Disable App.
+
+=item B<--no-inst-info>
+
+	Display instance information in header.
+
+=item B<--no-sys-info>
+
+	Display system information in header.
+
+=item B<--no-proc-info>
+
+	Display workers process information in header
 
 =back
 

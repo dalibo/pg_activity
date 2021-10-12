@@ -17,6 +17,7 @@ from .types import (
     RunningProcess,
     SortKey,
     SystemProcess,
+    SwapInfo,
 )
 
 
@@ -218,7 +219,7 @@ def get_load_average() -> Tuple[float, float, float]:
     return os.getloadavg()
 
 
-def get_mem_swap() -> Tuple[float, int, int, float, int, int]:
+def get_mem_swap() -> Tuple[MemoryInfo, SwapInfo]:
     """Get memory and swap usage"""
     with catch_warnings():
         simplefilter("ignore", RuntimeWarning)
@@ -228,13 +229,14 @@ def get_mem_swap() -> Tuple[float, int, int, float, int, int]:
     buffers = getattr(phymem, "buffers", 0)
     cached = getattr(phymem, "cached", 0)
     mem_used = phymem.total - (phymem.free + buffers + cached)
-    return (phymem.percent, mem_used, phymem.total, vmem.percent, vmem.used, vmem.total)
+    return (
+        MemoryInfo(mem_used, buffers + cached, phymem.free, phymem.total),
+        SwapInfo(vmem.used, vmem.free, vmem.total),
+    )
 
 
-def mem_swap_load() -> Tuple[MemoryInfo, MemoryInfo, LoadAverage]:
+def mem_swap_load() -> Tuple[MemoryInfo, SwapInfo, LoadAverage]:
     """Read memory, swap and load average from Data object."""
-    mem_swap = get_mem_swap()
-    memory = MemoryInfo(*mem_swap[:3])
-    swap = MemoryInfo(*mem_swap[3:])
+    memory, swap = get_mem_swap()
     load = LoadAverage(*get_load_average())
     return memory, swap, load
