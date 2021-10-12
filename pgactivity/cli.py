@@ -233,7 +233,30 @@ def get_parser() -> OptionParser:
         help="Disable log_min_duration_statements and log_min_duration_sample for pg_activity",
         default=False,
     )
-
+    # --no-inst-info
+    group.add_option(
+        "--no-inst-info",
+        dest="show_instance_info_in_header",
+        action="store_false",
+        help="Display instance information in header",
+        default=True,
+    )
+    # --no-sys-info
+    group.add_option(
+        "--no-sys-info",
+        dest="show_system_info_in_header",
+        action="store_false",
+        help="Display system information in header",
+        default=True,
+    )
+    # --no-proc-info
+    group.add_option(
+        "--no-proc-info",
+        dest="show_worker_info_in_header",
+        action="store_false",
+        help="Display workers process information in header",
+        default=True,
+    )
     parser.add_option_group(group)
 
     return parser

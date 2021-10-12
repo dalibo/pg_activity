@@ -8,9 +8,9 @@ from typing import (
     Iterable,
     Iterator,
     List,
-    NoReturn,
     Optional,
     Tuple,
+    Sequence,
 )
 
 from blessed import Terminal
@@ -31,11 +31,11 @@ from .keys import (
 from .types import (
     ActivityStats,
     Column,
-    DBInfo,
     Host,
     IOCounter,
-    MemoryInfo,
+    Pct,
     SelectableProcesses,
+    ServerInformation,
     SystemInfo,
     UI,
 )
@@ -129,23 +129,6 @@ def limit(func: Callable[..., Iterable[str]]) -> Callable[..., None]:
     return wrapper
 
 
-@functools.singledispatch
-def render(x: Any) -> NoReturn:
-    raise AssertionError(f"not implemented for type '{type(x).__name__}'")
-
-
-@render.register(MemoryInfo)
-def render_meminfo(m: MemoryInfo) -> str:
-    used, total = utils.naturalsize(m.used), utils.naturalsize(m.total)
-    return f"{m.percent}% - {used}/{total}"
-
-
-@render.register(IOCounter)
-def render_iocounter(i: IOCounter) -> str:
-    hbytes = utils.naturalsize(i.bytes)
-    return f"{hbytes}/s - {i.count}/s"
-
-
 @limit
 def help(term: Terminal, version: str, is_local: bool) -> Iterable[str]:
     """Render help menu."""
@@ -183,30 +166,41 @@ def header(
     ui: UI,
     *,
     host: Host,
-    dbinfo: DBInfo,
     pg_version: str,
-    tps: int,
-    active_connections: int,
+    server_information: ServerInformation,
     system_info: Optional[SystemInfo] = None,
 ) -> Iterator[str]:
-    """Return window header lines."""
-    pg_host = f"{host.user}@{host.host}:{host.port}/{host.dbname}"
-    yield (
-        " - ".join(
-            [
-                pg_version,
-                f"{term.bold}{host.hostname}{term.normal}",
-                f"{term.cyan}{pg_host}{term.normal}",
-                f"Ref.: {ui.refresh_time}s",
-            ]
-            + ([f"Min. duration: {ui.min_duration}s"] if ui.min_duration else [])
-        )
-    )
+    @functools.singledispatch
+    def render(x: Any) -> str:
+        if x is None:
+            return "-"
+        raise AssertionError(f"not implemented for type '{type(x).__name__}'")
 
-    total_size = utils.naturalsize(dbinfo.total_size)
-    size_ev = utils.naturalsize(dbinfo.size_ev)
+    @render.register(str)
+    def render_str(s: str) -> str:
+        return term.bold_green(s)
 
-    def render_columns(columns: List[List[str]], *, delimiter: str) -> Iterator[str]:
+    @render.register(int)
+    def render_int(n: int) -> str:
+        return term.bold_green(str(n))
+
+    @render.register(Pct)
+    def render_pct(n: Pct) -> str:
+        return term.bold_green(f"{n:.2f}%")
+
+    @render.register(float)
+    def render_float(n: float) -> str:
+        return term.bold_green(f"{n:.2f}")
+
+    @render.register(IOCounter)
+    def render_iocounter(i: IOCounter) -> str:
+        hbytes = utils.naturalsize(i.bytes) + "/s"
+        counts = str(i.count) + "/s"
+        return f"{term.bold_green(hbytes)} - {term.bold_green(counts)}"
+
+    def render_columns(
+        columns: Sequence[List[str]], *, delimiter: str
+    ) -> Iterator[str]:
         column_widths = [
             max(len(column_row) for column_row in column) for column in columns
         ]
@@ -222,31 +216,126 @@ def header(
                 )
             ).rstrip().rstrip(delimiter.strip())
 
-    # First row is always displayed, as underlying data is always available.
-    columns = [
-        [f"Size: {total_size} - {size_ev}/s"],
-        [f"TPS: {term.bold_green(str(tps))}"],
-        [f"Active connections: {term.bold_green(str(active_connections))}"],
-        [f"Duration mode: {term.bold_green(ui.duration_mode.name)}"],
-    ]
-    yield from render_columns(columns, delimiter=f" {term.bold_blue('⋅')} ")
+    si = server_information
+
+    """Return window header lines."""
+    pg_host = f"{host.user}@{host.host}:{host.port}/{host.dbname}"
+    yield (
+        " - ".join(
+            [
+                pg_version,
+                f"{term.bold}{host.hostname}{term.normal}",
+                f"{term.cyan}{pg_host}{term.normal}",
+                f"Ref.: {ui.refresh_time}s",
+                f"Duration mode: {ui.duration_mode.name}",
+            ]
+            + ([f"Min. duration: {ui.min_duration}s"] if ui.min_duration else [])
+        )
+    )
+
+    total_size = utils.naturalsize(si.total_size)
+    size_ev = f"{utils.naturalsize(si.size_evolution)}/s"
+    uptime = utils.naturaltimedelta(si.uptime)
+
+    if ui.show_instance_info_in_header:
+        # First rows are always displayed, as the underlying data is always available.
+        columns = [
+            [f"* Global: {render(uptime)} uptime"],
+            [f"{render(total_size)} dbs size - {render(size_ev)} growth"],
+            [f"{render(si.cache_hit_ratio)} cache hit ratio"],
+        ]
+        yield from render_columns(columns, delimiter=f" {term.bold_blue('⋅')} ")
+
+        columns = [
+            [f"  Sessions: {render(si.total)}/{render(si.max_connections)} total"],
+            [f"{render(si.active_connections)} active"],
+            [f"{render(si.idle)} idle"],
+            [f"{render(si.idle_in_transaction)} idle in txn"],
+            [f"{render(si.idle_in_transaction_aborted)} idle in txn abrt"],
+            [f"{render(si.waiting)} waiting"],
+        ]
+        yield from render_columns(columns, delimiter=f" {term.bold_blue('⋅')} ")
+
+        temp_size = utils.naturalsize(si.temp_bytes)
+        columns = [
+            [f"  Activity: {render(si.tps)} tps"],
+            [f"{render(si.insert_per_second)} insert/s"],
+            [f"{render(si.update_per_second)} update/s"],
+            [f"{render(si.delete_per_second)} delete/s"],
+            [f"{render(si.tuples_returned_per_second)} tuples returned/s"],
+            [f"{render(si.temp_files)} temp files"],
+            [f"{render(temp_size)} temp size"],
+        ]
+        yield from render_columns(columns, delimiter=f" {term.bold_blue('⋅')} ")
+    if ui.show_worker_info_in_header:
+        columns = [
+            [
+                f"* Worker processes: {render(si.worker_processes)}/{render(si.max_worker_processes)} total"
+            ],
+            [
+                f"{render(si.logical_replication_workers)}/{render(si.max_logical_replication_workers)} logical workers"
+            ],
+            [
+                f"{render(si.parallel_workers)}/{render(si.max_parallel_workers)} parallel workers"
+            ],
+        ]
+        yield from render_columns(columns, delimiter=f" {term.bold_blue('⋅')} ")
+
+        columns = [
+            [
+                f"  Other processes & info: {render(si.autovacuum_workers)}/{render(si.autovacuum_max_workers)} autovacuum workers"
+            ],
+            [f"{render(si.wal_senders)}/{render(si.max_wal_senders)} wal senders"],
+            [f"{render(si.wal_receivers)} wal receivers"],
+            [
+                f"{render(si.replication_slots)}/{render(si.max_replication_slots)} repl. slots"
+            ],
+        ]
+        yield from render_columns(columns, delimiter=f" {term.bold_blue('⋅')} ")
 
     # System information, only available in "local" mode.
-    if system_info is not None:
+    if system_info is not None and ui.show_system_info_in_header:
+        used, bc, free, total = (
+            utils.naturalsize(system_info.memory.used),
+            utils.naturalsize(system_info.memory.buff_cached),
+            utils.naturalsize(system_info.memory.free),
+            utils.naturalsize(system_info.memory.total),
+        )
+        system_columns = [
+            [f"* Mem.: {render(total)} total"],
+            [f"{render(free)} ({render(system_info.memory.pct_free)}) free"],
+            [f"{render(used)} ({render(system_info.memory.pct_used)}) used"],
+            [f"{render(bc)} ({render(system_info.memory.pct_bc)}) buff+cached"],
+        ]
+        yield from render_columns(system_columns, delimiter=f" {term.bold_blue('⋅')} ")
+
+        used, free, total = (
+            utils.naturalsize(system_info.swap.used),
+            utils.naturalsize(system_info.swap.free),
+            utils.naturalsize(system_info.swap.total),
+        )
+        system_columns = [
+            [f"  Swap: {render(total)} total"],
+            [f"{render(free)} ({render(system_info.swap.pct_free)}) free"],
+            [f"{render(used)} ({render(system_info.swap.pct_used)}) used"],
+        ]
+        yield from render_columns(system_columns, delimiter=f" {term.bold_blue('⋅')} ")
+
+        iops = f"{system_info.max_iops}/s"
+        system_columns = [
+            [f"  IO: {render(iops)} max iops"],
+            [f"{render(system_info.io_read)} read"],
+            [f"{render(system_info.io_write)} write"],
+        ]
+        yield from render_columns(system_columns, delimiter=f" {term.bold_blue('⋅')} ")
+
         load = system_info.load
         system_columns = [
             [
-                f"Mem.: {render(system_info.memory)}",
-                f"Swap: {render(system_info.swap)}",
-                f"Load: {load.avg1:.2f} {load.avg5:.2f} {load.avg15:.2f}",
-            ],
-            [
-                f"IO Max: {system_info.max_iops}/s",
-                f"Read:   {render(system_info.io_read)}",
-                f"Write:  {render(system_info.io_write)}",
+                f"  Load average: {render(load.avg1)} {render(load.avg5)} {render(load.avg15)}"
             ],
         ]
-        yield from render_columns(system_columns, delimiter="    ")
+        yield from render_columns(system_columns, delimiter=f" {term.bold_blue('⋅')} ")
 
 
 @limit
@@ -432,10 +521,8 @@ def screen(
     ui: UI,
     *,
     host: Host,
-    dbinfo: DBInfo,
     pg_version: str,
-    tps: int,
-    active_connections: int,
+    server_information: ServerInformation,
     activity_stats: ActivityStats,
     message: Optional[str],
     render_header: bool = True,
@@ -460,10 +547,8 @@ def screen(
             term,
             ui,
             host=host,
-            dbinfo=dbinfo,
             pg_version=pg_version,
-            tps=tps,
-            active_connections=active_connections,
+            server_information=server_information,
             system_info=system_info,
             lines_counter=lines_counter,
             width=width,

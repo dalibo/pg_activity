@@ -27,8 +27,10 @@ def main(
     is_local = data.pg_is_local() and data.pg_is_local_access()
 
     skip_sizes = options.nodbsize
-    pg_db_info = data.pg_get_db_info(
-        None, using_rds=options.rds, skip_sizes=options.nodbsize
+    server_information = data.pg_get_server_information(
+        prev_server_info=None,
+        using_rds=options.rds,
+        skip_sizes=options.nodbsize,
     )
 
     flag = types.Flag.from_options(is_local=is_local, **vars(options))
@@ -37,8 +39,11 @@ def main(
         min_duration=options.minduration,
         duration_mode=int(options.durationmode),
         wrap_query=options.wrap_query,
-        max_db_length=min(max(int(pg_db_info["max_length"]), 8), 16),
+        max_db_length=min(max(server_information.max_dbname_length, 8), 16),
         filters=data.filters,
+        show_instance_info_in_header=options.show_instance_info_in_header,
+        show_worker_info_in_header=options.show_worker_info_in_header,
+        show_system_info_in_header=options.show_system_info_in_header,
     )
 
     key, in_help = None, False
@@ -85,6 +90,12 @@ def main(
                 elif key.name == keys.CANCEL_SELECTION:
                     pg_procs.reset()
                     ui.end_interactive()
+                elif keys.is_toggle_header_sys_info(key):
+                    ui.toggle_system_info_in_header()
+                elif keys.is_toggle_header_inst_info(key):
+                    ui.toggle_instance_info_in_header()
+                elif keys.is_toggle_header_worker_info(key):
+                    ui.toggle_worker_info_in_header()
                 elif pg_procs.selected and key in (
                     keys.PROCESS_CANCEL,
                     keys.PROCESS_KILL,
@@ -163,19 +174,14 @@ def main(
 
             else:
                 if not ui.in_pause and not ui.interactive():
-                    pg_db_info = data.pg_get_db_info(
-                        pg_db_info, using_rds=options.rds, skip_sizes=skip_sizes
-                    )
                     if options.nodbsize and not skip_sizes:
                         skip_sizes = True
 
-                    dbinfo = types.DBInfo(
-                        total_size=int(pg_db_info["total_size"]),
-                        size_ev=int(pg_db_info["size_ev"]),
+                    server_information = data.pg_get_server_information(
+                        prev_server_info=server_information,
+                        using_rds=options.rds,
+                        skip_sizes=skip_sizes,
                     )
-                    tps = int(pg_db_info["tps"])
-
-                    active_connections = data.pg_get_active_connections()
                     memory, swap, load = activities.mem_swap_load()
                     system_info = types.SystemInfo.default(
                         memory=memory, swap=swap, load=load
@@ -229,10 +235,8 @@ def main(
                     term,
                     ui,
                     host=host,
-                    dbinfo=dbinfo,
                     pg_version=data.pg_version,
-                    tps=tps,
-                    active_connections=active_connections,
+                    server_information=server_information,
                     activity_stats=activity_stats,
                     message=msg_pile.get(),
                     render_header=render_header,

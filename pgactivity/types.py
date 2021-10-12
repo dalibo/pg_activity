@@ -1,5 +1,6 @@
 import enum
 import functools
+from datetime import timedelta
 from typing import (
     Any,
     Callable,
@@ -24,9 +25,11 @@ from attr import validators
 from . import colors, utils
 
 
+class Pct(float):
+    """Used to distinguish percentage from float when displaying the header"""
+
+
 T = TypeVar("T")
-
-
 E = TypeVar("E", bound=enum.IntEnum)
 
 
@@ -287,6 +290,9 @@ class UI:
     refresh_time: Union[float, int] = 2
     in_pause: bool = False
     interactive_timeout: Optional[int] = None
+    show_instance_info_in_header: bool = True
+    show_system_info_in_header: bool = True
+    show_worker_info_in_header: bool = True
 
     @classmethod
     def make(
@@ -566,6 +572,51 @@ class UI:
         """
         self.in_pause = not self.in_pause
 
+    def toggle_system_info_in_header(self) -> None:
+        """Toggle the 'show_system_info_in_header' attribute.
+
+        >>> ui = UI.make()
+        >>> ui.show_system_info_in_header
+        True
+        >>> ui.toggle_system_info_in_header()
+        >>> ui.show_system_info_in_header
+        False
+        >>> ui.toggle_system_info_in_header()
+        >>> ui.show_system_info_in_header
+        True
+        """
+        self.show_system_info_in_header = not self.show_system_info_in_header
+
+    def toggle_instance_info_in_header(self) -> None:
+        """Toggle the 'show_instance_info_in_header' attribute.
+
+        >>> ui = UI.make()
+        >>> ui.show_instance_info_in_header
+        True
+        >>> ui.toggle_instance_info_in_header()
+        >>> ui.show_instance_info_in_header
+        False
+        >>> ui.toggle_instance_info_in_header()
+        >>> ui.show_instance_info_in_header
+        True
+        """
+        self.show_instance_info_in_header = not self.show_instance_info_in_header
+
+    def toggle_worker_info_in_header(self) -> None:
+        """Toggle the 'show_worker_info_in_header' attribute.
+
+        >>> ui = UI.make()
+        >>> ui.show_worker_info_in_header
+        True
+        >>> ui.toggle_worker_info_in_header()
+        >>> ui.show_worker_info_in_header
+        False
+        >>> ui.toggle_worker_info_in_header()
+        >>> ui.show_worker_info_in_header
+        True
+        """
+        self.show_worker_info_in_header = not self.show_worker_info_in_header
+
     def evolve(self, **changes: Any) -> None:
         """Return a new UI with 'changes' applied.
 
@@ -632,21 +683,47 @@ class Host:
     dbname: str
 
 
-@attr.s(auto_attribs=True, slots=True)
-class DBInfo:
-    total_size: int
-    size_ev: int
-
-
-@attr.s(auto_attribs=True, slots=True)
-class MemoryInfo:
-    percent: float
+@attr.s(auto_attribs=True, slots=True, frozen=True)
+class SwapInfo:
     used: int
+    free: int
+    total: int
+
+    @classmethod
+    def default(cls) -> "SwapInfo":
+        return cls(0, 0, 0)
+
+    @property
+    def pct_used(self) -> Pct:
+        return Pct(self.used * 100 / self.total)
+
+    @property
+    def pct_free(self) -> Pct:
+        return Pct(self.free * 100 / self.total)
+
+
+@attr.s(auto_attribs=True, slots=True, frozen=True)
+class MemoryInfo:
+    used: int
+    buff_cached: int
+    free: int
     total: int
 
     @classmethod
     def default(cls) -> "MemoryInfo":
-        return cls(0.0, 0, 0)
+        return cls(0, 0, 0, 0)
+
+    @property
+    def pct_used(self) -> Pct:
+        return Pct(self.used * 100 / self.total)
+
+    @property
+    def pct_free(self) -> Pct:
+        return Pct(self.free * 100 / self.total)
+
+    @property
+    def pct_bc(self) -> Pct:
+        return Pct(self.buff_cached * 100 / self.total)
 
 
 @attr.s(auto_attribs=True, slots=True)
@@ -674,7 +751,7 @@ class IOCounter:
 @attr.s(auto_attribs=True, frozen=True, slots=True)
 class SystemInfo:
     memory: MemoryInfo
-    swap: MemoryInfo
+    swap: SwapInfo
     load: LoadAverage
     io_read: IOCounter
     io_write: IOCounter
@@ -685,26 +762,80 @@ class SystemInfo:
         cls,
         *,
         memory: Optional[MemoryInfo] = None,
-        swap: Optional[MemoryInfo] = None,
+        swap: Optional[SwapInfo] = None,
         load: Optional[LoadAverage] = None,
     ) -> "SystemInfo":
         """Zero-value builder.
 
         >>> SystemInfo.default()  # doctest: +NORMALIZE_WHITESPACE
-        SystemInfo(memory=MemoryInfo(percent=0.0, used=0, total=0),
-                   swap=MemoryInfo(percent=0.0, used=0, total=0),
+        SystemInfo(memory=MemoryInfo(used=0, buff_cached=0, free=0, total=0),
+                   swap=SwapInfo(used=0, free=0, total=0),
                    load=LoadAverage(avg1=0.0, avg5=0.0, avg15=0.0),
                    io_read=IOCounter(count=0, bytes=0, chars=0),
-                   io_write=IOCounter(count=0, bytes=0, chars=0),
-                   max_iops=0)
+                   io_write=IOCounter(count=0, bytes=0, chars=0), max_iops=0)
         """
         return cls(
             memory or MemoryInfo.default(),
-            swap or MemoryInfo.default(),
+            swap or SwapInfo.default(),
             load or LoadAverage.default(),
             IOCounter.default(),
             IOCounter.default(),
+            0,
         )
+
+
+@attr.s(frozen=True, auto_attribs=True, slots=True)
+class ServerInformation:
+    # Fetched from the database
+    xact_count: int
+    insert: int
+    update: int
+    delete: int
+    tuples_returned: int
+    total_size: int
+    cache_hit_ratio: Pct = attr.ib(converter=Pct)
+    max_dbname_length: int
+    uptime: timedelta
+    epoch: int  # an epoch,  used for the calculation of the tps & size_evolution
+    active_connections: int
+    idle: int
+    idle_in_transaction: int
+    idle_in_transaction_aborted: int
+    total: int
+    waiting: int
+    max_connections: int
+    autovacuum_workers: Optional[int]
+    autovacuum_max_workers: int
+    logical_replication_workers: Optional[int]
+    parallel_workers: Optional[int]
+    max_logical_replication_workers: Optional[int]
+    max_parallel_workers: Optional[int]
+    max_worker_processes: Optional[int]
+    max_wal_senders: Optional[int]
+    max_replication_slots: Optional[int]
+    wal_senders: Optional[int]
+    wal_receivers: Optional[int]
+    replication_slots: Optional[int]
+    temp_files: int
+    temp_bytes: int
+    # Computed in data.pg_get_server_information()
+    size_evolution: float
+    tps: int
+    insert_per_second: int
+    update_per_second: int
+    delete_per_second: int
+    tuples_returned_per_second: int
+
+    @property
+    def worker_processes(self) -> Optional[int]:
+        if self.parallel_workers is None and self.logical_replication_workers is None:
+            return None
+        else:
+            return (0 if self.parallel_workers is None else self.parallel_workers) + (
+                0
+                if self.logical_replication_workers is None
+                else self.logical_replication_workers
+            )
 
 
 class LockType(enum.Enum):

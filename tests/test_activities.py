@@ -12,6 +12,7 @@ from pgactivity.types import (
     MemoryInfo,
     RunningProcess,
     SystemProcess,
+    SwapInfo,
 )
 
 
@@ -117,12 +118,12 @@ def test_ps_complete_empty_procs(system_processes):
 
 
 def test_mem_swap_load() -> None:
-    pmem = namedtuple("pmem", ["percent", "total", "free", "buffers", "cached"])
-    vmem = namedtuple("vmem", ["percent", "used", "total"])
+    pmem = namedtuple("pmem", ["total", "free", "buffers", "cached"])
+    vmem = namedtuple("vmem", ["total", "free", "used"])
     with patch(
-        "psutil.virtual_memory", return_value=pmem(12.3, 45, 6, 6, 7)
+        "psutil.virtual_memory", return_value=pmem(45, 6, 6, 7)
     ) as virtual_memory, patch(
-        "psutil.swap_memory", return_value=vmem(6.7, 8, 90)
+        "psutil.swap_memory", return_value=vmem(8, 6, 2)
     ) as swap_memory, patch(
         "os.getloadavg", return_value=(0.14, 0.27, 0.44)
     ) as getloadavg:
@@ -130,6 +131,11 @@ def test_mem_swap_load() -> None:
     virtual_memory.assert_called_once_with()
     swap_memory.assert_called_once_with()
     getloadavg.assert_called_once_with()
-    assert memory == MemoryInfo(percent=12.3, used=26, total=45)
-    assert swap == MemoryInfo(percent=6.7, used=8, total=90)
+    assert memory == MemoryInfo(total=45, used=26, free=6, buff_cached=13)
+    assert swap == SwapInfo(total=8, used=2, free=6)
     assert load == LoadAverage(0.14, 0.27, 0.44)
+    assert memory.pct_used == 57.77777777777778
+    assert memory.pct_free == 13.333333333333334
+    assert memory.pct_bc == 28.88888888888889
+    assert swap.pct_used == 25.0
+    assert swap.pct_free == 75.0
