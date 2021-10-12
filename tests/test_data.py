@@ -24,7 +24,6 @@ def wait_for_data(fct, msg: str, timeout: int = 2):
 @pytest.fixture
 def data(postgresql):
     return Data.pg_connect(
-        1,
         host=postgresql.info.host,
         port=postgresql.info.port,
         database=postgresql.info.dbname,
