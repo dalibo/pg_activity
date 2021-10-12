@@ -72,7 +72,7 @@ class Data:
     @classmethod
     def pg_connect(
         cls,
-        min_duration: float,
+        min_duration: float = 0.0,
         *,
         host: Optional[str] = None,
         port: int = 5432,
