@@ -10,6 +10,7 @@ from typing import (
     Mapping,
     MutableSet,
     Optional,
+    overload,
     Sequence,
     Tuple,
     TypeVar,
@@ -817,9 +818,16 @@ class SelectableProcesses:
     >>> w.toggle_pin_focused()
     >>> w.selected, w.focused
     ([456, 789], 456)
+
+    >>> w[1]
+    Proc(pid=456)
+    >>> w[1:3]
+    [Proc(pid=456), Proc(pid=789)]
+
     >>> w.reset()
     >>> w.selected, w.focused
     ([], None)
+
     """
 
     items: List[BaseProcess]
@@ -831,6 +839,19 @@ class SelectableProcesses:
 
     def __iter__(self) -> Iterator[BaseProcess]:
         return iter(self.items)
+
+    @overload
+    def __getitem__(self, i: int) -> BaseProcess:
+        ...
+
+    @overload
+    def __getitem__(self, s: slice) -> List[BaseProcess]:
+        ...
+
+    def __getitem__(
+        self, val: Union[int, slice]
+    ) -> Union[BaseProcess, List[BaseProcess]]:
+        return self.items[val]
 
     @property
     def selected(self) -> List[int]:
@@ -848,7 +869,7 @@ class SelectableProcesses:
     def set_items(self, new_items: Sequence[BaseProcess]) -> None:
         self.items[:] = list(new_items)
 
-    def _position(self) -> Optional[int]:
+    def position(self) -> Optional[int]:
         if self.focused is None:
             return None
         for idx, proc in enumerate(self.items):
@@ -859,7 +880,7 @@ class SelectableProcesses:
     def focus_next(self) -> None:
         if not self.items:
             return
-        idx = self._position()
+        idx = self.position()
         if idx is None:
             next_idx = 0
         elif idx == len(self.items) - 1:
@@ -871,7 +892,7 @@ class SelectableProcesses:
     def focus_prev(self) -> None:
         if not self.items:
             return
-        idx = self._position() or 0
+        idx = self.position() or 0
         self.focused = self.items[idx - 1].pid
 
     def toggle_pin_focused(self) -> None:
