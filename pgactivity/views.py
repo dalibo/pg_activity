@@ -316,6 +316,7 @@ def processes_rows(
     term: Terminal,
     ui: UI,
     processes: SelectableProcesses,
+    maxlines: int,
     width: Optional[int],
 ) -> Iterator[str]:
     """Display table rows with processes information."""
@@ -337,7 +338,17 @@ def processes_rows(
 
     focused, pinned = processes.focused, processes.pinned
 
-    for process in processes:
+    # Scrolling is handeled here. we just have to manage the start position of the display.
+    # the length is managed by @limit. we try to have a 5 line leeway at the bottom of the
+    # page to increase readability.
+    position = processes.position()
+    start = 0
+    bottom = int(maxlines // 5)
+    if position is not None and position >= maxlines - bottom:
+        start = position - maxlines + 1 + bottom
+
+    for process in processes[start:]:
+
         if process.pid == focused:
             color_type = "cursor"
         elif process.pid in pinned:
@@ -497,7 +508,8 @@ def screen(
         term,
         ui,
         processes,
-        lines_counter=lines_counter,
+        maxlines=lines_counter.value,  # Used by process_rows
+        lines_counter=lines_counter,  # Used by @limit
         width=width,
     )
 
