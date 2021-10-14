@@ -151,25 +151,25 @@ def main(
                     )
 
             else:
-                pg_db_info = data.pg_get_db_info(
-                    pg_db_info, using_rds=options.rds, skip_sizes=skip_sizes
-                )
-                if options.nodbsize and not skip_sizes:
-                    skip_sizes = True
-
-                dbinfo = types.DBInfo(
-                    total_size=int(pg_db_info["total_size"]),
-                    size_ev=int(pg_db_info["size_ev"]),
-                )
-                tps = int(pg_db_info["tps"])
-
-                active_connections = data.pg_get_active_connections()
-                memory, swap, load = activities.mem_swap_load()
-                system_info = types.SystemInfo.default(
-                    memory=memory, swap=swap, load=load
-                )
-
                 if not ui.in_pause and not ui.interactive():
+                    pg_db_info = data.pg_get_db_info(
+                        pg_db_info, using_rds=options.rds, skip_sizes=skip_sizes
+                    )
+                    if options.nodbsize and not skip_sizes:
+                        skip_sizes = True
+
+                    dbinfo = types.DBInfo(
+                        total_size=int(pg_db_info["total_size"]),
+                        size_ev=int(pg_db_info["size_ev"]),
+                    )
+                    tps = int(pg_db_info["tps"])
+
+                    active_connections = data.pg_get_active_connections()
+                    memory, swap, load = activities.mem_swap_load()
+                    system_info = types.SystemInfo.default(
+                        memory=memory, swap=swap, load=load
+                    )
+
                     if is_local:
                         memory, swap, load = activities.mem_swap_load()
                         system_info = attr.evolve(
