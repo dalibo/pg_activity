@@ -57,6 +57,7 @@ class line_counter:
         return current_value
 
 
+@functools.lru_cache(maxsize=512)
 def shorten(term: Terminal, text: str, width: Optional[int] = None) -> str:
     r"""Truncate 'text' to fit in the given 'width' (or term.width).
 
