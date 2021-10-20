@@ -62,11 +62,11 @@ def main(
                 skip_sizes = False
             elif key is not None:
                 if keys.is_process_next(key):
-                    pg_procs.focus_next()
-                    ui.start_interactive()
+                    if pg_procs.focus_next():
+                        ui.start_interactive()
                 elif keys.is_process_prev(key):
-                    pg_procs.focus_prev()
-                    ui.start_interactive()
+                    if pg_procs.focus_prev():
+                        ui.start_interactive()
                 elif key == keys.SPACE:
                     pg_procs.toggle_pin_focused()
                 elif key.name == keys.CANCEL_SELECTION:

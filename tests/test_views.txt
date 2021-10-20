@@ -365,7 +365,7 @@ Tests scrolling in processes_rows()
 ...     ) for x in range(0, 10)]
 >>> ui = UI.make(flag=Flag.PID|Flag.DATABASE)
 >>> sproc = SelectableProcesses(processes_scroll)
->>> sproc.focus_next()
+>>> _ = sproc.focus_next()
 >>> sproc.position()
 0
 >>> lc = line_counter(4)
@@ -375,7 +375,7 @@ Tests scrolling in processes_rows()
 2      pgbench                      active   SELECT 2
 3      pgbench                      active   SELECT 3
 >>> for x in range(9):
-...     sproc.focus_next()
+...     _ = sproc.focus_next()
 >>> sproc.position()
 9
 >>> lc = line_counter(5)
@@ -384,7 +384,7 @@ Tests scrolling in processes_rows()
 7      pgbench                      active   SELECT 7
 8      pgbench                      active   SELECT 8
 9      pgbench                      active   SELECT 9
->>> sproc.focus_next()
+>>> _ = sproc.focus_next()
 >>> sproc.position()
 0
 >>> lc = line_counter(5)
@@ -395,7 +395,7 @@ Tests scrolling in processes_rows()
 3      pgbench                      active   SELECT 3
 4      pgbench                      active   SELECT 4
 >>> for x in range(9):
-...     sproc.focus_next()
+...     _ = sproc.focus_next()
 >>> sproc.position()
 9
 

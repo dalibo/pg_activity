@@ -778,31 +778,39 @@ class SelectableProcesses:
     >>> w.focused
 
     >>> w.focus_next()
+    True
     >>> w.focused
     456
     >>> w.focus_next()
+    True
     >>> w.focused
     123
     >>> w.focus_prev()
+    True
     >>> w.focused
     456
     >>> w.focus_prev()
+    True
     >>> w.focused
     789
     >>> w.focused = 789
     >>> w.focus_next()
+    True
     >>> w.focused
     456
     >>> w.focus_prev()
+    True
     >>> w.focused
     789
     >>> w.set_items(sorted(w.items))
     >>> w.focused
     789
     >>> w.focus_prev()
+    True
     >>> w.focused
     456
     >>> w.focus_next()
+    True
     >>> w.focused
     789
 
@@ -810,11 +818,13 @@ class SelectableProcesses:
     ([789], 789)
     >>> w.toggle_pin_focused()
     >>> w.focus_next()
+    True
     >>> w.toggle_pin_focused()
     >>> w.selected, w.focused
     ([123, 789], 123)
     >>> w.toggle_pin_focused()
     >>> w.focus_next()
+    True
     >>> w.toggle_pin_focused()
     >>> w.selected, w.focused
     ([456, 789], 456)
@@ -877,9 +887,9 @@ class SelectableProcesses:
                 return idx
         return None
 
-    def focus_next(self) -> None:
+    def focus_next(self) -> bool:
         if not self.items:
-            return
+            return False
         idx = self.position()
         if idx is None:
             next_idx = 0
@@ -888,12 +898,14 @@ class SelectableProcesses:
         else:
             next_idx = idx + 1
         self.focused = self.items[next_idx].pid
+        return True
 
-    def focus_prev(self) -> None:
+    def focus_prev(self) -> bool:
         if not self.items:
-            return
+            return False
         idx = self.position() or 0
         self.focused = self.items[idx - 1].pid
+        return True
 
     def toggle_pin_focused(self) -> None:
         assert self.focused is not None
