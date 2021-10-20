@@ -29,9 +29,11 @@ SPACE = " "
 PROCESS_CANCEL = "C"
 PROCESS_KILL = "K"
 PROCESS_NEXT = "KEY_DOWN"
+PROCESS_NEXTPAGE = "KEY_PGDOWN"
 PROCESS_NEXT_VI = "j"
 PROCESS_PREV = "KEY_UP"
 PROCESS_PREV_VI = "k"
+PROCESS_PREVPAGE = "KEY_PGUP"
 PROCESS_PIN = Key(SPACE, "tag/untag current query", "Space")
 REFRESH_DB_SIZE = "D"
 REFRESH_TIME_INCREASE = "+"
@@ -57,6 +59,14 @@ def is_process_prev(key: Keystroke) -> bool:
     elif key == PROCESS_PREV_VI:
         return True
     return False
+
+
+def is_process_nextpage(key: Keystroke) -> bool:
+    return key.name == PROCESS_NEXTPAGE
+
+
+def is_process_prevpage(key: Keystroke) -> bool:
+    return key.name == PROCESS_PREVPAGE
 
 
 EXIT_KEY = Key(EXIT, "quit")

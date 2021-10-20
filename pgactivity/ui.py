@@ -67,6 +67,12 @@ def main(
                 elif keys.is_process_prev(key):
                     if pg_procs.focus_prev():
                         ui.start_interactive()
+                elif keys.is_process_nextpage(key):
+                    if pg_procs.focus_next(term.height // 3):
+                        ui.start_interactive()
+                elif keys.is_process_prevpage(key):
+                    if pg_procs.focus_prev(term.height // 3):
+                        ui.start_interactive()
                 elif key == keys.SPACE:
                     pg_procs.toggle_pin_focused()
                 elif key.name == keys.CANCEL_SELECTION:
