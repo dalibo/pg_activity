@@ -814,6 +814,12 @@ class SelectableProcesses:
     >>> _ = w.focus_prev(3)
     >>> w.focused
     456
+    >>> _ = w.focus_last()
+    >>> w.focused
+    789
+    >>> _ = w.focus_first()
+    >>> w.focused
+    456
     >>> w.focused = 789
     >>> _ = w.focus_prev(2)
     >>> w.focused
@@ -925,6 +931,18 @@ class SelectableProcesses:
         else:
             next_idx = max(idx - offset, 0)
         self.focused = self.items[next_idx].pid
+        return True
+
+    def focus_first(self) -> bool:
+        if not self.items:
+            return False
+        self.focused = self.items[0].pid
+        return True
+
+    def focus_last(self) -> bool:
+        if not self.items:
+            return False
+        self.focused = self.items[-1].pid
         return True
 
     def toggle_pin_focused(self) -> None:
