@@ -153,7 +153,7 @@ def test_encoding(postgresql, data, execute):
     execute("UPDATE tbl SET s = 'waiting éléphant'", dbname="latin1", commit=True)
     running = wait_for_data(data.pg_get_activities, msg="could not fetch activities")
     assert "blocking éléphant" in running[0].query
-    (waiting,) = data.pg_get_waiting()
+    (waiting,) = wait_for_data(data.pg_get_waiting, "no waiting process")
     assert "waiting éléphant" in waiting.query
     (blocking,) = data.pg_get_blocking()
     assert "blocking éléphant" in blocking.query
