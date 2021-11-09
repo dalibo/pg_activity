@@ -52,7 +52,7 @@ def sys_get_proc(pid: int) -> Optional[SystemProcess]:
         cpu_times=cpu_times,
         read_delta=0,
         write_delta=0,
-        io_wait=status_iow == "disk sleep",
+        io_wait=(status_iow == psutil.STATUS_DISK_SLEEP),
         psutil_proc=psproc,
     )
 
