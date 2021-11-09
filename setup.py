@@ -54,7 +54,8 @@ setup(
         "testing": [
             "psycopg2-binary >= 2.8",
             "pytest",
-            "pytest-postgresql",
+            # From 4.0, pytest-postgresql is no compatible with python 3.6.
+            "pytest-postgresql ~= 3.0",
         ],
     },
     data_files=[
