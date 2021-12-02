@@ -153,3 +153,16 @@ reporting are still accounted for by postgres in `pg_stat_get_db_xact_commit()`
 and `pg_stat_get_db_xact_commit()`. Therefore `pg_activity` will display a non
 zero TPS even with no activity on the database, and/or no activity displayed on
 screen.
+
+**How can I specify a password for authentication ?**
+
+pg_activity uses libpq to access to PostgreSQL therefore all the traditional
+methods are available.
+
+You can pass the password for the database connection in a password file.
+Information can also be given via PostgreSQL's environment variables
+(PGPASSFILE or PGPASSWORD) or via the connection string parameters.
+
+The password file is preferred since it's more secure (security is deferred to
+the OS). Please avoid password in connection strings at all cost.
+
