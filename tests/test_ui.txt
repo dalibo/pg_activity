@@ -970,7 +970,6 @@ PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size: 106.07M - 0B/s ⋅ TPS: 0 ⋅ Active connections: 2 ⋅ Duration mode: query
                                 RUNNING QUERIES
 PID    DATABASE                      state   Query
-...    tests                 idle in trans   SELECT 43
 ...    tests                 idle in trans   UPDATE t SET s = 'blocking'
 ...    tests                        active   UPDATE t SET s = 'waiting'
 <BLANKLINE>
@@ -996,7 +995,6 @@ PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size: 106.07M - 0B/s ⋅ TPS: 0 ⋅ Active connections: 2 ⋅ Duration mode: query
                                 RUNNING QUERIES
 PID    DATABASE                      state   Query
-...    tests                 idle in trans   SELECT 43
 ...    tests                 idle in trans   UPDATE t SET s = 'blocking'
 ...    tests                        active   UPDATE t SET s = 'waiting'
 <BLANKLINE>

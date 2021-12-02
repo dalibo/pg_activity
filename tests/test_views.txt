@@ -380,9 +380,6 @@ Tests scrolling in processes_rows()
 9
 >>> lc = line_counter(5)
 >>> processes_rows(term, ui, sproc, lc.value, width=200, lines_counter=lc)
-6      pgbench                      active   SELECT 6
-7      pgbench                      active   SELECT 7
-8      pgbench                      active   SELECT 8
 9      pgbench                      active   SELECT 9
 >>> _ = sproc.focus_next()
 >>> sproc.position()
@@ -394,33 +391,6 @@ Tests scrolling in processes_rows()
 2      pgbench                      active   SELECT 2
 3      pgbench                      active   SELECT 3
 4      pgbench                      active   SELECT 4
->>> for x in range(9):
-...     _ = sproc.focus_next()
->>> sproc.position()
-9
-
-We never put the focus on the lower 1/5th of the screen.
-For 5 display lines, the focus will be on the 4th .
-
->>> lc = line_counter(5)
->>> processes_rows(term, ui, sproc, lc.value, width=200, lines_counter=lc)
-6      pgbench                      active   SELECT 6
-7      pgbench                      active   SELECT 7
-8      pgbench                      active   SELECT 8
-9      pgbench                      active   SELECT 9
-
-For 10 display lines, it should be at 8th line.
-
->>> lc = line_counter(10)
->>> processes_rows(term, ui, sproc, lc.value, width=200, lines_counter=lc)
-2      pgbench                      active   SELECT 2
-3      pgbench                      active   SELECT 3
-4      pgbench                      active   SELECT 4
-5      pgbench                      active   SELECT 5
-6      pgbench                      active   SELECT 6
-7      pgbench                      active   SELECT 7
-8      pgbench                      active   SELECT 8
-9      pgbench                      active   SELECT 9
 
 Tests for footer_*()
 --------------------

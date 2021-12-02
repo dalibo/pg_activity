@@ -339,18 +339,16 @@ def processes_rows(
 
     focused, pinned = processes.focused, processes.pinned
 
-    # Scrolling is handeled here. we just have to manage the start position of the display.
-    # the length is managed by @limit. we try to have a 5 line leeway at the bottom of the
-    # page to increase readability.
-    position = processes.position()
-    start = 0
-    bottom = int(maxlines // 5)
-    if position is not None and position >= maxlines - bottom:
-        start = position - maxlines + 1 + bottom
+    # Scrolling is handeled here. The first line we display is always the one
+    # with the focus. This choice was made to make it easier to manage the non
+    # truncated modes. The length is managed by the decorator @limit.
+    start = processes.position()
 
     for process in processes[start:]:
 
-        if process.pid == focused:
+        if process.pid == focused and process.pid in pinned:
+            color_type = "cursor_selected"
+        elif process.pid == focused:
             color_type = "cursor"
         elif process.pid in pinned:
             color_type = "yellow"
