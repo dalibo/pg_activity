@@ -46,7 +46,7 @@ setup(
     ],
     extras_require={
         "dev": [
-            "black",
+            "black >= 21.12b0",
             "check-manifest",
             "flake8",
             "mypy",
