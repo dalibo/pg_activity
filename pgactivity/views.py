@@ -247,7 +247,7 @@ def header(
                 f"Write:  {render(system_info.io_write)}",
             ],
         ]
-        yield from render_columns(system_columns, delimiter=",   ")
+        yield from render_columns(system_columns, delimiter="    ")
 
 
 @limit
