@@ -26,5 +26,8 @@ SELECT
           THEN true
           ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
       END
+  AND CASE WHEN %(dbname_filter)s IS NULL THEN true
+      ELSE datname ~* %(dbname_filter)s
+      END
 ORDER BY
       EXTRACT(epoch FROM (NOW() - a.{duration_column})) DESC;

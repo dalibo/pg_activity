@@ -38,6 +38,7 @@ def main(
         duration_mode=int(options.durationmode),
         query_display_mode=int(options.querydisplaymode),
         max_db_length=min(max(int(pg_db_info["max_length"]), 8), 16),
+        has_dbname_filter=True if options.dbnamefilter else False,
     )
 
     key, in_help = None, False

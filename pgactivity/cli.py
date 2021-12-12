@@ -126,6 +126,14 @@ def get_parser() -> OptionParser:
         type=float,
         default=0,
     )
+    # --dbname-filter
+    parser.add_option(
+        "--dbname-filter",
+        dest="dbnamefilter",
+        help="A regex to gather stats / activities only for DBs of interest. Case insensitive.",
+        metavar="REGEX_STRING",
+        default=None,
+    )
     # --verbose-mode
     parser.add_option(
         "--verbose-mode",
@@ -264,6 +272,7 @@ def main() -> None:
         options,
         dsn,
         min_duration=options.minduration,
+        dbname_filter=options.dbnamefilter,
     )
     hostname = socket.gethostname()
     conninfo = dataobj.pg_conn.info

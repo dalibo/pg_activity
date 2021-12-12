@@ -112,6 +112,9 @@ SELECT
                 THEN true
                 ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
             END
+        AND CASE WHEN %(dbname_filter)s IS NULL THEN true
+            ELSE datname ~* %(dbname_filter)s
+            END
       ) AS sq
       LEFT OUTER JOIN pg_database b ON sq.datid = b.oid
 GROUP BY

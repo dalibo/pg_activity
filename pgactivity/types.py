@@ -269,6 +269,7 @@ class UI:
         flag: Flag = Flag.all(),
         *,
         max_db_length: int = 16,
+        has_dbname_filter: bool = False,
         **kwargs: Any,
     ) -> "UI":
         possible_columns: Dict[str, Column] = {}
@@ -301,7 +302,7 @@ class UI:
         if Flag.DATABASE & flag:
             add_column(
                 key="database",
-                name="DATABASE",
+                name="DATABASE(*)" if has_dbname_filter else "DATABASE",
                 template_h=f"%-{max_db_length}s ",
                 transform=functools.lru_cache()(
                     lambda v: utils.ellipsis(v, width=16) if v else "",

@@ -67,6 +67,7 @@ class Data:
     pg_version: str
     pg_num_version: int
     min_duration: float
+    dbname_filter: str
     dsn_parameters: Dict[str, str]
 
     @classmethod
@@ -82,6 +83,7 @@ class Data:
         rds_mode: bool = False,
         dsn: str = "",
         hide_queries_in_logs: bool = False,
+        dbname_filter: str = "",
     ) -> "Data":
         """Create an instance by connecting to a PostgreSQL server."""
         pg_conn = psycopg2.connect(
@@ -111,6 +113,7 @@ class Data:
             pg_version,
             pg_conn.server_version,
             min_duration=min_duration,
+            dbname_filter=dbname_filter,
             dsn_parameters=pg_conn.info.dsn_parameters,
         )
 
@@ -198,6 +201,7 @@ class Data:
                     "skip_db_size": skip_sizes,
                     "prev_total_size": prev_total_size,
                     "using_rds": using_rds,
+                    "dbname_filter": self.dbname_filter,
                 },
             )
             ret = cur.fetchone()
@@ -230,7 +234,7 @@ class Data:
             query = queries.get("get_active_connections_post_90200")
 
         with self.pg_conn.cursor() as cur:
-            cur.execute(query)
+            cur.execute(query, {"dbname_filter": self.dbname_filter})
             ret = cur.fetchone()
         active_connections = int(ret["active_connections"])
         return active_connections
@@ -254,7 +258,13 @@ class Data:
         query = sql.SQL(qs).format(duration_column=sql.Identifier(duration_column))
 
         with self.pg_conn.cursor() as cur:
-            cur.execute(query, {"min_duration": self.min_duration})
+            cur.execute(
+                query,
+                {
+                    "min_duration": self.min_duration,
+                    "dbname_filter": self.dbname_filter,
+                },
+            )
             ret = cur.fetchall()
 
         return [RunningProcess(**row) for row in ret]
@@ -272,7 +282,13 @@ class Data:
         query = sql.SQL(qs).format(duration_column=sql.Identifier(duration_column))
 
         with self.pg_conn.cursor() as cur:
-            cur.execute(query, {"min_duration": self.min_duration})
+            cur.execute(
+                query,
+                {
+                    "min_duration": self.min_duration,
+                    "dbname_filter": self.dbname_filter,
+                },
+            )
             ret = cur.fetchall()
         return [WaitingProcess(**row) for row in ret]
 
@@ -291,7 +307,13 @@ class Data:
         query = sql.SQL(qs).format(duration_column=sql.Identifier(duration_column))
 
         with self.pg_conn.cursor() as cur:
-            cur.execute(query, {"min_duration": self.min_duration})
+            cur.execute(
+                query,
+                {
+                    "min_duration": self.min_duration,
+                    "dbname_filter": self.dbname_filter,
+                },
+            )
             ret = cur.fetchall()
         return [BlockingProcess(**row) for row in ret]
 
@@ -330,6 +352,7 @@ def pg_connect(
     dsn: str,
     exit_on_failed: bool = True,
     min_duration: float = 0.0,
+    dbname_filter: str = "",
 ) -> Data:
     """Try to build a Data instance by to connecting to postgres."""
     password = None
@@ -344,6 +367,7 @@ def pg_connect(
                 database=options.dbname,
                 rds_mode=options.rds,
                 min_duration=min_duration,
+                dbname_filter=dbname_filter,
                 hide_queries_in_logs=options.hide_queries_in_logs,
             )
         except OperationalError as err:

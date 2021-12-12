@@ -43,6 +43,9 @@ SELECT
                 THEN true
                 ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
             END
+        AND CASE WHEN %(dbname_filter)s IS NULL THEN true
+            ELSE datname ~* %(dbname_filter)s
+            END
       UNION ALL
       -- VirtualXid Lock
       SELECT
@@ -72,6 +75,9 @@ SELECT
         AND CASE WHEN %(min_duration)s = 0
                 THEN true
                 ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
+            END
+        AND CASE WHEN %(dbname_filter)s IS NULL THEN true
+            ELSE datname ~* %(dbname_filter)s
             END
       UNION ALL
       -- Relation or tuple Lock
@@ -103,6 +109,9 @@ SELECT
         AND CASE WHEN %(min_duration)s = 0
                 THEN true
                 ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
+            END
+        AND CASE WHEN %(dbname_filter)s IS NULL THEN true
+            ELSE datname ~* %(dbname_filter)s
             END
       ) AS sq
       LEFT OUTER JOIN pg_database b ON sq.datid = b.oid

@@ -55,14 +55,16 @@ Options
         --output=FILEPATH     Store running queries as CSV.
         --help                Show this help message and exit.
         --no-db-size          Skip total size of DB.
-        --min-duration        Don't display queries with smaller than specified
-                              duration (in seconds).
-        --verbose-mode=VERBOSE_MODE
-                              Queries display mode. Values: 1-TRUNCATED,
-                              2-FULL(default), 3-INDENTED
         --duration-mode=DURATION_MODE
                               Duration mode. Values: 1-QUERY(default),
                               2-TRANSACTION, 3-BACKEND
+        --min-duration        Don't display queries with smaller than specified
+                              duration (in seconds).
+        --dbname-filter=dbname_filter
+                              A regex to show queries only from DBs of interest
+        --verbose-mode=VERBOSE_MODE
+                              Queries display mode. Values: 1-TRUNCATED,
+                              2-FULL(default), 3-INDENTED
 
 
     Display options, you can exclude some columns by using them :

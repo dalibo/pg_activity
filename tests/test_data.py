@@ -157,3 +157,24 @@ def test_encoding(postgresql, data, execute):
     assert "waiting éléphant" in waiting.query
     (blocking,) = data.pg_get_blocking()
     assert "blocking éléphant" in blocking.query
+
+
+@pytest.fixture
+def data_dbname_filtered(postgresql):
+    return Data.pg_connect(
+        host=postgresql.info.host,
+        port=postgresql.info.port,
+        database=postgresql.info.dbname,
+        user=postgresql.info.user,
+        dbname_filter="temp",
+    )
+
+
+def test_dbname_filtering(data_dbname_filtered, execute):
+    """Test for PR #256, --dbname-filter flag"""
+    execute("SELECT pg_sleep(2)", dbname="template1", autocommit=True)
+    nbconn = wait_for_data(
+        data_dbname_filtered.pg_get_active_connections,
+        msg="could not get active connections for filtered DBNAME",
+    )
+    assert nbconn == 1
