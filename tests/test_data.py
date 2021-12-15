@@ -4,6 +4,7 @@ import pytest
 import psycopg2
 from psycopg2.errors import WrongObjectType
 
+from pgactivity import types
 from pgactivity.data import Data
 
 
@@ -166,7 +167,7 @@ def data_dbname_filtered(postgresql):
         port=postgresql.info.port,
         database=postgresql.info.dbname,
         user=postgresql.info.user,
-        dbname_filter="temp",
+        filters=types.Filters(dbname="temp"),
     )
 
 

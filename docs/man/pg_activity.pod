@@ -195,9 +195,9 @@ required by another session. It shows following information:
 
 	Don't display queries with smaller than specified duration (in seconds).
 
-=item B<--dbname-filter=REGEX_STRING>
+=item B<--filter=FIELD:REGEX>
 
-	A regex to gather stats / activities only for DBs of interest. Case insensitive.
+	Filter activities with a (case insensitive) regular expression applied on selected fields. Known fields are: dbname.
 
 =item B<--help>
 

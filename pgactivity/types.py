@@ -129,6 +129,32 @@ class Flag(enum.IntFlag):
         return flag
 
 
+@attr.s(auto_attribs=True, frozen=True, slots=True)
+class Filters:
+    dbname: Optional[str] = None
+
+    @classmethod
+    def from_options(cls, filters: Sequence[str]) -> "Filters":
+        fields = attr.fields_dict(cls)
+        attrs = {}
+        for f in filters:
+            try:
+                fname, regex = f.split(":", 1)
+            except ValueError:
+                raise ValueError(f"malformatted filter value '{f}'")
+            if not regex:
+                raise ValueError(f"empty regex in filter '{f}'")
+            if fname in attrs:
+                raise ValueError(f"got multiple filters '{fname}'")
+            if fname not in fields:
+                raise ValueError(f"unknown filter '{fname}'")
+            attrs[fname] = regex
+        return cls(**attrs)
+
+
+NO_FILTER = Filters()
+
+
 class SortKey(enum.Enum):
     cpu = enum.auto()
     mem = enum.auto()
@@ -269,7 +295,7 @@ class UI:
         flag: Flag = Flag.all(),
         *,
         max_db_length: int = 16,
-        has_dbname_filter: bool = False,
+        filters: Filters = NO_FILTER,
         **kwargs: Any,
     ) -> "UI":
         possible_columns: Dict[str, Column] = {}
@@ -302,7 +328,7 @@ class UI:
         if Flag.DATABASE & flag:
             add_column(
                 key="database",
-                name="DATABASE(*)" if has_dbname_filter else "DATABASE",
+                name="DATABASE(*)" if filters.dbname else "DATABASE",
                 template_h=f"%-{max_db_length}s ",
                 transform=functools.lru_cache()(
                     lambda v: utils.ellipsis(v, width=16) if v else "",

@@ -60,8 +60,9 @@ Options
                               2-TRANSACTION, 3-BACKEND
         --min-duration        Don't display queries with smaller than specified
                               duration (in seconds).
-        --dbname-filter=dbname_filter
-                              A regex to show queries only from DBs of interest
+        --filter=FIELD:REGEX  Filter activities with a (case insensitive) regular
+                              expression applied on selected fields. Known fields
+                              are: dbname.
         --verbose-mode=VERBOSE_MODE
                               Queries display mode. Values: 1-TRUNCATED,
                               2-FULL(default), 3-INDENTED

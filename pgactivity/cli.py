@@ -126,13 +126,17 @@ def get_parser() -> OptionParser:
         type=float,
         default=0,
     )
-    # --dbname-filter
+    # --filter
     parser.add_option(
-        "--dbname-filter",
-        dest="dbnamefilter",
-        help="A regex to gather stats / activities only for DBs of interest. Case insensitive.",
-        metavar="REGEX_STRING",
-        default=None,
+        "--filter",
+        dest="filters",
+        help=(
+            "Filter activities with a (case insensitive) regular expression applied on selected fields. "
+            "Known fields are: dbname."
+        ),
+        action="append",
+        metavar="FIELD:REGEX",
+        default=[],
     )
     # --verbose-mode
     parser.add_option(
@@ -268,11 +272,16 @@ def main() -> None:
         parser.print_help()
         sys.exit(1)
 
+    try:
+        filters = types.Filters.from_options(options.filters)
+    except ValueError as e:
+        parser.error(str(e))
+
     dataobj = data.pg_connect(
         options,
         dsn,
         min_duration=options.minduration,
-        dbname_filter=options.dbnamefilter,
+        filters=filters,
     )
     hostname = socket.gethostname()
     conninfo = dataobj.pg_conn.info
