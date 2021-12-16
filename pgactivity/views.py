@@ -131,7 +131,7 @@ def limit(func: Callable[..., Iterable[str]]) -> Callable[..., None]:
 
 
 @functools.singledispatch
-def render(x: NoReturn) -> str:
+def render(x: Any) -> NoReturn:
     raise AssertionError(f"not implemented for type '{type(x).__name__}'")
 
 
