@@ -1,5 +1,6 @@
 import time
 
+import attr
 import pytest
 import psycopg2
 from psycopg2.errors import WrongObjectType
@@ -160,22 +161,16 @@ def test_encoding(postgresql, data, execute):
     assert "blocking éléphant" in blocking.query
 
 
-@pytest.fixture
-def data_dbname_filtered(postgresql):
-    return Data.pg_connect(
-        host=postgresql.info.host,
-        port=postgresql.info.port,
-        database=postgresql.info.dbname,
-        user=postgresql.info.user,
-        filters=types.Filters(dbname="temp"),
-    )
-
-
-def test_dbname_filtering(data_dbname_filtered, execute):
-    """Test for PR #256, --dbname-filter flag"""
+def test_filters_dbname(data, execute):
+    data_filtered = attr.evolve(data, filters=types.Filters(dbname="temp"))
     execute("SELECT pg_sleep(2)", dbname="template1", autocommit=True)
     nbconn = wait_for_data(
-        data_dbname_filtered.pg_get_active_connections,
+        data.pg_get_active_connections,
         msg="could not get active connections for filtered DBNAME",
     )
-    assert nbconn == 1
+    nbconn_filtered = wait_for_data(
+        data_filtered.pg_get_active_connections,
+        msg="could not get active connections for filtered DBNAME",
+    )
+    assert nbconn == 2
+    assert nbconn_filtered == 1
