@@ -95,38 +95,6 @@ PostgreSQL 13.1 - localhost - tester@host:5432/postgres - Ref.: 2s - Min. durati
  Load: 25.00 0.19 0.39        Write:  8B/s - 9/s
 
 
-Tests for columns_header()
---------------------------
-
->>> ui = UI.make(query_mode=QueryMode.activities,
-...              flag=Flag.PID | Flag.DATABASE,
-...              sort_key=SortKey.cpu)
->>> columns_header(term, ui, width=83)
-PID    DATABASE                      state   Query
-
->>> ui = UI.make(query_mode=QueryMode.activities,
-...              flag=Flag.CPU,
-...              sort_key=SortKey.cpu)
->>> columns_header(term, ui)
-  CPU%              state   Query
-
->>> ui = UI.make(query_mode=QueryMode.activities,
-...              flag=Flag.MEM,
-...              sort_key=SortKey.cpu)
->>> columns_header(term, ui)
-MEM%              state   Query
-
->>> ui = UI.make(query_mode=QueryMode.blocking,
-...              flag=Flag.PID | Flag.DATABASE | Flag.APPNAME | Flag.RELATION | Flag.CLIENT | Flag.WAIT,
-...              sort_key=SortKey.duration)
->>> columns_header(term, ui, width=150)
-PID    DATABASE                      APP           CLIENT  RELATION          Waiting              state   Query
-
->>> ui.evolve(query_mode=QueryMode.activities)
->>> columns_header(term, ui, width=150)
-PID    DATABASE                      APP           CLIENT          Waiting              state   Query
-
-
 Tests for processes_rows()
 --------------------------
 

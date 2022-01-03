@@ -331,7 +331,7 @@ def processes_rows(
     ) -> None:
         color = getattr(term, colors.FIELD_BY_MODE[column.color(value)][color_type])
         # We also restore 'normal' style so that the next item does not
-        # inherit previous one's style.
+        # inherit from that of the previous one.
         text.append(f"{color}{column.render(value)}{term.normal}")
 
     focused, pinned = processes.focused, processes.pinned
