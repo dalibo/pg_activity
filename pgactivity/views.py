@@ -325,17 +325,14 @@ def processes_rows(
     if width is None:
         width = term.width
 
-    def text_append(value: str) -> None:
-        # We also restore 'normal' style so that the next item does not
-        # inherit previous one's style.
-        text.append(value + term.normal)
-
     def cell(
         value: Any,
         column: Column,
     ) -> None:
         color = getattr(term, colors.FIELD_BY_MODE[column.color(value)][color_type])
-        text_append(f"{color}{column.render(value)}")
+        # We also restore 'normal' style so that the next item does not
+        # inherit previous one's style.
+        text.append(f"{color}{column.render(value)}{term.normal}")
 
     focused, pinned = processes.focused, processes.pinned
 
