@@ -154,6 +154,15 @@ Tests for processes_rows()
 
 >>> ui = UI.make(flag=Flag.PID|Flag.CPU|Flag.MEM|Flag.DATABASE)
 >>> processes_rows(term, ui, SelectableProcesses(processes1), 100)
+6239   pgbench          0.1    1.0      idle in trans UPDATE pgbench_accounts
+SET abalance = abalance + 141 WHERE aid = 1932841;
+6228   pgbench          0.2    1.0             active \_ UPDATE
+pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
+1234   business         2.4    1.0             active SELECT product_id, p.name
+FROM products p LEFT JOIN sales s USING (product_id) WHERE s.date > CURRENT_DATE
+- INTERVAL '4 weeks' GROUP BY product_id, p.name, p.price, p.cost HAVING
+sum(p.price * s.units) > 5000;
+
 6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts
 SET abalance = abalance + 141 WHERE aid = 1932841;
 6228   pgbench             0.2  1.0             active   \_ UPDATE
@@ -165,31 +174,29 @@ HAVING sum(p.price * s.units) > 5000;
 
 >>> ui.evolve(query_display_mode=QueryDisplayMode.truncate)
 >>> processes_rows(term, ui, SelectableProcesses(processes1), 100)
-6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts
-6228   pgbench             0.2  1.0             active   \_ UPDATE pgbench_accou
-1234   business            2.4  1.0             active   SELECT product_id, p.na
+6239   pgbench          0.1    1.0      idle in trans UPDATE pgbench_accounts S
+6228   pgbench          0.2    1.0             active \_ UPDATE pgbench_account
+1234   business         2.4    1.0             active SELECT product_id, p.name
 
 >>> ui.evolve(query_display_mode=QueryDisplayMode.wrap)
 >>> processes_rows(term, ui, SelectableProcesses(processes1), 100)
-6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts
-                                                         SET abalance = abalance
-                                                         + 141 WHERE aid =
-                                                         1932841;
-6228   pgbench             0.2  1.0             active   \_ UPDATE
-                                                         pgbench_accounts SET
-                                                         abalance = abalance +
-                                                         3062 WHERE aid =
-                                                         7289374;
-1234   business            2.4  1.0             active   SELECT product_id,
-                                                         p.name FROM products p
-                                                         LEFT JOIN sales s USING
-                                                         (product_id) WHERE
-                                                         s.date > CURRENT_DATE -
-                                                         INTERVAL '4 weeks'
-                                                         GROUP BY product_id,
-                                                         p.name, p.price, p.cost
-                                                         HAVING sum(p.price *
-                                                         s.units) > 5000;
+6239   pgbench          0.1    1.0      idle in trans UPDATE pgbench_accounts
+                                                       SET abalance = abalance +
+                                                       141 WHERE aid = 1932841;
+6228   pgbench          0.2    1.0             active \_ UPDATE
+                                                       pgbench_accounts SET
+                                                       abalance = abalance +
+                                                       3062 WHERE aid = 7289374;
+1234   business         2.4    1.0             active SELECT product_id, p.name
+                                                       FROM products p LEFT JOIN
+                                                       sales s USING
+                                                       (product_id) WHERE s.date
+                                                       > CURRENT_DATE - INTERVAL
+                                                       '4 weeks' GROUP BY
+                                                       product_id, p.name,
+                                                       p.price, p.cost HAVING
+                                                       sum(p.price * s.units) >
+                                                       5000;
 
 >>> allflags = Flag.all()
 >>> ui = UI.make(flag=allflags)
@@ -199,33 +206,33 @@ HAVING sum(p.price * s.units) > 5000;
 Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 (TODO: this is buggy, the first line should be wrapped as well if too long)
 >>> processes_rows(term, ui, SelectableProcesses(processes1), 100, width=250)
-6239   pgbench                   pgbench         postgres            local    0.1  1.0       7B      12B  0.000000                N    N      idle in trans   UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
-6228   pgbench                   pgbench         postgres            local    0.2  1.0       0B    1.08M  0.000413                     Y             active   \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
-1234   business               accounting              bob            local    2.4  1.0    9.42M    1.21K  20:34.00 BackendRandomLoc    N             active   SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id) WHERE s.date
-> CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name, p.price, p.cost HAVING sum(p.price * s.units) > 5000;
+6239   pgbench                   pgbench         postgres            local 0.1    1.0  7B       12B       0.000000                N N        idle in trans UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
+6228   pgbench                   pgbench         postgres            local 0.2    1.0  0B       1.08M     0.000413                  Y               active \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
+1234   business               accounting              bob            local 2.4    1.0  9.42M    1.21K     20:34.00 BackendRandomLoc N               active SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id) WHERE s.date >
+CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name, p.price, p.cost HAVING sum(p.price * s.units) > 5000;
 
 >>> ui = UI.make(flag=Flag.PID|Flag.DATABASE,
 ...              query_display_mode=QueryDisplayMode.truncate)
 >>> processes_rows(term, ui, SelectableProcesses(processes1), 100)
-6239   pgbench               idle in trans   UPDATE pgbench_accounts SET abalanc
-6228   pgbench                      active   \_ UPDATE pgbench_accounts SET abal
-1234   business                     active   SELECT product_id, p.name FROM prod
+6239   pgbench              idle in trans UPDATE pgbench_accounts SET abalance
+6228   pgbench                     active \_ UPDATE pgbench_accounts SET abalan
+1234   business                    active SELECT product_id, p.name FROM produc
 
 >>> ui.evolve(query_display_mode=QueryDisplayMode.wrap)
 >>> processes_rows(term, ui, SelectableProcesses(processes1), 100)
-6239   pgbench               idle in trans   UPDATE pgbench_accounts SET
-                                             abalance = abalance + 141 WHERE aid
-                                             = 1932841;
-6228   pgbench                      active   \_ UPDATE pgbench_accounts SET
-                                             abalance = abalance + 3062 WHERE
-                                             aid = 7289374;
-1234   business                     active   SELECT product_id, p.name FROM
-                                             products p LEFT JOIN sales s USING
-                                             (product_id) WHERE s.date >
-                                             CURRENT_DATE - INTERVAL '4 weeks'
-                                             GROUP BY product_id, p.name,
-                                             p.price, p.cost HAVING sum(p.price
-                                             * s.units) > 5000;
+6239   pgbench              idle in trans UPDATE pgbench_accounts SET abalance
+                                           = abalance + 141 WHERE aid = 1932841;
+6228   pgbench                     active \_ UPDATE pgbench_accounts SET
+                                           abalance = abalance + 3062 WHERE aid
+                                           = 7289374;
+1234   business                    active SELECT product_id, p.name FROM
+                                           products p LEFT JOIN sales s USING
+                                           (product_id) WHERE s.date >
+                                           CURRENT_DATE - INTERVAL '4 weeks'
+                                           GROUP BY product_id, p.name, p.price,
+                                           p.cost HAVING sum(p.price * s.units)
+                                           > 5000;
+
 
 >>> processes2 = [
 ...     BlockingProcess(
@@ -259,14 +266,13 @@ Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 ... ]
 >>> ui.evolve(query_mode=QueryMode.waiting)
 >>> processes_rows(term, ui, SelectableProcesses(processes2), 100)
-6239   pgbench                      active   END;
-6228   pgbench               idle in trans   UPDATE pgbench_branches SET
-                                             bbalance = bbalance + 1788 WHERE
-                                             bid = 68;
+6239   pgbench                     active END;
+6228   pgbench              idle in trans UPDATE pgbench_branches SET bbalance
+                                           = bbalance + 1788 WHERE bid = 68;
 >>> ui = UI.make(query_mode=QueryMode.blocking, flag=allflags)
 >>> processes_rows(term, ui, SelectableProcesses(processes2), 100, width=250)
-6239   pgbench                   pgbench         postgres          1.2.3.4      None    transactionid    ExclusiveLock  11:06.00      Client Read             active   END;
-6228   pgbench                   pgbench         postgres            local      ahah            tuple RowExclusiveLock  0.000413      Client Read      idle in trans   UPDATE pgbench_branches SET bbalance = bbalance + 1788 WHERE bid = 68;
+6239   pgbench                   pgbench         postgres          1.2.3.4      None    transactionid    ExclusiveLock  11:06.00      Client Read            active END;
+6228   pgbench                   pgbench         postgres            local      ahah            tuple RowExclusiveLock  0.000413      Client Read     idle in trans UPDATE pgbench_branches SET bbalance = bbalance + 1788 WHERE bid = 68;
 
 >>> processes1b = [
 ...     RunningProcess(
@@ -309,11 +315,10 @@ Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 >>> all_but_local_flags = Flag.PID|Flag.DATABASE|Flag.APPNAME|Flag.USER|Flag.CLIENT|Flag.TIME|Flag.WAIT
 >>> ui = UI.make(query_mode=QueryMode.activities,flag=all_but_local_flags)
 >>> processes_rows(term, ui, SelectableProcesses(processes1b), 100, width=200)
-6239   pgbench                   pgbench         postgres            local  0.000000                N      idle in trans   UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
-6228   pgbench                      none         postgres            local  0.000413                Y             active   \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid =
-7289374;
-1234   business               accounting              bob     192.168.0.47  20:34.00             clog             active   SELECT product_id, p.name FROM products p LEFT JOIN sales s USING
-(product_id) WHERE s.date > CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name, p.price, p.cost HAVING sum(p.price * s.units) > 5000;
+6239   pgbench                   pgbench         postgres            local  0.000000                N     idle in trans UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
+6228   pgbench                      none         postgres            local  0.000413                Y            active \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
+1234   business               accounting              bob     192.168.0.47  20:34.00             clog            active SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id)
+WHERE s.date > CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name, p.price, p.cost HAVING sum(p.price * s.units) > 5000;
 
 Tests scrolling in processes_rows()
 -----------------------------------
@@ -338,30 +343,30 @@ Tests scrolling in processes_rows()
 0
 >>> lc = line_counter(4)
 >>> processes_rows(term, ui, sproc, lc.value, width=200, lines_counter=lc)
-0      pgbench                      active   SELECT 0
-1      pgbench                      active   SELECT 1
-2      pgbench                      active   SELECT 2
-3      pgbench                      active   SELECT 3
+0      pgbench                     active SELECT 0
+1      pgbench                     active SELECT 1
+2      pgbench                     active SELECT 2
+3      pgbench                     active SELECT 3
 >>> for x in range(9):
 ...     _ = sproc.focus_next()
 >>> sproc.position()
 9
 >>> lc = line_counter(5)
 >>> processes_rows(term, ui, sproc, lc.value, width=200, lines_counter=lc)
-6      pgbench                      active   SELECT 6
-7      pgbench                      active   SELECT 7
-8      pgbench                      active   SELECT 8
-9      pgbench                      active   SELECT 9
+6      pgbench                     active SELECT 6
+7      pgbench                     active SELECT 7
+8      pgbench                     active SELECT 8
+9      pgbench                     active SELECT 9
 >>> _ = sproc.focus_next()
 >>> sproc.position()
 0
 >>> lc = line_counter(5)
 >>> processes_rows(term, ui, sproc, lc.value, width=200, lines_counter=lc)
-0      pgbench                      active   SELECT 0
-1      pgbench                      active   SELECT 1
-2      pgbench                      active   SELECT 2
-3      pgbench                      active   SELECT 3
-4      pgbench                      active   SELECT 4
+0      pgbench                     active SELECT 0
+1      pgbench                     active SELECT 1
+2      pgbench                     active SELECT 2
+3      pgbench                     active SELECT 3
+4      pgbench                     active SELECT 4
 >>> for x in range(9):
 ...     _ = sproc.focus_next()
 >>> sproc.position()
@@ -372,23 +377,23 @@ For 5 display lines, the focus will be on the 4th .
 
 >>> lc = line_counter(5)
 >>> processes_rows(term, ui, sproc, lc.value, width=200, lines_counter=lc)
-6      pgbench                      active   SELECT 6
-7      pgbench                      active   SELECT 7
-8      pgbench                      active   SELECT 8
-9      pgbench                      active   SELECT 9
+6      pgbench                     active SELECT 6
+7      pgbench                     active SELECT 7
+8      pgbench                     active SELECT 8
+9      pgbench                     active SELECT 9
 
 For 10 display lines, it should be at 8th line.
 
 >>> lc = line_counter(10)
 >>> processes_rows(term, ui, sproc, lc.value, width=200, lines_counter=lc)
-2      pgbench                      active   SELECT 2
-3      pgbench                      active   SELECT 3
-4      pgbench                      active   SELECT 4
-5      pgbench                      active   SELECT 5
-6      pgbench                      active   SELECT 6
-7      pgbench                      active   SELECT 7
-8      pgbench                      active   SELECT 8
-9      pgbench                      active   SELECT 9
+2      pgbench                     active SELECT 2
+3      pgbench                     active SELECT 3
+4      pgbench                     active SELECT 4
+5      pgbench                     active SELECT 5
+6      pgbench                     active SELECT 6
+7      pgbench                     active SELECT 7
+8      pgbench                     active SELECT 8
+9      pgbench                     active SELECT 9
 
 Tests for footer_*()
 --------------------
@@ -443,9 +448,9 @@ PostgreSQL 13 - testhost - pgadm@server.prod.tld:5433/app - Ref.: 10s - Min. dur
  Swap: 1.0% - 2.29K/5.88G      Read:   128B/s - 6/s
  Load: 0.50 1.90 0.93          Write:  8B/s - 9/s
                                 RUNNING QUERIES
-PID    DATABASE           CPU% MEM%              state   Query
-1234   business            2.4  1.0             active   SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id) WHERE s.date >
-6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
+PID    DATABASE         CPU%   MEM%             state Query
+1234   business         2.4    1.0             active SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id) WHERE s.date > C
+6239   pgbench          0.1    1.0      idle in trans UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -481,8 +486,8 @@ PostgreSQL 13 - testhost - pgadm@server.prod.tld:5433/app - Ref.: 10s - Min.
  Swap: 1.0% - 2.29K/5.88G      Read:   128B/s - 6/s
  Load: 0.50 1.90 0.93          Write:  8B/s - 9/s
                                 RUNNING QUERIES
-PID    DATABASE           CPU% MEM%              state   Query
-1234   business            2.4  1.0             active   SELECT product_id, p.na
+PID    DATABASE         CPU%   MEM%             state Query
+1234   business         2.4    1.0             active SELECT product_id, p.name
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>

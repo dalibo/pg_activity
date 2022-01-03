@@ -108,7 +108,7 @@ No activity, first screen followed by help screen:
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size: 106.07M - 0B/s ⋅ TPS: 0 ⋅ Active connections: 1 ⋅ Duration mode: query
                                 RUNNING QUERIES
-PID    DATABASE                     USER           CLIENT              state   Query
+PID    DATABASE                     USER           CLIENT             state Query
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -153,7 +153,7 @@ Press any key to exit.
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size: 106.07M - 0B/s ⋅ TPS: 0 ⋅ Active connections: 1 ⋅ Duration mode: query
                                 RUNNING QUERIES
-PID    DATABASE                     USER           CLIENT              state   Query
+PID    DATABASE                     USER           CLIENT             state Query
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -196,8 +196,8 @@ change query mode then quit:
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size: 106.07M - 0B/s ⋅ TPS: 0 ⋅ Active connections: 1 ⋅ Duration mode: query
                                 RUNNING QUERIES
-DATABASE                     USER           CLIENT              state   Query
-tests                    postgres     127.0.0.1/32      idle in trans   SELECT pg_sleep(0)
+DATABASE                     USER           CLIENT             state Query
+tests                    postgres     127.0.0.1/32     idle in trans SELECT pg_sleep(0)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -222,8 +222,8 @@ tests                    postgres     127.0.0.1/32      idle in trans   SELECT p
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size: 106.07M - 0B/s ⋅ TPS: 0 ⋅ Active connections: 1 ⋅ Duration mode: query
                                 RUNNING QUERIES
-DATABASE                     USER           CLIENT              state   Query
-tests                    postgres     127.0.0.1/32      idle in trans   SELECT pg_sleep(0)
+DATABASE                     USER           CLIENT             state Query
+tests                    postgres     127.0.0.1/32     idle in trans SELECT pg_sleep(0)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -248,8 +248,8 @@ tests                    postgres     127.0.0.1/32      idle in trans   SELECT p
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 0.5s
  Size: 106.07M - 0B/s ⋅ TPS: 0 ⋅ Active connections: 1 ⋅ Duration mode: query
                                 RUNNING QUERIES
-DATABASE                     USER           CLIENT              state   Query
-tests                    postgres     127.0.0.1/32      idle in trans   SELECT pg_sleep(0)
+DATABASE                     USER           CLIENT             state Query
+tests                    postgres     127.0.0.1/32     idle in trans SELECT pg_sleep(0)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -274,8 +274,8 @@ tests                    postgres     127.0.0.1/32      idle in trans   SELECT p
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size: 106.07M - 0B/s ⋅ TPS: 0 ⋅ Active connections: 1 ⋅ Duration mode: query
                                 RUNNING QUERIES
-DATABASE                     USER           CLIENT              state   Query
-tests                    postgres     127.0.0.1/32      idle in trans   SELECT pg_sleep(0)
+DATABASE                     USER           CLIENT             state Query
+tests                    postgres     127.0.0.1/32     idle in trans SELECT pg_sleep(0)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -300,8 +300,8 @@ tests                    postgres     127.0.0.1/32      idle in trans   SELECT p
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size: 106.07M - 0B/s ⋅ TPS: 0 ⋅ Active connections: 1 ⋅ Duration mode: query
                                      PAUSE
-DATABASE                     USER           CLIENT              state   Query
-tests                    postgres     127.0.0.1/32      idle in trans   SELECT pg_sleep(0)
+DATABASE                     USER           CLIENT             state Query
+tests                    postgres     127.0.0.1/32     idle in trans SELECT pg_sleep(0)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -326,8 +326,8 @@ tests                    postgres     127.0.0.1/32      idle in trans   SELECT p
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size: 106.07M - 0B/s ⋅ TPS: 0 ⋅ Active connections: 1 ⋅ Duration mode: query
                                      PAUSE
-DATABASE                     USER           CLIENT              state   Query
-tests                    postgres     127.0.0.1/32      idle in trans   SELECT pg_sleep(0)
+DATABASE                     USER           CLIENT             state Query
+tests                    postgres     127.0.0.1/32     idle in trans SELECT pg_sleep(0)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -352,8 +352,8 @@ tests                    postgres     127.0.0.1/32      idle in trans   SELECT p
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size: 106.07M - 0B/s ⋅ TPS: 0 ⋅ Active connections: 1 ⋅ Duration mode: query
                                      PAUSE
-DATABASE                     USER           CLIENT              state   Query
-tests                    postgres     127.0.0.1/32      idle in trans   SELECT pg_sleep(0)
+DATABASE                     USER           CLIENT             state Query
+tests                    postgres     127.0.0.1/32     idle in trans SELECT pg_sleep(0)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -378,8 +378,8 @@ tests                    postgres     127.0.0.1/32      idle in trans   SELECT p
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size: 106.07M - 0B/s ⋅ TPS: 0 ⋅ Active connections: 1 ⋅ Duration mode: query
                                      PAUSE
-DATABASE                     USER           CLIENT              state   Query
-tests                    postgres     127.0.0.1/32      idle in trans   SELECT pg_sleep(0)
+DATABASE                     USER           CLIENT             state Query
+tests                    postgres     127.0.0.1/32     idle in trans SELECT pg_sleep(0)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -404,8 +404,8 @@ tests                    postgres     127.0.0.1/32      idle in trans   SELECT p
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size: 106.07M - 0B/s ⋅ TPS: 0 ⋅ Active connections: 1 ⋅ Duration mode: query
                                 RUNNING QUERIES
-DATABASE                     USER           CLIENT              state   Query
-tests                    postgres     127.0.0.1/32      idle in trans   SELECT pg_sleep(0)
+DATABASE                     USER           CLIENT             state Query
+tests                    postgres     127.0.0.1/32     idle in trans SELECT pg_sleep(0)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -430,8 +430,8 @@ tests                    postgres     127.0.0.1/32      idle in trans   SELECT p
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size: 106.07M - 0B/s ⋅ TPS: 0 ⋅ Active connections: 1 ⋅ Duration mode: transaction
                                 RUNNING QUERIES
-DATABASE                     USER           CLIENT              state   Query
-tests                    postgres     127.0.0.1/32      idle in trans   SELECT pg_sleep(0)
+DATABASE                     USER           CLIENT             state Query
+tests                    postgres     127.0.0.1/32     idle in trans SELECT pg_sleep(0)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -456,8 +456,8 @@ tests                    postgres     127.0.0.1/32      idle in trans   SELECT p
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size: 106.07M - 0B/s ⋅ TPS: 0 ⋅ Active connections: 1 ⋅ Duration mode: transaction
                                 RUNNING QUERIES
-DATABASE                     USER           CLIENT              state   Query
-tests                    postgres     127.0.0.1/32      idle in trans   SELECT pg_sleep(0)
+DATABASE                     USER           CLIENT             state Query
+tests                    postgres     127.0.0.1/32     idle in trans SELECT pg_sleep(0)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -482,7 +482,7 @@ tests                    postgres     127.0.0.1/32      idle in trans   SELECT p
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size: 106.07M - 0B/s ⋅ TPS: 0 ⋅ Active connections: 1 ⋅ Duration mode: transaction
                                 WAITING QUERIES
-DATABASE                     USER           CLIENT  RELATION             TYPE             MODE              state   Query
+DATABASE                     USER           CLIENT  RELATION             TYPE             MODE             state Query
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -508,8 +508,8 @@ DATABASE                     USER           CLIENT  RELATION             TYPE   
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size: 106.07M - 0B/s ⋅ TPS: 0 ⋅ Active connections: 1 ⋅ Duration mode: transaction
                                 RUNNING QUERIES
-DATABASE                     USER           CLIENT              state   Query
-tests                    postgres     127.0.0.1/32      idle in trans   SELECT pg_sleep(0)
+DATABASE                     USER           CLIENT             state Query
+tests                    postgres     127.0.0.1/32     idle in trans SELECT pg_sleep(0)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -534,7 +534,7 @@ tests                    postgres     127.0.0.1/32      idle in trans   SELECT p
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 1s
  Size: 106.07M - 0B/s ⋅ TPS: 0 ⋅ Active connections: 1 ⋅ Duration mode: transaction
                                 BLOCKING QUERIES
-DATABASE                     USER           CLIENT  RELATION             TYPE             MODE              state   Query
+DATABASE                     USER           CLIENT  RELATION             TYPE             MODE             state Query
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -579,9 +579,9 @@ Use another set of options:
 ... )
 >>> run_ui(options, ["D", "v", "q"], width=100, render_header=False)
                                 RUNNING QUERIES
-DATABASE                      state   Query
-tests                 idle in trans   CREATE TABLE persons (firstname text, lastname text, age int,
-                                      address text)
+DATABASE                     state Query
+tests                idle in trans CREATE TABLE persons (firstname text, lastname text, age int,
+                                    address text)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -605,9 +605,9 @@ tests                 idle in trans   CREATE TABLE persons (firstname text, last
 <BLANKLINE>
 ----------------------------------------- sending key 'D' ------------------------------------------
                                 RUNNING QUERIES
-DATABASE                      state   Query
-tests                 idle in trans   CREATE TABLE persons (firstname text, lastname text, age int,
-                                      address text)
+DATABASE                     state Query
+tests                idle in trans CREATE TABLE persons (firstname text, lastname text, age int,
+                                    address text)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -631,8 +631,8 @@ tests                 idle in trans   CREATE TABLE persons (firstname text, last
 <BLANKLINE>
 ----------------------------------------- sending key 'v' ------------------------------------------
                                 RUNNING QUERIES
-DATABASE                      state   Query
-tests                 idle in trans   CREATE TABLE persons (firstname text, lastname text, age int,
+DATABASE                     state Query
+tests                idle in trans CREATE TABLE persons (firstname text, lastname text, age int, ad
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>

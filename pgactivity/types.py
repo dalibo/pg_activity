@@ -19,6 +19,7 @@ from typing import (
 
 import attr
 import psutil
+from attr import validators
 
 from . import colors, utils
 
@@ -203,7 +204,8 @@ _color_key_marker = f"{id(object())}"
 class Column:
     """A column in stats table.
 
-    >>> c = Column("pid", "PID", "%-6s", True, SortKey.cpu, max_width=6,
+    >>> c = Column("pid", "PID", mandatory=True, sort_key=SortKey.cpu,
+    ...            min_width=6, max_width=6,
     ...            transform=lambda v: str(v)[::-1])
     >>> c.title_render()
     'PID   '
@@ -217,45 +219,55 @@ class Column:
     '876543'
     >>> c.color_key
     'pid'
+
+    >>> c = attr.evolve(c, justify="right", min_width=4, max_width=5)
+    >>> c.title_render()
+    ' PID'
+    >>> c.render('7654321')
+    '12345'
+    >>> c.render('21')
+    '  12'
     """
 
     key: str = attr.ib(repr=False)
     name: str
-    template_h: str = attr.ib()
     mandatory: bool = False
     sort_key: Optional[SortKey] = None
+    min_width: int = attr.ib(default=0, repr=False)
     max_width: Optional[int] = attr.ib(default=None, repr=False)
+    justify: str = attr.ib(
+        "left", validator=validators.in_(["left", "center", "right"])
+    )
     transform: Callable[[Any], str] = attr.ib(default=str, repr=False)
     color_key: Union[str, Callable[[Any], str]] = attr.ib(
         default=_color_key_marker, repr=False
     )
 
-    @template_h.validator
-    def _template_h_is_a_format_string_(self, attribute: Any, value: str) -> None:
-        """Validate template_h attribute.
-
-        >>> Column("k", "a", "b%%aa")
-        Traceback (most recent call last):
-            ...
-        ValueError: template_h must be a format string with one placeholder
-        >>> Column("k", "a", "baad")
-        Traceback (most recent call last):
-            ...
-        ValueError: template_h must be a format string with one placeholder
-        >>> Column("k", "a", "%s is good")  # doctest: +ELLIPSIS
-        Column(name='a', template_h='%s is good', ...)
-        """
-        if value.count("%") != 1:
-            raise ValueError(
-                f"{attribute.name} must be a format string with one placeholder"
-            )
+    _justify: Callable[[str], str] = attr.ib(init=False)
 
     def __attrs_post_init__(self) -> None:
         if self.color_key == _color_key_marker:
             object.__setattr__(self, "color_key", self.key)
 
+        if self.justify == "left":
+
+            def _justify(value: str) -> str:
+                return value.ljust(self.min_width)[: self.max_width]
+
+        elif self.justify == "right":
+
+            def _justify(value: str) -> str:
+                return value.rjust(self.min_width)[: self.max_width]
+
+        elif self.justify == "center":
+
+            def _justify(value: str) -> str:
+                return value.center(self.min_width)[: self.max_width]
+
+        object.__setattr__(self, "_justify", _justify)
+
     def title_render(self) -> str:
-        return self.template_h % self.name
+        return self._justify(self.name)
 
     def title_color(self, sort_by: SortKey) -> str:
         if self.sort_key == sort_by:
@@ -263,7 +275,7 @@ class Column:
         return "green"
 
     def render(self, value: Any) -> str:
-        return self.template_h % self.transform(value)[: self.max_width]
+        return self._justify(self.transform(value))
 
     def color(self, value: Any) -> str:
         if callable(self.color_key):
@@ -308,28 +320,30 @@ class UI:
             add_column(
                 key="application_name",
                 name="APP",
-                template_h="%16s ",
+                min_width=16,
                 max_width=16,
+                justify="right",
             )
         if Flag.CLIENT & flag:
             add_column(
                 key="client",
                 name="CLIENT",
-                template_h="%16s ",
+                min_width=16,
                 max_width=16,
+                justify="right",
             )
         if Flag.CPU & flag:
             add_column(
                 key="cpu",
                 name="CPU%",
-                template_h="%6s ",
+                min_width=6,
                 sort_key=SortKey.cpu,
             )
         if Flag.DATABASE & flag:
             add_column(
                 key="database",
                 name="DATABASE(*)" if filters.dbname else "DATABASE",
-                template_h=f"%-{max_db_length}s ",
+                min_width=max_db_length,
                 transform=functools.lru_cache()(
                     lambda v: utils.ellipsis(v, width=16) if v else "",
                 ),
@@ -339,7 +353,7 @@ class UI:
             add_column(
                 key="io_wait",
                 name="IOW",
-                template_h="%4s ",
+                min_width=4,
                 transform=utils.yn,
                 color_key=colors.wait,
             )
@@ -347,7 +361,7 @@ class UI:
             add_column(
                 key="mem",
                 name="MEM%",
-                template_h="%4s ",
+                min_width=4,
                 sort_key=SortKey.mem,
                 transform=lambda v: str(round(v, 1)),
             )
@@ -355,18 +369,27 @@ class UI:
             add_column(
                 key="mode",
                 name="MODE",
-                template_h="%16s ",
+                min_width=16,
                 max_width=16,
+                justify="right",
                 color_key=colors.lock_mode,
             )
         if Flag.PID & flag:
-            add_column(key="pid", name="PID", template_h="%-6s ")
-        add_column(key="query", name="Query", template_h=" %2s")
+            add_column(
+                key="pid",
+                name="PID",
+                min_width=6,
+            )
+        add_column(
+            key="query",
+            name="Query",
+            min_width=2,
+        )
         if Flag.READ & flag:
             add_column(
                 key="read",
                 name="READ/s",
-                template_h="%8s ",
+                min_width=8,
                 sort_key=SortKey.read,
                 transform=utils.naturalsize,
             )
@@ -374,13 +397,15 @@ class UI:
             add_column(
                 key="relation",
                 name="RELATION",
-                template_h="%9s ",
+                min_width=9,
                 max_width=9,
+                justify="right",
             )
         add_column(
             key="state",
             name="state",
-            template_h=" %17s  ",
+            min_width=17,
+            justify="right",
             transform=utils.short_state,
             color_key=colors.short_state,
         )
@@ -388,29 +413,43 @@ class UI:
             add_column(
                 key="duration",
                 name="TIME+",
-                template_h="%9s ",
+                min_width=9,
+                justify="right",
                 sort_key=SortKey.duration,
                 transform=lambda v: utils.format_duration(v)[0],
                 color_key=lambda v: utils.format_duration(v)[1],
             )
         if Flag.TYPE & flag:
-            add_column(key="type", name="TYPE", template_h="%16s ", max_width=16)
+            add_column(
+                key="type",
+                name="TYPE",
+                min_width=16,
+                max_width=16,
+                justify="right",
+            )
         if Flag.USER & flag:
-            add_column(key="user", name="USER", template_h="%16s ", max_width=16)
+            add_column(
+                key="user",
+                name="USER",
+                min_width=16,
+                max_width=16,
+                justify="right",
+            )
         if Flag.WAIT & flag:
             add_column(
                 key="wait",
                 name="Waiting",
-                template_h="%16s ",
+                min_width=16,
+                max_width=16,
+                justify="right",
                 transform=utils.wait_status,
                 color_key=colors.wait,
-                max_width=16,
             )
         if Flag.WRITE & flag:
             add_column(
                 key="write",
                 name="WRITE/s",
-                template_h="%8s ",
+                min_width=8,
                 sort_key=SortKey.write,
                 transform=utils.naturalsize,
             )
@@ -574,7 +613,7 @@ class UI:
 
         >>> ui = UI.make()
         >>> ui.column("cpu")  # doctest: +ELLIPSIS
-        Column(name='CPU%', template_h='%6s ', mandatory=False, sort_key=...)
+        Column(name='CPU%', mandatory=False, sort_key=...)
         >>> ui.column("gloups")
         Traceback (most recent call last):
           ...

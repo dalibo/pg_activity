@@ -20,21 +20,21 @@ def term() -> Terminal:
                 sort_key=SortKey.cpu,
             ),
             83,
-            "PID    DATABASE                      state   Query",
+            "PID    DATABASE                     state Query",
         ),
         (
             UI.make(
                 query_mode=QueryMode.activities, flag=Flag.CPU, sort_key=SortKey.cpu
             ),
             None,
-            "  CPU%              state   Query",
+            "CPU%               state Query",
         ),
         (
             UI.make(
                 query_mode=QueryMode.activities, flag=Flag.MEM, sort_key=SortKey.cpu
             ),
             None,
-            "MEM%              state   Query",
+            "MEM%             state Query",
         ),
         (
             UI.make(
@@ -48,7 +48,7 @@ def term() -> Terminal:
                 sort_key=SortKey.duration,
             ),
             150,
-            "PID    DATABASE                      APP           CLIENT  RELATION          Waiting              state   Query",
+            "PID    DATABASE                      APP           CLIENT  RELATION          Waiting             state Query",
         ),
     ],
     ids=[

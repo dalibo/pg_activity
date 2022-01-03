@@ -279,7 +279,7 @@ def columns_header(term: Terminal, ui: UI) -> Iterator[str]:
     for column in ui.columns():
         color = getattr(term, f"black_on_{column.title_color(ui.sort_key)}")
         htitles.append(f"{color}{column.title_render()}")
-    yield term.ljust("".join(htitles), fillchar=" ") + term.normal
+    yield term.ljust(" ".join(htitles), fillchar=" ") + term.normal
 
 
 def get_indent(ui: UI) -> str:
@@ -288,16 +288,12 @@ def get_indent(ui: UI) -> str:
     >>> from pgactivity.types import Flag, UI
     >>> ui = UI.make(flag=Flag.CPU)
     >>> get_indent(ui)
-    '                           '
+    '                         '
     >>> ui = UI.make(flag=Flag.PID | Flag.DATABASE | Flag.APPNAME | Flag.RELATION)
     >>> get_indent(ui)
-    '                                                             '
+    '                                                           '
     """
-    indent = ""
-    for column in ui.columns():
-        if column.name != "Query":
-            indent += column.template_h % " "
-    return indent
+    return " " * sum(c.min_width + 1 for c in ui.columns() if c.name != "Query")
 
 
 def format_query(query: str, is_parallel_worker: bool) -> str:
@@ -399,7 +395,7 @@ def processes_rows(
 
             cell(query_value, ui.column("query"))
 
-        for line in ("".join(text) + term.normal).splitlines():
+        for line in (" ".join(text) + term.normal).splitlines():
             yield line
 
 
