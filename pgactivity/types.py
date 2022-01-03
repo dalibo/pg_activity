@@ -300,9 +300,9 @@ class UI:
     ) -> "UI":
         possible_columns: Dict[str, Column] = {}
 
-        def add_column(key: str, **kwargs: Any) -> None:
+        def add_column(key: str, name: str, **kwargs: Any) -> None:
             assert key not in possible_columns, f"duplicated key {key}"
-            possible_columns[key] = Column(key, **kwargs)
+            possible_columns[key] = Column(key=key, name=name, **kwargs)
 
         if Flag.APPNAME & flag:
             add_column(
