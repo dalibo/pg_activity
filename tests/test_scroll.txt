@@ -28,7 +28,7 @@ Tests scrolling in processes_rows()
 >>> sproc.position()
 0
 >>> lc = line_counter(4)
->>> processes_rows(term, ui, sproc, lc.value, width=200, lines_counter=lc)
+>>> processes_rows(term, ui, sproc, lc.value, lines_counter=lc)
 0      pgbench                     active SELECT 0
 1      pgbench                     active SELECT 1
 2      pgbench                     active SELECT 2
@@ -38,7 +38,7 @@ Tests scrolling in processes_rows()
 >>> sproc.position()
 9
 >>> lc = line_counter(5)
->>> processes_rows(term, ui, sproc, lc.value, width=200, lines_counter=lc)
+>>> processes_rows(term, ui, sproc, lc.value, lines_counter=lc)
 6      pgbench                     active SELECT 6
 7      pgbench                     active SELECT 7
 8      pgbench                     active SELECT 8
@@ -47,7 +47,7 @@ Tests scrolling in processes_rows()
 >>> sproc.position()
 0
 >>> lc = line_counter(5)
->>> processes_rows(term, ui, sproc, lc.value, width=200, lines_counter=lc)
+>>> processes_rows(term, ui, sproc, lc.value, lines_counter=lc)
 0      pgbench                     active SELECT 0
 1      pgbench                     active SELECT 1
 2      pgbench                     active SELECT 2
@@ -62,7 +62,7 @@ We never put the focus on the lower 1/5th of the screen.
 For 5 display lines, the focus will be on the 4th .
 
 >>> lc = line_counter(5)
->>> processes_rows(term, ui, sproc, lc.value, width=200, lines_counter=lc)
+>>> processes_rows(term, ui, sproc, lc.value, lines_counter=lc)
 6      pgbench                     active SELECT 6
 7      pgbench                     active SELECT 7
 8      pgbench                     active SELECT 8
@@ -71,7 +71,7 @@ For 5 display lines, the focus will be on the 4th .
 For 10 display lines, it should be at 8th line.
 
 >>> lc = line_counter(10)
->>> processes_rows(term, ui, sproc, lc.value, width=200, lines_counter=lc)
+>>> processes_rows(term, ui, sproc, lc.value, lines_counter=lc)
 2      pgbench                     active SELECT 2
 3      pgbench                     active SELECT 3
 4      pgbench                     active SELECT 4
