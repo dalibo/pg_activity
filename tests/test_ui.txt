@@ -40,7 +40,7 @@ Default CLI options, passed to ui.main():
 ...     "port": f"{postgres.info.port}",
 ...     "rds": False,
 ...     "username": f"{postgres.info.user}",
-...     "querydisplaymode": "2",
+...     "wrap_query": False,
 ... }
 >>> options = optparse.Values(defaults=defaults)
 
@@ -138,7 +138,7 @@ Released under PostgreSQL License.
      Space: pause/unpause
          +: increase refresh time (max:5s)
          -: decrease refresh time (min:0.5s)
-         v: change display mode
+         v: toggle query wrap
          T: change duration mode
          D: force refresh database size
          R: force refresh
@@ -570,7 +570,7 @@ Use another set of options:
 ...     defaults=dict(
 ...         defaults,
 ...         durationmode="2",
-...         querydisplaymode="3",
+...         wrap_query=True,
 ...         noclient=True,
 ...         nouser=True,
 ...         nodbsize=True,
@@ -681,7 +681,7 @@ Interactive mode:
 ...     defaults=dict(
 ...         defaults,
 ...         durationmode="1",
-...         querydisplaymode="3",
+...         wrap_query=True,
 ...         nopid=False,
 ...         noclient=True,
 ...         nouser=True,

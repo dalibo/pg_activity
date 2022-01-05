@@ -98,15 +98,14 @@ def get_parser() -> OptionParser:
         help="Skip total size of DB",
         default=False,
     )
-    # --query-display-mode
+    # --wrap-query
     parser.add_option(
         "-w",
-        "--query-display-mode",
-        dest="querydisplaymode",
-        help="Queries display mode. Values: 1-TRUNCATED, 2-FULL(default), 3-INDENTED",
-        metavar="DISPLAY_MODE",
-        choices=["1", "2", "3"],
-        default="2",
+        "--wrap-query",
+        dest="wrap_query",
+        action="store_true",
+        help="Wrap query column instead of truncating",
+        default=False,
     )
     # --duration-mode
     parser.add_option(
@@ -137,15 +136,6 @@ def get_parser() -> OptionParser:
         action="append",
         metavar="FIELD:REGEX",
         default=[],
-    )
-    # --verbose-mode
-    parser.add_option(
-        "--verbose-mode",
-        dest="querydisplaymode",
-        help="DEPRECATED, use --query-display-mode instead",
-        metavar="VERBOSE_MODE",
-        choices=["1", "2", "3"],
-        default="2",
     )
 
     group = OptionGroup(

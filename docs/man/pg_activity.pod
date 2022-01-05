@@ -183,9 +183,9 @@ required by another session. It shows following information:
 
 	Skip total size of DB.
 
-=item B<-w DISPLAY_MODE, --query-display-mode=DISPLAY_MODE>
+=item B<-w, --wrap-query>
 
-	Queries display mode. Values: 1-TRUNCATED, 2-FULL(default), 3-INDENTED
+	Wrap query column instead of truncating
 
 =item B<--duration-mode=DURATION_MODE>
 
