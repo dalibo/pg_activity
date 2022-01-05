@@ -701,7 +701,7 @@ independent of the number of digits in PIDs.)
 ...     run_ui(options, keys, render_footer=True, width=140)  # doctest: +ELLIPSIS,+NORMALIZE_WHITESPACE
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size: 106.07M - 0B/s ⋅ TPS: 0 ⋅ Active connections: 2 ⋅ Duration mode: query
-                                RUNNING QUERIES
+                                                              RUNNING QUERIES
 PID    DATABASE                      state   Query
 ...    tests                 idle in trans   SELECT 42
 ...    tests                 idle in trans   SELECT 43
@@ -727,7 +727,7 @@ F1/1 Running queries   F2/2 Waiting queries   F3/3 Blocking queries  Space Pause
 ---------------------------------------------------------- sending key 'KEY_DOWN' ----------------------------------------------------------
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size: 106.07M - 0B/s ⋅ TPS: 0 ⋅ Active connections: 2 ⋅ Duration mode: query
-                                RUNNING QUERIES
+                                                              RUNNING QUERIES
 PID    DATABASE                      state   Query
 ...    tests                 idle in trans   SELECT 42
 ...    tests                 idle in trans   SELECT 43
@@ -753,7 +753,7 @@ C Cancel current query     K Terminate current query  Space Tag/untag current qu
 ------------------------------------------------------------- sending key '2' --------------------------------------------------------------
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size: 106.07M - 0B/s ⋅ TPS: 0 ⋅ Active connections: 2 ⋅ Duration mode: query
-                                WAITING QUERIES
+                                                              WAITING QUERIES
 PID    DATABASE          RELATION             TYPE             MODE              state   Query
 ...    tests                 None    transactionid        ShareLock             active   UPDATE t SET s = 'waiting'
 <BLANKLINE>
@@ -779,7 +779,7 @@ F1/1 Running queries   F2/2 Waiting queries   F3/3 Blocking queries  Space Pause
 ------------------------------------------------------------- sending key '3' --------------------------------------------------------------
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size: 106.07M - 0B/s ⋅ TPS: 0 ⋅ Active connections: 2 ⋅ Duration mode: query
-                                BLOCKING QUERIES
+                                                              BLOCKING QUERIES
 PID    DATABASE          RELATION             TYPE             MODE              state   Query
 ...    tests                 None    transactionid    ExclusiveLock      idle in trans   UPDATE t SET s = 'blocking'
 <BLANKLINE>
@@ -805,7 +805,7 @@ F1/1 Running queries   F2/2 Waiting queries   F3/3 Blocking queries  Space Pause
 ------------------------------------------------------------- sending key '1' --------------------------------------------------------------
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size: 106.07M - 0B/s ⋅ TPS: 0 ⋅ Active connections: 2 ⋅ Duration mode: query
-                                RUNNING QUERIES
+                                                              RUNNING QUERIES
 PID    DATABASE                      state   Query
 ...    tests                 idle in trans   SELECT 42
 ...    tests                 idle in trans   SELECT 43
@@ -831,7 +831,7 @@ F1/1 Running queries   F2/2 Waiting queries   F3/3 Blocking queries  Space Pause
 ---------------------------------------------------------- sending key 'KEY_DOWN' ----------------------------------------------------------
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size: 106.07M - 0B/s ⋅ TPS: 0 ⋅ Active connections: 2 ⋅ Duration mode: query
-                                RUNNING QUERIES
+                                                              RUNNING QUERIES
 PID    DATABASE                      state   Query
 ...    tests                 idle in trans   SELECT 42
 ...    tests                 idle in trans   SELECT 43
@@ -861,7 +861,7 @@ C Cancel current query     K Terminate current query  Space Tag/untag current qu
 ------------------------------------------------------------- sending key 'n' --------------------------------------------------------------
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size: 106.07M - 0B/s ⋅ TPS: 0 ⋅ Active connections: 2 ⋅ Duration mode: query
-                                RUNNING QUERIES
+                                                              RUNNING QUERIES
 PID    DATABASE                      state   Query
 ...    tests                 idle in trans   SELECT 42
 ...    tests                 idle in trans   SELECT 43
@@ -891,7 +891,7 @@ C Cancel current query     K Terminate current query  Space Tag/untag current qu
 ------------------------------------------------------------- sending key 'y' --------------------------------------------------------------
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size: 106.07M - 0B/s ⋅ TPS: 0 ⋅ Active connections: 2 ⋅ Duration mode: query
-                                RUNNING QUERIES
+                                                              RUNNING QUERIES
 PID    DATABASE                      state   Query
 ...    tests                 idle in trans   SELECT 43
 ...    tests                 idle in trans   UPDATE t SET s = 'blocking'
@@ -917,7 +917,7 @@ PID    DATABASE                      state   Query
 ---------------------------------------------------------- sending key 'KEY_DOWN' ----------------------------------------------------------
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size: 106.07M - 0B/s ⋅ TPS: 0 ⋅ Active connections: 2 ⋅ Duration mode: query
-                                RUNNING QUERIES
+                                                              RUNNING QUERIES
 PID    DATABASE                      state   Query
 ...    tests                 idle in trans   SELECT 43
 ...    tests                 idle in trans   UPDATE t SET s = 'blocking'
@@ -943,7 +943,7 @@ PID    DATABASE                      state   Query
 ------------------------------------------------------------- sending key ' ' --------------------------------------------------------------
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size: 106.07M - 0B/s ⋅ TPS: 0 ⋅ Active connections: 2 ⋅ Duration mode: query
-                                RUNNING QUERIES
+                                                              RUNNING QUERIES
 PID    DATABASE                      state   Query
 ...    tests                 idle in trans   SELECT 43
 ...    tests                 idle in trans   UPDATE t SET s = 'blocking'
@@ -969,7 +969,7 @@ C Cancel current query     K Terminate current query  Space Tag/untag current qu
 ------------------------------------------------------------- sending key 'j' --------------------------------------------------------------
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size: 106.07M - 0B/s ⋅ TPS: 0 ⋅ Active connections: 2 ⋅ Duration mode: query
-                                RUNNING QUERIES
+                                                              RUNNING QUERIES
 PID    DATABASE                      state   Query
 ...    tests                 idle in trans   SELECT 43
 ...    tests                 idle in trans   UPDATE t SET s = 'blocking'
@@ -995,7 +995,7 @@ C Cancel current query     K Terminate current query  Space Tag/untag current qu
 ------------------------------------------------------------- sending key ' ' --------------------------------------------------------------
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size: 106.07M - 0B/s ⋅ TPS: 0 ⋅ Active connections: 2 ⋅ Duration mode: query
-                                RUNNING QUERIES
+                                                              RUNNING QUERIES
 PID    DATABASE                      state   Query
 ...    tests                 idle in trans   SELECT 43
 ...    tests                 idle in trans   UPDATE t SET s = 'blocking'
@@ -1025,7 +1025,7 @@ C Cancel current query     K Terminate current query  Space Tag/untag current qu
 ------------------------------------------------------------- sending key 'y' --------------------------------------------------------------
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size: 106.07M - 0B/s ⋅ TPS: 0 ⋅ Active connections: 1 ⋅ Duration mode: query
-                                RUNNING QUERIES
+                                                              RUNNING QUERIES
 PID    DATABASE                      state   Query
 <BLANKLINE>
 <BLANKLINE>
