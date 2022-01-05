@@ -22,7 +22,7 @@ Released under PostgreSQL License.
          t: sort by TIME+ desc. (activities)
          +: increase refresh time (max:5s)
          -: decrease refresh time (min:0.5s)
-         v: change display mode
+         v: toggle query wrap
          T: change duration mode
          D: force refresh database size
          R: force refresh
@@ -42,7 +42,7 @@ Released under PostgreSQL License.
      Space: pause/unpause
          +: increase refresh time (max:5s)
          -: decrease refresh time (min:0.5s)
-         v: change display mode
+         v: toggle query wrap
          T: change duration mode
          D: force refresh database size
          R: force refresh
@@ -154,31 +154,11 @@ Tests for processes_rows()
 
 >>> ui = UI.make(flag=Flag.PID|Flag.CPU|Flag.MEM|Flag.DATABASE)
 >>> processes_rows(term, ui, SelectableProcesses(processes1), 100)
-6239   pgbench          0.1    1.0      idle in trans UPDATE pgbench_accounts
-SET abalance = abalance + 141 WHERE aid = 1932841;
-6228   pgbench          0.2    1.0             active \_ UPDATE
-pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
-1234   business         2.4    1.0             active SELECT product_id, p.name
-FROM products p LEFT JOIN sales s USING (product_id) WHERE s.date > CURRENT_DATE
-- INTERVAL '4 weeks' GROUP BY product_id, p.name, p.price, p.cost HAVING
-sum(p.price * s.units) > 5000;
-
-6239   pgbench             0.1  1.0      idle in trans   UPDATE pgbench_accounts
-SET abalance = abalance + 141 WHERE aid = 1932841;
-6228   pgbench             0.2  1.0             active   \_ UPDATE
-pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
-1234   business            2.4  1.0             active   SELECT product_id,
-p.name FROM products p LEFT JOIN sales s USING (product_id) WHERE s.date >
-CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name, p.price, p.cost
-HAVING sum(p.price * s.units) > 5000;
-
->>> ui.evolve(query_display_mode=QueryDisplayMode.truncate)
->>> processes_rows(term, ui, SelectableProcesses(processes1), 100)
 6239   pgbench          0.1    1.0      idle in trans UPDATE pgbench_accounts S
 6228   pgbench          0.2    1.0             active \_ UPDATE pgbench_account
 1234   business         2.4    1.0             active SELECT product_id, p.name
 
->>> ui.evolve(query_display_mode=QueryDisplayMode.wrap)
+>>> ui.evolve(wrap_query=True)
 >>> processes_rows(term, ui, SelectableProcesses(processes1), 100)
 6239   pgbench          0.1    1.0      idle in trans UPDATE pgbench_accounts
                                                        SET abalance = abalance +
@@ -209,16 +189,14 @@ Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 6239   pgbench                   pgbench         postgres            local 0.1    1.0  7B       12B       0.000000                N N        idle in trans UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
 6228   pgbench                   pgbench         postgres            local 0.2    1.0  0B       1.08M     0.000413                  Y               active \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
 1234   business               accounting              bob            local 2.4    1.0  9.42M    1.21K     20:34.00 BackendRandomLoc N               active SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id) WHERE s.date >
-CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name, p.price, p.cost HAVING sum(p.price * s.units) > 5000;
 
->>> ui = UI.make(flag=Flag.PID|Flag.DATABASE,
-...              query_display_mode=QueryDisplayMode.truncate)
+>>> ui = UI.make(flag=Flag.PID|Flag.DATABASE, wrap_query=False)
 >>> processes_rows(term, ui, SelectableProcesses(processes1), 100)
 6239   pgbench              idle in trans UPDATE pgbench_accounts SET abalance
 6228   pgbench                     active \_ UPDATE pgbench_accounts SET abalan
 1234   business                    active SELECT product_id, p.name FROM produc
 
->>> ui.evolve(query_display_mode=QueryDisplayMode.wrap)
+>>> ui.evolve(wrap_query=True)
 >>> processes_rows(term, ui, SelectableProcesses(processes1), 100)
 6239   pgbench              idle in trans UPDATE pgbench_accounts SET abalance
                                            = abalance + 141 WHERE aid = 1932841;
@@ -318,7 +296,6 @@ CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name, p.price, p.cost H
 6239   pgbench                   pgbench         postgres            local  0.000000                N     idle in trans UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
 6228   pgbench                      none         postgres            local  0.000413                Y            active \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
 1234   business               accounting              bob     192.168.0.47  20:34.00             clog            active SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id)
-WHERE s.date > CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name, p.price, p.cost HAVING sum(p.price * s.units) > 5000;
 
 Tests scrolling in processes_rows()
 -----------------------------------
@@ -427,7 +404,7 @@ Tests for screen()
 ...     query_mode=QueryMode.activities,
 ...     flag=Flag.PID|Flag.CPU|Flag.MEM|Flag.DATABASE,
 ...     sort_key=SortKey.cpu,
-...     query_display_mode=QueryDisplayMode.truncate,
+...     wrap_query=False,
 ...     in_pause=False,
 ... )
 >>> screen(

@@ -3,7 +3,7 @@ from typing import Optional
 from blessed.keyboard import Keystroke
 
 from . import keys
-from .types import DurationMode, Flag, QueryDisplayMode, QueryMode, SortKey, enum_next
+from .types import DurationMode, Flag, QueryMode, SortKey, enum_next
 
 
 def refresh_time(
@@ -50,19 +50,19 @@ def duration_mode(key: Keystroke, mode: DurationMode) -> DurationMode:
     return mode
 
 
-def query_display_mode(key: Keystroke, mode: QueryDisplayMode) -> QueryDisplayMode:
-    """Return the updated query display mode matching input key.
+def wrap_query(key: Keystroke, wrap: bool) -> bool:
+    """Return the updated 'wrap' value depending on input key.
 
     >>> from blessed.keyboard import Keystroke as k
 
-    >>> query_display_mode(k("42"), QueryDisplayMode.truncate).name
-    'truncate'
-    >>> query_display_mode(k("v"), QueryDisplayMode.wrap_noindent).name
-    'wrap'
+    >>> wrap_query(k("42"), True)
+    True
+    >>> wrap_query(k("v"), False)
+    True
     """
-    if key == keys.CHANGE_DISPLAY_MODE:
-        return enum_next(mode)
-    return mode
+    if key == keys.WRAP_QUERY:
+        return not wrap
+    return wrap
 
 
 def query_mode(key: Keystroke) -> Optional[QueryMode]:

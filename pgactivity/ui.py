@@ -36,7 +36,7 @@ def main(
         flag=flag,
         min_duration=options.minduration,
         duration_mode=int(options.durationmode),
-        query_display_mode=int(options.querydisplaymode),
+        wrap_query=options.wrap_query,
         max_db_length=min(max(int(pg_db_info["max_length"]), 8), 16),
         filters=data.filters,
     )
@@ -134,9 +134,7 @@ def main(
                     ui.end_interactive()
                     changes = {
                         "duration_mode": handlers.duration_mode(key, ui.duration_mode),
-                        "query_display_mode": handlers.query_display_mode(
-                            key, ui.query_display_mode
-                        ),
+                        "wrap_query": handlers.wrap_query(key, ui.wrap_query),
                     }
                     if key in (keys.REFRESH_TIME_INCREASE, keys.REFRESH_TIME_DECREASE):
                         changes["refresh_time"] = handlers.refresh_time(

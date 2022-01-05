@@ -35,7 +35,6 @@ from .types import (
     Host,
     IOCounter,
     MemoryInfo,
-    QueryDisplayMode,
     SelectableProcesses,
     SystemInfo,
     UI,
@@ -356,42 +355,16 @@ def processes_rows(
                 cell(getattr(process, field), column)
 
         indent = get_indent(ui) + " "
-        dif = width - len(indent)
-
-        query_display_mode = ui.query_display_mode
-        if dif < 0:
-            # Switch to wrap_noindent mode if terminal is too narrow.
-            query_display_mode = QueryDisplayMode.wrap_noindent
+        qwidth = width - len(indent)
 
         if process.query is not None:
             query = format_query(process.query, process.is_parallel_worker)
 
-            if query_display_mode == QueryDisplayMode.truncate:
-                query_value = query[:dif]
+            if not ui.wrap_query:
+                query_value = query[:qwidth]
             else:
-                if query_display_mode == QueryDisplayMode.wrap_noindent:
-                    if term.length(query.split(" ", 1)[0]) >= dif:
-                        # Query too long to even start on the first line, wrap all
-                        # lines.
-                        query_lines = TextWrapper(width).wrap(query)
-                    else:
-                        # Only wrap subsequent lines.
-                        wrapped_lines = TextWrapper(dif, drop_whitespace=False).wrap(
-                            query
-                        )
-                        if wrapped_lines:
-                            query_lines = [wrapped_lines[0]] + TextWrapper(width).wrap(
-                                "".join(wrapped_lines[1:]).lstrip()
-                            )
-                        else:
-                            query_lines = []
-                    query_value = "\n".join(query_lines)
-                else:
-                    assert (
-                        query_display_mode == QueryDisplayMode.wrap
-                    ), f"unexpected mode {query_display_mode}"
-                    wrapped_lines = TextWrapper(dif).wrap(query)
-                    query_value = f"\n{indent}".join(wrapped_lines)
+                wrapped_lines = TextWrapper(qwidth).wrap(query)
+                query_value = f"\n{indent}".join(wrapped_lines)
 
             cell(query_value, ui.column("query"))
 

@@ -22,7 +22,7 @@ class Key:
 
 CANCEL_SELECTION = "KEY_ESCAPE"
 CHANGE_DURATION_MODE = "T"
-CHANGE_DISPLAY_MODE = "v"
+WRAP_QUERY = "v"
 EXIT = "q"
 HELP = "h"
 SPACE = " "
@@ -92,7 +92,7 @@ BINDINGS: List[Key] = [
     Key(SORTBY_TIME, "sort by TIME+ desc. (activities)", local_only=True),
     Key(REFRESH_TIME_INCREASE, "increase refresh time (max:5s)"),
     Key(REFRESH_TIME_DECREASE, "decrease refresh time (min:0.5s)"),
-    Key(CHANGE_DISPLAY_MODE, "change display mode"),
+    Key(WRAP_QUERY, "toggle query wrap"),
     Key(CHANGE_DURATION_MODE, "change duration mode"),
     Key(REFRESH_DB_SIZE, "force refresh database size"),
     Key("R", "force refresh"),

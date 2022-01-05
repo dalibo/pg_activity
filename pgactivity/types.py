@@ -169,17 +169,6 @@ class SortKey(enum.Enum):
 
 
 @enum.unique
-class QueryDisplayMode(enum.IntEnum):
-    truncate = 1
-    wrap_noindent = 2
-    wrap = 3
-
-    @classmethod
-    def default(cls) -> "QueryDisplayMode":
-        return cls.wrap_noindent
-
-
-@enum.unique
 class QueryMode(enum.Enum):
     activities = "running queries"
     waiting = "waiting queries"
@@ -292,9 +281,7 @@ class UI:
     duration_mode: DurationMode = attr.ib(
         default=DurationMode.query, converter=DurationMode
     )
-    query_display_mode: QueryDisplayMode = attr.ib(
-        default=QueryDisplayMode.default(), converter=QueryDisplayMode
-    )
+    wrap_query: bool = False
     sort_key: SortKey = attr.ib(default=SortKey.default(), converter=SortKey)
     query_mode: QueryMode = attr.ib(default=QueryMode.activities, converter=QueryMode)
     refresh_time: Union[float, int] = 2
@@ -595,7 +582,7 @@ class UI:
             return
         forbidden = set(changes) - {
             "duration_mode",
-            "query_display_mode",
+            "wrap_query",
             "sort_key",
             "query_mode",
             "refresh_time",
