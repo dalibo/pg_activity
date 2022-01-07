@@ -1,0 +1,83 @@
+Tests scrolling in processes_rows()
+-----------------------------------
+
+>>> from blessed import Terminal
+>>> from pgactivity.types import *
+>>> from pgactivity.views import *
+
+>>> term = Terminal(force_styling=None)
+>>> term.width
+80
+
+>>> processes_scroll = [
+...     RunningProcess(
+...         pid=x,
+...         application_name="pgbench",
+...         database="pgbench",
+...         user="postgres",
+...         client="local",
+...         state="active",
+...         query=f"SELECT {x}",
+...         duration=0.0,
+...         wait=False,
+...         is_parallel_worker=False,
+...     ) for x in range(0, 10)]
+>>> ui = UI.make(flag=Flag.PID|Flag.DATABASE)
+>>> sproc = SelectableProcesses(processes_scroll)
+>>> _ = sproc.focus_next()
+>>> sproc.position()
+0
+>>> lc = line_counter(4)
+>>> processes_rows(term, ui, sproc, lc.value, width=200, lines_counter=lc)
+0      pgbench                     active SELECT 0
+1      pgbench                     active SELECT 1
+2      pgbench                     active SELECT 2
+3      pgbench                     active SELECT 3
+>>> for x in range(9):
+...     _ = sproc.focus_next()
+>>> sproc.position()
+9
+>>> lc = line_counter(5)
+>>> processes_rows(term, ui, sproc, lc.value, width=200, lines_counter=lc)
+6      pgbench                     active SELECT 6
+7      pgbench                     active SELECT 7
+8      pgbench                     active SELECT 8
+9      pgbench                     active SELECT 9
+>>> _ = sproc.focus_next()
+>>> sproc.position()
+0
+>>> lc = line_counter(5)
+>>> processes_rows(term, ui, sproc, lc.value, width=200, lines_counter=lc)
+0      pgbench                     active SELECT 0
+1      pgbench                     active SELECT 1
+2      pgbench                     active SELECT 2
+3      pgbench                     active SELECT 3
+4      pgbench                     active SELECT 4
+>>> for x in range(9):
+...     _ = sproc.focus_next()
+>>> sproc.position()
+9
+
+We never put the focus on the lower 1/5th of the screen.
+For 5 display lines, the focus will be on the 4th .
+
+>>> lc = line_counter(5)
+>>> processes_rows(term, ui, sproc, lc.value, width=200, lines_counter=lc)
+6      pgbench                     active SELECT 6
+7      pgbench                     active SELECT 7
+8      pgbench                     active SELECT 8
+9      pgbench                     active SELECT 9
+
+For 10 display lines, it should be at 8th line.
+
+>>> lc = line_counter(10)
+>>> processes_rows(term, ui, sproc, lc.value, width=200, lines_counter=lc)
+2      pgbench                     active SELECT 2
+3      pgbench                     active SELECT 3
+4      pgbench                     active SELECT 4
+5      pgbench                     active SELECT 5
+6      pgbench                     active SELECT 6
+7      pgbench                     active SELECT 7
+8      pgbench                     active SELECT 8
+9      pgbench                     active SELECT 9
+
