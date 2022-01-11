@@ -230,7 +230,9 @@ class Column:
     justify: str = attr.ib(
         "left", validator=validators.in_(["left", "center", "right"])
     )
-    transform: Callable[[Any], str] = attr.ib(default=str, repr=False)
+    transform: Callable[[Any], str] = attr.ib(
+        default=lambda v: str(v) if v is not None else "", repr=False
+    )
     color_key: Union[str, Callable[[Any], str]] = attr.ib(
         default=_color_key_marker, repr=False
     )

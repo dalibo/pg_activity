@@ -985,7 +985,7 @@ C Cancel current query     K Terminate current query  Space Tag/untag current qu
 ------------------------------------------------------------- sending key '2' --------------------------------------------------------------
                                                               WAITING QUERIES
 PID    DATABASE          RELATION             TYPE             MODE              state   Query
-...    tests                 None    transactionid        ShareLock             active   UPDATE t SET s = 'waiting'
+...    tests                         transactionid        ShareLock             active   UPDATE t SET s = 'waiting'
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -1009,7 +1009,7 @@ F1/1 Running queries   F2/2 Waiting queries   F3/3 Blocking queries  Space Pause
 ------------------------------------------------------------- sending key '3' --------------------------------------------------------------
                                                               BLOCKING QUERIES
 PID    DATABASE          RELATION             TYPE             MODE              state   Query
-...    tests                 None    transactionid    ExclusiveLock      idle in trans   UPDATE t SET s = 'blocking'
+...    tests                         transactionid    ExclusiveLock      idle in trans   UPDATE t SET s = 'blocking'
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
