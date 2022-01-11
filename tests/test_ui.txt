@@ -1185,9 +1185,9 @@ C Cancel current query     K Terminate current query  Space Tag/untag current qu
 ------------------------------------------------------------- sending key 'j' --------------------------------------------------------------
                                                               RUNNING QUERIES
 PID    DATABASE                      state   Query
-...    tests                 idle in trans   SELECT 43
 ...    tests                 idle in trans   UPDATE t SET s = 'blocking'
 ...    tests                        active   UPDATE t SET s = 'waiting'
+...    tests                 idle in trans   SELECT 43
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -1209,9 +1209,9 @@ C Cancel current query     K Terminate current query  Space Tag/untag current qu
 ------------------------------------------------------------- sending key ' ' --------------------------------------------------------------
                                                               RUNNING QUERIES
 PID    DATABASE                      state   Query
-...    tests                 idle in trans   SELECT 43
 ...    tests                 idle in trans   UPDATE t SET s = 'blocking'
 ...    tests                        active   UPDATE t SET s = 'waiting'
+...    tests                 idle in trans   SELECT 43
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>

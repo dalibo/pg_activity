@@ -43,6 +43,7 @@ Tests scrolling in processes_rows()
 7      pgbench                     active SELECT 7
 8      pgbench                     active SELECT 8
 9      pgbench                     active SELECT 9
+0      pgbench                     active SELECT 0
 >>> _ = sproc.focus_next()
 >>> sproc.position()
 0
@@ -67,6 +68,7 @@ For 5 display lines, the focus will be on the 4th .
 7      pgbench                     active SELECT 7
 8      pgbench                     active SELECT 8
 9      pgbench                     active SELECT 9
+0      pgbench                     active SELECT 0
 
 For 10 display lines, it should be at 8th line.
 
@@ -80,4 +82,6 @@ For 10 display lines, it should be at 8th line.
 7      pgbench                     active SELECT 7
 8      pgbench                     active SELECT 8
 9      pgbench                     active SELECT 9
+0      pgbench                     active SELECT 0
+1      pgbench                     active SELECT 1
 
