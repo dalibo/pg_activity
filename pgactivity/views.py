@@ -329,18 +329,31 @@ def processes_rows(
         # inherit from that of the previous one.
         text.append(f"{color}{column.render(value)}{term.normal}")
 
+    position = processes.position()
+    if position is None:
+        display_processes = iter(processes)
+    else:
+        # Scrolling is handled here. We just have to manage the start position of the
+        # display. the length is managed by @limit.
+        if ui.wrap_query:
+            # When the query is wrapped, we always display selected process first (sort
+            # of relative scrolling).
+            start = position
+        else:
+            # Otherwise, we compute the start position of the table and try to have a 5 lines
+            # leeway at the bottom of the page to increase readability.
+            start = 0
+            bottom = int(maxlines // 5)
+            if position is not None and position >= maxlines - bottom:
+                start = position - maxlines + 1 + bottom
+
+        display_processes = itertools.chain(
+            iter(processes[-(len(processes) - start) :]), iter(processes[:start])
+        )
+
     focused, pinned = processes.focused, processes.pinned
 
-    # Scrolling is handeled here. we just have to manage the start position of the display.
-    # the length is managed by @limit. we try to have a 5 line leeway at the bottom of the
-    # page to increase readability.
-    position = processes.position()
-    start = 0
-    bottom = int(maxlines // 5)
-    if position is not None and position >= maxlines - bottom:
-        start = position - maxlines + 1 + bottom
-
-    for process in processes[start:]:
+    for process in display_processes:
 
         if process.pid == focused:
             color_type = "cursor"
