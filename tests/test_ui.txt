@@ -755,7 +755,7 @@ PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size: 106.07M - 0B/s ⋅ TPS: 0 ⋅ Active connections: 2 ⋅ Duration mode: query
                                                               WAITING QUERIES
 PID    DATABASE          RELATION             TYPE             MODE              state   Query
-...    tests                 None    transactionid        ShareLock             active   UPDATE t SET s = 'waiting'
+...    tests                         transactionid        ShareLock             active   UPDATE t SET s = 'waiting'
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -781,7 +781,7 @@ PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s
  Size: 106.07M - 0B/s ⋅ TPS: 0 ⋅ Active connections: 2 ⋅ Duration mode: query
                                                               BLOCKING QUERIES
 PID    DATABASE          RELATION             TYPE             MODE              state   Query
-...    tests                 None    transactionid    ExclusiveLock      idle in trans   UPDATE t SET s = 'blocking'
+...    tests                         transactionid    ExclusiveLock      idle in trans   UPDATE t SET s = 'blocking'
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
