@@ -357,7 +357,7 @@ def processes_rows(
         indent = get_indent(ui) + " "
         qwidth = width - len(indent)
 
-        if process.query is not None:
+        if qwidth > 0 and process.query is not None:
             query = format_query(process.query, process.is_parallel_worker)
 
             if not ui.wrap_query:
