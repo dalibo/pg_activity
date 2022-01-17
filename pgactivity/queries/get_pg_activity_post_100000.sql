@@ -1,5 +1,6 @@
 -- Get data from pg_activity from pg 10 to pg 11
 -- We assume a background_worker with a not null query is a parallel worker.
+-- NEW pg_activity.backend_type
 SELECT
       a.pid AS pid,
       a.application_name AS application_name,

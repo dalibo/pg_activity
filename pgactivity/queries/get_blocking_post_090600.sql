@@ -1,4 +1,5 @@
--- Get blocking queries >= 9.2
+-- Get blocking queries >= 9.6
+-- NEW pg_stat_activity.waiting => pg_stat_activity.wait_event
 SELECT
       pid,
       application_name,
@@ -11,7 +12,7 @@ SELECT
       duration,
       state,
       convert_from(sq.query::bytea, coalesce(pg_catalog.pg_encoding_to_char(b.encoding), 'UTF8')) AS query,
-      waiting as wait
+      wait_event as wait
   FROM
       (
       -- Transaction id lock
@@ -31,7 +32,7 @@ SELECT
             EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
             pg_stat_activity.state as state,
             blocking.relation::regclass AS relation,
-            pg_stat_activity.waiting
+            pg_stat_activity.wait_event
         FROM
             pg_locks AS blocking
             JOIN pg_locks AS blocked ON (blocking.transactionid = blocked.transactionid AND blocking.locktype = blocked.locktype)
@@ -64,7 +65,7 @@ SELECT
             EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
             pg_stat_activity.state as state,
             blocking.relation::regclass AS relation,
-            pg_stat_activity.waiting
+            pg_stat_activity.wait_event
         FROM
             pg_locks AS blocking
             JOIN pg_locks AS blocked ON (blocking.virtualxid = blocked.virtualxid AND blocking.locktype = blocked.locktype)
@@ -97,7 +98,7 @@ SELECT
             EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
             pg_stat_activity.state as state,
             blocking.relation::regclass AS relation,
-            pg_stat_activity.waiting
+            pg_stat_activity.wait_event
         FROM
             pg_locks AS blocking
             JOIN pg_locks AS blocked ON (blocking.database = blocked.database AND blocking.relation = blocked.relation AND blocking.locktype = blocked.locktype)
@@ -128,6 +129,6 @@ GROUP BY
       state,
       query,
       encoding,
-      waiting
+      wait_event
 ORDER BY
       duration DESC;

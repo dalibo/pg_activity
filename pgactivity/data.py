@@ -208,15 +208,15 @@ class Data:
         elif self.pg_num_version >= 100000:
             query = queries.get("get_server_info_post_100000")
         elif self.pg_num_version >= 90600:
-            query = queries.get("get_server_info_post_90600")
+            query = queries.get("get_server_info_post_090600")
         elif self.pg_num_version >= 90400:
-            query = queries.get("get_server_info_post_90400")
+            query = queries.get("get_server_info_post_090400")
         elif self.pg_num_version >= 90200:
-            query = queries.get("get_server_info_post_90200")
+            query = queries.get("get_server_info_post_090200")
         elif self.pg_num_version >= 90000:
-            query = queries.get("get_server_info_post_90000")
+            query = queries.get("get_server_info_post_090000")
         else:
-            query = queries.get("get_server_info")
+            query = queries.get("get_server_info_oldest")
 
         with self.pg_conn.cursor() as cur:
             cur.execute(
@@ -265,11 +265,11 @@ class Data:
         elif self.pg_num_version >= 100000:
             qs = queries.get("get_pg_activity_post_100000")
         elif self.pg_num_version >= 90600:
-            qs = queries.get("get_pg_activity_post_90600")
+            qs = queries.get("get_pg_activity_post_090600")
         elif self.pg_num_version >= 90200:
-            qs = queries.get("get_pg_activity_post_90200")
+            qs = queries.get("get_pg_activity_post_090200")
         else:
-            qs = queries.get("get_pg_activity")
+            qs = queries.get("get_pg_activity_oldest")
 
         duration_column = self.get_duration_column(duration_mode)
         query = sql.SQL(qs).format(duration_column=sql.Identifier(duration_column))
@@ -291,9 +291,9 @@ class Data:
         Get waiting queries.
         """
         if self.pg_num_version >= 90200:
-            qs = queries.get("get_waiting_post_90200")
+            qs = queries.get("get_waiting_post_090200")
         else:
-            qs = queries.get("get_waiting")
+            qs = queries.get("get_waiting_oldest")
 
         duration_column = self.get_duration_column(duration_mode)
         query = sql.SQL(qs).format(duration_column=sql.Identifier(duration_column))
@@ -314,11 +314,11 @@ class Data:
         Get blocking queries
         """
         if self.pg_num_version >= 90600:
-            qs = queries.get("get_blocking_post_90600")
+            qs = queries.get("get_blocking_post_090600")
         elif self.pg_num_version >= 90200:
-            qs = queries.get("get_blocking_post_90200")
+            qs = queries.get("get_blocking_post_090200")
         else:
-            qs = queries.get("get_blocking")
+            qs = queries.get("get_blocking_oldest")
 
         duration_column = self.get_duration_column(duration_mode)
         query = sql.SQL(qs).format(duration_column=sql.Identifier(duration_column))

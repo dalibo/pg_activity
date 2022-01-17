@@ -1,4 +1,5 @@
 -- Get data from pg_activity since pg 11
+-- NEW pg_activity.backend_type value for 'parallel worker'
 SELECT
       a.pid AS pid,
       a.application_name AS application_name,

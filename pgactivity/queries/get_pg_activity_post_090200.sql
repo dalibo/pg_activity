@@ -1,4 +1,6 @@
 -- Get data from pg_activity from pg 9.2 to pg 9.5
+-- NEW pg_stat_activity.current_query => pg_stat_activity.query
+-- NEW pg_stat_activity.procpid => pg_stat_activity.pid
 SELECT
       a.pid AS pid,
       a.application_name AS application_name,
