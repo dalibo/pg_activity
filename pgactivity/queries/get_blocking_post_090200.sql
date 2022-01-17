@@ -1,4 +1,7 @@
--- Get blocking queries
+-- Get blocking queries >= 9.2
+-- NEW pg_stat_activity.state
+-- NEW pg_stat_activity.current_query => pg_stat_activity.query
+-- NEW pg_stat_activity.procpid => pg_stat_activity.pid
 SELECT
       pid,
       application_name,
@@ -9,24 +12,16 @@ SELECT
       mode,
       locktype AS type,
       duration,
-      CASE
-          WHEN sq.query = '<IDLE> in transaction (aborted)' THEN 'idle in transaction (aborted)'
-          WHEN sq.query = '<IDLE> in transaction' THEN 'idle in transaction'
-          WHEN sq.query = '<IDLE>' THEN 'idle'
-          ELSE 'active'
-      END AS state,
-      CASE WHEN sq.query LIKE '<IDLE>%%'
-          THEN NULL
-          ELSE convert_from(sq.query::bytea, coalesce(pg_catalog.pg_encoding_to_char(b.encoding), 'UTF8'))
-      END AS query,
-      waiting AS wait
+      state,
+      convert_from(sq.query::bytea, coalesce(pg_catalog.pg_encoding_to_char(b.encoding), 'UTF8')) AS query,
+      waiting as wait
   FROM
       (
       -- Transaction id lock
       SELECT
             blocking.pid,
-            '<unknown>' AS application_name,
-            pg_stat_activity.current_query AS query,
+            pg_stat_activity.application_name,
+            pg_stat_activity.query,
             blocking.mode,
             pg_stat_activity.datname,
             pg_stat_activity.datid,
@@ -37,26 +32,29 @@ SELECT
             END AS client,
             blocking.locktype,
             EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
-            NULL AS state,
+            pg_stat_activity.state as state,
             blocking.relation::regclass AS relation,
             pg_stat_activity.waiting
         FROM
             pg_locks AS blocking
             JOIN pg_locks AS blocked ON (blocking.transactionid = blocked.transactionid AND blocking.locktype = blocked.locktype)
-            JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.procpid)
+            JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.pid)
        WHERE
             blocking.granted
         AND NOT blocked.granted
         AND CASE WHEN %(min_duration)s = 0
                 THEN true
                 ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
+            END
+        AND CASE WHEN %(dbname_filter)s IS NULL THEN true
+            ELSE datname ~* %(dbname_filter)s
             END
       UNION ALL
       -- VirtualXid Lock
       SELECT
             blocking.pid,
-            '<unknown>' AS application_name,
-            pg_stat_activity.current_query AS query,
+            pg_stat_activity.application_name,
+            pg_stat_activity.query,
             blocking.mode,
             pg_stat_activity.datname,
             pg_stat_activity.datid,
@@ -67,13 +65,13 @@ SELECT
             END AS client,
             blocking.locktype,
             EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
-            NULL AS state,
+            pg_stat_activity.state as state,
             blocking.relation::regclass AS relation,
             pg_stat_activity.waiting
         FROM
             pg_locks AS blocking
             JOIN pg_locks AS blocked ON (blocking.virtualxid = blocked.virtualxid AND blocking.locktype = blocked.locktype)
-            JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.procpid)
+            JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.pid)
        WHERE
             blocking.granted
         AND NOT blocked.granted
@@ -81,12 +79,15 @@ SELECT
                 THEN true
                 ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
             END
+        AND CASE WHEN %(dbname_filter)s IS NULL THEN true
+            ELSE datname ~* %(dbname_filter)s
+            END
       UNION ALL
       -- Relation or tuple Lock
       SELECT
             blocking.pid,
-            '<unknown>' AS application_name,
-            pg_stat_activity.current_query AS query,
+            pg_stat_activity.application_name,
+            pg_stat_activity.query,
             blocking.mode,
             pg_stat_activity.datname,
             pg_stat_activity.datid,
@@ -97,13 +98,13 @@ SELECT
             END AS client,
             blocking.locktype,
             EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
-            NULL AS state,
+            pg_stat_activity.state as state,
             blocking.relation::regclass AS relation,
             pg_stat_activity.waiting
         FROM
             pg_locks AS blocking
             JOIN pg_locks AS blocked ON (blocking.database = blocked.database AND blocking.relation = blocked.relation AND blocking.locktype = blocked.locktype)
-            JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.procpid)
+            JOIN pg_stat_activity ON (blocking.pid = pg_stat_activity.pid)
        WHERE
             blocking.granted
         AND NOT blocked.granted
