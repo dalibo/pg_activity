@@ -41,7 +41,7 @@ This is only necessary to test development versions. First, clone the repository
 
     $ git clone https://github.com/dalibo/pg_activity.git
 
-Change the branch if necessary. Then create an dedicated environment,
+Change the branch if necessary. Then create a dedicated environment,
 install dependencies and then pg\_activity from the repo:
 
     $ python3 -m venv MYENV
