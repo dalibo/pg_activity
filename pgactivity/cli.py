@@ -2,7 +2,7 @@ import os
 import socket
 import sys
 import time
-from optparse import OptionParser, OptionGroup
+from argparse import ArgumentParser
 
 from blessed import Terminal
 from psycopg2.errors import OperationalError
@@ -10,11 +10,12 @@ from psycopg2.errors import OperationalError
 from . import __version__, data, types, ui
 
 
-def get_parser() -> OptionParser:
-    parser = OptionParser(
-        add_help_option=False,
-        version="%prog " + __version__,
-        usage="%prog [options] [connection string]",
+def get_parser() -> ArgumentParser:
+    parser = ArgumentParser(
+        usage="%(prog)s [options] [connection string]",
+        description=(
+            "htop like application for PostgreSQL " "server activity monitoring."
+        ),
         epilog=(
             "The connection string can be in the form of a list of "
             "Key/Value parameters or an URI as described in the PostgreSQL documentation. "
@@ -22,12 +23,17 @@ def get_parser() -> OptionParser:
             "may support different formats or parameters (for example, connection URIs are "
             "only supported from libpq 9.2)"
         ),
-        description=(
-            "htop like application for PostgreSQL " "server activity monitoring."
-        ),
+        add_help=False,
+    )
+    # Connection string
+    parser.add_argument(
+        "connection_string",
+        help="A valid connection string to the database, e.g.: "
+        "'host=HOSTNAME port=PORT user=USER dbname=DBNAME'.",
+        nargs="?",
     )
     # -U / --username
-    parser.add_option(
+    parser.add_argument(
         "-U",
         "--username",
         dest="username",
@@ -35,7 +41,7 @@ def get_parser() -> OptionParser:
         metavar="USERNAME",
     )
     # -p / --port
-    parser.add_option(
+    parser.add_argument(
         "-p",
         "--port",
         dest="port",
@@ -43,7 +49,7 @@ def get_parser() -> OptionParser:
         metavar="PORT",
     )
     # -h / --host
-    parser.add_option(
+    parser.add_argument(
         "-h",
         "--host",
         dest="host",
@@ -51,7 +57,7 @@ def get_parser() -> OptionParser:
         metavar="HOSTNAME",
     )
     # -d / --dbname
-    parser.add_option(
+    parser.add_argument(
         "-d",
         "--dbname",
         dest="dbname",
@@ -59,15 +65,16 @@ def get_parser() -> OptionParser:
         metavar="DBNAME",
     )
     # --blocksize
-    parser.add_option(
+    parser.add_argument(
         "--blocksize",
         dest="blocksize",
-        help="Filesystem blocksize (default: %default)",
+        help="Filesystem blocksize (default: %(default)s)",
         metavar="BLOCKSIZE",
+        type=int,
         default=4096,
     )
     # --rds
-    parser.add_option(
+    parser.add_argument(
         "--rds",
         dest="rds",
         action="store_true",
@@ -75,23 +82,15 @@ def get_parser() -> OptionParser:
         default=False,
     )
     # --output
-    parser.add_option(
+    parser.add_argument(
         "--output",
         dest="output",
         help="Store running queries as CSV",
         metavar="FILEPATH",
         default=None,
     )
-    # --help
-    parser.add_option(
-        "--help",
-        dest="help",
-        action="store_true",
-        help="Show this help message and exit",
-        default=False,
-    )
     # --no-db-size
-    parser.add_option(
+    parser.add_argument(
         "--no-db-size",
         dest="nodbsize",
         action="store_true",
@@ -99,7 +98,7 @@ def get_parser() -> OptionParser:
         default=False,
     )
     # --wrap-query
-    parser.add_option(
+    parser.add_argument(
         "-w",
         "--wrap-query",
         dest="wrap_query",
@@ -108,7 +107,7 @@ def get_parser() -> OptionParser:
         default=False,
     )
     # --duration-mode
-    parser.add_option(
+    parser.add_argument(
         "--duration-mode",
         dest="durationmode",
         help="Duration mode. Values: 1-QUERY(default), 2-TRANSACTION, 3-BACKEND",
@@ -117,7 +116,7 @@ def get_parser() -> OptionParser:
         default="1",
     )
     # --min-duration
-    parser.add_option(
+    parser.add_argument(
         "--min-duration",
         dest="minduration",
         help="Don't display queries with smaller than specified duration (in seconds)",
@@ -126,7 +125,7 @@ def get_parser() -> OptionParser:
         default=0,
     )
     # --filter
-    parser.add_option(
+    parser.add_argument(
         "--filter",
         dest="filters",
         help=(
@@ -137,12 +136,27 @@ def get_parser() -> OptionParser:
         metavar="FIELD:REGEX",
         default=[],
     )
+    # --version
+    parser.add_argument(
+        "--version",
+        help="show program's version number and exit",
+        action="version",
+        version=f"%(prog)s {__version__}",
+    )
+    # --help
+    parser.add_argument(
+        "--help",
+        dest="help",
+        action="store_true",
+        help="Show this help message and exit",
+        default=False,
+    )
 
-    group = OptionGroup(
-        parser, "Display Options, you can exclude some columns by using them "
+    group = parser.add_argument_group(
+        "Display Options", "you can exclude some columns by using them."
     )
     # --no-pid
-    group.add_option(
+    group.add_argument(
         "--no-pid",
         dest="nopid",
         action="store_true",
@@ -150,7 +164,7 @@ def get_parser() -> OptionParser:
         default=False,
     )
     # --no-database
-    group.add_option(
+    group.add_argument(
         "--no-database",
         dest="nodb",
         action="store_true",
@@ -158,7 +172,7 @@ def get_parser() -> OptionParser:
         default=False,
     )
     # --no-user
-    group.add_option(
+    group.add_argument(
         "--no-user",
         dest="nouser",
         action="store_true",
@@ -166,7 +180,7 @@ def get_parser() -> OptionParser:
         default=False,
     )
     # --no-client
-    group.add_option(
+    group.add_argument(
         "--no-client",
         dest="noclient",
         action="store_true",
@@ -174,23 +188,23 @@ def get_parser() -> OptionParser:
         default=False,
     )
     # --no-cpu
-    group.add_option(
+    group.add_argument(
         "--no-cpu",
         dest="nocpu",
         action="store_true",
-        help="Disable CPU%",
+        help="Disable CPU%%",
         default=False,
     )
     # --no-mem
-    group.add_option(
+    group.add_argument(
         "--no-mem",
         dest="nomem",
         action="store_true",
-        help="Disable MEM%",
+        help="Disable MEM%%",
         default=False,
     )
     # --no-read
-    group.add_option(
+    group.add_argument(
         "--no-read",
         dest="noread",
         action="store_true",
@@ -198,7 +212,7 @@ def get_parser() -> OptionParser:
         default=False,
     )
     # --no-write
-    group.add_option(
+    group.add_argument(
         "--no-write",
         dest="nowrite",
         action="store_true",
@@ -206,7 +220,7 @@ def get_parser() -> OptionParser:
         default=False,
     )
     # --no-time
-    group.add_option(
+    group.add_argument(
         "--no-time",
         dest="notime",
         action="store_true",
@@ -214,11 +228,11 @@ def get_parser() -> OptionParser:
         default=False,
     )
     # --no-wait
-    group.add_option(
+    group.add_argument(
         "--no-wait", dest="nowait", action="store_true", help="Disable W", default=False
     )
     # --no-app-name
-    group.add_option(
+    group.add_argument(
         "--no-app-name",
         dest="noappname",
         action="store_true",
@@ -226,7 +240,7 @@ def get_parser() -> OptionParser:
         default=False,
     )
     # --hide-queries-in-logs
-    group.add_option(
+    group.add_argument(
         "--hide-queries-in-logs",
         dest="hide_queries_in_logs",
         action="store_true",
@@ -234,7 +248,7 @@ def get_parser() -> OptionParser:
         default=False,
     )
     # --no-inst-info
-    group.add_option(
+    group.add_argument(
         "--no-inst-info",
         dest="show_instance_info_in_header",
         action="store_false",
@@ -242,7 +256,7 @@ def get_parser() -> OptionParser:
         default=True,
     )
     # --no-sys-info
-    group.add_option(
+    group.add_argument(
         "--no-sys-info",
         dest="show_system_info_in_header",
         action="store_false",
@@ -250,14 +264,13 @@ def get_parser() -> OptionParser:
         default=True,
     )
     # --no-proc-info
-    group.add_option(
+    group.add_argument(
         "--no-proc-info",
         dest="show_worker_info_in_header",
         action="store_false",
         help="Display workers process information in header",
         default=True,
     )
-    parser.add_option_group(group)
 
     return parser
 
@@ -273,27 +286,21 @@ def main() -> None:
         sys.exit("FATAL: Platform not supported.")
 
     parser = get_parser()
-    (options, args) = parser.parse_args()
-    if len(args) == 1:
-        dsn = args[0]
-    elif len(args) > 1:
-        parser.error("at most one argument is expected")
-    else:
-        dsn = ""
+    args = parser.parse_args()
 
-    if options.help:
+    if args.help:
         parser.print_help()
         sys.exit(1)
 
     try:
-        filters = types.Filters.from_options(options.filters)
+        filters = types.Filters.from_options(args.filters)
     except ValueError as e:
         parser.error(str(e))
 
     dataobj = data.pg_connect(
-        options,
-        dsn,
-        min_duration=options.minduration,
+        args,
+        args.connection_string,
+        min_duration=args.minduration,
         filters=filters,
     )
     hostname = socket.gethostname()
@@ -309,7 +316,7 @@ def main() -> None:
     term = Terminal()
     while True:
         try:
-            ui.main(term, dataobj, host, options, dsn)
+            ui.main(term, dataobj, host, args)
         except OperationalError:
             while True:
                 print(term.clear + term.home, end="")

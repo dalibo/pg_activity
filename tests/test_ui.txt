@@ -89,7 +89,7 @@ Default CLI options, passed to ui.main():
 ...         return ks
 ...
 ...     with patch.object(term, "inkey", new=inkey):
-...         ui.main(term, dataobj, host, options, "",
+...         ui.main(term, dataobj, host, options,
 ...                 render_header=render_header, render_footer=render_footer,
 ...                 width=width, wait_on_actions=1)
 ...

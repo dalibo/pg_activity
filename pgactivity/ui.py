@@ -1,5 +1,5 @@
-import optparse
 import time
+from argparse import Namespace
 from typing import Dict, List, Optional, cast
 
 import attr
@@ -13,8 +13,7 @@ def main(
     term: Terminal,
     data: Data,
     host: types.Host,
-    options: optparse.Values,
-    dsn: str,
+    options: Namespace,
     *,
     render_header: bool = True,
     render_footer: bool = True,
