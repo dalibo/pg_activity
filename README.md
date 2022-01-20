@@ -30,7 +30,7 @@ along with psycopg2 (version 2.8 or higher):
 
     $ python3 -m pip install pg_activity psycopg2-binary
 
-Then launch:
+In case your `$PATH` does not already contain it, the full path is:
 
     $ ~/.local/bin/pg_activity
 
