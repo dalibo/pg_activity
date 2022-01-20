@@ -21,6 +21,7 @@ from .types import (
     BlockingProcess,
     Filters,
     WaitingProcess,
+    Pct,
     RunningProcess,
     ServerInformation,
     NO_FILTER,
@@ -232,11 +233,13 @@ class Data:
             )
             ret = cur.fetchone()
 
+        hr: Optional[Pct] = None
         tps, ips, ups, dps, rps = 0, 0, 0, 0, 0
         size_ev = 0.0
         if prev_server_info is not None:
             dt = float(ret["epoch"] - prev_server_info.epoch)
             try:
+                # Note: All this could be negative just after a stat reset
                 tps = int((ret["xact_count"] - prev_server_info.xact_count) / dt)
                 size_ev = float(ret["total_size"] - prev_server_info.total_size) / dt
                 ips = int((ret["insert"] - prev_server_info.insert) / dt)
@@ -245,6 +248,10 @@ class Data:
                 rps = int(
                     (ret["tuples_returned"] - prev_server_info.tuples_returned) / dt
                 )
+                deltaread = ret["blks_read"] - prev_server_info.blks_read
+                deltahit = ret["blks_hit"] - prev_server_info.blks_hit
+                if deltaread + deltahit != 0:
+                    hr = Pct(100 * deltahit / (deltaread + deltahit))
             except ZeroDivisionError:
                 pass
 
@@ -255,6 +262,7 @@ class Data:
             update_per_second=ups,
             delete_per_second=dps,
             tuples_returned_per_second=rps,
+            cache_hit_ratio_last_snap=hr,
             **ret,
         )
 

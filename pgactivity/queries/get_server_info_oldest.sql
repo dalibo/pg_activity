@@ -9,10 +9,8 @@ WITH dbinfo AS(
                    WHEN %(skip_db_size)s THEN %(prev_total_size)s
                    ELSE SUM(pg_database_size(d.datname))
                END, 0) AS total_size,
-               COALESCE(CASE WHEN sum(sd.blks_read) + sum(sd.blks_hit) = 0
-                   THEN 0
-                   ELSE trunc(100 * sum(sd.blks_hit) / (sum(sd.blks_read) + sum(sd.blks_hit)), 2)
-               END, 0) AS cache_hit_ratio,
+               COALESCE(SUM(sd.blks_read), 0) AS blks_read,
+               COALESCE(SUM(sd.blks_hit), 0) AS blks_hit,
                COALESCE(MAX(LENGTH(d.datname)), 0) AS max_dbname_length,
                current_timestamp - pg_postmaster_start_time() AS uptime,
                EXTRACT(EPOCH FROM NOW()) AS epoch
