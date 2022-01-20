@@ -44,16 +44,16 @@ This is only necessary to test development versions. First, clone the repository
 Change the branch if necessary. Then create a dedicated environment,
 install dependencies and then pg\_activity from the repo:
 
-    $ python3 -m venv MYENV
-    $ source MYENV/bin/activate
-    $ python3 -m pip install psycopg2-binary
-    $ python3 -m pip install pg_activity/
-    $ pg_activity
+    $ cd pg_activity
+    $ python3 -m venv .venv
+    $ . .venv/bin/activate
+    (.venv) $ pip install psycopg2-binary .
+    (.venv) $ pg_activity
 
 To quit this env and destroy it:
 
     $ deactivate
-    $ rm -r MYENV
+    $ rm -r .venv
 
 Usage
 -----
