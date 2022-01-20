@@ -1,6 +1,6 @@
 import getpass
-import optparse
 import re
+from argparse import Namespace
 from typing import Dict, List, Optional, Union
 
 import attr
@@ -365,8 +365,7 @@ class Data:
 
 
 def pg_connect(
-    options: optparse.Values,
-    dsn: str,
+    options: Namespace,
     exit_on_failed: bool = True,
     min_duration: float = 0.0,
     filters: Filters = NO_FILTER,
@@ -376,7 +375,7 @@ def pg_connect(
     for nb_try in range(2):
         try:
             data = Data.pg_connect(
-                dsn=dsn,
+                dsn=options.connection_string,
                 host=options.host,
                 port=options.port,
                 user=options.username,
