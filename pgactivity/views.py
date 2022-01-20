@@ -242,7 +242,7 @@ def header(
         columns = [
             [f"* Global: {render(uptime)} uptime"],
             [f"{render(total_size)} dbs size - {render(size_ev)} growth"],
-            [f"{render(si.cache_hit_ratio)} cache hit ratio"],
+            [f"{render(si.cache_hit_ratio_last_snap)} cache hit ratio"],
         ]
         yield from render_columns(columns, delimiter=f" {term.bold_blue('⋅')} ")
 
