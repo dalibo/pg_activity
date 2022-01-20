@@ -8,19 +8,52 @@ Command line tool for PostgreSQL server activity monitoring.
 
 ![pg_activity screenshot](https://raw.github.com/dalibo/pg_activity/master/docs/imgs/screenshot.png)
 
-Installation
-------------
+Installation from packages (recommended)
+----------------------------------------
 
 pg\_activity is available in many Linux distributions; the PostgreSQL Global
 Development Group (PGDG) also provides packages for RPM-based
 (https://yum.postgresql.org/) and Debian-based distributions
-(https://wiki.postgresql.org/wiki/Apt). Using distribution packages is the
-recommended way to install pg\_activity.
+(https://wiki.postgresql.org/wiki/Apt):
+
+    $ sudo yum install pg_activity
+
+    $ sudo apt install pg-activity
+
+Using distribution packages is the recommended way to install pg\_activity.
+
+Installation from pip
+---------------------
 
 Alternatively, pg\_activity can be installed using pip on Python 3.6 or later
 along with psycopg2 (version 2.8 or higher):
 
     $ python3 -m pip install pg_activity psycopg2-binary
+
+In case your `$PATH` does not already contain it, the full path is:
+
+    $ ~/.local/bin/pg_activity
+
+Installation from the git repository
+------------------------------------
+
+This is only necessary to test development versions. First, clone the repository:
+
+    $ git clone https://github.com/dalibo/pg_activity.git
+
+Change the branch if necessary. Then create a dedicated environment,
+install dependencies and then pg\_activity from the repo:
+
+    $ cd pg_activity
+    $ python3 -m venv .venv
+    $ . .venv/bin/activate
+    (.venv) $ pip install psycopg2-binary .
+    (.venv) $ pg_activity
+
+To quit this env and destroy it:
+
+    $ deactivate
+    $ rm -r .venv
 
 Usage
 -----
