@@ -16,39 +16,38 @@ Functional tests for 'ui' module
 >>> postgres = getfixture("postgresql")
 
 Default CLI options, passed to ui.main():
->>> parser = argparse.ArgumentParser()
->>> parser.set_defaults(
-...     blocksize=4096,
-...     dbname=f"{postgres.info.dbname}",
-...     durationmode="1",
-...     help=False,
-...     host=f"{postgres.info.host}",
-...     legacy_ui=False,
-...     minduration=0,
-...     filters=[],
-...     noappname=True,
-...     noclient=False,
-...     nocolor=False,
-...     nocpu=True,
-...     nodb=False,
-...     nodbsize=False,
-...     nomem=True,
-...     nopid=False,
-...     noread=True,
-...     notime=True,
-...     nouser=False,
-...     nowait=True,
-...     nowrite=True,
-...     output=None,
-...     port=f"{postgres.info.port}",
-...     rds=False,
-...     username=f"{postgres.info.user}",
-...     wrap_query=False,
-...     show_instance_info_in_header=True,
-...     show_worker_info_in_header=True,
-...     show_system_info_in_header=True,
-... )
->>> options = parser.parse_args([])
+>>> defaults = {
+...     "blocksize": 4096,
+...     "dbname": f"{postgres.info.dbname}",
+...     "durationmode": "1",
+...     "help": False,
+...     "host": f"{postgres.info.host}",
+...     "legacy_ui": False,
+...     "minduration": 0,
+...     "filters": [],
+...     "noappname": True,
+...     "noclient": False,
+...     "nocolor": False,
+...     "nocpu": True,
+...     "nodb": False,
+...     "nodbsize": False,
+...     "nomem": True,
+...     "nopid": False,
+...     "noread": True,
+...     "notime": True,
+...     "nouser": False,
+...     "nowait": True,
+...     "nowrite": True,
+...     "output": None,
+...     "port": f"{postgres.info.port}",
+...     "rds": False,
+...     "username": f"{postgres.info.user}",
+...     "wrap_query": False,
+...     "show_instance_info_in_header": True,
+...     "show_worker_info_in_header": True,
+...     "show_system_info_in_header": True,
+... }
+>>> options = argparse.Namespace(**defaults)
 
 >>> os.environ["LINES"] = "26"
 >>> term = blessed.Terminal(force_styling=None)
@@ -412,11 +411,11 @@ PID    DATABASE                     USER           CLIENT             state Quer
 <BLANKLINE>
 ------------------------------------------------------------------------------------------- sending key 'q' --------------------------------------------------------------------------------------------
 
->>> options = parser.parse_args([])
->>> options.nopid = True
->>> options.show_instance_info_in_header = False
->>> options.show_worker_info_in_header = False
->>> options.show_system_info_in_header = False
+>>> defaults["nopid"] = True
+>>> defaults["show_instance_info_in_header"] = False
+>>> defaults["show_worker_info_in_header"] = False
+>>> defaults["show_system_info_in_header"] = False
+>>> options = argparse.Namespace(**defaults)
 
 One query, idle in transaction:
 >>> cur = postgres.cursor()
@@ -803,12 +802,17 @@ Another idle transaction, with a long query:
 
 Use another set of options:
 >>> output = getfixture("tmp_path") / "activities.csv"
->>> options.durationmode = "2"
->>> options.wrap_query = True
->>> options.noclient = True
->>> options.nouser = True
->>> options.nodbsize = True
->>> options.output = str(output)
+>>> options = argparse.Namespace(
+...     **dict(
+...         defaults,
+...         durationmode="2",
+...         wrap_query=True,
+...         noclient=True,
+...         nouser=True,
+...         nodbsize=True,
+...         output=str(output),
+...     ),
+... )
 >>> run_ui(options, ["D", "v", "q"], width=100, render_header=False)
                                 RUNNING QUERIES
 DATABASE                     state Query
@@ -909,12 +913,17 @@ Interactive mode:
 >>> execute("UPDATE t SET s = 'waiting'", commit=True)
 >>> time.sleep(1)
 
->>> options.durationmode = "1"
->>> options.wrap_query = True
->>> options.nopid = False
->>> options.noclient = True
->>> options.nouser = True
->>> options.output = None
+>>> options = argparse.Namespace(
+...     **dict(
+...         defaults,
+...         durationmode="1",
+...         wrap_query=True,
+...         nopid=False,
+...         noclient=True,
+...         nouser=True,
+...         output=None,
+...     ),
+... )
 
 (Note: we patch boxed() widget to disable border in order to make output
 independent of the number of digits in PIDs.)
