@@ -14,7 +14,7 @@ def get_parser() -> ArgumentParser:
     parser = ArgumentParser(
         usage="%(prog)s [options] [connection string]",
         description=(
-            "htop like application for PostgreSQL " "server activity monitoring."
+            "htop like application for PostgreSQL server activity monitoring."
         ),
         epilog=(
             "The connection string can be in the form of a list of "
