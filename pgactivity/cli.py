@@ -28,8 +28,10 @@ def get_parser() -> ArgumentParser:
     # Connection string
     parser.add_argument(
         "connection_string",
-        help="A valid connection string to the database, e.g.: "
-        "'host=HOSTNAME port=PORT user=USER dbname=DBNAME'.",
+        help=(
+            "A valid connection string to the database, e.g.: "
+            "'host=HOSTNAME port=PORT user=USER dbname=DBNAME'."
+        ),
         nargs="?",
     )
     # -U / --username
