@@ -160,7 +160,8 @@ def get_parser() -> ArgumentParser:
     )
 
     group = parser.add_argument_group(
-        "Display Options", "These options may be used hide some columns from the processes table."
+        "Display Options",
+        "These options may be used hide some columns from the processes table.",
     )
     # --no-pid
     group.add_argument(
