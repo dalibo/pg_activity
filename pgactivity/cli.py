@@ -25,47 +25,6 @@ def get_parser() -> ArgumentParser:
         ),
         add_help=False,
     )
-    # Connection string
-    parser.add_argument(
-        "connection_string",
-        help=(
-            "A valid connection string to the database, e.g.: "
-            "'host=HOSTNAME port=PORT user=USER dbname=DBNAME'."
-        ),
-        nargs="?",
-    )
-    # -U / --username
-    parser.add_argument(
-        "-U",
-        "--username",
-        dest="username",
-        help="Database user name",
-        metavar="USERNAME",
-    )
-    # -p / --port
-    parser.add_argument(
-        "-p",
-        "--port",
-        dest="port",
-        help="Database server port",
-        metavar="PORT",
-    )
-    # -h / --host
-    parser.add_argument(
-        "-h",
-        "--host",
-        dest="host",
-        help="Database server host or socket directory",
-        metavar="HOSTNAME",
-    )
-    # -d / --dbname
-    parser.add_argument(
-        "-d",
-        "--dbname",
-        dest="dbname",
-        help="Database name to connect to",
-        metavar="DBNAME",
-    )
     # --blocksize
     parser.add_argument(
         "--blocksize",
@@ -152,6 +111,52 @@ def get_parser() -> ArgumentParser:
         action="store_true",
         help="Show this help message and exit",
         default=False,
+    )
+
+    group = parser.add_argument_group(
+        "Connection Options",
+    )
+    # Connection string
+    group.add_argument(
+        "connection_string",
+        help=(
+            "A valid connection string to the database, e.g.: "
+            "'host=HOSTNAME port=PORT user=USER dbname=DBNAME'."
+        ),
+        nargs="?",
+        metavar="connection string",
+    )
+    # -h / --host
+    group.add_argument(
+        "-h",
+        "--host",
+        dest="host",
+        help="Database server host or socket directory",
+        metavar="HOSTNAME",
+    )
+    # -p / --port
+    group.add_argument(
+        "-p",
+        "--port",
+        dest="port",
+        help="Database server port",
+        metavar="PORT",
+    )
+    # -U / --username
+    group.add_argument(
+        "-U",
+        "--username",
+        dest="username",
+        help="Database user name",
+        metavar="USERNAME",
+    )
+    # -d / --dbname
+    group.add_argument(
+        "-d",
+        "--dbname",
+        dest="dbname",
+        help="Database name to connect to",
+        metavar="DBNAME",
     )
 
     group = parser.add_argument_group(
