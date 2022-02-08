@@ -203,6 +203,8 @@ class Data:
 
         if self.pg_num_version >= 140000:
             query = queries.get("get_server_info_post_140000")
+        elif self.pg_num_version >= 120000:
+            query = queries.get("get_server_info_post_120000")
         elif self.pg_num_version >= 110000:
             query = queries.get("get_server_info_post_110000")
         elif self.pg_num_version >= 100000:
