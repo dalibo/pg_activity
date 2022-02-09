@@ -53,7 +53,7 @@ setup(
         ],
         "testing": [
             "psycopg2-binary >= 2.8",
-            "pytest",
+            "pytest < 7.0.0",  # pytest-postgresql 3 is not compatible with pytest 7.0.0
             # From 4.0, pytest-postgresql is no compatible with python 3.6.
             "pytest-postgresql ~= 3.0",
         ],
