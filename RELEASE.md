@@ -51,64 +51,8 @@ page](https://github.com/dalibo/pg_activity/releases) :
 
 ## Create the release on pypi
 
-A detailed explanation can be found [in the python
-documentation](https://packaging.python.org/tutorials/packaging-projects/).
-
-Update [setuptools](https://pypi.org/project/setuptools/),
-[wheel](https://pypi.org/project/wheel/) and
-[twine](https://pypi.org/project/twine/) :
-
-```
-python -m pip install --user --upgrade setuptools wheel twine
-```
-
-Package pg_activity :
-
-```
-python setup.py sdist bdist_wheel --universal
-```
-
-Create a token for the pg_activity project : 
-
-* Go to the `Account settings` page of [pipy](https://pypi.org) ;
-* Scroll down to `API tokens` then `Add API token` ;
-* Select a `token name` and set the scope to `Project: pg-activity` ;
-* Make sure that you copy the token, you will not see it again.
-
-Creating the `.pypirc` :
-
-```
-$ cat ~/.pypirc 
-[distutils]
-  index-servers =
-    pg_activity
-
-[pg_activity]
-  repository = https://upload.pypi.org/legacy/
-  username = __token__
-  password = YOUR_TOKEN_HERE
-
-$ chmod 600 ~/.pypirc 
-```
-
-Upload the package (`repository` is the project name specified in the
-`.pypirc`) : 
-
-```
-$ export VERSION=1.6.0
-$ twine upload --repository pg_activity \
-  dist/pg_activity-${VERSION}.tar.gz \
-  dist/pg_activity-${VERSION}-py2.py3-none-any.whl 
-
-Uploading distributions to https://upload.pypi.org/legacy/
-Uploading pg_activity-1.6.0-py2.py3-none-any.whl
-100%|====================================| 38.7k/38.7k [00:01<00:00, 20.8kB/s]
-Uploading pg_activity-1.6.0.tar.gz
-100%|====================================| 39.5k/39.5k [00:01<00:00, 30.6kB/s]
-
-View at:
-https://pypi.org/project/pg-activity/1.6.0/
-```
+Upon push of a tag to GitHub, the "publish" workflow will build the Python
+package and upload to PyPI.
 
 ## Send a mail to pgsql-announce
 
