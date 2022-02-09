@@ -37,7 +37,7 @@ setup(
         "Topic :: Database",
     ],
     keywords="postgresql activity monitoring cli sql top",
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     install_requires=[
         "attrs >= 17, !=21.1",
         "blessed",
@@ -53,9 +53,9 @@ setup(
         ],
         "testing": [
             "psycopg2-binary >= 2.8",
+            "psycopg[binary]",
             "pytest",
-            # From 4.0, pytest-postgresql is no compatible with python 3.6.
-            "pytest-postgresql ~= 3.0",
+            "pytest-postgresql >= 4.0",
         ],
     },
     data_files=[

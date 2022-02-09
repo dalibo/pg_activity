@@ -2,8 +2,9 @@ import time
 
 import attr
 import pytest
-import psycopg2
-from psycopg2.errors import WrongObjectType
+import psycopg
+from psycopg.conninfo import make_conninfo
+from psycopg.errors import WrongObjectType
 
 from pgactivity import types
 from pgactivity.data import Data
@@ -46,12 +47,11 @@ def test_pg_get_server_information(data):
 
 
 def test_activities(postgresql, data):
-    with postgresql.cursor() as cur:
-        cur.execute("SELECT pg_sleep(1)")
+    postgresql.execute("SELECT pg_sleep(1)")
     (running,) = data.pg_get_activities()
     assert "pg_sleep" in running.query
     assert running.state == "idle in transaction"
-    if postgresql.server_version >= 100000:
+    if postgresql.info.server_version >= 100000:
         assert running.wait == "ClientRead"
     else:
         assert running.wait is None
@@ -59,8 +59,7 @@ def test_activities(postgresql, data):
 
 
 def test_blocking_waiting(postgresql, data, execute):
-    with postgresql.cursor() as cur:
-        cur.execute("CREATE TABLE t AS (SELECT 'init'::text s)")
+    postgresql.execute("CREATE TABLE t AS (SELECT 'init'::text s)")
     postgresql.commit()
     execute("UPDATE t SET s = 'blocking'")
     execute("UPDATE t SET s = 'waiting 1'", commit=True)
@@ -73,7 +72,7 @@ def test_blocking_waiting(postgresql, data, execute):
     assert len(waiting) == 2
     assert "blocking" in blocking[0].query
     assert "waiting 1" in waiting[0].query and "waiting 2" in waiting[1].query
-    if postgresql.server_version >= 100000:
+    if postgresql.info.server_version >= 100000:
         assert blocking[0].wait == "ClientRead"
         assert blocking[1].wait == "transactionid"
     assert str(blocking[0].type) == "transactionid"
@@ -81,8 +80,7 @@ def test_blocking_waiting(postgresql, data, execute):
 
 
 def test_pg_get_blocking_virtualxid(postgresql, data, execute):
-    with postgresql.cursor() as cur:
-        cur.execute("CREATE TABLE t AS (SELECT 'init'::text s)")
+    postgresql.execute("CREATE TABLE t AS (SELECT 'init'::text s)")
     postgresql.commit()
     execute("UPDATE t SET s = 'blocking'")
     execute("CREATE INDEX CONCURRENTLY ON t(s)", autocommit=True)
@@ -96,15 +94,13 @@ def test_pg_get_blocking_virtualxid(postgresql, data, execute):
 
 
 def test_cancel_backend(postgresql, data):
-    with postgresql.cursor() as cur:
-        cur.execute("SELECT pg_sleep(1)")
+    postgresql.execute("SELECT pg_sleep(1)")
     (running,) = data.pg_get_activities()
     assert data.pg_cancel_backend(running.pid)
 
 
 def test_terminate_backend(postgresql, data):
-    with postgresql.cursor() as cur:
-        cur.execute("SELECT pg_sleep(1)")
+    postgresql.execute("SELECT pg_sleep(1)")
     (running,) = data.pg_get_activities()
     assert data.pg_terminate_backend(running.pid)
     assert not data.pg_get_activities()
@@ -112,25 +108,23 @@ def test_terminate_backend(postgresql, data):
 
 def test_encoding(postgresql, data, execute):
     """Test for issue #149"""
-    conninfo = postgresql.info.dsn_parameters
-    conn = psycopg2.connect(**conninfo)
+    conninfo = postgresql.info.dsn
+    conn = psycopg.connect(conninfo)
     conn.autocommit = True
-    with conn.cursor() as cur:
-        # plateform specific locales (,Centos, Ubuntu)
-        for encoding in ["fr_FR.latin1", "fr_FR.88591", "fr_FR.8859-1"]:
-            try:
-                cur.execute(
-                    f"CREATE DATABASE latin1 ENCODING 'latin1' TEMPLATE template0 LC_COLLATE '{encoding}' LC_CTYPE '{encoding}'"
-                )
-            except WrongObjectType:
-                continue
-            else:
-                break
+    # plateform specific locales (,Centos, Ubuntu)
+    for encoding in ["fr_FR.latin1", "fr_FR.88591", "fr_FR.8859-1"]:
+        try:
+            conn.execute(
+                f"CREATE DATABASE latin1 ENCODING 'latin1' TEMPLATE template0 LC_COLLATE '{encoding}' LC_CTYPE '{encoding}'"
+            )
+        except WrongObjectType:
+            continue
+        else:
+            break
 
-    conninfo = conninfo.copy()
-    conninfo["dbname"] = "latin1"
-    with psycopg2.connect(**conninfo) as conn, conn.cursor() as cur:
-        cur.execute("CREATE TABLE tbl AS (SELECT 'initilialized éléphant' s)")
+    conninfo = make_conninfo(conninfo, dbname="latin1")
+    with psycopg.connect(conninfo) as conn:
+        conn.execute("CREATE TABLE tbl AS (SELECT 'initilialized éléphant' s)")
         conn.commit()
 
     execute("UPDATE tbl SET s = 'blocking éléphant'", dbname="latin1")

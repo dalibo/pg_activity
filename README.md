@@ -25,7 +25,7 @@ Using distribution packages is the recommended way to install pg\_activity.
 Installation from pip
 ---------------------
 
-Alternatively, pg\_activity can be installed using pip on Python 3.6 or later
+Alternatively, pg\_activity can be installed using pip on Python 3.7 or later
 along with psycopg2 (version 2.8 or higher):
 
     $ python3 -m pip install pg_activity psycopg2-binary

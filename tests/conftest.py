@@ -3,8 +3,9 @@ import pathlib
 import threading
 from typing import Optional
 
-import psycopg2
-import psycopg2.errors
+import psycopg
+from psycopg.conninfo import make_conninfo
+import psycopg.errors
 import pytest
 
 LOGGER = logging.getLogger(__name__)
@@ -29,10 +30,10 @@ def execute(postgresql):
         autocommit: bool = False,
         dbname: Optional[str] = None,
     ) -> None:
-        connection_parms = postgresql.info.dsn_parameters
+        dsn, kwargs = postgresql.info.dsn, {}
         if dbname:
-            connection_parms["dbname"] = dbname
-        conn = psycopg2.connect(**connection_parms)
+            kwargs["dbname"] = dbname
+        conn = psycopg.connect(make_conninfo(dsn, **kwargs))
         conn.autocommit = autocommit
 
         def _execute() -> None:
@@ -47,8 +48,8 @@ def execute(postgresql):
                 try:
                     c.execute(query)
                 except (
-                    psycopg2.errors.AdminShutdown,
-                    psycopg2.errors.QueryCanceledError,
+                    psycopg.errors.AdminShutdown,
+                    psycopg.errors.QueryCanceled,
                 ):
                     return
                 if not autocommit and commit:

@@ -418,9 +418,7 @@ PID    DATABASE                     USER           CLIENT             state Quer
 >>> options = argparse.Namespace(**defaults)
 
 One query, idle in transaction:
->>> cur = postgres.cursor()
->>> cur.execute("SELECT pg_sleep(0)")
->>> cur.close()
+>>> _ = postgres.execute("SELECT pg_sleep(0)")
 
 Change refresh time, pause, change duration mode, change sort order, unpause,
 change query mode then quit:
@@ -796,9 +794,7 @@ DATABASE                     USER           CLIENT  RELATION             TYPE   
 
 
 Another idle transaction, with a long query:
->>> cur = postgres.cursor()
->>> cur.execute("CREATE TABLE persons (firstname text, lastname text, age int, address text)")
->>> cur.close()
+>>> _ = postgres.execute("CREATE TABLE persons (firstname text, lastname text, age int, address text)")
 
 Use another set of options:
 >>> output = getfixture("tmp_path") / "activities.csv"
@@ -897,9 +893,8 @@ tests                idle in trans CREATE TABLE persons (firstname text, lastnam
 >>> len(lines)
 4
 
->>> with postgres.cursor() as cur:
-...     cur.execute("CREATE TABLE t (s text)")
-...     cur.execute("INSERT INTO t VALUES ('init')")
+>>> _ = postgres.execute("CREATE TABLE t (s text)")
+>>> _ = postgres.execute("INSERT INTO t VALUES ('init')")
 >>> postgres.commit()
 
 
@@ -1261,7 +1256,5 @@ PID    DATABASE                      state   Query
 ------------------------------------------------------------- sending key 'q' --------------------------------------------------------------
 
 Waiting query should be unblocked:
->>> with postgres.cursor() as c:
-...     c.execute("SELECT s from t")
-...     c.fetchall()
+>>> postgres.execute("SELECT s from t").fetchall()
 [('waiting',)]
