@@ -41,7 +41,7 @@ setup(
     install_requires=[
         "attrs >= 17, !=21.1",
         "blessed",
-        "humanize",
+        "humanize >= 2.6.0",
         "psutil >= 2.0.0",
     ],
     extras_require={
