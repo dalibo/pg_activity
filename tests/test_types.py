@@ -1,4 +1,4 @@
-from pgactivity.types import Flag
+from pgactivity.types import Filters, Flag
 
 
 def test_flag():
@@ -70,3 +70,8 @@ def test_flag_from_options():
         | Flag.CLIENT
         | Flag.APPNAME
     )
+
+
+def test_filters_from_options():
+    f = Filters.from_options(["dbname:postgres"])
+    assert f == Filters(dbname="postgres")
