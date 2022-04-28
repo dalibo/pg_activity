@@ -1,0 +1,4 @@
+attrs==17.4
+blessed==1.18.1
+humanize==2.6.0
+psutil==5.5.1
