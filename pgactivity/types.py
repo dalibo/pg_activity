@@ -22,7 +22,7 @@ import attr
 import psutil
 from attr import validators
 
-from . import colors, utils
+from . import compat, colors, utils
 
 
 class Pct(float):
@@ -139,7 +139,7 @@ class Filters:
 
     @classmethod
     def from_options(cls, filters: Sequence[str]) -> "Filters":
-        fields = attr.fields_dict(cls)
+        fields = compat.fields_dict(cls)
         attrs = {}
         for f in filters:
             try:
