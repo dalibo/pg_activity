@@ -29,4 +29,4 @@ SELECT
       ELSE a.datname ~* %(dbname_filter)s
       END
 ORDER BY
-      EXTRACT(epoch FROM (NOW() - a.{duration_column})) DESC;
+      EXTRACT(epoch FROM (NOW() - a.{duration_column})) DESC, a.pid;
