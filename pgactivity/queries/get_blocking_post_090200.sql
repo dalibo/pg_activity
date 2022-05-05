@@ -13,7 +13,7 @@ SELECT
       locktype AS type,
       duration,
       state,
-      convert_from(sq.query::bytea, coalesce(pg_catalog.pg_encoding_to_char(b.encoding), 'UTF8')) AS query,
+      convert_from(replace(sq.query, '\', '\\')::bytea, coalesce(pg_catalog.pg_encoding_to_char(b.encoding), 'UTF8')) AS query,
       waiting as wait
   FROM
       (

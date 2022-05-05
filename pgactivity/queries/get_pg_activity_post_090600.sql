@@ -13,7 +13,7 @@ SELECT
       a.wait_event AS wait,
       a.usename AS user,
       a.state AS state,
-      convert_from(a.query::bytea, coalesce(pg_catalog.pg_encoding_to_char(b.encoding), 'UTF8')) AS query,
+      convert_from(replace(a.query, '\', '\\')::bytea, coalesce(pg_catalog.pg_encoding_to_char(b.encoding), 'UTF8')) AS query,
       false AS is_parallel_worker
   FROM
       pg_stat_activity a

@@ -17,7 +17,7 @@ SELECT
       END AS state,
       CASE WHEN sq.query LIKE '<IDLE>%%'
           THEN NULL
-          ELSE convert_from(sq.query::bytea, coalesce(pg_catalog.pg_encoding_to_char(b.encoding), 'UTF8'))
+          ELSE convert_from(replace(sq.query, '\', '\\')::bytea, coalesce(pg_catalog.pg_encoding_to_char(b.encoding), 'UTF8'))
       END AS query,
       waiting AS wait
   FROM
