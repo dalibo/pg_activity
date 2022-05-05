@@ -18,7 +18,7 @@ SELECT
       END AS state,
       CASE
           WHEN a.current_query LIKE '<IDLE>%%' THEN NULL
-          ELSE convert_from(a.current_query::bytea, coalesce(pg_catalog.pg_encoding_to_char(b.encoding), 'UTF8'))
+          ELSE convert_from(replace(a.current_query, '\', '\\')::bytea, coalesce(pg_catalog.pg_encoding_to_char(b.encoding), 'UTF8'))
       END AS query,
       false AS is_parallel_worker
   FROM
