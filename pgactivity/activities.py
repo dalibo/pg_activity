@@ -198,7 +198,7 @@ def sorted(processes: List[T], *, key: SortKey, reverse: bool = False) -> List[T
     """
     return builtins.sorted(
         processes,
-        key=lambda p: getattr(p, key.name) or 0,  # TODO: avoid getattr()
+        key=lambda p: (getattr(p, key.name) or 0, p.pid),  # TODO: avoid getattr()
         reverse=reverse,
     )
 
