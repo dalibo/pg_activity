@@ -157,6 +157,23 @@ def sorted(processes: List[T], *, key: SortKey, reverse: bool = False) -> List[T
     ...         user="postgres",
     ...         client="local",
     ...         cpu=0.1,
+    ...         mem=0.994_254_939_413_836,
+    ...         read=0.1,
+    ...         write=0.282_725_318_098_656_75,
+    ...         state="idle in transaction",
+    ...         query="UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;",
+    ...         duration=0.1,
+    ...         wait="ClientRead",
+    ...         io_wait=False,
+    ...         is_parallel_worker=False,
+    ...     ),
+    ...     LocalRunningProcess(
+    ...         pid="6240",
+    ...         application_name="pgbench",
+    ...         database="pgbench",
+    ...         user="postgres",
+    ...         client="local",
+    ...         cpu=0.1,
     ...         mem=0.993_254_939_413_836,
     ...         read=0.1,
     ...         write=0.282_725_318_098_656_75,
@@ -179,7 +196,7 @@ def sorted(processes: List[T], *, key: SortKey, reverse: bool = False) -> List[T
     ...         write=0.113_090_128_201_154_74,
     ...         state="active",
     ...         query="UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;",
-    ...         duration=None,
+    ...         duration=0.01,
     ...         wait=False,
     ...         io_wait=False,
     ...         is_parallel_worker=True,
@@ -188,14 +205,21 @@ def sorted(processes: List[T], *, key: SortKey, reverse: bool = False) -> List[T
 
     >>> processes = sorted(processes, key=SortKey.cpu, reverse=True)
     >>> [p.pid for p in processes]
-    ['6228', '6239']
+    ['6228', '6239', '6240']
     >>> processes = sorted(processes, key=SortKey.mem)
     >>> [p.pid for p in processes]
-    ['6239', '6228']
+    ['6240', '6239', '6228']
+
+    When using the 'duration' sort key, processes are also sorted by ascending PID:
     >>> processes = sorted(processes, key=SortKey.duration, reverse=True)
     >>> [p.pid for p in processes]
-    ['6239', '6228']
+    ['6239', '6240', '6228']
     """
+
+    # If we filter by duration, we also need to filter by ascending pid
+    if key == SortKey.duration:
+        processes = builtins.sorted(processes, key=lambda p: p.pid, reverse=False)
+
     return builtins.sorted(
         processes,
         key=lambda p: getattr(p, key.name) or 0,  # TODO: avoid getattr()
