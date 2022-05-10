@@ -167,7 +167,7 @@ FAQ
 **I can't see my queries only TPS is shown**
 
 `pg_activity` scans the view `pg_stat_activity` with a user defined refresh
-time comprised between O.5 and 5 seconds. It can be modified in the interface
+time comprised between 0.5 and 5 seconds. It can be modified in the interface
 with the `+` and `-` keys. Any query executed between two scans won't be
 displayed.
 
