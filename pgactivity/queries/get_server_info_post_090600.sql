@@ -1,4 +1,4 @@
--- Get the server informations for pg >= 9.6
+-- Get the server information for pg >= 9.6
 -- NEW pg_stat_wal_receiver
 -- NEW pg_stat_activity.wait_event_type
 -- NEW parallelism

@@ -294,7 +294,7 @@ required by another session. It shows following information:
 
 =over 2
 
-All the environnement variables supported by libpq (PostgreSQL's query
+All the environment variables supported by libpq (PostgreSQL's query
 protocol) are supported by pg_activity.
 
 See: https://www.postgresql.org/docs/current/libpq-envars.html

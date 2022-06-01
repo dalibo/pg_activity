@@ -1,4 +1,4 @@
--- Get the server informations for pg >= 10
+-- Get the server information for pg >= 10
 -- NEW pg_activity.backend_type
 -- NEW guc max_logical_replication_workers
 -- NEW guc max_parallel_workers

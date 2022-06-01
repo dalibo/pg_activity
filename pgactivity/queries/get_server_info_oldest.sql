@@ -1,4 +1,4 @@
--- Get the server informations prior to 9.0
+-- Get the server information prior to 9.0
 WITH dbinfo AS(
         SELECT COALESCE(SUM(sd.xact_commit + sd.xact_rollback)::BIGINT, 0) AS xact_count,
 	       COALESCE(SUM(tup_inserted)::BIGINT, 0) AS insert,

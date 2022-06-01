@@ -1,4 +1,4 @@
--- Get the server informations for pg >= 9.4
+-- Get the server information for pg >= 9.4
 -- NEW guc max_replication_slots
 -- NEW guc max_worker_processes
 

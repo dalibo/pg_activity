@@ -139,7 +139,7 @@ class Data:
 
     def pg_is_local_access(self) -> bool:
         """
-        Verify if the user running pg_activity can acces
+        Verify if the user running pg_activity can access
         system information for the postmaster process.
         """
         try:

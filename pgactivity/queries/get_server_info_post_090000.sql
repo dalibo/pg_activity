@@ -1,4 +1,4 @@
--- Get the server informations for pg >= 9.0
+-- Get the server information for pg >= 9.0
 -- NEW guc max_wal_senders
 WITH dbinfo AS(
         SELECT COALESCE(SUM(sd.xact_commit + sd.xact_rollback)::BIGINT, 0) AS xact_count,

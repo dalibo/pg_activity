@@ -1,4 +1,4 @@
--- Get the server informations for pg >= 11
+-- Get the server information for pg >= 11
 -- NEW: pg_replication_slots
 WITH dbinfo AS(
         SELECT COALESCE(SUM(sd.xact_commit + sd.xact_rollback)::BIGINT, 0) AS xact_count,

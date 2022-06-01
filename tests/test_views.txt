@@ -125,7 +125,7 @@ PostgreSQL 9.6 - server - pgadm@server.prod.tld:5433/app - Ref.: 10s - Duration 
  * Worker processes: 3/8 total ⋅ 1/8 logical workers ⋅ 2/8 parallel workers
    Other processes & info: 3/3 autovacuum workers ⋅ 1/10 wal senders ⋅ 0 wal receivers ⋅ 10/10 repl. slots
 
-Local host, with priviledged access:
+Local host, with privileged access:
 
 >>> host = Host("localhost", "tester", "host", 5432, "postgres")
 >>> sysinfo = SystemInfo(
