@@ -1,8 +1,8 @@
-build/
-htmlcov/
-dist/
-pg_activity.egg-info
-pgactivity/__pycache__/
 .coverage
-.vscode
 .tox
+.vscode
+__pycache__/
+build/
+dist/
+htmlcov/
+pg_activity.egg-info
