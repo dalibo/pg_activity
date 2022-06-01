@@ -1,5 +1,5 @@
--- Get the server informations for pg >= 9.3
--- NEW pg_read_file no longuer need 3 parameters (since 9.1)
+-- Get the server information for pg >= 9.3
+-- NEW pg_read_file no longer need 3 parameters (since 9.1)
 WITH dbinfos AS(
         SELECT COALESCE(SUM(sd.xact_commit + sd.xact_rollback)::BIGINT, 0) AS xact_count,
 	       COALESCE(SUM(tup_inserted)::BIGINT, 0) AS insert,

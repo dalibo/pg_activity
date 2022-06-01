@@ -1,4 +1,4 @@
--- Get the server informations for pg >= 12
+-- Get the server information for pg >= 12
 -- NEW: pg_ls_tmp_dir()
 WITH dbinfo AS(
         SELECT COALESCE(SUM(sd.xact_commit + sd.xact_rollback)::BIGINT, 0) AS xact_count,

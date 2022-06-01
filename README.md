@@ -59,10 +59,10 @@ Usage
 -----
 
 `pg_activity` works locally or remotely. In local execution context, to obtain
-sufficient rights to display system informations, the system user running
+sufficient rights to display system information, the system user running
 `pg_activity` must be the same user running postgresql server (`postgres` by
 default), or have more rights like `root`. Otherwise, `pg_activity` can fallback
-to a degraded mode without displaying system informations. On the same way,
+to a degraded mode without displaying system information. On the same way,
 PostgreSQL user used to connect to the database must be super-user.
 ex:
 
@@ -182,7 +182,7 @@ What is more, `pg_activity` uses different queries to get :
      `pg_stat_get_db_xact_rollback()`
 *    and more ( eg : `pg_cancel_backend()` and `pg_terminate_backend()` )
 
-Thoses queries cannot be seen in the query tab because all queries issued from
+Those queries cannot be seen in the query tab because all queries issued from
 the `pg_activity` backend are considered as noise and are not displayed . On
 the other hand, the transactions used to get the info for `pg_activity`'s
 reporting are still accounted for by postgres in `pg_stat_get_db_xact_commit()`

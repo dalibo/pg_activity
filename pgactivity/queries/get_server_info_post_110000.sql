@@ -1,4 +1,4 @@
--- Get the server informations for pg >= 11
+-- Get the server information for pg >= 11
 -- NEW: pg_activity.backend_type = 'parallel worker'
 -- NEW: pg_activity.backend_type = 'logical replication worker'
 WITH dbinfo AS(

@@ -19,7 +19,7 @@ Change log:
   query, transaction, backend (@nilshamerlinck )
 * Move to dalibo labs (@daamien)
 * Expand current 1-3s refresh interval to 0.5-5s (@kmoppel)
-* Add a refresh dbsize interative action shortcut (D) (Fabio Renato Geiss)
+* Add a refresh dbsize interactive action shortcut (D) (Fabio Renato Geiss)
 * Add --verbose-mode in man page (@julmon)
 
 Bug fixes:

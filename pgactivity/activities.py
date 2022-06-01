@@ -81,13 +81,13 @@ def ps_complete(
         if new_proc is None:
             continue
         try:
-            # Getting informations from the previous loop
+            # Getting information from the previous loop
             proc = processes[pid]
         except KeyError:
             # No previous information about this process
             proc = new_proc
         else:
-            # Update old process with new informations
+            # Update old process with new information
             mem_percent = proc.mem_percent
             cpu_percent = proc.cpu_percent
             if proc.psutil_proc is not None:
