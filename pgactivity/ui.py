@@ -35,6 +35,7 @@ def main(
     flag = types.Flag.from_options(is_local=is_local, **vars(options))
     ui = types.UI.make(
         flag=flag,
+        refresh_time=options.refresh,
         min_duration=options.minduration,
         duration_mode=int(options.durationmode),
         wrap_query=options.wrap_query,

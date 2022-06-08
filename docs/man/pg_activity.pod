@@ -268,10 +268,6 @@ required by another session. It shows following information:
 
 	Wrap query column instead of truncating
 
-=item B<--duration-mode=DURATION_MODE>
-
-	Duration mode. Values: 1-QUERY(default), 2-TRANSACTION, 3-BACKEND
-
 =item B<--min-duration=SECONDS>
 
 	Don't display queries with smaller than specified duration (in seconds).
@@ -279,6 +275,10 @@ required by another session. It shows following information:
 =item B<--filter=FIELD:REGEX>
 
 	Filter activities with a (case insensitive) regular expression applied on selected fields. Known fields are: dbname.
+
+=item B<--refresh>
+
+	Change the refresh rate, allowed values are: 0.5, 1, 2, 3, 4, 5 (in seconds) (default: 2).
 
 =item B<--help>
 
