@@ -97,6 +97,16 @@ def get_parser() -> ArgumentParser:
         metavar="FIELD:REGEX",
         default=[],
     )
+    # --refresh
+    parser.add_argument(
+        "--refresh",
+        dest="refresh",
+        help="Refresh rate. Values: 0.5, 1, 2, 3, 4, 5 (default: %(default)s).",
+        metavar="REFRESH",
+        choices=[0.5, 1, 2, 3, 4, 5],
+        type=float,
+        default=2,
+    )
     # --version
     parser.add_argument(
         "--version",

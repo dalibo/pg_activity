@@ -23,6 +23,7 @@ Default CLI options, passed to ui.main():
 ...     "help": False,
 ...     "host": f"{postgres.info.host}",
 ...     "legacy_ui": False,
+...     "refresh": 2,
 ...     "minduration": 0,
 ...     "filters": [],
 ...     "noappname": True,
