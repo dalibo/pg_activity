@@ -216,10 +216,6 @@ def sorted(processes: List[T], *, key: SortKey, reverse: bool = False) -> List[T
     ['6239', '6240', '6228']
     """
 
-    # If we filter by duration, we also need to filter by ascending pid
-    if key == SortKey.duration:
-        processes = builtins.sorted(processes, key=lambda p: p.pid, reverse=False)
-
     return builtins.sorted(
         processes,
         key=lambda p: getattr(p, key.name) or 0,  # TODO: avoid getattr()
