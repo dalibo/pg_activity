@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "PG_ACTIVITY 1"
-.TH PG_ACTIVITY 1 "2022-06-08" "pg_activity 3.0.0a1" "Command line tool for PostgreSQL server activity monitoring."
+.TH PG_ACTIVITY 1 "2022-06-09" "pg_activity 3.0.0a1" "Command line tool for PostgreSQL server activity monitoring."
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -347,26 +347,8 @@ required by another session. It shows following information:
 .PD
 .SH "COMMAND-LINE OPTIONS"
 .IX Header "COMMAND-LINE OPTIONS"
-.IP "\fB\-U \s-1USERNAME\s0\fR, \fB\-\-username=USERNAME\fR" 2
-.IX Item "-U USERNAME, --username=USERNAME"
-.Vb 1
-\&        Database user name.
-.Ve
-.IP "\fB\-p \s-1PORT\s0\fR, \fB\-\-port=PORT\fR" 2
-.IX Item "-p PORT, --port=PORT"
-.Vb 1
-\&        Database server port.
-.Ve
-.IP "\fB\-h \s-1HOSTNAME\s0\fR, \fB\-\-host=HOSTNAME\fR" 2
-.IX Item "-h HOSTNAME, --host=HOSTNAME"
-.Vb 1
-\&        Database server host or socket directory.
-.Ve
-.IP "\fB\-d \s-1DBNAME\s0\fR, \fB\-\-dbname=DBNAME\fR" 2
-.IX Item "-d DBNAME, --dbname=DBNAME"
-.Vb 1
-\&    Database name to connect to.
-.Ve
+.SS "\s-1OPTIONS\s0"
+.IX Subsection "OPTIONS"
 .IP "\fB\-\-blocksize=BLOCKSIZE\fR" 2
 .IX Item "--blocksize=BLOCKSIZE"
 .Vb 1
@@ -390,7 +372,7 @@ required by another session. It shows following information:
 .IP "\fB\-w, \-\-wrap\-query\fR" 2
 .IX Item "-w, --wrap-query"
 .Vb 1
-\&        Wrap query column instead of truncating
+\&        Wrap query column instead of truncating.
 .Ve
 .IP "\fB\-\-min\-duration=SECONDS\fR" 2
 .IX Item "--min-duration=SECONDS"
@@ -402,11 +384,6 @@ required by another session. It shows following information:
 .Vb 1
 \&        Filter activities with a (case insensitive) regular expression applied on selected fields. Known fields are: dbname.
 .Ve
-.IP "\fB\-\-refresh\fR" 2
-.IX Item "--refresh"
-.Vb 1
-\&        Change the refresh rate, allowed values are: 0.5, 1, 2, 3, 4, 5 (in seconds) (default: 2).
-.Ve
 .IP "\fB\-\-help\fR" 2
 .IX Item "--help"
 .Vb 1
@@ -417,16 +394,30 @@ required by another session. It shows following information:
 .Vb 1
 \&        Show program\*(Aqs version number and exit.
 .Ve
-.SH "ENVIRONMENT VARIABLES"
-.IX Header "ENVIRONMENT VARIABLES"
-.RS 2
-All the environment variables supported by libpq (PostgreSQL's query
-protocol) are supported by pg_activity.
-.Sp
-See: https://www.postgresql.org/docs/current/libpq\-envars.html
-.RE
-.SH "DISPLAY OPTIONS"
-.IX Header "DISPLAY OPTIONS"
+.SS "\s-1CONNECTION OPTIONS\s0"
+.IX Subsection "CONNECTION OPTIONS"
+.IP "\fB\-U \s-1USERNAME\s0\fR, \fB\-\-username=USERNAME\fR" 2
+.IX Item "-U USERNAME, --username=USERNAME"
+.Vb 1
+\&        Database user name.
+.Ve
+.IP "\fB\-p \s-1PORT\s0\fR, \fB\-\-port=PORT\fR" 2
+.IX Item "-p PORT, --port=PORT"
+.Vb 1
+\&        Database server port.
+.Ve
+.IP "\fB\-h \s-1HOSTNAME\s0\fR, \fB\-\-host=HOSTNAME\fR" 2
+.IX Item "-h HOSTNAME, --host=HOSTNAME"
+.Vb 1
+\&        Database server host or socket directory.
+.Ve
+.IP "\fB\-d \s-1DBNAME\s0\fR, \fB\-\-dbname=DBNAME\fR" 2
+.IX Item "-d DBNAME, --dbname=DBNAME"
+.Vb 1
+\&    Database name to connect to.
+.Ve
+.SS "\s-1PROCESS DISPLAY OPTIONS\s0"
+.IX Subsection "PROCESS DISPLAY OPTIONS"
 .IP "\fB\-\-no\-pid\fR" 2
 .IX Item "--no-pid"
 .Vb 1
@@ -482,6 +473,8 @@ See: https://www.postgresql.org/docs/current/libpq\-envars.html
 .Vb 1
 \&        Disable App.
 .Ve
+.SS "\s-1OTHER DISPLAY OPTIONS\s0"
+.IX Subsection "OTHER DISPLAY OPTIONS"
 .IP "\fB\-\-no\-inst\-info\fR" 2
 .IX Item "--no-inst-info"
 .Vb 1
@@ -495,8 +488,21 @@ See: https://www.postgresql.org/docs/current/libpq\-envars.html
 .IP "\fB\-\-no\-proc\-info\fR" 2
 .IX Item "--no-proc-info"
 .Vb 1
-\&        Display workers process information in header
+\&        Display workers process information in header.
 .Ve
+.IP "\fB\-\-refresh\fR" 2
+.IX Item "--refresh"
+.Vb 1
+\&        Change the refresh rate, allowed values are: 0.5, 1, 2, 3, 4, 5 (in seconds) (default: 2).
+.Ve
+.SH "ENVIRONMENT VARIABLES"
+.IX Header "ENVIRONMENT VARIABLES"
+.RS 2
+All the environment variables supported by libpq (PostgreSQL's query
+protocol) are supported by pg_activity.
+.Sp
+See: https://www.postgresql.org/docs/current/libpq\-envars.html
+.RE
 .SH "INTERACTIVE COMMANDS"
 .IX Header "INTERACTIVE COMMANDS"
 .IP "\fBr\fR     Sort by READ/s, descending." 2
@@ -510,22 +516,22 @@ See: https://www.postgresql.org/docs/current/libpq\-envars.html
 .IX Item "m Sort by MEM%, descending."
 .IP "\fBt\fR     Sort by \s-1TIME+,\s0 descending." 2
 .IX Item "t Sort by TIME+, descending."
-.IP "\fBT\fR     Change duration mode: query, transaction, backend" 2
-.IX Item "T Change duration mode: query, transaction, backend"
+.IP "\fBT\fR     Change duration mode: query, transaction, backend." 2
+.IX Item "T Change duration mode: query, transaction, backend."
 .IP "\fBSpace\fR Pause on/off." 2
 .IX Item "Space Pause on/off."
-.IP "\fBv\fR     Change queries display mode: full, truncated, indented" 2
-.IX Item "v Change queries display mode: full, truncated, indented"
+.IP "\fBv\fR     Change queries display mode: full, truncated, indented." 2
+.IX Item "v Change queries display mode: full, truncated, indented."
 .IP "\fB\s-1UP / DOWN\s0\fR Scroll process list." 2
 .IX Item "UP / DOWN Scroll process list."
 .IP "\fBk / j\fR Scroll process list." 2
 .IX Item "k / j Scroll process list."
-.IP "\fBq\fR     Quit" 2
-.IX Item "q Quit"
-.IP "\fB+\fR     Increase refresh time. Maximum value: 3s" 2
-.IX Item "+ Increase refresh time. Maximum value: 3s"
-.IP "\fB\-\fR     Decrease refresh time. Minimum Value: 1s" 2
-.IX Item "- Decrease refresh time. Minimum Value: 1s"
+.IP "\fBq\fR     Quit." 2
+.IX Item "q Quit."
+.IP "\fB+\fR     Increase refresh time. Maximum value: 3s." 2
+.IX Item "+ Increase refresh time. Maximum value: 3s."
+.IP "\fB\-\fR     Decrease refresh time. Minimum Value: 1s." 2
+.IX Item "- Decrease refresh time. Minimum Value: 1s."
 .IP "\fBF1/1\fR  Running queries monitoring." 2
 .IX Item "F1/1 Running queries monitoring."
 .IP "\fBF2/2\fR  Waiting queries monitoring." 2
@@ -546,6 +552,10 @@ See: https://www.postgresql.org/docs/current/libpq\-envars.html
 .PD 0
 .IP "\fB\s-1DOWN /\s0 j\fR  Move down the cursor." 2
 .IX Item "DOWN / j Move down the cursor."
+.IP "\fB\s-1PAGE UP\s0\fR    Move the cursor to the first line." 2
+.IX Item "PAGE UP Move the cursor to the first line."
+.IP "\fB\s-1PAGE DOWN\s0\fR  Move the cursor to the last line." 2
+.IX Item "PAGE DOWN Move the cursor to the last line."
 .IP "\fBK\fR     Terminate the current backend/tagged backends." 2
 .IX Item "K Terminate the current backend/tagged backends."
 .IP "\fBC\fR     Cancel the current backend/tagged backends." 2

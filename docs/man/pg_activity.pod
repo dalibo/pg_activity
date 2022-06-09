@@ -230,23 +230,9 @@ required by another session. It shows following information:
 
 =head1 COMMAND-LINE OPTIONS
 
+=head2 OPTIONS
+
 =over 2
-
-=item B<-U USERNAME>, B<--username=USERNAME>
-
-	Database user name.
-
-=item B<-p PORT>, B<--port=PORT>
-
-	Database server port.
-
-=item B<-h HOSTNAME>, B<--host=HOSTNAME>
-
-	Database server host or socket directory.
-
-=item B<-d DBNAME>, B<--dbname=DBNAME>
-
-    Database name to connect to.
 
 =item B<--blocksize=BLOCKSIZE>
 
@@ -266,7 +252,7 @@ required by another session. It shows following information:
 
 =item B<-w, --wrap-query>
 
-	Wrap query column instead of truncating
+	Wrap query column instead of truncating.
 
 =item B<--min-duration=SECONDS>
 
@@ -275,10 +261,6 @@ required by another session. It shows following information:
 =item B<--filter=FIELD:REGEX>
 
 	Filter activities with a (case insensitive) regular expression applied on selected fields. Known fields are: dbname.
-
-=item B<--refresh>
-
-	Change the refresh rate, allowed values are: 0.5, 1, 2, 3, 4, 5 (in seconds) (default: 2).
 
 =item B<--help>
 
@@ -290,18 +272,29 @@ required by another session. It shows following information:
 
 =back
 
-=head1 ENVIRONMENT VARIABLES
+=head2 CONNECTION OPTIONS
 
 =over 2
 
-All the environment variables supported by libpq (PostgreSQL's query
-protocol) are supported by pg_activity.
+=item B<-U USERNAME>, B<--username=USERNAME>
 
-See: https://www.postgresql.org/docs/current/libpq-envars.html
+	Database user name.
+
+=item B<-p PORT>, B<--port=PORT>
+
+	Database server port.
+
+=item B<-h HOSTNAME>, B<--host=HOSTNAME>
+
+	Database server host or socket directory.
+
+=item B<-d DBNAME>, B<--dbname=DBNAME>
+
+    Database name to connect to.
 
 =back
 
-=head1 DISPLAY OPTIONS
+=head2 PROCESS DISPLAY OPTIONS
 
 =over 2
 
@@ -349,6 +342,12 @@ See: https://www.postgresql.org/docs/current/libpq-envars.html
 
 	Disable App.
 
+=back
+
+=head2 OTHER DISPLAY OPTIONS
+
+=over 2
+
 =item B<--no-inst-info>
 
 	Display instance information in header.
@@ -359,7 +358,22 @@ See: https://www.postgresql.org/docs/current/libpq-envars.html
 
 =item B<--no-proc-info>
 
-	Display workers process information in header
+	Display workers process information in header.
+
+=item B<--refresh>
+
+	Change the refresh rate, allowed values are: 0.5, 1, 2, 3, 4, 5 (in seconds) (default: 2).
+
+=back
+
+=head1 ENVIRONMENT VARIABLES
+
+=over 2
+
+All the environment variables supported by libpq (PostgreSQL's query
+protocol) are supported by pg_activity.
+
+See: https://www.postgresql.org/docs/current/libpq-envars.html
 
 =back
 
@@ -377,21 +391,21 @@ See: https://www.postgresql.org/docs/current/libpq-envars.html
 
 =item B<t>     Sort by TIME+, descending.
 
-=item B<T>     Change duration mode: query, transaction, backend
+=item B<T>     Change duration mode: query, transaction, backend.
 
 =item B<Space> Pause on/off.
 
-=item B<v>     Change queries display mode: full, truncated, indented
+=item B<v>     Change queries display mode: full, truncated, indented.
 
 =item B<UP / DOWN> Scroll process list.
 
 =item B<k / j> Scroll process list.
 
-=item B<q>     Quit
+=item B<q>     Quit.
 
-=item B<+>     Increase refresh time. Maximum value: 3s
+=item B<+>     Increase refresh time. Maximum value: 3s.
 
-=item B<->     Decrease refresh time. Minimum Value: 1s
+=item B<->     Decrease refresh time. Minimum Value: 1s.
 
 =item B<F1/1>  Running queries monitoring.
 
@@ -414,6 +428,10 @@ See: https://www.postgresql.org/docs/current/libpq-envars.html
 =item B<UP / k>    Move up the cursor.
 
 =item B<DOWN / j>  Move down the cursor.
+
+=item B<PAGE UP>    Move the cursor to the first line.
+
+=item B<PAGE DOWN>  Move the cursor to the last line.
 
 =item B<K>     Terminate the current backend/tagged backends.
 
