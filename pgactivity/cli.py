@@ -293,7 +293,7 @@ def get_parser() -> ArgumentParser:
     group.add_argument(
         "--refresh",
         dest="refresh",
-        help="Refresh rate. Values: 0.5, 1, 2, 3, 4, 5 (default: 2).",
+        help="Refresh rate. Values: %(choices)s (default: %(default)d).",
         metavar="REFRESH",
         choices=[0.5, 1, 2, 3, 4, 5],
         type=float,
