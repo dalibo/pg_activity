@@ -1,5 +1,6 @@
 import time
 from argparse import Namespace
+from functools import partial
 from typing import Dict, List, Optional, cast
 
 import attr
@@ -25,11 +26,13 @@ def main(
 
     is_local = data.pg_is_local() and data.pg_is_local_access()
 
-    skip_sizes = options.nodbsize
+    skip_db_size = options.nodbsize
     server_information = data.pg_get_server_information(
         prev_server_info=None,
         using_rds=options.rds,
-        skip_sizes=options.nodbsize,
+        skip_db_size=options.nodbsize,
+        skip_tempfile=options.notempfiles,
+        skip_walreceiver=options.nowalreceiver,
     )
 
     flag = types.Flag.from_options(is_local=is_local, **vars(options))
@@ -65,7 +68,7 @@ def main(
             elif not ui.interactive() and key == keys.SPACE:
                 ui.toggle_pause()
             elif options.nodbsize and key == keys.REFRESH_DB_SIZE:
-                skip_sizes = False
+                skip_db_size = False
             elif key is not None:
                 if keys.is_process_next(key):
                     if pg_procs.focus_next():
@@ -174,13 +177,15 @@ def main(
 
             else:
                 if not ui.in_pause and not ui.interactive():
-                    if options.nodbsize and not skip_sizes:
-                        skip_sizes = True
+                    if options.nodbsize and not skip_db_size:
+                        skip_db_size = True
 
                     server_information = data.pg_get_server_information(
                         prev_server_info=server_information,
                         using_rds=options.rds,
-                        skip_sizes=skip_sizes,
+                        skip_db_size=skip_db_size,
+                        skip_tempfile=options.notempfiles,
+                        skip_walreceiver=options.nowalreceiver,
                     )
                     memory, swap, load = activities.mem_swap_load()
                     system_info = types.SystemInfo.default(
@@ -228,8 +233,9 @@ def main(
                     activity_stats = (pg_procs, system_info) if is_local else pg_procs  # type: ignore[assignment]
 
                 if options.output is not None:
+                    custom_asdict = partial(attr.asdict, recurse=True)
                     with open(options.output, "a") as f:
-                        utils.csv_write(f, map(attr.asdict, pg_procs.items))
+                        utils.csv_write(f, map(custom_asdict, pg_procs.items))
 
                 views.screen(
                     term,

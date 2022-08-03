@@ -786,6 +786,18 @@ class SystemInfo:
         )
 
 
+@attr.s(frozen=False, auto_attribs=True, slots=True)
+class FailedQueriesInfo:
+    temp_file_query_failed: bool = False
+    wal_receivers_query_failed: bool = False
+
+
+@attr.s(frozen=True, auto_attribs=True, slots=True)
+class TempFileInfo:
+    temp_files: int
+    temp_bytes: int
+
+
 @attr.s(frozen=True, auto_attribs=True, slots=True)
 class ServerInformation:
     # Fetched from the database
@@ -819,8 +831,7 @@ class ServerInformation:
     wal_senders: Optional[int]
     wal_receivers: Optional[int]
     replication_slots: Optional[int]
-    temp_files: int
-    temp_bytes: int
+    temporary_file: Optional[TempFileInfo]
     # Computed in data.pg_get_server_information()
     size_evolution: float
     tps: int

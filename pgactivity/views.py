@@ -256,14 +256,19 @@ def header(
         ]
         yield from render_columns(columns, delimiter=f" {term.bold_blue('⋅')} ")
 
-        temp_size = utils.naturalsize(si.temp_bytes)
+        if si.temporary_file is not None:
+            temp_files = si.temporary_file.temp_files
+            temp_size = utils.naturalsize(si.temporary_file.temp_bytes)
+        else:
+            temp_files = None
+            temp_size = None
         columns = [
             [f"  Activity: {render(si.tps)} tps"],
             [f"{render(si.insert_per_second)} insert/s"],
             [f"{render(si.update_per_second)} update/s"],
             [f"{render(si.delete_per_second)} delete/s"],
             [f"{render(si.tuples_returned_per_second)} tuples returned/s"],
-            [f"{render(si.temp_files)} temp files"],
+            [f"{render(temp_files)} temp files"],
             [f"{render(temp_size)} temp size"],
         ]
         yield from render_columns(columns, delimiter=f" {term.bold_blue('⋅')} ")

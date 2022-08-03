@@ -76,7 +76,7 @@ def get_parser() -> ArgumentParser:
         "--rds",
         dest="rds",
         action="store_true",
-        help="Enable support for AWS RDS.",
+        help="Enable support for AWS RDS (implies --no-tempfiles).",
         default=False,
     )
     # --output
@@ -93,6 +93,22 @@ def get_parser() -> ArgumentParser:
         dest="nodbsize",
         action="store_true",
         help="Skip total size of DB.",
+        default=False,
+    )
+    # --no-tempfiles
+    group.add_argument(
+        "--no-tempfiles",
+        dest="notempfiles",
+        action="store_true",
+        help="Skip tempfile count and size.",
+        default=False,
+    )
+    # --no-walreceiver
+    group.add_argument(
+        "--no-walreceiver",
+        dest="nowalreceiver",
+        action="store_true",
+        help="Skip walreceiver checks.",
         default=False,
     )
     # --wrap-query
@@ -366,6 +382,8 @@ def main() -> None:
         filters = types.Filters.from_options(args.filters)
     except ValueError as e:
         parser.error(str(e))
+    if args.rds:
+        args.notempfile = True
 
     dataobj = data.pg_connect(
         args,
