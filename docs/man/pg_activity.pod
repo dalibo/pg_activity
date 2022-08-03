@@ -240,7 +240,7 @@ required by another session. It shows following information:
 
 =item B<--rds>
 
-	Enable support for AWS RDS.
+	Enable support for AWS RDS (implies --no-tempfiles).
 
 =item B<--output=FILEPATH>
 
@@ -249,6 +249,22 @@ required by another session. It shows following information:
 =item B<--no-db-size>
 
 	Skip total size of DB.
+
+=item B<--no-tempfile>
+
+	Skip tempfile count and size.
+
+=item B<--no-walreceiver>
+
+	Skip walreceiver checks.
+
+=item B<--no-tempfile-size>
+
+	Skip tempfile count and size.
+
+=item B<--no-walreceiver>
+
+	Skip walreceiver checks.
 
 =item B<-w, --wrap-query>
 
@@ -444,6 +460,47 @@ See: https://www.postgresql.org/docs/current/libpq-envars.html
 =item B<Other> Back to activity.
 
 =back
+
+=head1 MISSING DATA IN THE UI ?
+
+pg_activity is best used with a user owning the SUPERUSER privilege. Ordinary
+users can only see all the information about their own sessions (sessions
+belonging to a role that they are a member of). In rows about other sessions,
+many columns will be null or not picked by pg_activity. It will impact both the
+information gathered in the B<HEADER> section and the B<ACTIVITY PANEL>
+
+If a user doesn't have the CONNECT privilege on a database the
+pg_database_size() function will fail and pg_activity will crash. The
+B<--no-db-size> option can be used in this case. This situation is frequent for
+cloud database where the service provider has created a service database with a
+restricted access.
+
+Some settings are visible only to superusers or members of pg_read_all_settings
+such as the data_directory guc. If the user cannot read this parameter or
+access the pid file in the PGDATA directory, the B<system information HEADER>
+group will not be displayed. The B<%CPU>, B<%MEM>, B<Read/s> and B<Write/s>
+columns will also be missing from the B<ACTIVITY PANEL>.
+
+On some OS like MacOS, psutils.io_counters() is not implemented. The effect are
+the same as thoses described when data_directory is not readable.
+
+pg_activity needs to access the pgsql_tmp directory stored in all tablespaces
+in order to compute the number and size of the temporary files. This requires
+the usage of the pg_ls_tmpdir() function (or pg_ls_dir() and pg_stats_file()
+for versions older than PostgreSQL 12). The user needs to own the SUPERUSER
+privilege, be a member of pg_read_server_files or have EXECUTE rights on the
+function to fetch the information.  When the number of tempfile grows a lot,
+the query might also timeout. The first failure to access this data will Temp
+file stats can be completely skipped with B<--no-tempfile>.
+
+Aurora doesn't provide the pg_stat_get_wal_receiver() function.  Therefore
+there is no wal receiver data in the B<process & information HEADER> group. The
+first failure to access this data might be logged by the PostgreSQL, the
+following checks will be skipped.  Wal receiver checks can be completely
+disabled with B<--no-walreceiver>.
+
+Finally, some information are not available in older version of PostgreSQL,
+the fields will therefore be empty.
 
 =head1 EXAMPLES
 

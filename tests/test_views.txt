@@ -112,8 +112,10 @@ Remote host:
 ...     update_per_second=20,
 ...     delete_per_second=30,
 ...     tuples_returned_per_second=40,
-...     temp_files=5,
-...     temp_bytes=12054865,
+...     temporary_file=TempFileInfo(
+...        temp_files=5,
+...        temp_bytes=12054865,
+...     ),
 ...     max_dbname_length=27,
 ...     waiting=3,)
 
@@ -438,8 +440,10 @@ Tests for screen()
 ...     update_per_second=20,
 ...     delete_per_second=30,
 ...     tuples_returned_per_second=40,
-...     temp_files=5,
-...     temp_bytes=12054865,
+...     temporary_file=TempFileInfo(
+...         temp_files=5,
+...         temp_bytes=12054865,
+...     ),
 ...     max_dbname_length=27,
 ...     waiting=3,)
 >>> ui = UI.make(
