@@ -32,6 +32,8 @@ Default CLI options, passed to ui.main():
 ...     "nocpu": True,
 ...     "nodb": False,
 ...     "nodbsize": False,
+...     "notempfiles": False,
+...     "nowalreceiver": False,
 ...     "nomem": True,
 ...     "nopid": False,
 ...     "noread": True,
@@ -138,8 +140,10 @@ Force local mode and mock server and system info
 ...             update_per_second=20,
 ...             delete_per_second=30,
 ...             tuples_returned_per_second=40,
-...             temp_files=5,
-...             temp_bytes=12054865,
+...             temporary_file=types.TempFileInfo(
+...                 temp_files=5,
+...                 temp_bytes=12054865,
+...             ),
 ...             max_dbname_length=27,
 ...             waiting=3,))
 >>> mem_swap_load = patch(
@@ -809,6 +813,8 @@ Use another set of options:
 ...         noclient=True,
 ...         nouser=True,
 ...         nodbsize=True,
+...         notempfiles=False,
+...         nowalreceiver=False,
 ...         output=str(output),
 ...     ),
 ... )

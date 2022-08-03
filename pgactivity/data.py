@@ -1,7 +1,7 @@
 import getpass
 import re
 from argparse import Namespace
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional
 
 import attr
 import psutil
@@ -9,21 +9,26 @@ import psycopg2
 import psycopg2.extras
 from psycopg2 import sql
 from psycopg2.errors import (
+    FeatureNotSupported,
     InterfaceError,
     InvalidPassword,
+    InsufficientPrivilege,
     OperationalError,
     ProgrammingError,
+    QueryCanceled,
 )
 from psycopg2.extensions import connection
 
 from . import queries
 from .types import (
     BlockingProcess,
+    FailedQueriesInfo,
     Filters,
     WaitingProcess,
     Pct,
     RunningProcess,
     ServerInformation,
+    TempFileInfo,
     NO_FILTER,
 )
 from .utils import clean_str
@@ -77,6 +82,7 @@ class Data:
     min_duration: float
     filters: Filters
     dsn_parameters: Dict[str, str]
+    failed_queries: FailedQueriesInfo
 
     @classmethod
     def pg_connect(
@@ -110,17 +116,13 @@ class Data:
                 cur.execute(queries.get("disable_log_min_duration_statement"))
                 if pg_conn.server_version >= 130000:
                     cur.execute(queries.get("disable_log_min_duration_sample"))
-            if not rds_mode:  # Make sure we are using superuser if not on RDS
-                cur.execute(queries.get("is_superuser"))
-                ret = cur.fetchone()
-                if ret[0] != "on":
-                    raise Exception("Must be run with database superuser privileges.")
         pg_version = pg_get_short_version(pg_get_version(pg_conn))
         return cls(
             pg_conn,
             pg_version,
             pg_conn.server_version,
             min_duration=min_duration,
+            failed_queries=FailedQueriesInfo(),
             filters=filters,
             dsn_parameters=pg_conn.info.dsn_parameters,
         )
@@ -146,6 +148,9 @@ class Data:
         try:
             query = queries.get("get_pid_file")
             with self.pg_conn.cursor() as cur:
+                # This query doesn't crash when the user doesn't have the
+                # required privilege to acces the data_directory guc
+                # it will just return an empty string
                 cur.execute(query)
                 ret = cur.fetchone()
             pid_file = ret["pid_file"]
@@ -186,13 +191,105 @@ class Data:
             ret: Dict[str, bool] = cur.fetchone()
         return ret["is_stopped"]
 
-    DbInfoDict = Dict[str, Union[str, int, float]]
+    def pg_get_temporary_file(self) -> Optional[TempFileInfo]:
+        """
+        Count the number of temporary files and get their total size
+        """
+        if self.failed_queries.temp_file_query_failed:
+            # prevent a spam of errors in PostgreSQL logs if we already failed once
+            # for lack of privilege or timeout
+            return None
+
+        if self.pg_num_version >= 120000:
+            query = queries.get("get_temporary_files_post_120000")
+        elif self.pg_num_version >= 90100:
+            query = queries.get("get_temporary_files_post_090100")
+        else:
+            query = queries.get("get_temporary_files_oldest")
+
+        with self.pg_conn.cursor() as cur:
+            try:
+                cur.execute(queries.get("set_statement_timeout"), {"timeout": "400ms"})
+                cur.execute(query)
+                ret = cur.fetchone()
+            except InsufficientPrivilege:
+                # superuser or pg_read_server_files are required (Issue #278)
+                cur.execute(queries.get("reset_statement_timeout"))
+                self.failed_queries.temp_file_query_failed = True
+                return None
+            except QueryCanceled:
+                # if an excessive amount of tempfile exists, the query could be very long
+                # to avoid such a case we set a statement_timeout shorter than the lowest
+                # refresh rate. This could end up spamming the PostgreSQL logs.
+                self.failed_queries.temp_file_query_failed = True
+                cur.execute(queries.get("reset_statement_timeout"))
+                return None
+            cur.execute(queries.get("reset_statement_timeout"))
+
+        return TempFileInfo(**ret)
+
+    def pg_get_wal_senders(self) -> Optional[int]:
+        """
+        Count the number of wal senders
+        """
+        if self.pg_num_version >= 90100:
+            query = queries.get("get_wal_senders_post_090100")
+        else:
+            return None
+
+        with self.pg_conn.cursor() as cur:
+            cur.execute(query)
+            ret = cur.fetchone()
+
+        return int(ret["wal_senders"])
+
+    def pg_get_wal_receivers(self) -> Optional[int]:
+        """
+        Count the number of wal receivers
+        """
+        if self.failed_queries.wal_receivers_query_failed:
+            # prevent a spam of errors un PostgreSQL logs if we already failed once
+            # because the feature is not implemented
+            return None
+
+        if self.pg_num_version >= 90600:
+            query = queries.get("get_wal_receivers_post_090600")
+        else:
+            return None
+
+        try:
+            with self.pg_conn.cursor() as cur:
+                cur.execute(query)
+                ret = cur.fetchone()
+        except FeatureNotSupported:
+            # Not implemented on Aurora (Issue #301)
+            self.failed_queries.wal_receivers_query_failed = True
+            return None
+
+        return int(ret["wal_receivers"])
+
+    def pg_get_replication_slots(self) -> Optional[int]:
+        """
+        Count the number of replication slots
+        """
+        if self.pg_num_version >= 140000:
+            query = queries.get("get_replication_slots_post_140000")
+        else:
+            return None
+
+        with self.pg_conn.cursor() as cur:
+            cur.execute(query)
+            ret = cur.fetchone()
+
+        return int(ret["replication_slots"])
 
     def pg_get_server_information(
         self,
         prev_server_info: Optional[ServerInformation] = None,
         using_rds: bool = False,
-        skip_sizes: bool = False,
+        skip_db_size: bool = False,
+        skip_tempfile: bool = False,
+        skip_walreceiver: bool = False,
     ) -> ServerInformation:
         """
         Get the server information (session, workers, cache hit ratio etc..)
@@ -202,11 +299,7 @@ class Data:
         if prev_server_info is not None:
             prev_total_size = prev_server_info.total_size
 
-        if self.pg_num_version >= 140000:
-            query = queries.get("get_server_info_post_140000")
-        elif self.pg_num_version >= 120000:
-            query = queries.get("get_server_info_post_120000")
-        elif self.pg_num_version >= 110000:
+        if self.pg_num_version >= 110000:
             query = queries.get("get_server_info_post_110000")
         elif self.pg_num_version >= 100000:
             query = queries.get("get_server_info_post_100000")
@@ -226,12 +319,21 @@ class Data:
                 query,
                 {
                     "dbname_filter": self.filters.dbname,
-                    "skip_db_size": skip_sizes,
+                    "skip_db_size": skip_db_size,
                     "prev_total_size": prev_total_size,
                     "using_rds": using_rds,
                 },
             )
             ret = cur.fetchone()
+
+        temporary_file_info: Optional[TempFileInfo] = None
+        if not skip_tempfile:
+            temporary_file_info = self.pg_get_temporary_file()
+        wal_senders = self.pg_get_wal_senders()
+        wal_receivers: Optional[int] = None
+        if not skip_walreceiver:
+            wal_receivers = self.pg_get_wal_receivers()
+        replication_slots = self.pg_get_replication_slots()
 
         hr: Optional[Pct] = None
         tps, ips, ups, dps, rps = 0, 0, 0, 0, 0
@@ -263,6 +365,10 @@ class Data:
             delete_per_second=dps,
             tuples_returned_per_second=rps,
             cache_hit_ratio_last_snap=hr,
+            temporary_file=temporary_file_info,
+            wal_senders=wal_senders,
+            wal_receivers=wal_receivers,
+            replication_slots=replication_slots,
             **ret,
         )
 

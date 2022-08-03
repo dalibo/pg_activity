@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "PG_ACTIVITY 1"
-.TH PG_ACTIVITY 1 "2022-06-10" "pg_activity 3.0.0a1" "Command line tool for PostgreSQL server activity monitoring."
+.TH PG_ACTIVITY 1 "2022-09-02" "pg_activity 3.0.0a1" "Command line tool for PostgreSQL server activity monitoring."
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -357,7 +357,7 @@ required by another session. It shows following information:
 .IP "\fB\-\-rds\fR" 2
 .IX Item "--rds"
 .Vb 1
-\&        Enable support for AWS RDS.
+\&        Enable support for AWS RDS (implies \-\-no\-tempfiles).
 .Ve
 .IP "\fB\-\-output=FILEPATH\fR" 2
 .IX Item "--output=FILEPATH"
@@ -368,6 +368,21 @@ required by another session. It shows following information:
 .IX Item "--no-db-size"
 .Vb 1
 \&        Skip total size of DB.
+.Ve
+.IP "\fB\-\-no\-tempfiles\fR" 2
+.IX Item "--no-tempfiles"
+.Vb 1
+\&        Skip tempfile count and size.
+.Ve
+.IP "\fB\-\-no\-walreceiver\fR" 2
+.IX Item "--no-walreceiver"
+.Vb 1
+\&        Skip walreceiver checks.
+.Ve
+.IP "\fB\-\-no\-walreceiver\fR" 2
+.IX Item "--no-walreceiver"
+.Vb 1
+\&        Skip walreceiver checks.
 .Ve
 .IP "\fB\-w, \-\-wrap\-query\fR" 2
 .IX Item "-w, --wrap-query"
@@ -567,6 +582,47 @@ See: https://www.postgresql.org/docs/current/libpq\-envars.html
 .IP "\fBOther\fR Back to activity." 2
 .IX Item "Other Back to activity."
 .PD
+.SH "MISSING DATA IN THE UI?"
+.IX Header "MISSING DATA IN THE UI?"
+pg_activity is best used with a user owning the \s-1SUPERUSER\s0 privilege. Ordinary
+users can only see all the information about their own sessions (sessions
+belonging to a role that they are a member of). In rows about other sessions,
+many columns will be null or not picked by pg_activity. It will impact both the
+information gathered in the \fB\s-1HEADER\s0\fR section and the \fB\s-1ACTIVITY PANEL\s0\fR
+.PP
+If a user doesn't have the \s-1CONNECT\s0 privilege on a database the
+\&\fBpg_database_size()\fR function will fail and pg_activity will crash. The
+\&\fB\-\-no\-db\-size\fR option can be used in this case. This situation is frequent for
+cloud database where the service provider has created a service database with a
+restricted access.
+.PP
+Some settings are visible only to superusers or members of pg_read_all_settings
+such as the data_directory guc. If the user cannot read this parameter or
+access the pid file in the \s-1PGDATA\s0 directory, the \fBsystem information \s-1HEADER\s0\fR
+group will not be displayed. The \fB\f(CB%CPU\fB\fR, \fB\f(CB%MEM\fB\fR, \fBRead/s\fR and \fBWrite/s\fR
+columns will also be missing from the \fB\s-1ACTIVITY PANEL\s0\fR.
+.PP
+On some \s-1OS\s0 like MacOS, psutils.\fBio_counters()\fR is not implemented. The effect are
+the same as those described when data_directory is not readable.
+.PP
+pg_activity needs to access the pgsql_tmp directory stored in all tablespaces
+in order to compute the number and size of the temporary files. This requires
+the usage of the \fBpg_ls_tmpdir()\fR function (or \fBpg_ls_dir()\fR and \fBpg_stats_file()\fR
+for versions older than PostgreSQL 12). The user needs to own the \s-1SUPERUSER\s0
+privilege, be a member of pg_read_server_files or have \s-1EXECUTE\s0 rights on the
+function to fetch the information. When the number of tempfiles grows a lot,
+the query might also timeout. The first failure to access this data will
+disable tempfile statistics. The feature can be disabled with
+\&\fB\-\-no\-tempfiles\fR.
+.PP
+Aurora doesn't provide the \fBpg_stat_get_wal_receiver()\fR function.  Therefore
+there is no wal receiver data in the \fBprocess & information \s-1HEADER\s0\fR group. The
+first failure to access this data might be logged by the PostgreSQL, the
+following checks will be skipped.  Wal receiver checks can be completely
+disabled with \fB\-\-no\-walreceiver\fR.
+.PP
+Finally, some information is not available in older version of PostgreSQL,
+the fields will therefore be empty.
 .SH "EXAMPLES"
 .IX Header "EXAMPLES"
 PGPASSWORD='mypassword' pg_activity \-U pgadmin \-h 127.0.0.1 \-\-no\-client
