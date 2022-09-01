@@ -1,13 +1,46 @@
+import logging
 import os
 import socket
 import sys
 import time
 from argparse import ArgumentParser
+from io import StringIO
+from typing import Optional
 
 from blessed import Terminal
 from psycopg2.errors import OperationalError
 
 from . import __version__, data, types, ui
+
+
+def configure_logger(debug_file: Optional[str] = None) -> StringIO:
+    logger = logging.getLogger("pgactivity")
+    logger.setLevel(logging.DEBUG)
+
+    # The steamhandler is used to print hints to the user when he exists.
+    # The INFO log level is reserved for this.
+    memory_string = StringIO()
+    c_handler = logging.StreamHandler(memory_string)
+    c_handler.setLevel(logging.INFO)
+    c_handler.name = "stream_handler"
+
+    c_format = logging.Formatter("Hint - %(message)s")
+    c_handler.setFormatter(c_format)
+
+    logger.addHandler(c_handler)
+
+    if debug_file is not None:
+        f_handler = logging.FileHandler(debug_file)
+        f_handler.setLevel(logging.DEBUG)
+
+        f_format = logging.Formatter(
+            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        )
+        f_handler.setFormatter(f_format)
+
+        logger.addHandler(f_handler)
+
+    return memory_string
 
 
 def get_parser() -> ArgumentParser:
@@ -116,6 +149,14 @@ def get_parser() -> ArgumentParser:
         action="append",
         metavar="FIELD:REGEX",
         default=[],
+    )
+    # --debug-file
+    group.add_argument(
+        "--debug-file",
+        dest="debug_file",
+        metavar="DEBUG_FILE",
+        help="Enable debug and write it to DEBUG_FILE.",
+        default=None,
     )
     # --version
     group.add_argument(
@@ -331,6 +372,7 @@ def main() -> None:
 
     parser = get_parser()
     args = parser.parse_args()
+    memory_stream = configure_logger(args.debug_file)
 
     if args.help:
         parser.print_help()
@@ -374,10 +416,10 @@ def main() -> None:
                 newdataobj = dataobj.try_reconnect()
                 if newdataobj is not None:
                     dataobj = newdataobj
-                    print(term.clear + term.home, end="")
                     break
         except KeyboardInterrupt:
             sys.exit(1)
         else:
-            print(term.clear + term.home, end="")
             break
+        finally:
+            print(memory_stream.getvalue())

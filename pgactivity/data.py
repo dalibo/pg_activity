@@ -1,4 +1,5 @@
 import getpass
+import logging
 import re
 from argparse import Namespace
 from typing import Dict, List, Optional
@@ -145,15 +146,23 @@ class Data:
         Verify if the user running pg_activity can access
         system information for the postmaster process.
         """
+        pid_file: Optional[str] = None
+        logger = logging.getLogger("pgactivity")
         try:
-            query = queries.get("get_pid_file")
+            query = queries.get("get_data_directory")
             with self.pg_conn.cursor() as cur:
                 # This query doesn't crash when the user doesn't have the
                 # requiered privilege to acces the data_directory guc
                 # it will just return an empty string
-                cur.execute(query)
+                try:
+                    cur.execute(query)
+                except InsufficientPrivilege:
+                    logger.info(
+                        "Insufficient privilege to show data_directory. System counters are disabled."
+                    )
+                    return False
                 ret = cur.fetchone()
-            pid_file = ret["pid_file"]
+            pid_file = f"{ret['data_directory']}/postmaster.pid"
             with open(pid_file, "r") as fd:
                 pid = fd.readlines()[0].strip()
                 try:
@@ -162,11 +171,20 @@ class Data:
                     proc.cpu_times()
                     return True
                 except psutil.AccessDenied:
+                    logger.info(
+                        "Acces denied to the psutil data. System counters are disabled."
+                    )
                     return False
                 except Exception:
+                    logger.info(
+                        "Impossible to fetch data from psutil. This might be a platform limitation. System counters are disabled."
+                    )
                     return False
         except Exception:
-            return False
+            logger.info(
+                "Impossible to open the pid file. System counters are disabled."
+            )
+        return False
 
     def pg_cancel_backend(self, pid: int) -> bool:
         """
@@ -216,6 +234,10 @@ class Data:
                 # superuser or pg_read_server_files are requiered (Issue #278)
                 cur.execute(queries.get("reset_statement_timeout"))
                 self.failed_queries.temp_file_query_failed = True
+                logger = logging.getLogger("pgactivity")
+                logger.info(
+                    "Insufficient privilege to fetch the tempfile data. The feature was disabled. Please use --no-tempfile or a platform specific setting (eg. --rds)."
+                )
                 return None
             except QueryCanceled:
                 # if an excessive amount of tempfile exists, the query could be very long
@@ -223,6 +245,10 @@ class Data:
                 # refresh rate. This could end up spamming the PostgreSQL logs.
                 self.failed_queries.temp_file_query_failed = True
                 cur.execute(queries.get("reset_statement_timeout"))
+                logger = logging.getLogger("pgactivity")
+                logger.info(
+                    "The tempfile query ended in a timeout. The feature was disabled. Check the temporary files on the server."
+                )
                 return None
             cur.execute(queries.get("reset_statement_timeout"))
 
@@ -264,6 +290,10 @@ class Data:
         except FeatureNotSupported:
             # Not implemented on Aurora (Issue #301)
             self.failed_queries.wal_receivers_query_failed = True
+            logger = logging.getLogger("pgactivity")
+            logger.info(
+                "The receiver information is not available on you platform. The feature is disabled. Please use the --no-walreceiver option."
+            )
             return None
 
         return int(ret["wal_receivers"])
@@ -315,15 +345,23 @@ class Data:
             query = queries.get("get_server_info_oldest")
 
         with self.pg_conn.cursor() as cur:
-            cur.execute(
-                query,
-                {
-                    "dbname_filter": self.filters.dbname,
-                    "skip_db_size": skip_db_size,
-                    "prev_total_size": prev_total_size,
-                    "using_rds": using_rds,
-                },
-            )
+            try:
+                cur.execute(
+                    query,
+                    {
+                        "dbname_filter": self.filters.dbname,
+                        "skip_db_size": skip_db_size,
+                        "prev_total_size": prev_total_size,
+                        "using_rds": using_rds,
+                    },
+                )
+            except InsufficientPrivilege as e:
+                if e.pgerror.find("permission denied for database") >= 0:
+                    logger = logging.getLogger("pgactivity")
+                    logger.info(
+                        "Insufficient privilege to connect to a database. Try to use a --filter, the --no-db-size option or a platform specific setting (eg. --rds)"
+                    )
+                raise e
             ret = cur.fetchone()
 
         temporary_file_info: Optional[TempFileInfo] = None
