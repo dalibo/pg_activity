@@ -893,6 +893,7 @@ class BaseProcess:
     duration: Optional[float]
     state: str
     query: Optional[str]
+    query_leader_pid: Optional[int]
     is_parallel_worker: bool
 
 
@@ -901,6 +902,7 @@ class RunningProcess(BaseProcess):
     """Process for a running query."""
 
     wait: Union[bool, None, str]
+    query_leader_pid: Optional[int]
     is_parallel_worker: bool
 
 
@@ -914,7 +916,8 @@ class WaitingProcess(BaseProcess):
     type: LockType = attr.ib(converter=locktype)
     relation: str
 
-    # TODO: update queries to select/compute this column.
+    # TODO: update queries to select/compute these column.
+    query_leader_pid: Optional[int] = attr.ib(default=None, init=False)
     is_parallel_worker: bool = attr.ib(default=False, init=False)
 
 
@@ -929,7 +932,8 @@ class BlockingProcess(BaseProcess):
     relation: str
     wait: Union[bool, None, str]
 
-    # TODO: update queries to select/compute this column.
+    # TODO: update queries to select/compute these column.
+    query_leader_pid: Optional[int] = attr.ib(default=None, init=False)
     is_parallel_worker: bool = attr.ib(default=False, init=False)
 
 

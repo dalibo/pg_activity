@@ -20,6 +20,7 @@ Tests scrolling in processes_rows()
 ...         query=f"SELECT {x}",
 ...         duration=0.0,
 ...         wait=False,
+...         query_leader_pid=x,
 ...         is_parallel_worker=False,
 ...     ) for x in range(0, 10)]
 >>> ui = UI.make(flag=Flag.PID|Flag.DATABASE)

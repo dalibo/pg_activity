@@ -149,24 +149,8 @@ T = TypeVar("T", RunningProcess, WaitingProcess, BlockingProcess, LocalRunningPr
 def sorted(processes: List[T], *, key: SortKey, reverse: bool = False) -> List[T]:
     """Return processes sorted.
 
+    PostgreSQL 13+
     >>> processes = [
-    ...     LocalRunningProcess(
-    ...         pid="6239",
-    ...         application_name="pgbench",
-    ...         database="pgbench",
-    ...         user="postgres",
-    ...         client="local",
-    ...         cpu=0.1,
-    ...         mem=0.994_254_939_413_836,
-    ...         read=0.1,
-    ...         write=0.282_725_318_098_656_75,
-    ...         state="idle in transaction",
-    ...         query="UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;",
-    ...         duration=0.1,
-    ...         wait="ClientRead",
-    ...         io_wait=False,
-    ...         is_parallel_worker=False,
-    ...     ),
     ...     LocalRunningProcess(
     ...         pid="6240",
     ...         application_name="pgbench",
@@ -178,10 +162,29 @@ def sorted(processes: List[T], *, key: SortKey, reverse: bool = False) -> List[T
     ...         read=0.1,
     ...         write=0.282_725_318_098_656_75,
     ...         state="idle in transaction",
-    ...         query="UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;",
+    ...         query="UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 1932841;",
     ...         duration=0.1,
     ...         wait="ClientRead",
     ...         io_wait=False,
+    ...         query_leader_pid=6240,
+    ...         is_parallel_worker=False,
+    ...     ),
+    ...     LocalRunningProcess(
+    ...         pid="6239",
+    ...         application_name="pgbench",
+    ...         database="pgbench",
+    ...         user="postgres",
+    ...         client="local",
+    ...         cpu=0.1,
+    ...         mem=0.994_254_939_413_836,
+    ...         read=0.1,
+    ...         write=0.282_725_318_098_656_75,
+    ...         state="idle in transaction",
+    ...         query="UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 7289374;",
+    ...         duration=0.1,
+    ...         wait="ClientRead",
+    ...         io_wait=False,
+    ...         query_leader_pid=6239,
     ...         is_parallel_worker=False,
     ...     ),
     ...     LocalRunningProcess(
@@ -195,30 +198,102 @@ def sorted(processes: List[T], *, key: SortKey, reverse: bool = False) -> List[T
     ...         read=0.2,
     ...         write=0.113_090_128_201_154_74,
     ...         state="active",
-    ...         query="UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;",
-    ...         duration=0.01,
+    ...         query="UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 1932841;",
+    ...         duration=0.1,
     ...         wait=False,
     ...         io_wait=False,
+    ...         query_leader_pid=6240,
     ...         is_parallel_worker=True,
     ...     ),
     ... ]
 
     >>> processes = sorted(processes, key=SortKey.cpu, reverse=True)
     >>> [p.pid for p in processes]
-    ['6228', '6239', '6240']
+    ['6228', '6240', '6239']
     >>> processes = sorted(processes, key=SortKey.mem)
     >>> [p.pid for p in processes]
     ['6240', '6239', '6228']
 
-    When using the 'duration' sort key, processes are also sorted by ascending PID:
+    When using the 'duration' sort key, processes are also sorted by ascending
+    (query_leader_pid, is_parallel_worker).
     >>> processes = sorted(processes, key=SortKey.duration, reverse=True)
     >>> [p.pid for p in processes]
     ['6239', '6240', '6228']
+
+    PostgreSQL 12- (query_leader_pid is None)
+    >>> processes = [
+    ...     LocalRunningProcess(
+    ...         pid="6240",
+    ...         application_name="pgbench",
+    ...         database="pgbench",
+    ...         user="postgres",
+    ...         client="local",
+    ...         cpu=0.1,
+    ...         mem=0.993_254_939_413_836,
+    ...         read=0.1,
+    ...         write=0.282_725_318_098_656_75,
+    ...         state="idle in transaction",
+    ...         query="UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 1932841;",
+    ...         duration=0.1,
+    ...         wait="ClientRead",
+    ...         io_wait=False,
+    ...         query_leader_pid=None,
+    ...         is_parallel_worker=False,
+    ...     ),
+    ...     LocalRunningProcess(
+    ...         pid="6239",
+    ...         application_name="pgbench",
+    ...         database="pgbench",
+    ...         user="postgres",
+    ...         client="local",
+    ...         cpu=0.1,
+    ...         mem=0.994_254_939_413_836,
+    ...         read=0.1,
+    ...         write=0.282_725_318_098_656_75,
+    ...         state="idle in transaction",
+    ...         query="UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 7289374;",
+    ...         duration=0.1,
+    ...         wait="ClientRead",
+    ...         io_wait=False,
+    ...         query_leader_pid=None,
+    ...         is_parallel_worker=False,
+    ...     ),
+    ...     LocalRunningProcess(
+    ...         pid="6228",
+    ...         application_name="pgbench",
+    ...         database="pgbench",
+    ...         user="postgres",
+    ...         client="local",
+    ...         cpu=0.2,
+    ...         mem=1.024_758_418_061_11,
+    ...         read=0.2,
+    ...         write=0.113_090_128_201_154_74,
+    ...         state="active",
+    ...         query="UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 1932841;",
+    ...         duration=0.1,
+    ...         wait=False,
+    ...         io_wait=False,
+    ...         query_leader_pid=None,
+    ...         is_parallel_worker=True,
+    ...     ),
+    ... ]
+
+    >>> processes = sorted(processes, key=SortKey.duration, reverse=True)
+    >>> [p.pid for p in processes]
+    ['6240', '6239', '6228']
     """
 
-    # If we filter by duration, we also need to filter by ascending pid
+    # If we filter by duration, we also need to filter by ascending
+    # (query_leader_pid, is_parallel_worker):
+    # * for pg13+: query_leader_pid = coalesce(leader_pid, pid)
+    # * for pg12-: query_leader_pid = Null / None
+    # Note: parallel_worker have the same "duration" as their leader.
     if key == SortKey.duration:
-        processes = builtins.sorted(processes, key=lambda p: p.pid, reverse=False)
+        processes = builtins.sorted(
+            processes,
+            key=lambda p: (p.query_leader_pid, p.is_parallel_worker),
+            reverse=False,
+        )
 
     return builtins.sorted(
         processes,

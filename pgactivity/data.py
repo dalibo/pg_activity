@@ -414,7 +414,9 @@ class Data:
         """
         Get activity from pg_stat_activity view.
         """
-        if self.pg_num_version >= 110000:
+        if self.pg_num_version >= 130000:
+            qs = queries.get("get_pg_activity_post_130000")
+        elif self.pg_num_version >= 110000:
             qs = queries.get("get_pg_activity_post_110000")
         elif self.pg_num_version >= 100000:
             qs = queries.get("get_pg_activity_post_100000")

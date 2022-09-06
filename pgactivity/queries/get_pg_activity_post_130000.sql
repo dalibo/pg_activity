@@ -1,6 +1,5 @@
--- Get data from pg_activity from pg 9.6 to 10
--- In this version there is no way to distinguish parallel workers from the rest
--- NEW pg_stat_activity.waiting => pg_stat_activity.wait_event
+-- Get data from pg_activity since pg 13
+-- NEW pg_activity.leader_pid
 SELECT
       a.pid AS pid,
       a.application_name AS application_name,
@@ -14,20 +13,20 @@ SELECT
       a.usename AS user,
       a.state AS state,
       convert_from(replace(a.query, '\', '\\')::bytea, coalesce(pg_catalog.pg_encoding_to_char(b.encoding), 'UTF8')) AS query,
-      NULL AS query_leader_pid,
-      false AS is_parallel_worker
-  FROM
+      coalesce(a.leader_pid, a.pid) AS query_leader_pid,
+      a.backend_type = 'parallel worker' AS is_parallel_worker
+ FROM
       pg_stat_activity a
       LEFT OUTER JOIN pg_database b ON a.datid = b.oid
  WHERE
-      state <> 'idle'
-  AND pid <> pg_backend_pid()
+      a.state <> 'idle'
+  AND a.pid <> pg_catalog.pg_backend_pid()
   AND CASE WHEN %(min_duration)s = 0
           THEN true
           ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
       END
-  AND CASE WHEN %(dbname_filter)s IS NULL THEN true
-      ELSE a.datname ~* %(dbname_filter)s
-      END
+    AND CASE WHEN %(dbname_filter)s IS NULL THEN true
+        ELSE a.datname ~* %(dbname_filter)s
+        END
 ORDER BY
       EXTRACT(epoch FROM (NOW() - a.{duration_column})) DESC;
