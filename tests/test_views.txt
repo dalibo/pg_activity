@@ -203,6 +203,7 @@ Tests for processes_rows()
 ...         duration=0.0,
 ...         wait=False,
 ...         io_wait=False,
+...         query_leader_pid=6239,
 ...         is_parallel_worker=False,
 ...     ),
 ...     LocalRunningProcess(
@@ -216,10 +217,11 @@ Tests for processes_rows()
 ...         read=0.2,
 ...         write=1_128_201,
 ...         state="active",
-...         query="UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;",
+...         query="UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;",
 ...         duration=0.000413,
 ...         wait=None,
 ...         io_wait=True,
+...         query_leader_pid=6239,
 ...         is_parallel_worker=True,
 ...     ),
 ...     LocalRunningProcess(
@@ -237,6 +239,7 @@ Tests for processes_rows()
 ...         duration=1234,
 ...         wait="BackendRandomLock",
 ...         io_wait=False,
+...         query_leader_pid=1234,
 ...         is_parallel_worker=False,
 ...     ),
 ... ]
@@ -254,8 +257,8 @@ Tests for processes_rows()
                                                        141 WHERE aid = 1932841;
 6228   pgbench          0.2    1.0             active \_ UPDATE
                                                        pgbench_accounts SET
-                                                       abalance = abalance +
-                                                       3062 WHERE aid = 7289374;
+                                                       abalance = abalance + 141
+                                                       WHERE aid = 1932841;
 1234   business         2.4    1.0             active SELECT product_id, p.name
                                                        FROM products p LEFT JOIN
                                                        sales s USING
@@ -276,7 +279,7 @@ Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 (TODO: this is buggy, the first line should be wrapped as well if too long)
 >>> processes_rows(term, ui, SelectableProcesses(processes1), 100, width=250)
 6239   pgbench                   pgbench         postgres            local 0.1    1.0  7B       12B       0.000000                N N        idle in trans UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
-6228   pgbench                   pgbench         postgres            local 0.2    1.0  0B       1.08M     0.000413                  Y               active \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
+6228   pgbench                   pgbench         postgres            local 0.2    1.0  0B       1.08M     0.000413                  Y               active \_ UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
 1234   business               accounting              bob            local 2.4    1.0  9.42M    1.21K     20:34.00 BackendRandomLoc N               active SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id) WHERE s.date >
 
 >>> ui = UI.make(flag=Flag.PID|Flag.DATABASE, wrap_query=False)
@@ -290,8 +293,8 @@ Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 6239   pgbench              idle in trans UPDATE pgbench_accounts SET abalance
                                            = abalance + 141 WHERE aid = 1932841;
 6228   pgbench                     active \_ UPDATE pgbench_accounts SET
-                                           abalance = abalance + 3062 WHERE aid
-                                           = 7289374;
+                                           abalance = abalance + 141 WHERE aid =
+					   1932841;
 1234   business                    active SELECT product_id, p.name FROM
                                            products p LEFT JOIN sales s USING
                                            (product_id) WHERE s.date >
@@ -352,6 +355,7 @@ Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 ...         query="UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;",
 ...         duration=0.0,
 ...         wait=False,
+...         query_leader_pid=6239,
 ...         is_parallel_worker=False,
 ...     ),
 ...     RunningProcess(
@@ -361,9 +365,10 @@ Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 ...         user="postgres",
 ...         client="local",
 ...         state="active",
-...         query="UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;",
+...         query="UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;",
 ...         duration=0.000413,
 ...         wait=True,
+...         query_leader_pid=6239,
 ...         is_parallel_worker=True,
 ...     ),
 ...     RunningProcess(
@@ -376,6 +381,7 @@ Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 ...         query="SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id) WHERE s.date > CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name, p.price, p.cost HAVING sum(p.price * s.units) > 5000;",
 ...         duration=1234,
 ...         wait="clog",
+...         query_leader_pid=1234,
 ...         is_parallel_worker=False,
 ...     ),
 ... ]
@@ -383,7 +389,7 @@ Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 >>> ui = UI.make(query_mode=QueryMode.activities,flag=all_but_local_flags)
 >>> processes_rows(term, ui, SelectableProcesses(processes1b), 100, width=200)
 6239   pgbench                   pgbench         postgres            local  0.000000                N     idle in trans UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
-6228   pgbench                      none         postgres            local  0.000413                Y            active \_ UPDATE pgbench_accounts SET abalance = abalance + 3062 WHERE aid = 7289374;
+6228   pgbench                      none         postgres            local  0.000413                Y            active \_ UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
 1234   business               accounting              bob     192.168.0.47  20:34.00             clog            active SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id)
 
 Tests for footer_*()

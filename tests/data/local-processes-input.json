@@ -42,6 +42,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6221,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6221,
@@ -93,6 +94,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6222,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6222,
@@ -144,6 +146,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6223,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6223,
@@ -195,6 +198,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6224,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6224,
@@ -246,6 +250,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6225,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6225,
@@ -297,6 +302,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6226,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6226,
@@ -348,6 +354,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6227,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6227,
@@ -399,6 +406,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6228,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6228,
@@ -450,6 +458,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6229,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6229,
@@ -501,6 +510,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6230,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6230,
@@ -552,6 +562,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6231,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6231,
@@ -603,6 +614,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6232,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6232,
@@ -654,6 +666,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6233,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6233,
@@ -705,6 +718,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6234,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6234,
@@ -756,6 +770,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6235,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6235,
@@ -807,6 +822,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6237,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6237,
@@ -858,6 +874,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6238,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6238,
@@ -909,6 +926,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6239,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6239,
@@ -960,6 +978,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6240,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6240,
@@ -1013,6 +1032,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6221,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6221,
@@ -1064,6 +1084,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6222,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6222,
@@ -1115,6 +1136,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6223,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6223,
@@ -1166,6 +1188,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6224,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6224,
@@ -1217,6 +1240,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6225,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6225,
@@ -1268,6 +1292,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6226,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6226,
@@ -1319,6 +1344,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6227,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6227,
@@ -1370,6 +1396,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6228,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6228,
@@ -1421,6 +1448,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6229,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6229,
@@ -1472,6 +1500,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6230,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6230,
@@ -1523,6 +1552,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6231,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6231,
@@ -1574,6 +1604,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6232,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6232,
@@ -1625,6 +1656,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6233,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6233,
@@ -1676,6 +1708,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6234,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6234,
@@ -1727,6 +1760,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6235,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6235,
@@ -1778,6 +1812,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6236,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6236,
@@ -1829,6 +1864,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6237,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6237,
@@ -1880,6 +1916,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6238,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6238,
@@ -1931,6 +1968,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6239,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6239,
@@ -1982,6 +2020,7 @@
                 "read_delta": 0.0,
                 "write_delta": 0.0
             },
+	    "query_leader_pid": 6240,
             "is_parallel_worker": false,
             "mem": null,
             "pid": 6240,
