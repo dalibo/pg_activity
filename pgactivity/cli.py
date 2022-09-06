@@ -76,7 +76,7 @@ def get_parser() -> ArgumentParser:
         "--rds",
         dest="rds",
         action="store_true",
-        help="Enable support for AWS RDS (implies --no-tempfiles).",
+        help="Enable support for AWS RDS (implies --no-tempfiles and filters out the rdsadmin database from space calculation).",
         default=False,
     )
     # --output
