@@ -240,7 +240,7 @@ required by another session. It shows following information:
 
 =item B<--rds>
 
-	Enable support for AWS RDS (implies --no-tempfiles).
+	Enable support for AWS RDS (implies --no-tempfiles and filters out the rdsadmin database from space calculation).
 
 =item B<--output=FILEPATH>
 
@@ -273,6 +273,8 @@ required by another session. It shows following information:
 =item B<--filter=FIELD:REGEX>
 
 	Filter activities with a (case insensitive) regular expression applied on selected fields. Known fields are: dbname.
+	
+	Note: It's possible to filter out a database with negative lookahead, eg: '^(?!database_name)'
 
 =item B<--help>
 
