@@ -5,7 +5,7 @@
 * Bump version in `pgactivity/__init__.py`, rebuild the man page
 * Commit these changes on the `master` branch
 * Create an annotated (and possibly signed) tag, as
-  `git commit -a [-s] -m 'pg_activity 1.6.0' v1.6.0`
+  `git tag -a [-s] -m 'pg_activity 1.6.0' v1.6.0`
 * Push with `--follow-tags`
 
 ## PyPI package
