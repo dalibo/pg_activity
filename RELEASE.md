@@ -1,17 +1,31 @@
 # Release HOW TO
 
-## Creating the pull request
+## Git
 
-* Edit the following files and change the version :
-  + `pgactivity/__init__.py`
-* Prepare the release notes using the [commit
-  list](https://github.com/dalibo/pg_activity/commits/master)
-* Submit the PR with the release notes in the description.
+* Bump version in `pgactivity/__init__.py`, rebuild the man page
+* Commit these changes on the `master` branch
+* Create an annotated (and possibly signed) tag, as
+  `git commit -a [-s] -m 'pg_activity 1.6.0' v1.6.0`
+* Push with `--follow-tags`
 
-Example commit message from [release
-1.6.0](https://github.com/dalibo/pg_activity/releases/tag/v1.6.0)
+## PyPI package
 
-``` 
+This requires no special action as, upon push of a tag on GitHub, the "publish"
+workflow will build the Python package and upload to PyPI.
+
+## GitHub release
+
+Prepare the release notes, for instance from closed issues, merged pull
+requests, or directly the git history (e.g. `git log $(git describe --tags
+--abbrev=0).. --format=%s --reverse` to get commits from the previous tag).
+
+Use this to *draft a new release* from [release page][], choosing the tag just
+pushed.
+
+[release page]: https://github.com/dalibo/pg_activity/releases
+
+See for example [release 1.6.0](v1.6.0):
+```
 Change log:
 
 * Add the --min-duration flag to only show laggy queries (@kmoppel)
@@ -33,26 +47,10 @@ Bug fixes:
   @julmon, report: @kmoppel)
 * Fix #113: Do not try to display query duration if not there (fix: @julmon,
   report: @pmpetit) 
-
 ```
 
-## Creating the release on github
+[v1.6.0]: https://github.com/dalibo/pg_activity/releases/tag/v1.6.0
 
-Once the PR is merged, the release can be created.
-
-Choose the option "Draft a new release" from the [release
-page](https://github.com/dalibo/pg_activity/releases) : 
-
-* Input a tag version (eg, v1.6.0) ;
-* Leave the target as is (master) ;
-* Input the release title (eg, pg_activity 1.6.0) ;
-* Add the release notes in the release description ;
-* Then press  `publish release`.
-
-## Create the release on pypi
-
-Upon push of a tag to GitHub, the "publish" workflow will build the Python
-package and upload to PyPI.
 
 ## Send a mail to pgsql-announce
 
@@ -74,5 +72,3 @@ This release adds the following features :
 
 The full release notes can be read here :
 https://github.com/dalibo/pg_activity/releases/tag/v1.6.0
-```
-
