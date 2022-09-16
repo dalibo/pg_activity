@@ -52,14 +52,10 @@ Bug fixes:
 [v1.6.0]: https://github.com/dalibo/pg_activity/releases/tag/v1.6.0
 
 
-## Send a mail to pgsql-announce
+## Create a news article on postgresql.org and submit it
 
 Example for release 1.6.0 : 
 ```
-mailto  : pgsql-announce(at)postgresql(dot)org
-Subject : pg_activity release 1.6.0
-Content :
-
 pg_activity (https://github.com/dalibo/pg_activity) 1.6.0 has been released.
 
 This release adds the following features :
