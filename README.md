@@ -61,9 +61,11 @@ Usage
 `pg_activity` works locally or remotely. In local execution context, to obtain
 sufficient rights to display system information, the system user running
 `pg_activity` must be the same user running postgresql server (`postgres` by
-default), or have more rights like `root`. Otherwise, `pg_activity` can fallback
-to a degraded mode without displaying system information. On the same way,
-PostgreSQL user used to connect to the database must be super-user.
+default), or have more rights like `root`. The PostgreSQL user used to connect
+to the database must be super-user in order to get as much data as possible.
+Otherwise, `pg_activity` can fall back to a degraded mode where some data like
+system information or temporary file data are not displayed.
+
 ex:
 
     sudo -u postgres pg_activity -U postgres
@@ -71,48 +73,59 @@ ex:
 Options
 -------
 
-    pg_activity [options]
+    pg_activity [options] [connection string]
 
     Options:
-        --version             Show program's version number and exit
-        -U USERNAME, --username=USERNAME
-                              Database user name (default: "postgres").
-        -p PORT, --port=PORT  Database server port (default: "5432").
-        -h HOSTNAME, --host=HOSTNAME
-                              Database server host or socket directory (default:
-                              "localhost").
-        -d DBNAME, --dbname=DBNAME
-                              Database name to connect to (default: "postgres").
-        --blocksize=BLOCKSIZE Filesystem blocksize (default: 4096).
-        --rds                 Enable support for AWS RDS.
-        --output=FILEPATH     Store running queries as CSV.
-        --help                Show this help message and exit.
-        --no-db-size          Skip total size of DB.
-        --duration-mode=DURATION_MODE
-                              Duration mode. Values: 1-QUERY(default),
-                              2-TRANSACTION, 3-BACKEND
-        --min-duration        Don't display queries with smaller than specified
-                              duration (in seconds).
-        --filter=FIELD:REGEX  Filter activities with a (case insensitive) regular
-                              expression applied on selected fields. Known fields
-                              are: dbname.
-        --verbose-mode=VERBOSE_MODE
-                              Queries display mode. Values: 1-TRUNCATED,
-                              2-FULL(default), 3-INDENTED
+      --blocksize BLOCKSIZE
+                            Filesystem blocksize (default: 4096).
+      --rds                 Enable support for AWS RDS (implies --no-tempfiles and filters out the rdsadmin database from space calculation).
+      --output FILEPATH     Store running queries as CSV.
+      --no-db-size          Skip total size of DB.
+      --no-tempfiles        Skip tempfile count and size.
+      --no-walreceiver      Skip walreceiver checks.
+      -w, --wrap-query      Wrap query column instead of truncating.
+      --duration-mode DURATION_MODE
+                            Duration mode. Values: 1-QUERY(default), 2-TRANSACTION, 3-BACKEND.
+      --min-duration SECONDS
+                            Don't display queries with smaller than specified duration (in seconds).
+      --filter FIELD:REGEX  Filter activities with a (case insensitive) regular expression applied on selected fields. Known fields are: dbname.
+      --debug-file DEBUG_FILE
+                            Enable debug and write it to DEBUG_FILE.
+      --version             show program's version number and exit.
+      --help                Show this help message and exit.
 
+    Connection Options:
+      connection string     A valid connection string to the database, e.g.: 'host=HOSTNAME port=PORT user=USER dbname=DBNAME'.
+      -h HOSTNAME, --host HOSTNAME
+                            Database server host or socket directory.
+      -p PORT, --port PORT  Database server port.
+      -U USERNAME, --username USERNAME
+                            Database user name.
+      -d DBNAME, --dbname DBNAME
+                            Database name to connect to.
 
-    Display options, you can exclude some columns by using them :
-        --no-database         Disable DATABASE.
-        --no-user             Disable USER.
-        --no-client           Disable CLIENT.
-        --no-cpu              Disable CPU%.
-        --no-mem              Disable MEM%.
-        --no-read             Disable READ/s.
-        --no-write            Disable WRITE/s.
-        --no-time             Disable TIME+.
-        --no-wait             Disable W.
-        --no-app-name         Disable App.
+    Process table display options:
+      These options may be used hide some columns from the processes table.
 
+      --no-pid              Disable PID.
+      --no-database         Disable DATABASE.
+      --no-user             Disable USER.
+      --no-client           Disable CLIENT.
+      --no-cpu              Disable CPU%.
+      --no-mem              Disable MEM%.
+      --no-read             Disable READ/s.
+      --no-write            Disable WRITE/s.
+      --no-time             Disable TIME+.
+      --no-wait             Disable W.
+      --no-app-name         Disable App.
+
+    Other display options:
+      --hide-queries-in-logs
+                            Disable log_min_duration_statements and log_min_duration_sample for pg_activity.
+      --no-inst-info        Display instance information in header.
+      --no-sys-info         Display system information in header.
+      --no-proc-info        Display workers process information in header.
+      --refresh REFRESH     Refresh rate. Values: 0.5, 1, 2, 3, 4, 5 (default: 2).
 
 Notes
 -----
@@ -147,6 +160,9 @@ Interactives commands
 | `h`       | Help page                                                        |
 | `R`       | Refresh                                                          |
 | `D`       | Refresh Database Size (including when --no-dbzise option applied)|
+| `s`       | Display system information in header                             |
+| `i`       | Display general instance information in header                   |
+| `o`       | Display worker information in header                             |
 
 Navigation mode
 ---------------
