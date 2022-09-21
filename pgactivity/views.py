@@ -227,7 +227,7 @@ def header(
                 f"{term.bold}{host.hostname}{term.normal}",
                 f"{term.cyan}{pg_host}{term.normal}",
                 f"Ref.: {ui.refresh_time}s",
-                f"Duration mode: {ui.duration_mode.name}",
+                f"Duration mode: {term.yellow}{ui.duration_mode.name}{term.normal}",
             ]
             + ([f"Min. duration: {ui.min_duration}s"] if ui.min_duration else [])
         )
