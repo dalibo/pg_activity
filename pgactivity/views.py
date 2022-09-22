@@ -226,10 +226,14 @@ def header(
                 pg_version,
                 f"{term.bold}{host.hostname}{term.normal}",
                 f"{term.cyan}{pg_host}{term.normal}",
-                f"Ref.: {ui.refresh_time}s",
+                f"Ref.: {term.yellow}{ui.refresh_time}s{term.normal}",
                 f"Duration mode: {term.yellow}{ui.duration_mode.name}{term.normal}",
             ]
-            + ([f"Min. duration: {ui.min_duration}s"] if ui.min_duration else [])
+            + (
+                [f"Min. duration: {term.yellow}{ui.min_duration}s{term.normal}"]
+                if ui.min_duration
+                else []
+            )
         )
     )
 
