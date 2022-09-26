@@ -696,11 +696,17 @@ class SwapInfo:
         return cls(0, 0, 0)
 
     @property
-    def pct_used(self) -> Pct:
+    def pct_used(self) -> Optional[Pct]:
+        if self.total == 0:
+            # account for the zero swap case (#318)
+            return None
         return Pct(self.used * 100 / self.total)
 
     @property
-    def pct_free(self) -> Pct:
+    def pct_free(self) -> Optional[Pct]:
+        if self.total == 0:
+            # account for the zero swap case (#318)
+            return None
         return Pct(self.free * 100 / self.total)
 
 
@@ -716,15 +722,21 @@ class MemoryInfo:
         return cls(0, 0, 0, 0)
 
     @property
-    def pct_used(self) -> Pct:
+    def pct_used(self) -> Optional[Pct]:
+        if self.total == 0:
+            return None
         return Pct(self.used * 100 / self.total)
 
     @property
-    def pct_free(self) -> Pct:
+    def pct_free(self) -> Optional[Pct]:
+        if self.total == 0:
+            return None
         return Pct(self.free * 100 / self.total)
 
     @property
-    def pct_bc(self) -> Pct:
+    def pct_bc(self) -> Optional[Pct]:
+        if self.total == 0:
+            return None
         return Pct(self.buff_cached * 100 / self.total)
 
 

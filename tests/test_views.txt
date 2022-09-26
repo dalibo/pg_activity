@@ -184,6 +184,23 @@ PostgreSQL 9.6 - localhost - tester@host:5432/postgres - Ref.: 10s - Duration mo
 ...        width=200)
 PostgreSQL 9.6 - localhost - tester@host:5432/postgres - Ref.: 2s - Duration mode: transaction - Min. duration: 1.2s
 
+>>> sysinfo = SystemInfo(
+...     MemoryInfo(used=0, buff_cached=0, free=0, total=0),
+...     SwapInfo(used=0, free=0, total=0),
+...     LoadAverage(avg1=0, avg5=0, avg15=0),
+...     io_read=IOCounter(0,0),
+...     io_write=IOCounter(0,0),
+...     max_iops=0)
+>>> ui.toggle_system_info_in_header()
+>>> header(term, ui, host=host, server_information=serverinfo,
+...        system_info=sysinfo, pg_version="PostgreSQL 9.6",
+...        width=200)
+PostgreSQL 9.6 - localhost - tester@host:5432/postgres - Ref.: 2s - Duration mode: transaction - Min. duration: 1.2s
+ * Mem.: 0B total ⋅ 0B (-) free ⋅ 0B (-) used ⋅ 0B (-) buff+cached
+   Swap: 0B total ⋅ 0B (-) free ⋅ 0B (-) used
+   IO: 0/s max iops ⋅ 0B/s - 0/s read ⋅ 0B/s - 0/s write
+   Load average: 0 0 0
+
 Tests for processes_rows()
 --------------------------
 
