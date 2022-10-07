@@ -24,7 +24,9 @@ def main(
 
     fs_blocksize = options.blocksize
 
-    is_local = data.pg_is_local() and data.pg_is_local_access()
+    is_local = (
+        False if options.rds else data.pg_is_local() and data.pg_is_local_access()
+    )
 
     skip_db_size = options.nodbsize
     server_information = data.pg_get_server_information(
