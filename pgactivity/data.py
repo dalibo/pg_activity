@@ -164,8 +164,12 @@ class Data:
         try:
             with open(pid_file, "r") as fd:
                 pid = fd.readline().strip()
-        except PermissionError:
-            logger.info("Access Denied to the pidfile. System counters are disabled.")
+        except OSError as e:
+            logger.info(
+                "pidfile %s could not be read: %s. System counters are disabled.",
+                pid_file,
+                e,
+            )
             return False
 
         try:
