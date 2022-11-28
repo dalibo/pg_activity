@@ -1,9 +1,12 @@
 [flake8]
 doctests = True
 ignore =
-  E203, # whitespace before ‘:’
-  E501, # line too long
-  W503, # line break before binary operator
+  # whitespace before ‘:’
+  E203,
+  # line too long
+  E501,
+  # line break before binary operator
+  W503,
 exclude =
   .git,
   .mypy_cache,
