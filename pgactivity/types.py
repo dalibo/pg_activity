@@ -885,6 +885,8 @@ class LockType(enum.Enum):
 
     def __str__(self) -> str:
         # Custom str(self) for transparent rendering in views.
+        assert isinstance(self.name, str)
+        # TODO ^ remove this assert for mypy > 0.991
         return self.name
 
 
