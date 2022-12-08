@@ -909,6 +909,7 @@ class BaseProcess:
     query: Optional[str]
     query_leader_pid: Optional[int]
     is_parallel_worker: bool
+    encoding: str
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)

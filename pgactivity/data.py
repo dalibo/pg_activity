@@ -33,6 +33,7 @@ from .types import (
     NO_FILTER,
 )
 from .utils import clean_str
+from .psycopg_utils import DictDecoderCursor
 
 
 logger = logging.getLogger("pgactivity")
@@ -104,6 +105,7 @@ class Data:
         filters: Filters = NO_FILTER,
     ) -> "Data":
         """Create an instance by connecting to a PostgreSQL server."""
+        psycopg2.extensions.register_type(psycopg2.extensions.BYTES)
         pg_conn = psycopg2.connect(
             dsn=dsn,
             host=host,
@@ -112,7 +114,7 @@ class Data:
             database=database,
             password=password,
             application_name="pg_activity",
-            cursor_factory=psycopg2.extras.DictCursor,
+            cursor_factory=DictDecoderCursor,
         )
         pg_conn.autocommit = True
         with pg_conn.cursor() as cur:
@@ -134,7 +136,7 @@ class Data:
     def try_reconnect(self) -> Optional["Data"]:
         try:
             pg_conn = psycopg2.connect(
-                cursor_factory=psycopg2.extras.DictCursor, **self.dsn_parameters
+                cursor_factory=DictDecoderCursor, **self.dsn_parameters
             )
         except (InterfaceError, OperationalError):
             return None

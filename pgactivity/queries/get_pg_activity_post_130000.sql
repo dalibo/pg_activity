@@ -12,9 +12,10 @@ SELECT
       a.wait_event AS wait,
       a.usename AS user,
       a.state AS state,
-      convert_from(replace(a.query, '\', '\\')::bytea, coalesce(pg_catalog.pg_encoding_to_char(b.encoding), 'UTF8')) AS query,
+      replace(a.query, '\', '\\')::bytea AS query,
       coalesce(a.leader_pid, a.pid) AS query_leader_pid,
-      a.backend_type = 'parallel worker' AS is_parallel_worker
+      a.backend_type = 'parallel worker' AS is_parallel_worker,
+      coalesce(pg_catalog.pg_encoding_to_char(b.encoding), 'UTF8') AS encoding
  FROM
       pg_stat_activity a
       LEFT OUTER JOIN pg_database b ON a.datid = b.oid
