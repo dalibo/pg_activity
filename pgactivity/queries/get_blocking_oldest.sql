@@ -20,7 +20,7 @@ SELECT
           ELSE replace(sq.query, '\', '\\')::bytea
       END AS query,
       waiting AS wait,
-      coalesce(pg_catalog.pg_encoding_to_char(b.encoding), 'UTF8') AS encoding
+      coalesce(pg_catalog.pg_encoding_to_char(b.encoding), current_setting('server_encoding')) AS encoding
   FROM
       (
       -- Transaction id lock

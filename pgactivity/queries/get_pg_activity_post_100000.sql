@@ -18,7 +18,7 @@ SELECT
       (   a.backend_type = 'background worker'
           AND a.query IS NOT NULL
       ) AS is_parallel_worker,
-      coalesce(pg_catalog.pg_encoding_to_char(b.encoding), 'UTF8') AS encoding
+      coalesce(pg_catalog.pg_encoding_to_char(b.encoding), current_setting('server_encoding')) AS encoding
   FROM
       pg_stat_activity a
       LEFT OUTER JOIN pg_database b ON a.datid = b.oid
