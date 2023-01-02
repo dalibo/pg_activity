@@ -906,7 +906,7 @@ class BaseProcess:
     client: str
     duration: Optional[float]
     state: str
-    query: Optional[str]
+    query: Optional[memoryview]
     query_leader_pid: Optional[int]
     is_parallel_worker: bool
     encoding: str

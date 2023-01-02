@@ -11,8 +11,9 @@ SELECT
       locktype AS type,
       duration,
       state,
-      convert_from(replace(sq.query, '\', '\\')::bytea, coalesce(pg_catalog.pg_encoding_to_char(b.encoding), 'UTF8')) AS query,
-      wait_event as wait
+      replace(sq.query, '\', '\\')::bytea AS query,
+      wait_event as wait,
+      coalesce(pg_catalog.pg_encoding_to_char(b.encoding), 'UTF8') AS encoding
   FROM
       (
       -- Transaction id lock

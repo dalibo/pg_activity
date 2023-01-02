@@ -13,9 +13,10 @@ SELECT
       a.waiting AS wait,
       a.usename AS user,
       a.state AS state,
-      convert_from(replace(a.query, '\', '\\')::bytea, coalesce(pg_catalog.pg_encoding_to_char(b.encoding), 'UTF8')) AS query,
+      replace(a.query, '\', '\\')::bytea AS query,
       NULL AS query_leader_pid,
-      false AS is_parallel_worker
+      false AS is_parallel_worker,
+      coalesce(pg_catalog.pg_encoding_to_char(b.encoding), 'UTF8') AS encoding
   FROM
       pg_stat_activity a
       LEFT OUTER JOIN pg_database b ON a.datid = b.oid

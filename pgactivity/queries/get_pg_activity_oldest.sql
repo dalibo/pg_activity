@@ -18,10 +18,11 @@ SELECT
       END AS state,
       CASE
           WHEN a.current_query LIKE '<IDLE>%%' THEN NULL
-          ELSE convert_from(replace(a.current_query, '\', '\\')::bytea, coalesce(pg_catalog.pg_encoding_to_char(b.encoding), 'UTF8'))
+          ELSE replace(a.current_query, '\', '\\')::bytea
       END AS query,
       NULL AS query_leader_pid,
-      false AS is_parallel_worker
+      false AS is_parallel_worker,
+      coalesce(pg_catalog.pg_encoding_to_char(b.encoding), 'UTF8') AS encoding
   FROM
         pg_stat_activity a
         LEFT OUTER JOIN pg_database b ON a.datid = b.oid

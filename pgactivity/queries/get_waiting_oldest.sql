@@ -20,8 +20,9 @@ SELECT
       END AS state,
       CASE WHEN a.current_query LIKE '<IDLE>%%'
           THEN NULL
-          ELSE convert_from(replace(a.current_query, '\', '\\')::bytea, coalesce(pg_catalog.pg_encoding_to_char(b.encoding), 'UTF8'))
-      END AS query
+          ELSE replace(a.current_query, '\', '\\')::bytea
+      END AS query,
+      coalesce(pg_catalog.pg_encoding_to_char(b.encoding), 'UTF8') AS encoding
   FROM
       pg_catalog.pg_locks
       JOIN pg_catalog.pg_stat_activity a ON (pg_catalog.pg_locks.pid = a.procpid)

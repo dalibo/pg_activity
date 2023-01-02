@@ -469,7 +469,8 @@ def processes_rows(
         qwidth = width - len(indent)
 
         if qwidth > 0 and process.query is not None:
-            query = format_query(process.query, process.is_parallel_worker)
+            q = process.query.tobytes().decode(process.encoding, errors="replace")
+            query = format_query(q, process.is_parallel_worker)
 
             if not ui.wrap_query:
                 query_value = query[:qwidth]
