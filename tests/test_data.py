@@ -13,6 +13,7 @@ from pgactivity.data import Data
 def decode_query(record):
     return record.query.tobytes().decode(record.encoding)
 
+
 def wait_for_data(fct, msg: str, timeout: int = 2):
     count = int(timeout / 0.1)
     for _ in range(count):
@@ -74,7 +75,9 @@ def test_blocking_waiting(postgresql, data, execute):
     assert len(blocking) == 2
     assert len(waiting) == 2
     assert "blocking" in decode_query(blocking[0])
-    assert "waiting 1" in decode_query(waiting[0]) and "waiting 2" in decode_query(waiting[1])
+    assert "waiting 1" in decode_query(waiting[0]) and "waiting 2" in decode_query(
+        waiting[1]
+    )
     if postgresql.info.server_version >= 100000:
         assert blocking[0].wait == "ClientRead"
         assert blocking[1].wait == "transactionid"
