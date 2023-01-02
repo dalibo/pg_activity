@@ -17,11 +17,12 @@ Tests scrolling in processes_rows()
 ...         user="postgres",
 ...         client="local",
 ...         state="active",
-...         query=f"SELECT {x}",
+...         query=memoryview(f"SELECT {x}".encode("utf8")),
 ...         duration=0.0,
 ...         wait=False,
 ...         query_leader_pid=x,
 ...         is_parallel_worker=False,
+...         encoding="utf8",
 ...     ) for x in range(0, 10)]
 >>> ui = UI.make(flag=Flag.PID|Flag.DATABASE)
 >>> sproc = SelectableProcesses(processes_scroll)

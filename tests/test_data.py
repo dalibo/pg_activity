@@ -10,6 +10,9 @@ from pgactivity import types
 from pgactivity.data import Data
 
 
+def decode_query(record):
+    return record.query.tobytes().decode(record.encoding)
+
 def wait_for_data(fct, msg: str, timeout: int = 2):
     count = int(timeout / 0.1)
     for _ in range(count):
@@ -49,7 +52,7 @@ def test_pg_get_server_information(data):
 def test_activities(postgresql, data):
     postgresql.execute("SELECT pg_sleep(1)")
     (running,) = data.pg_get_activities()
-    assert "pg_sleep" in running.query
+    assert "pg_sleep" in decode_query(running)
     assert running.state == "idle in transaction"
     if postgresql.info.server_version >= 100000:
         assert running.wait == "ClientRead"
@@ -70,8 +73,8 @@ def test_blocking_waiting(postgresql, data, execute):
     waiting = data.pg_get_waiting()
     assert len(blocking) == 2
     assert len(waiting) == 2
-    assert "blocking" in blocking[0].query
-    assert "waiting 1" in waiting[0].query and "waiting 2" in waiting[1].query
+    assert "blocking" in decode_query(blocking[0])
+    assert "waiting 1" in decode_query(waiting[0]) and "waiting 2" in decode_query(waiting[1])
     if postgresql.info.server_version >= 100000:
         assert blocking[0].wait == "ClientRead"
         assert blocking[1].wait == "transactionid"
@@ -88,8 +91,8 @@ def test_pg_get_blocking_virtualxid(postgresql, data, execute):
         data.pg_get_blocking, msg="could not fetch blocking queries"
     )
     (waiting,) = data.pg_get_waiting()
-    assert "blocking" in blocking.query
-    assert "CREATE INDEX CONCURRENTLY ON t(s)" in waiting.query
+    assert "blocking" in decode_query(blocking)
+    assert "CREATE INDEX CONCURRENTLY ON t(s)" in decode_query(waiting)
     assert str(blocking.type) == "virtualxid"
 
 
@@ -130,11 +133,11 @@ def test_encoding(postgresql, data, execute):
     execute("UPDATE tbl SET s = 'blocking éléphant'", dbname="latin1")
     execute("UPDATE tbl SET s = 'waiting éléphant'", dbname="latin1", commit=True)
     running = wait_for_data(data.pg_get_activities, msg="could not fetch activities")
-    assert "blocking éléphant" in running[0].query
+    assert "blocking éléphant" in decode_query(running[0])
     (waiting,) = wait_for_data(data.pg_get_waiting, "no waiting process")
-    assert "waiting éléphant" in waiting.query
+    assert "waiting éléphant" in decode_query(waiting)
     (blocking,) = data.pg_get_blocking()
-    assert "blocking éléphant" in blocking.query
+    assert "blocking éléphant" in decode_query(blocking)
 
 
 def test_filters_dbname(data, execute):
