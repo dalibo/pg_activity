@@ -231,7 +231,9 @@ class Data:
 
         with self.pg_conn.cursor() as cur:
             try:
-                cur.execute(queries.get("set_statement_timeout"), {"timeout": "400ms"})
+                cur.execute(
+                    sql.SQL("SET statement_timeout TO {}").format(sql.Literal("400ms"))
+                )
                 cur.execute(query)
                 ret = cur.fetchone()
             except InsufficientPrivilege:
