@@ -9,9 +9,13 @@ jobs:
       matrix:
         include:
           - python: "3.7"
+            psycopg: "psycopg2"
           - python: "3.8"
+            psycopg: "psycopg3"
           - python: "3.9"
+            psycopg: "psycopg2"
           - python: "3.10"
+            psycopg: "psycopg3"
     steps:
       - uses: actions/checkout@v2
       - name: Setup Python
@@ -25,4 +29,4 @@ jobs:
            sudo locale-gen fr_FR
            sudo update-locale
       - name: Test
-        run: tox -e py
+        run: tox -e py-${{ matrix.psycopg }}

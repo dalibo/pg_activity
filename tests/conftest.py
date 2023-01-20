@@ -1,15 +1,21 @@
 import logging
 import pathlib
 import threading
-from typing import Optional
+from typing import Any, List, Optional
 
 import psycopg
 from psycopg.conninfo import make_conninfo
 import psycopg.errors
 import pytest
 
+from pgactivity import pg
+
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.DEBUG)
+
+
+def pytest_report_header(config: Any) -> List[str]:
+    return [f"psycopg: {pg.__version__}"]
 
 
 @pytest.fixture(scope="session")

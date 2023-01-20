@@ -90,28 +90,27 @@ class Data:
     ) -> "Data":
         """Create an instance by connecting to a PostgreSQL server."""
         pg_conn = pg.connect(
-            dsn=dsn,
+            dsn,
             host=host,
             port=port,
             user=user,
-            database=database,
+            dbname=database,
             password=password,
             application_name="pg_activity",
         )
-        pg_conn.autocommit = True
         if hide_queries_in_logs:
             pg.execute(pg_conn, queries.get("disable_log_min_duration_statement"))
-            if pg_conn.server_version >= 130000:
+            if pg.server_version(pg_conn) >= 130000:
                 pg.execute(pg_conn, queries.get("disable_log_min_duration_sample"))
         pg_version = pg_get_short_version(pg_get_version(pg_conn))
         return cls(
             pg_conn,
             pg_version,
-            pg_conn.server_version,
+            pg.server_version(pg_conn),
             min_duration=min_duration,
             failed_queries=FailedQueriesInfo(),
             filters=filters,
-            dsn_parameters=pg_conn.info.dsn_parameters,
+            dsn_parameters=pg.connection_parameters(pg_conn),
         )
 
     def try_reconnect(self) -> Optional["Data"]:
@@ -120,9 +119,8 @@ class Data:
         except (pg.InterfaceError, pg.OperationalError):
             return None
         else:
-            pg_conn.autocommit = True
             return attr.evolve(
-                self, pg_conn=pg_conn, dsn_parameters=pg_conn.info.dsn_parameters
+                self, pg_conn=pg_conn, dsn_parameters=pg.connection_parameters(pg_conn)
             )
 
     def pg_is_local_access(self) -> bool:

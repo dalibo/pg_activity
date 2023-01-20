@@ -2,6 +2,14 @@
 
 ## **Unreleased**
 
+### Added
+
+* Add support for Psycopg 3 database driver, as an alternative to psycopg2.
+  Packagers and users installing from `pip` are encouraged to install the
+  `psycopg` dependency instead of psycopg2.
+* Add `psycopg` and `psycopg2` setuptools extras to ease complete installation
+  from pip.
+
 ### Fixed
 
 * Fix a few typos in the man page.

@@ -57,8 +57,13 @@ setup(
             "flake8",
             "mypy",
         ],
-        "testing": [
+        "psycopg2": [
             "psycopg2-binary >= 2.8",
+        ],
+        "psycopg": [
+            "psycopg[binary]",
+        ],
+        "testing": [
             "psycopg[binary]",
             "pytest",
             "pytest-postgresql >= 4.0",

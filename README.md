@@ -26,9 +26,9 @@ Installation from pip
 ---------------------
 
 Alternatively, pg\_activity can be installed using pip on Python 3.7 or later
-along with psycopg2 (version 2.8 or higher):
+along with psycopg:
 
-    $ python3 -m pip install pg_activity psycopg2-binary
+    $ python3 -m pip install "pg_activity[psycopg]"
 
 In case your `$PATH` does not already contain it, the full path is:
 
@@ -42,12 +42,12 @@ This is only necessary to test development versions. First, clone the repository
     $ git clone https://github.com/dalibo/pg_activity.git
 
 Change the branch if necessary. Then create a dedicated environment,
-install dependencies and then pg\_activity from the repo:
+and install pg\_activity with the psycopg database driver:
 
     $ cd pg_activity
     $ python3 -m venv .venv
     $ . .venv/bin/activate
-    (.venv) $ pip install psycopg2-binary .
+    (.venv) $ pip install ".[psycopg]"
     (.venv) $ pg_activity
 
 To quit this env and destroy it:
