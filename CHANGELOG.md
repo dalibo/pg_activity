@@ -12,6 +12,7 @@
 * Use [codespell](https://github.com/codespell-project/codespell) to check
   misspellings.
 * Add Project-URLs core metadata for Python packaging.
+* Install the project in *develop* mode in Tox test environment.
 
 ## pg\_activity 3.0.2  - 2023-01-17
 
