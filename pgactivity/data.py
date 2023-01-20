@@ -238,7 +238,6 @@ class Data:
                 ret = cur.fetchone()
             except InsufficientPrivilege:
                 # superuser or pg_read_server_files are required (Issue #278)
-                cur.execute(queries.get("reset_statement_timeout"))
                 self.failed_queries.temp_file_query_failed = True
                 logger.info(
                     "Insufficient privilege to fetch the tempfile data. "
@@ -251,13 +250,13 @@ class Data:
                 # to avoid such a case we set a statement_timeout shorter than the lowest
                 # refresh rate. This could end up spamming the PostgreSQL logs.
                 self.failed_queries.temp_file_query_failed = True
-                cur.execute(queries.get("reset_statement_timeout"))
                 logger.info(
                     "The tempfile query ended in a timeout. "
                     "The feature was disabled. Check the temporary files on the server."
                 )
                 return None
-            cur.execute(queries.get("reset_statement_timeout"))
+            finally:
+                cur.execute(queries.get("reset_statement_timeout"))
 
         return TempFileInfo(**ret)
 
