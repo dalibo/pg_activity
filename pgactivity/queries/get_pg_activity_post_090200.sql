@@ -22,11 +22,11 @@ SELECT
  WHERE
       state <> 'idle'
   AND pid <> pg_backend_pid()
-  AND CASE WHEN %(min_duration)s = 0
+  AND CASE WHEN {min_duration} = 0
           THEN true
           ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
       END
-  AND CASE WHEN %(dbname_filter)s IS NULL THEN true
+  AND CASE WHEN {dbname_filter} IS NULL THEN true
       ELSE a.datname ~* %(dbname_filter)s
       END
 ORDER BY

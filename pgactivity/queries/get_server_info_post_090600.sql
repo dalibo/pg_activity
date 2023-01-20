@@ -19,7 +19,7 @@ WITH dbinfo AS(
           FROM pg_database d
                INNER JOIN pg_stat_database sd ON d.oid = sd.datid
          WHERE NOT (d.datname = 'rdsadmin' AND %(using_rds)s)
-               AND CASE WHEN %(dbname_filter)s IS NULL THEN true
+               AND CASE WHEN {dbname_filter} IS NULL THEN true
                         ELSE d.datname ~* %(dbname_filter)s
                    END
 ), activity AS (
@@ -40,7 +40,7 @@ WITH dbinfo AS(
                current_setting('max_wal_senders')::int AS max_wal_senders,
                current_setting('max_replication_slots')::int AS max_replication_slots
           FROM pg_stat_activity
-         WHERE CASE WHEN %(dbname_filter)s IS NULL THEN true
+         WHERE CASE WHEN {dbname_filter} IS NULL THEN true
                     ELSE datname ~* %(dbname_filter)s
                END
 )

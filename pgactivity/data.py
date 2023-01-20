@@ -320,6 +320,12 @@ class Data:
 
         return int(ret["replication_slots"])
 
+    @property
+    def dbname_filter(self) -> sql.Composable:
+        if self.filters.dbname:
+            return sql.Literal(self.filters.dbname)
+        return sql.NULL
+
     def pg_get_server_information(
         self,
         prev_server_info: Optional[ServerInformation] = None,
@@ -351,10 +357,11 @@ class Data:
         else:
             query = queries.get("get_server_info_oldest")
 
+        qs = sql.SQL(query).format(dbname_filter=self.dbname_filter)
         with self.pg_conn.cursor() as cur:
             try:
                 cur.execute(
-                    query,
+                    qs,
                     {
                         "dbname_filter": self.filters.dbname,
                         "skip_db_size": skip_db_size,
@@ -434,7 +441,11 @@ class Data:
             qs = queries.get("get_pg_activity_oldest")
 
         duration_column = self.get_duration_column(duration_mode)
-        query = sql.SQL(qs).format(duration_column=sql.Identifier(duration_column))
+        query = sql.SQL(qs).format(
+            dbname_filter=self.dbname_filter,
+            duration_column=sql.Identifier(duration_column),
+            min_duration=sql.Literal(self.min_duration),
+        )
 
         with self.pg_conn.cursor() as cur:
             cur.execute(
@@ -458,7 +469,11 @@ class Data:
             qs = queries.get("get_waiting_oldest")
 
         duration_column = self.get_duration_column(duration_mode)
-        query = sql.SQL(qs).format(duration_column=sql.Identifier(duration_column))
+        query = sql.SQL(qs).format(
+            dbname_filter=self.dbname_filter,
+            duration_column=sql.Identifier(duration_column),
+            min_duration=sql.Literal(self.min_duration),
+        )
 
         with self.pg_conn.cursor() as cur:
             cur.execute(
@@ -483,7 +498,11 @@ class Data:
             qs = queries.get("get_blocking_oldest")
 
         duration_column = self.get_duration_column(duration_mode)
-        query = sql.SQL(qs).format(duration_column=sql.Identifier(duration_column))
+        query = sql.SQL(qs).format(
+            dbname_filter=self.dbname_filter,
+            duration_column=sql.Identifier(duration_column),
+            min_duration=sql.Literal(self.min_duration),
+        )
 
         with self.pg_conn.cursor() as cur:
             cur.execute(

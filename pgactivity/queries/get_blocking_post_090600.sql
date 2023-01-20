@@ -40,11 +40,11 @@ SELECT
        WHERE
             blocking.granted
         AND NOT blocked.granted
-        AND CASE WHEN %(min_duration)s = 0
+        AND CASE WHEN {min_duration} = 0
                 THEN true
                 ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
             END
-        AND CASE WHEN %(dbname_filter)s IS NULL THEN true
+        AND CASE WHEN {dbname_filter} IS NULL THEN true
             ELSE datname ~* %(dbname_filter)s
             END
       UNION ALL
@@ -73,11 +73,11 @@ SELECT
        WHERE
             blocking.granted
         AND NOT blocked.granted
-        AND CASE WHEN %(min_duration)s = 0
+        AND CASE WHEN {min_duration} = 0
                 THEN true
                 ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
             END
-        AND CASE WHEN %(dbname_filter)s IS NULL THEN true
+        AND CASE WHEN {dbname_filter} IS NULL THEN true
             ELSE datname ~* %(dbname_filter)s
             END
       UNION ALL
@@ -107,11 +107,11 @@ SELECT
             blocking.granted
         AND NOT blocked.granted
         AND blocked.relation IS NOT NULL
-        AND CASE WHEN %(min_duration)s = 0
+        AND CASE WHEN {min_duration} = 0
                 THEN true
                 ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s
             END
-        AND CASE WHEN %(dbname_filter)s IS NULL THEN true
+        AND CASE WHEN {dbname_filter} IS NULL THEN true
             ELSE datname ~* %(dbname_filter)s
             END
       ) AS sq
