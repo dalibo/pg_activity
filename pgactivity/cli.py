@@ -8,9 +8,9 @@ from io import StringIO
 from typing import Optional
 
 from blessed import Terminal
-from psycopg2.errors import OperationalError
 
 from . import __version__, data, types, ui
+from .pg import OperationalError
 
 
 def configure_logger(debug_file: Optional[str] = None) -> StringIO:

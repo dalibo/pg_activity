@@ -6,21 +6,9 @@ from typing import Dict, List, Optional
 
 import attr
 import psutil
-import psycopg2
-import psycopg2.extras
-from psycopg2 import sql
-from psycopg2.errors import (
-    FeatureNotSupported,
-    InterfaceError,
-    InvalidPassword,
-    InsufficientPrivilege,
-    OperationalError,
-    ProgrammingError,
-    QueryCanceled,
-)
-from psycopg2.extensions import connection
 
-from . import queries
+from . import queries, pg
+from .pg import sql, Connection
 from .types import (
     BlockingProcess,
     FailedQueriesInfo,
@@ -38,13 +26,10 @@ from .utils import clean_str
 logger = logging.getLogger("pgactivity")
 
 
-def pg_get_version(pg_conn: connection) -> str:
+def pg_get_version(pg_conn: Connection) -> str:
     """Get PostgreSQL server version."""
-    query = queries.get("get_version")
-    with pg_conn.cursor() as cur:
-        cur.execute(query)
-        ret: Dict[str, str] = cur.fetchone()
-    return ret["pg_version"]
+    ret = pg.fetchone(pg_conn, queries.get("get_version"))
+    return ret["pg_version"]  # type: ignore[no-any-return]
 
 
 def pg_get_short_version(text_version: str) -> str:
@@ -80,7 +65,7 @@ def pg_get_short_version(text_version: str) -> str:
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
 class Data:
-    pg_conn: connection
+    pg_conn: Connection
     pg_version: str
     pg_num_version: int
     min_duration: float
@@ -104,7 +89,7 @@ class Data:
         filters: Filters = NO_FILTER,
     ) -> "Data":
         """Create an instance by connecting to a PostgreSQL server."""
-        pg_conn = psycopg2.connect(
+        pg_conn = pg.connect(
             dsn=dsn,
             host=host,
             port=port,
@@ -112,14 +97,12 @@ class Data:
             database=database,
             password=password,
             application_name="pg_activity",
-            cursor_factory=psycopg2.extras.DictCursor,
         )
         pg_conn.autocommit = True
-        with pg_conn.cursor() as cur:
-            if hide_queries_in_logs:
-                cur.execute(queries.get("disable_log_min_duration_statement"))
-                if pg_conn.server_version >= 130000:
-                    cur.execute(queries.get("disable_log_min_duration_sample"))
+        if hide_queries_in_logs:
+            pg.execute(pg_conn, queries.get("disable_log_min_duration_statement"))
+            if pg_conn.server_version >= 130000:
+                pg.execute(pg_conn, queries.get("disable_log_min_duration_sample"))
         pg_version = pg_get_short_version(pg_get_version(pg_conn))
         return cls(
             pg_conn,
@@ -133,10 +116,8 @@ class Data:
 
     def try_reconnect(self) -> Optional["Data"]:
         try:
-            pg_conn = psycopg2.connect(
-                cursor_factory=psycopg2.extras.DictCursor, **self.dsn_parameters
-            )
-        except (InterfaceError, OperationalError):
+            pg_conn = pg.connect(**self.dsn_parameters)
+        except (pg.InterfaceError, pg.OperationalError):
             return None
         else:
             pg_conn.autocommit = True
@@ -150,15 +131,13 @@ class Data:
         system information for the postmaster process.
         """
         query = queries.get("get_data_directory")
-        with self.pg_conn.cursor() as cur:
-            try:
-                cur.execute(query)
-            except InsufficientPrivilege:
-                logger.info(
-                    "Insufficient privilege to show data_directory. System counters are disabled."
-                )
-                return False
-            ret = cur.fetchone()
+        try:
+            ret = pg.fetchone(self.pg_conn, query)
+        except pg.InsufficientPrivilege:
+            logger.info(
+                "Insufficient privilege to show data_directory. System counters are disabled."
+            )
+            return False
 
         pid_file = f"{ret['data_directory']}/postmaster.pid"
         try:
@@ -195,10 +174,8 @@ class Data:
         Cancel a backend
         """
         query = queries.get("do_pg_cancel_backend")
-        with self.pg_conn.cursor() as cur:
-            cur.execute(query, {"pid": pid})
-            ret: Dict[str, bool] = cur.fetchone()
-        return ret["is_stopped"]
+        ret = pg.fetchone(self.pg_conn, query, {"pid": pid})
+        return ret["is_stopped"]  # type: ignore[no-any-return]
 
     def pg_terminate_backend(self, pid: int) -> bool:
         """
@@ -208,10 +185,8 @@ class Data:
             query = queries.get("do_pg_terminate_backend")
         else:
             query = queries.get("do_pg_cancel_backend")
-        with self.pg_conn.cursor() as cur:
-            cur.execute(query, {"pid": pid})
-            ret: Dict[str, bool] = cur.fetchone()
-        return ret["is_stopped"]
+        ret = pg.fetchone(self.pg_conn, query, {"pid": pid})
+        return ret["is_stopped"]  # type: ignore[no-any-return]
 
     def pg_get_temporary_file(self) -> Optional[TempFileInfo]:
         """
@@ -229,34 +204,33 @@ class Data:
         else:
             query = queries.get("get_temporary_files_oldest")
 
-        with self.pg_conn.cursor() as cur:
-            try:
-                cur.execute(
-                    sql.SQL("SET statement_timeout TO {}").format(sql.Literal("400ms"))
-                )
-                cur.execute(query)
-                ret = cur.fetchone()
-            except InsufficientPrivilege:
-                # superuser or pg_read_server_files are required (Issue #278)
-                self.failed_queries.temp_file_query_failed = True
-                logger.info(
-                    "Insufficient privilege to fetch the tempfile data. "
-                    "The feature was disabled. Please use --no-tempfiles or a platform specific setting (eg. --rds)."
-                )
+        try:
+            pg.execute(
+                self.pg_conn,
+                sql.SQL("SET statement_timeout TO {}").format(sql.Literal("400ms")),
+            )
+            ret = pg.fetchone(self.pg_conn, query)
+        except pg.InsufficientPrivilege:
+            # superuser or pg_read_server_files are required (Issue #278)
+            self.failed_queries.temp_file_query_failed = True
+            logger.info(
+                "Insufficient privilege to fetch the tempfile data. "
+                "The feature was disabled. Please use --no-tempfiles or a platform specific setting (eg. --rds)."
+            )
 
-                return None
-            except QueryCanceled:
-                # if an excessive amount of tempfile exists, the query could be very long
-                # to avoid such a case we set a statement_timeout shorter than the lowest
-                # refresh rate. This could end up spamming the PostgreSQL logs.
-                self.failed_queries.temp_file_query_failed = True
-                logger.info(
-                    "The tempfile query ended in a timeout. "
-                    "The feature was disabled. Check the temporary files on the server."
-                )
-                return None
-            finally:
-                cur.execute(queries.get("reset_statement_timeout"))
+            return None
+        except pg.QueryCanceled:
+            # if an excessive amount of tempfile exists, the query could be very long
+            # to avoid such a case we set a statement_timeout shorter than the lowest
+            # refresh rate. This could end up spamming the PostgreSQL logs.
+            self.failed_queries.temp_file_query_failed = True
+            logger.info(
+                "The tempfile query ended in a timeout. "
+                "The feature was disabled. Check the temporary files on the server."
+            )
+            return None
+        finally:
+            pg.execute(self.pg_conn, queries.get("reset_statement_timeout"))
 
         return TempFileInfo(**ret)
 
@@ -268,11 +242,7 @@ class Data:
             query = queries.get("get_wal_senders_post_090100")
         else:
             return None
-
-        with self.pg_conn.cursor() as cur:
-            cur.execute(query)
-            ret = cur.fetchone()
-
+        ret = pg.fetchone(self.pg_conn, query)
         return int(ret["wal_senders"])
 
     def pg_get_wal_receivers(self) -> Optional[int]:
@@ -290,10 +260,8 @@ class Data:
             return None
 
         try:
-            with self.pg_conn.cursor() as cur:
-                cur.execute(query)
-                ret = cur.fetchone()
-        except FeatureNotSupported:
+            ret = pg.fetchone(self.pg_conn, query)
+        except pg.FeatureNotSupported:
             # Not implemented on Aurora (Issue #301)
             self.failed_queries.wal_receivers_query_failed = True
             logger.info(
@@ -312,11 +280,7 @@ class Data:
             query = queries.get("get_replication_slots_post_140000")
         else:
             return None
-
-        with self.pg_conn.cursor() as cur:
-            cur.execute(query)
-            ret = cur.fetchone()
-
+        ret = pg.fetchone(self.pg_conn, query)
         return int(ret["replication_slots"])
 
     @property
@@ -357,24 +321,23 @@ class Data:
             query = queries.get("get_server_info_oldest")
 
         qs = sql.SQL(query).format(dbname_filter=self.dbname_filter)
-        with self.pg_conn.cursor() as cur:
-            try:
-                cur.execute(
-                    qs,
-                    {
-                        "dbname_filter": self.filters.dbname,
-                        "skip_db_size": skip_db_size,
-                        "prev_total_size": prev_total_size,
-                        "using_rds": using_rds,
-                    },
-                )
-            except InsufficientPrivilege:
-                logger.info(
-                    "Privileges might be insufficient to connect to a database. "
-                    "Try to use a --filter, the --no-db-size option or a platform specific setting (eg. --rds)"
-                )
-                raise
-            ret = cur.fetchone()
+        try:
+            ret = pg.fetchone(
+                self.pg_conn,
+                qs,
+                {
+                    "dbname_filter": self.filters.dbname,
+                    "skip_db_size": skip_db_size,
+                    "prev_total_size": prev_total_size,
+                    "using_rds": using_rds,
+                },
+            )
+        except pg.InsufficientPrivilege:
+            logger.info(
+                "Privileges might be insufficient to connect to a database. "
+                "Try to use a --filter, the --no-db-size option or a platform specific setting (eg. --rds)"
+            )
+            raise
 
         temporary_file_info: Optional[TempFileInfo] = None
         if not skip_tempfile:
@@ -446,15 +409,14 @@ class Data:
             min_duration=sql.Literal(self.min_duration),
         )
 
-        with self.pg_conn.cursor() as cur:
-            cur.execute(
-                query,
-                {
-                    "min_duration": self.min_duration,
-                    "dbname_filter": self.filters.dbname,
-                },
-            )
-            ret = cur.fetchall()
+        ret = pg.fetchall(
+            self.pg_conn,
+            query,
+            {
+                "min_duration": self.min_duration,
+                "dbname_filter": self.filters.dbname,
+            },
+        )
 
         return [RunningProcess(**row) for row in ret]
 
@@ -474,15 +436,14 @@ class Data:
             min_duration=sql.Literal(self.min_duration),
         )
 
-        with self.pg_conn.cursor() as cur:
-            cur.execute(
-                query,
-                {
-                    "min_duration": self.min_duration,
-                    "dbname_filter": self.filters.dbname,
-                },
-            )
-            ret = cur.fetchall()
+        ret = pg.fetchall(
+            self.pg_conn,
+            query,
+            {
+                "min_duration": self.min_duration,
+                "dbname_filter": self.filters.dbname,
+            },
+        )
         return [WaitingProcess(**row) for row in ret]
 
     def pg_get_blocking(self, duration_mode: int = 1) -> List[BlockingProcess]:
@@ -503,15 +464,14 @@ class Data:
             min_duration=sql.Literal(self.min_duration),
         )
 
-        with self.pg_conn.cursor() as cur:
-            cur.execute(
-                query,
-                {
-                    "min_duration": self.min_duration,
-                    "dbname_filter": self.filters.dbname,
-                },
-            )
-            ret = cur.fetchall()
+        ret = pg.fetchall(
+            self.pg_conn,
+            query,
+            {
+                "min_duration": self.min_duration,
+                "dbname_filter": self.filters.dbname,
+            },
+        )
         return [BlockingProcess(**row) for row in ret]
 
     def pg_is_local(self) -> bool:
@@ -519,9 +479,7 @@ class Data:
         Is pg_activity connected locally?
         """
         query = queries.get("get_pga_inet_addresses")
-        with self.pg_conn.cursor() as cur:
-            cur.execute(query)
-            ret = cur.fetchone()
+        ret = pg.fetchone(self.pg_conn, query)
         if ret["inet_server_addr"] == ret["inet_client_addr"]:
             return True
         return False
@@ -566,10 +524,10 @@ def pg_connect(
                 filters=filters,
                 hide_queries_in_logs=options.hide_queries_in_logs,
             )
-        except OperationalError as err:
+        except pg.OperationalError as err:
             errmsg = str(err).strip()
             if nb_try < 1 and (
-                isinstance(err, InvalidPassword)
+                isinstance(err, pg.InvalidPassword)
                 or errmsg.startswith("FATAL:  password authentication failed for user")
                 or errmsg == "fe_sendauth: no password supplied"
             ):
@@ -579,7 +537,7 @@ def pg_connect(
                 raise SystemExit("pg_activity: FATAL: %s" % clean_str(msg))
             else:
                 raise Exception("Could not connect to PostgreSQL")
-        except ProgrammingError as err:
+        except pg.ProgrammingError as err:
             errmsg = str(err).strip()
             if errmsg.startswith("invalid dsn"):
                 raise SystemExit(
