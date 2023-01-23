@@ -164,9 +164,9 @@ B<min duration> seconds. It displays the following information:
 
 =back
 
-=head2 THE WAITING QUERIES PANNEL
+=head2 THE WAITING QUERIES PANEL
 
-The waiting queries view displays queries that are wainting for a lock. It
+The waiting queries view displays queries that are waiting for a lock. It
 shows the following information:
 
 =over 2
@@ -195,7 +195,7 @@ shows the following information:
 
 =back
 
-=head2 THE BLOCKING QUERIES PANNEL
+=head2 THE BLOCKING QUERIES PANEL
 
 The blocking queries view displays the queries that lock an object which is
 required by another session. It shows following information:

@@ -1,5 +1,11 @@
 # Change log
 
+## **Unreleased**
+
+### Fixed
+
+* Fix a few typos in the man page.
+
 ## pg\_activity 3.0.2  - 2023-01-17
 
 ### Fixed

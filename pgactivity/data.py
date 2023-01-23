@@ -496,7 +496,7 @@ class Data:
 
     def pg_is_local(self) -> bool:
         """
-        Is pg_activity connected localy ?
+        Is pg_activity connected locally?
         """
         query = queries.get("get_pga_inet_addresses")
         with self.pg_conn.cursor() as cur:
