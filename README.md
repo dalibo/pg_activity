@@ -218,3 +218,7 @@ Information can also be given via PostgreSQL's environment variables
 The password file is preferred since it's more secure (security is deferred to
 the OS). Please avoid password in connection strings at all cost.
 
+Change log
+----------
+
+See [CHANGELOG.md](https://github.com/dalibo/pg_activity/blob/master/CHANGELOG.md).
