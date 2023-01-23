@@ -1,0 +1,2 @@
+[codespell]
+skip = .git,.mypy_cache,.tox,.venv,htmlcov

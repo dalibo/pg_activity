@@ -48,6 +48,7 @@ setup(
         "dev": [
             "black >= 21.12b0",
             "check-manifest",
+            "codespell",
             "flake8",
             "mypy",
         ],
