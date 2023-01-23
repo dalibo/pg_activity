@@ -9,6 +9,8 @@
   `psycopg` dependency instead of psycopg2.
 * Add `psycopg` and `psycopg2` setuptools extras to ease complete installation
   from pip.
+* Prepare statements for execution when using the `psycopg` database driver for
+  better performance.
 
 ### Fixed
 

@@ -36,14 +36,14 @@ try:
         query: Union[str, sql.Composed],
         args: Union[None, Sequence[Any], Dict[str, Any]] = None,
     ) -> None:
-        conn.execute(query, args)
+        conn.execute(query, args, prepare=True)
 
     def fetchone(
         conn: Connection,
         query: Union[str, sql.Composed],
         args: Union[None, Sequence[Any], Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
-        row = conn.execute(query, args).fetchone()
+        row = conn.execute(query, args, prepare=True).fetchone()
         assert row is not None
         return row
 
@@ -52,7 +52,7 @@ try:
         query: Union[str, sql.Composed],
         args: Union[None, Sequence[Any], Dict[str, Any]] = None,
     ) -> List[Dict[str, Any]]:
-        return conn.execute(query, args).fetchall()
+        return conn.execute(query, args, prepare=True).fetchall()
 
 except ImportError:
     import psycopg2
