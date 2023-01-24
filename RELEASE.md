@@ -1,15 +1,22 @@
 # Release HOW TO
 
-## Git
+## Preparatory changes
 
-* Write a new change log section, for instance from closed issues, merged pull
-  requests, or directly the git history (e.g. `git log $(git describe --tags
-  --abbrev=0).. --format=%s --reverse` to get commits from the previous tag)
-* Bump version in `pgactivity/__init__.py`, rebuild the man page
-* Commit these changes on the `master` branch
-* Create an annotated (and possibly signed) tag, as
-  `git tag -a [-s] -m 'pg_activity 1.6.0' v1.6.0`
-* Push with `--follow-tags`
+* Review the **Unreleased** section, if any, in `CHANGELOG.md` possibly adding
+  any missing item from closed issues, merged pull requests, or directly the git
+  history[^git-changes],
+* Rename the **Unreleased** section according to the version to be released,
+  with a date,
+* Bump the version in `pgactivity/__init__.py`,
+* Rebuild the man page, and,
+* Commit these changes (either on a dedicated branch, before submitting a pull
+  request or directly on the `master` branch).
+* Then, when changes landed in the `master` branch, create an annotated (and
+  possibly signed) tag, as `git tag -a [-s] -m 'pg_activity 1.6.0' v1.6.0`, and,
+* Push with `--follow-tags`.
+
+[^git-changes]: Use `git log $(git describe --tags --abbrev=0).. --format=%s
+  --reverse` to get commits from the previous tag.
 
 ## PyPI package
 
