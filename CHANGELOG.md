@@ -8,6 +8,7 @@
 
 ### Misc.
 
+* Add a change log file.
 * Use [codespell](https://github.com/codespell-project/codespell) to check
   misspellings.
 * Add Project-URLs core metadata for Python packaging.
