@@ -24,6 +24,11 @@ setup(
     packages=find_packages("."),
     include_package_data=True,
     url="https://github.com/dalibo/pg_activity",
+    project_urls={
+        "Bug Tracker": "https://github.com/dalibo/pg_activity/issues/",
+        "Changelog": "https://github.com/dalibo/pg_activity/blob/master/CHANGELOG.md",
+        "Source code": "https://github.com/dalibo/pg_activity/",
+    },
     license="PostgreSQL",
     description="Command line tool for PostgreSQL server activity monitoring.",
     long_description=long_description,

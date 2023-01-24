@@ -10,6 +10,7 @@
 
 * Use [codespell](https://github.com/codespell-project/codespell) to check
   misspellings.
+* Add Project-URLs core metadata for Python packaging.
 
 ## pg\_activity 3.0.2  - 2023-01-17
 
