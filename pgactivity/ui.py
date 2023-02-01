@@ -21,7 +21,6 @@ def main(
     width: Optional[int] = None,
     wait_on_actions: Optional[float] = None,
 ) -> None:
-
     fs_blocksize = options.blocksize
 
     is_local = data.pg_is_local() and data.pg_is_local_access()

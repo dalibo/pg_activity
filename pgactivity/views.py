@@ -452,7 +452,6 @@ def processes_rows(
     focused, pinned = processes.focused, processes.pinned
 
     for process in display_processes:
-
         if process.pid == focused:
             color_type = "cursor"
         elif process.pid in pinned:

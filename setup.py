@@ -51,7 +51,7 @@ setup(
     ],
     extras_require={
         "dev": [
-            "black >= 21.12b0",
+            "black >= 23.1.0",
             "check-manifest",
             "codespell",
             "flake8",
