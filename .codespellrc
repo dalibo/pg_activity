@@ -1,2 +1,2 @@
 [codespell]
-skip = .git,.mypy_cache,.tox,.venv,htmlcov
+skip = .git,.mypy_cache,.tox,.venv,build,htmlcov
