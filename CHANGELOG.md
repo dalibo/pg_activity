@@ -21,6 +21,8 @@
   misspellings.
 * Add Project-URLs core metadata for Python packaging.
 * Install the project in *develop* mode in Tox test environment.
+* Require blessed >= 1.15.0, as earlier versions are not compatible with Python
+  3.7.
 
 ## pg\_activity 3.0.2  - 2023-01-17
 

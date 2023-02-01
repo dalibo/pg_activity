@@ -45,7 +45,7 @@ setup(
     python_requires=">=3.7",
     install_requires=[
         "attrs >= 17, !=21.1",
-        "blessed",
+        "blessed >= 1.15.0",
         "humanize >= 2.6.0",
         "psutil >= 2.0.0",
     ],
