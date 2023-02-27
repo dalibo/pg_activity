@@ -21,7 +21,7 @@ from typing import (
 
 import attr
 import psutil
-from attr import validators, converters
+from attr import validators
 
 from . import compat, colors, utils
 
@@ -908,7 +908,7 @@ class BaseProcess:
     duration: Optional[float]
     state: str
     query: Optional[str]
-    encoding: str = attr.ib(converter=converters.default_if_none("utf-8"))  # type: ignore[misc]
+    encoding: Optional[str]
     query_leader_pid: Optional[int]
     is_parallel_worker: bool
 
@@ -916,15 +916,21 @@ class BaseProcess:
 
     @classmethod
     def from_bytes(
-        cls: Type[_P], *, encoding: Optional[Union[str, bytes]], **kwargs: Any
+        cls: Type[_P],
+        server_encoding: str,
+        *,
+        encoding: Optional[Union[str, bytes]],
+        **kwargs: Any,
     ) -> _P:
         if encoding is None:
-            encoding = "utf-8"
+            enc = server_encoding
         elif isinstance(encoding, bytes):  # psycopg2
-            encoding = encoding.decode()
+            enc = encoding = encoding.decode()
+        else:
+            enc = encoding
         for name, value in kwargs.items():
             if isinstance(value, bytes):
-                kwargs[name] = value.decode(encoding, errors="replace")
+                kwargs[name] = value.decode(enc, errors="replace")
         return cls(encoding=encoding, **kwargs)
 
 

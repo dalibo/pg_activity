@@ -2,6 +2,7 @@ import getpass
 import logging
 import re
 from argparse import Namespace
+from functools import partial
 from typing import Dict, List, Optional
 
 import attr
@@ -68,6 +69,7 @@ class Data:
     pg_conn: Connection
     pg_version: str
     pg_num_version: int
+    server_encoding: str
     min_duration: float
     filters: Filters
     dsn_parameters: Dict[str, str]
@@ -103,10 +105,13 @@ class Data:
             if pg.server_version(pg_conn) >= 130000:
                 pg.execute(pg_conn, queries.get("disable_log_min_duration_sample"))
         pg_version = pg_get_short_version(pg_get_version(pg_conn))
+        server_encoding = pg_conn.info.parameter_status("server_encoding")
+        assert server_encoding is not None
         return cls(
             pg_conn,
             pg_version,
             pg.server_version(pg_conn),
+            server_encoding,
             min_duration=min_duration,
             failed_queries=FailedQueriesInfo(),
             filters=filters,
@@ -412,7 +417,7 @@ class Data:
                 "min_duration": self.min_duration,
                 "dbname_filter": self.filters.dbname,
             },
-            mkrow=RunningProcess.from_bytes,
+            mkrow=partial(RunningProcess.from_bytes, self.server_encoding),
             text_as_bytes=True,
         )
 
@@ -439,7 +444,7 @@ class Data:
                 "min_duration": self.min_duration,
                 "dbname_filter": self.filters.dbname,
             },
-            mkrow=WaitingProcess.from_bytes,
+            mkrow=partial(WaitingProcess.from_bytes, self.server_encoding),
             text_as_bytes=True,
         )
 
@@ -468,7 +473,7 @@ class Data:
                 "min_duration": self.min_duration,
                 "dbname_filter": self.filters.dbname,
             },
-            mkrow=BlockingProcess.from_bytes,
+            mkrow=partial(BlockingProcess.from_bytes, self.server_encoding),
             text_as_bytes=True,
         )
 
