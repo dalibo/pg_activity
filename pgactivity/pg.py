@@ -1,5 +1,17 @@
 import os
-from typing import Any, Dict, List, Sequence, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    List,
+    Optional,
+    Sequence,
+    TypeVar,
+    Union,
+    overload,
+)
+
+Row = TypeVar("Row")
 
 try:
     if "_PGACTIVITY_USE_PSYCOPG2" in os.environ:
@@ -38,21 +50,78 @@ try:
     ) -> None:
         conn.execute(query, args, prepare=True)
 
+    @overload
+    def cursor(conn: Connection, mkrow: Callable[..., Row]) -> psycopg.Cursor[Row]:
+        ...
+
+    @overload
+    def cursor(conn: Connection, mkrow: None) -> psycopg.Cursor[psycopg.rows.DictRow]:
+        ...
+
+    def cursor(
+        conn: Connection, mkrow: Optional[Callable[..., Row]]
+    ) -> Union[psycopg.Cursor[psycopg.rows.DictRow], psycopg.Cursor[Row]]:
+        if mkrow is not None:
+            return conn.cursor(row_factory=psycopg.rows.kwargs_row(mkrow))
+        return conn.cursor()
+
+    @overload
+    def fetchone(
+        conn: Connection,
+        query: Union[str, sql.Composed],
+        args: Union[None, Sequence[Any], Dict[str, Any]] = None,
+        *,
+        mkrow: Callable[..., Row],
+    ) -> Row:
+        ...
+
+    @overload
     def fetchone(
         conn: Connection,
         query: Union[str, sql.Composed],
         args: Union[None, Sequence[Any], Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
-        row = conn.execute(query, args, prepare=True).fetchone()
+        ...
+
+    def fetchone(
+        conn: Connection,
+        query: Union[str, sql.Composed],
+        args: Union[None, Sequence[Any], Dict[str, Any]] = None,
+        *,
+        mkrow: Optional[Callable[..., Row]] = None,
+    ) -> Union[Dict[str, Any], Row]:
+        with cursor(conn, mkrow) as cur:
+            row = cur.execute(query, args, prepare=True).fetchone()
         assert row is not None
         return row
 
+    @overload
+    def fetchall(
+        conn: Connection,
+        query: Union[str, sql.Composed],
+        args: Union[None, Sequence[Any], Dict[str, Any]] = None,
+        *,
+        mkrow: Callable[..., Row],
+    ) -> List[Row]:
+        ...
+
+    @overload
     def fetchall(
         conn: Connection,
         query: Union[str, sql.Composed],
         args: Union[None, Sequence[Any], Dict[str, Any]] = None,
     ) -> List[Dict[str, Any]]:
-        return conn.execute(query, args, prepare=True).fetchall()
+        ...
+
+    def fetchall(
+        conn: Connection,
+        query: Union[str, sql.Composed],
+        args: Union[None, Sequence[Any], Dict[str, Any]] = None,
+        *,
+        mkrow: Optional[Callable[..., Row]] = None,
+    ) -> Union[List[Dict[str, Any]], List[Row]]:
+        with cursor(conn, mkrow) as cur:
+            return cur.execute(query, args, prepare=True).fetchall()
 
 except ImportError:
     import psycopg2
@@ -95,25 +164,34 @@ except ImportError:
         with conn.cursor() as cur:
             cur.execute(query, args)
 
-    def fetchone(
+    def fetchone(  # type: ignore[no-redef]
         conn: Connection,
         query: Union[str, sql.Composed],
         args: Union[None, Sequence[Any], Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
+        *,
+        mkrow: Optional[Callable[..., Row]] = None,
+    ) -> Union[Dict[str, Any], Row]:
         with conn.cursor() as cur:
             cur.execute(query, args)
             row = cur.fetchone()
         assert row is not None
+        if mkrow is not None:
+            return mkrow(**row)
         return row
 
-    def fetchall(
+    def fetchall(  # type: ignore[no-redef]
         conn: Connection,
         query: Union[str, sql.Composed],
         args: Union[None, Sequence[Any], Dict[str, Any]] = None,
-    ) -> List[Dict[str, Any]]:
+        *,
+        mkrow: Optional[Callable[..., Row]] = None,
+    ) -> Union[List[Dict[str, Any]], List[Row]]:
         with conn.cursor() as cur:
             cur.execute(query, args)
-            return cur.fetchall()
+            rows = cur.fetchall()
+        if mkrow is not None:
+            return [mkrow(**row) for row in rows]
+        return rows
 
 
 __all__ = [

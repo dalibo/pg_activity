@@ -207,7 +207,7 @@ class Data:
                 self.pg_conn,
                 sql.SQL("SET statement_timeout TO {}").format(sql.Literal("400ms")),
             )
-            ret = pg.fetchone(self.pg_conn, query)
+            return pg.fetchone(self.pg_conn, query, mkrow=TempFileInfo)
         except pg.InsufficientPrivilege:
             # superuser or pg_read_server_files are required (Issue #278)
             self.failed_queries.temp_file_query_failed = True
@@ -229,8 +229,6 @@ class Data:
             return None
         finally:
             pg.execute(self.pg_conn, queries.get("reset_statement_timeout"))
-
-        return TempFileInfo(**ret)
 
     def pg_get_wal_senders(self) -> Optional[int]:
         """
@@ -407,16 +405,15 @@ class Data:
             min_duration=sql.Literal(self.min_duration),
         )
 
-        ret = pg.fetchall(
+        return pg.fetchall(
             self.pg_conn,
             query,
             {
                 "min_duration": self.min_duration,
                 "dbname_filter": self.filters.dbname,
             },
+            mkrow=RunningProcess,
         )
-
-        return [RunningProcess(**row) for row in ret]
 
     def pg_get_waiting(self, duration_mode: int = 1) -> List[WaitingProcess]:
         """
@@ -434,15 +431,15 @@ class Data:
             min_duration=sql.Literal(self.min_duration),
         )
 
-        ret = pg.fetchall(
+        return pg.fetchall(
             self.pg_conn,
             query,
             {
                 "min_duration": self.min_duration,
                 "dbname_filter": self.filters.dbname,
             },
+            mkrow=WaitingProcess,
         )
-        return [WaitingProcess(**row) for row in ret]
 
     def pg_get_blocking(self, duration_mode: int = 1) -> List[BlockingProcess]:
         """
@@ -462,15 +459,15 @@ class Data:
             min_duration=sql.Literal(self.min_duration),
         )
 
-        ret = pg.fetchall(
+        return pg.fetchall(
             self.pg_conn,
             query,
             {
                 "min_duration": self.min_duration,
                 "dbname_filter": self.filters.dbname,
             },
+            mkrow=BlockingProcess,
         )
-        return [BlockingProcess(**row) for row in ret]
 
     def pg_is_local(self) -> bool:
         """
