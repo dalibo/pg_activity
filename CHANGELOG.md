@@ -14,6 +14,9 @@
 
 ### Fixed
 
+* Rework decoding of the `query` column to (hopefully) make it more robust
+  (see #149 for the original report, #302 for a new problem raised while fixing
+  the previous one and #332 for the latest update).
 * Fix a few typos in the man page.
 
 ### Misc.

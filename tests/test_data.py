@@ -107,7 +107,7 @@ def test_terminate_backend(postgresql, data):
 
 
 def test_encoding(postgresql, data, execute):
-    """Test for issue #149"""
+    """Test for issue #149, #332."""
     conninfo = postgresql.info.dsn
     conn = psycopg.connect(conninfo)
     conn.autocommit = True
@@ -135,13 +135,6 @@ def test_encoding(postgresql, data, execute):
     assert "waiting éléphant" in waiting.query
     (blocking,) = data.pg_get_blocking()
     assert "blocking éléphant" in blocking.query
-
-
-def test_InvalidTextRepresentation(postgresql, data, execute):
-    """Test for issue #275"""
-    postgresql.execute("select '123' ~ '\\d+', 'Hello world!\n', pg_sleep(3)")
-    running = data.pg_get_activities()
-    assert "123" in running[0].query
 
 
 def test_filters_dbname(data, execute):

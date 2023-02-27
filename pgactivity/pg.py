@@ -19,6 +19,7 @@ try:
 
     import psycopg
     from psycopg import sql as sql
+    from psycopg.adapt import Buffer, Loader
     from psycopg.rows import dict_row
     from psycopg.errors import (
         FeatureNotSupported as FeatureNotSupported,
@@ -33,6 +34,12 @@ try:
     __version__ = psycopg.__version__
 
     Connection = psycopg.Connection[Dict[str, Any]]
+
+    class BytesLoader(Loader):
+        def load(self, data: Buffer) -> bytes:
+            if isinstance(data, memoryview):
+                return bytes(data)
+            return data
 
     def connect(*args: Any, **kwargs: Any) -> Connection:
         return psycopg.connect(*args, autocommit=True, row_factory=dict_row, **kwargs)
@@ -51,19 +58,27 @@ try:
         conn.execute(query, args, prepare=True)
 
     @overload
-    def cursor(conn: Connection, mkrow: Callable[..., Row]) -> psycopg.Cursor[Row]:
+    def cursor(
+        conn: Connection, mkrow: Callable[..., Row], text_as_bytes: bool
+    ) -> psycopg.Cursor[Row]:
         ...
 
     @overload
-    def cursor(conn: Connection, mkrow: None) -> psycopg.Cursor[psycopg.rows.DictRow]:
+    def cursor(
+        conn: Connection, mkrow: None, text_as_bytes: bool
+    ) -> psycopg.Cursor[psycopg.rows.DictRow]:
         ...
 
     def cursor(
-        conn: Connection, mkrow: Optional[Callable[..., Row]]
+        conn: Connection, mkrow: Optional[Callable[..., Row]], text_as_bytes: bool
     ) -> Union[psycopg.Cursor[psycopg.rows.DictRow], psycopg.Cursor[Row]]:
         if mkrow is not None:
-            return conn.cursor(row_factory=psycopg.rows.kwargs_row(mkrow))
-        return conn.cursor()
+            cur = conn.cursor(row_factory=psycopg.rows.kwargs_row(mkrow))
+        else:
+            cur = conn.cursor()  # type: ignore[assignment]
+        if text_as_bytes:
+            cur.adapters.register_loader("text", BytesLoader)
+        return cur
 
     @overload
     def fetchone(
@@ -72,6 +87,7 @@ try:
         args: Union[None, Sequence[Any], Dict[str, Any]] = None,
         *,
         mkrow: Callable[..., Row],
+        text_as_bytes: bool = False,
     ) -> Row:
         ...
 
@@ -80,6 +96,8 @@ try:
         conn: Connection,
         query: Union[str, sql.Composed],
         args: Union[None, Sequence[Any], Dict[str, Any]] = None,
+        *,
+        text_as_bytes: bool = False,
     ) -> Dict[str, Any]:
         ...
 
@@ -89,8 +107,9 @@ try:
         args: Union[None, Sequence[Any], Dict[str, Any]] = None,
         *,
         mkrow: Optional[Callable[..., Row]] = None,
+        text_as_bytes: bool = False,
     ) -> Union[Dict[str, Any], Row]:
-        with cursor(conn, mkrow) as cur:
+        with cursor(conn, mkrow, text_as_bytes) as cur:
             row = cur.execute(query, args, prepare=True).fetchone()
         assert row is not None
         return row
@@ -102,6 +121,7 @@ try:
         args: Union[None, Sequence[Any], Dict[str, Any]] = None,
         *,
         mkrow: Callable[..., Row],
+        text_as_bytes: bool = False,
     ) -> List[Row]:
         ...
 
@@ -110,6 +130,8 @@ try:
         conn: Connection,
         query: Union[str, sql.Composed],
         args: Union[None, Sequence[Any], Dict[str, Any]] = None,
+        *,
+        text_as_bytes: bool = False,
     ) -> List[Dict[str, Any]]:
         ...
 
@@ -118,13 +140,15 @@ try:
         query: Union[str, sql.Composed],
         args: Union[None, Sequence[Any], Dict[str, Any]] = None,
         *,
+        text_as_bytes: bool = False,
         mkrow: Optional[Callable[..., Row]] = None,
     ) -> Union[List[Dict[str, Any]], List[Row]]:
-        with cursor(conn, mkrow) as cur:
+        with cursor(conn, mkrow, text_as_bytes) as cur:
             return cur.execute(query, args, prepare=True).fetchall()
 
 except ImportError:
     import psycopg2
+    import psycopg2.extensions
     from psycopg2.extras import DictCursor
     from psycopg2 import sql as sql  # type: ignore[no-redef]
     from psycopg2.errors import (  # type: ignore[no-redef]
@@ -170,8 +194,11 @@ except ImportError:
         args: Union[None, Sequence[Any], Dict[str, Any]] = None,
         *,
         mkrow: Optional[Callable[..., Row]] = None,
+        text_as_bytes: bool = False,
     ) -> Union[Dict[str, Any], Row]:
         with conn.cursor() as cur:
+            if text_as_bytes:
+                psycopg2.extensions.register_type(psycopg2.extensions.BYTES, cur)
             cur.execute(query, args)
             row = cur.fetchone()
         assert row is not None
@@ -185,8 +212,11 @@ except ImportError:
         args: Union[None, Sequence[Any], Dict[str, Any]] = None,
         *,
         mkrow: Optional[Callable[..., Row]] = None,
+        text_as_bytes: bool = False,
     ) -> Union[List[Dict[str, Any]], List[Row]]:
         with conn.cursor() as cur:
+            if text_as_bytes:
+                psycopg2.extensions.register_type(psycopg2.extensions.BYTES, cur)
             cur.execute(query, args)
             rows = cur.fetchall()
         if mkrow is not None:

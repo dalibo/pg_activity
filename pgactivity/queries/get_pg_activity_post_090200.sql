@@ -13,7 +13,7 @@ SELECT
       a.waiting AS wait,
       a.usename AS user,
       a.state AS state,
-      convert_from(replace(a.query, '\', '\\')::bytea, coalesce(pg_catalog.pg_encoding_to_char(b.encoding), 'UTF8')) AS query,
+      a.query AS query,
       pg_catalog.pg_encoding_to_char(b.encoding) AS encoding,
       NULL AS query_leader_pid,
       false AS is_parallel_worker

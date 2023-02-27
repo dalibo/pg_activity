@@ -14,6 +14,7 @@ from typing import (
     overload,
     Sequence,
     Tuple,
+    Type,
     TypeVar,
     Union,
 )
@@ -910,6 +911,21 @@ class BaseProcess:
     encoding: str = attr.ib(converter=converters.default_if_none("utf-8"))  # type: ignore[misc]
     query_leader_pid: Optional[int]
     is_parallel_worker: bool
+
+    _P = TypeVar("_P", bound="BaseProcess")
+
+    @classmethod
+    def from_bytes(
+        cls: Type[_P], *, encoding: Optional[Union[str, bytes]], **kwargs: Any
+    ) -> _P:
+        if encoding is None:
+            encoding = "utf-8"
+        elif isinstance(encoding, bytes):  # psycopg2
+            encoding = encoding.decode()
+        for name, value in kwargs.items():
+            if isinstance(value, bytes):
+                kwargs[name] = value.decode(encoding, errors="replace")
+        return cls(encoding=encoding, **kwargs)
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)

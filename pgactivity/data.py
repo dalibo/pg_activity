@@ -412,7 +412,8 @@ class Data:
                 "min_duration": self.min_duration,
                 "dbname_filter": self.filters.dbname,
             },
-            mkrow=RunningProcess,
+            mkrow=RunningProcess.from_bytes,
+            text_as_bytes=True,
         )
 
     def pg_get_waiting(self, duration_mode: int = 1) -> List[WaitingProcess]:
@@ -438,7 +439,8 @@ class Data:
                 "min_duration": self.min_duration,
                 "dbname_filter": self.filters.dbname,
             },
-            mkrow=WaitingProcess,
+            mkrow=WaitingProcess.from_bytes,
+            text_as_bytes=True,
         )
 
     def pg_get_blocking(self, duration_mode: int = 1) -> List[BlockingProcess]:
@@ -466,7 +468,8 @@ class Data:
                 "min_duration": self.min_duration,
                 "dbname_filter": self.filters.dbname,
             },
-            mkrow=BlockingProcess,
+            mkrow=BlockingProcess.from_bytes,
+            text_as_bytes=True,
         )
 
     def pg_is_local(self) -> bool:

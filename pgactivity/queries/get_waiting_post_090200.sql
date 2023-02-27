@@ -16,7 +16,7 @@ SELECT
       pg_locks.relation::regclass AS relation,
       EXTRACT(epoch FROM (NOW() - a.{duration_column})) AS duration,
       a.state as state,
-      convert_from(replace(a.query, '\', '\\')::bytea, coalesce(pg_catalog.pg_encoding_to_char(b.encoding), 'UTF8')) AS query,
+      a.query AS query,
       pg_catalog.pg_encoding_to_char(b.encoding) AS encoding
   FROM
       pg_catalog.pg_locks
