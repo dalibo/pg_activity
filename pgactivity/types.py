@@ -20,7 +20,7 @@ from typing import (
 
 import attr
 import psutil
-from attr import validators
+from attr import validators, converters
 
 from . import compat, colors, utils
 
@@ -907,6 +907,7 @@ class BaseProcess:
     duration: Optional[float]
     state: str
     query: Optional[str]
+    encoding: str = attr.ib(converter=converters.default_if_none("utf-8"))  # type: ignore[misc]
     query_leader_pid: Optional[int]
     is_parallel_worker: bool
 

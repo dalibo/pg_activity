@@ -13,6 +13,7 @@ SELECT
       a.usename AS user,
       a.state AS state,
       convert_from(replace(a.query, '\', '\\')::bytea, coalesce(pg_catalog.pg_encoding_to_char(b.encoding), 'UTF8')) AS query,
+      pg_catalog.pg_encoding_to_char(b.encoding) AS encoding,
       coalesce(a.leader_pid, a.pid) AS query_leader_pid,
       a.backend_type = 'parallel worker' AS is_parallel_worker
  FROM

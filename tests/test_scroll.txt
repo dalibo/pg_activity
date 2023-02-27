@@ -18,6 +18,7 @@ Tests scrolling in processes_rows()
 ...         client="local",
 ...         state="active",
 ...         query=f"SELECT {x}",
+...         encoding=None,
 ...         duration=0.0,
 ...         wait=False,
 ...         query_leader_pid=x,

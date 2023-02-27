@@ -19,6 +19,7 @@ SELECT
           THEN NULL
           ELSE convert_from(replace(sq.query, '\', '\\')::bytea, coalesce(pg_catalog.pg_encoding_to_char(b.encoding), 'UTF8'))
       END AS query,
+      pg_catalog.pg_encoding_to_char(b.encoding) AS encoding,
       waiting AS wait
   FROM
       (

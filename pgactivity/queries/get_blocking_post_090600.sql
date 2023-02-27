@@ -12,6 +12,7 @@ SELECT
       duration,
       state,
       convert_from(replace(sq.query, '\', '\\')::bytea, coalesce(pg_catalog.pg_encoding_to_char(b.encoding), 'UTF8')) AS query,
+      pg_catalog.pg_encoding_to_char(b.encoding) AS encoding,
       wait_event as wait
   FROM
       (
