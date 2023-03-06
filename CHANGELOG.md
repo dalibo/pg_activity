@@ -1,5 +1,12 @@
 # Change log
 
+## pg\_activity 3.1.1 - 2023-03-06
+
+### Fixed
+
+* Fix crash on startup with no "connection string" argument and the psycopg
+  backend #346.
+
 ## pg\_activity 3.1.0 - 2023-03-01
 
 ### Added

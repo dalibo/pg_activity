@@ -185,6 +185,7 @@ def get_parser() -> ArgumentParser:
             "'host=HOSTNAME port=PORT user=USER dbname=DBNAME'."
         ),
         nargs="?",
+        default="",
         metavar="connection string",
     )
     # -h / --host
