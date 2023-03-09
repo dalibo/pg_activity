@@ -41,8 +41,8 @@ try:
                 return bytes(data)
             return data
 
-    def connect(*args: Any, **kwargs: Any) -> Connection:
-        return psycopg.connect(*args, autocommit=True, row_factory=dict_row, **kwargs)
+    def connect(dsn: str, **kwargs: Any) -> Connection:
+        return psycopg.connect(dsn, autocommit=True, row_factory=dict_row, **kwargs)
 
     def server_version(conn: Connection) -> int:
         return conn.info.server_version
@@ -165,12 +165,12 @@ except ImportError:
 
     __version__ = psycopg2.__version__
 
-    def connect(*args: Any, **kwargs: Any) -> Connection:
+    def connect(dsn: str, **kwargs: Any) -> Connection:
         try:
             kwargs.setdefault("database", kwargs.pop("dbname"))
         except KeyError:
             pass
-        conn = psycopg2.connect(*args, cursor_factory=DictCursor, **kwargs)
+        conn = psycopg2.connect(dsn, cursor_factory=DictCursor, **kwargs)
         conn.autocommit = True
         return conn  # type: ignore[no-any-return]
 
