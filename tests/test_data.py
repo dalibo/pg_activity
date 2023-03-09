@@ -3,7 +3,6 @@ import time
 import attr
 import pytest
 import psycopg
-from psycopg.conninfo import make_conninfo
 from psycopg.errors import WrongObjectType
 
 from pgactivity import types
@@ -109,21 +108,24 @@ def test_terminate_backend(postgresql, data):
 def test_encoding(postgresql, data, execute):
     """Test for issue #149, #332."""
     conninfo = postgresql.info.dsn
-    conn = psycopg.connect(conninfo)
-    conn.autocommit = True
-    # plateform specific locales (,Centos, Ubuntu)
-    for encoding in ["fr_FR.latin1", "fr_FR.88591", "fr_FR.8859-1"]:
-        try:
-            conn.execute(
-                f"CREATE DATABASE latin1 ENCODING 'latin1' TEMPLATE template0 LC_COLLATE '{encoding}' LC_CTYPE '{encoding}'"
-            )
-        except WrongObjectType:
-            continue
+    # plateform specific locales (Centos, Ubuntu)
+    encodings = ["fr_FR.latin1", "fr_FR.88591", "fr_FR.8859-1"]
+    with psycopg.connect(conninfo, autocommit=True) as conn:
+        for encoding in encodings:
+            try:
+                conn.execute(
+                    f"CREATE DATABASE latin1 ENCODING 'latin1' TEMPLATE template0 LC_COLLATE '{encoding}' LC_CTYPE '{encoding}'"
+                )
+            except WrongObjectType:
+                continue
+            else:
+                break
         else:
-            break
+            pytest.fail(
+                f"could not create a database with encoding amongst {', '.join(encodings)}"
+            )
 
-    conninfo = make_conninfo(conninfo, dbname="latin1")
-    with psycopg.connect(conninfo) as conn:
+    with psycopg.connect(conninfo, dbname="latin1") as conn:
         conn.execute("CREATE TABLE tbl AS (SELECT 'initilialized éléphant' s)")
         conn.commit()
 
@@ -132,9 +134,9 @@ def test_encoding(postgresql, data, execute):
     running = wait_for_data(data.pg_get_activities, msg="could not fetch activities")
     assert "blocking éléphant" in running[0].query
     (waiting,) = wait_for_data(data.pg_get_waiting, "no waiting process")
-    assert "waiting éléphant" in waiting.query
+    assert waiting.query and "waiting éléphant" in waiting.query
     (blocking,) = data.pg_get_blocking()
-    assert "blocking éléphant" in blocking.query
+    assert blocking.query and "blocking éléphant" in blocking.query
 
 
 def test_filters_dbname(data, execute):
