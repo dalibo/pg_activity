@@ -5,6 +5,7 @@ from typing import Any, List, Optional
 
 import psycopg
 from psycopg.conninfo import make_conninfo
+from psycopg import sql
 import psycopg.errors
 import pytest
 
@@ -21,6 +22,38 @@ def pytest_report_header(config: Any) -> List[str]:
 @pytest.fixture(scope="session")
 def datadir() -> pathlib.Path:
     return pathlib.Path(__file__).parent / "data"
+
+
+@pytest.fixture
+def database_factory(postgresql):
+    dbnames = set()
+
+    def createdb(dbname: str, encoding: str, locale: Optional[str] = None) -> None:
+        with psycopg.connect(postgresql.info.dsn, autocommit=True) as conn:
+            qs = sql.SQL(
+                "CREATE DATABASE {dbname} ENCODING {encoding} TEMPLATE template0"
+            ).format(dbname=sql.Identifier(dbname), encoding=sql.Identifier(encoding))
+            if locale:
+                qs = sql.SQL(" ").join(
+                    [
+                        qs,
+                        sql.SQL("LOCALE {locale}").format(
+                            locale=sql.Identifier(locale)
+                        ),
+                    ]
+                )
+            conn.execute(qs)
+        dbnames.add(dbname)
+
+    yield createdb
+
+    with psycopg.connect(postgresql.info.dsn, autocommit=True) as conn:
+        for dbname in dbnames:
+            conn.execute(
+                sql.SQL("DROP DATABASE IF EXISTS {dbname} WITH (FORCE)").format(
+                    dbname=sql.Identifier(dbname)
+                )
+            )
 
 
 @pytest.fixture

@@ -153,6 +153,28 @@ def test_client_encoding(postgresql, encoding: str) -> None:
     )
 
 
+@pytest.mark.parametrize(
+    "pyenc, pgenc",
+    [
+        ("utf8", "UTF8"),
+        pytest.param("ascii", "SQL_ASCII", marks=pytest.mark.xfail),
+    ],
+)
+def test_postgres_and_python_encoding(
+    database_factory, pyenc: str, pgenc: str, data, postgresql
+) -> None:
+    dbname = pyenc
+    database_factory(dbname, encoding=pgenc)
+    with psycopg.connect(
+        postgresql.info.dsn, dbname=dbname, client_encoding="utf-8"
+    ) as conn:
+        conn.execute("SELECT 'encoding'")
+        (running,) = data.pg_get_activities()
+    assert "'encoding'" in running.query
+    assert running.encoding == pgenc
+    assert running.database == dbname
+
+
 def test_filters_dbname(data, execute):
     data_filtered = attr.evolve(data, filters=types.Filters(dbname="temp"))
     execute("SELECT pg_sleep(2)", dbname="template1", autocommit=True)
