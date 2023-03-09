@@ -36,7 +36,7 @@ Global :
 
 =item - B<dbs size>: total size of the databases (filtered);
 
-=item - B<growth>: groth in B/s of the databases (filtered);
+=item - B<growth>: growth in B/s of the databases (filtered);
 
 =item - B<cache hit ratio>: the percentage of page read from the PostgreSQL's cache since last snapshot (filtered).
 

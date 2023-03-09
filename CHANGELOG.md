@@ -1,5 +1,11 @@
 # Change log
 
+## pg\_activity 3.1.2 - UNRELEASED
+
+### Fixed
+
+* Fix typos in man pages, spotted by codespell.
+
 ## pg\_activity 3.1.1 - 2023-03-06
 
 ### Fixed
