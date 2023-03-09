@@ -139,9 +139,7 @@ def test_encoding(postgresql, data, execute):
     assert blocking.query and "blocking éléphant" in blocking.query
 
 
-@pytest.mark.parametrize(
-    "encoding", ["utf-8", "latin1", pytest.param("sql_ascii", marks=pytest.mark.xfail)]
-)
+@pytest.mark.parametrize("encoding", ["utf-8", "latin1", "sql_ascii"])
 def test_client_encoding(postgresql, encoding: str) -> None:
     data = Data.pg_connect(
         host=postgresql.info.host,

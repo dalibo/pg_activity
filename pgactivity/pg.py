@@ -1,3 +1,4 @@
+import logging
 import os
 from typing import (
     Any,
@@ -42,13 +43,29 @@ try:
                 return bytes(data)
             return data
 
+    class AutoTextLoader(Loader):
+        def load(self, data: Buffer) -> str:
+            if not isinstance(data, bytes):
+                data = bytes(data)
+            return data.decode(errors="replace")
+
     def connect(dsn: str, **kwargs: Any) -> Connection:
         # Set client_encoding to 'auto', if unset by the user.
         # This is (more or less) what's done by psql.
         conninfo = conninfo_to_dict(dsn)
         conninfo.setdefault("client_encoding", "auto")
         dsn = make_conninfo(**conninfo)
-        return psycopg.connect(dsn, autocommit=True, row_factory=dict_row, **kwargs)
+        conn = psycopg.connect(dsn, autocommit=True, row_factory=dict_row, **kwargs)
+        if conn.info.encoding == "ascii":
+            # If client encoding is still 'ascii', fall back to a loader with a replace
+            # policy.
+            logging.getLogger("pgactivity").warning(
+                "client encoding is 'ascii', using a fallback loader for character types"
+            )
+            conn.adapters.register_loader("text", AutoTextLoader)
+            conn.adapters.register_loader("varchar", AutoTextLoader)
+            conn.adapters.register_loader('"char"', AutoTextLoader)
+        return conn
 
     def server_version(conn: Connection) -> int:
         return conn.info.server_version
