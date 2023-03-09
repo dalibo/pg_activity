@@ -139,6 +139,22 @@ def test_encoding(postgresql, data, execute):
     assert blocking.query and "blocking éléphant" in blocking.query
 
 
+@pytest.mark.parametrize(
+    "encoding", ["utf-8", "latin1", pytest.param("sql_ascii", marks=pytest.mark.xfail)]
+)
+def test_client_encoding(postgresql, encoding: str) -> None:
+    data = Data.pg_connect(
+        host=postgresql.info.host,
+        port=postgresql.info.port,
+        database=postgresql.info.dbname,
+        user=postgresql.info.user,
+        dsn=f"client_encoding={encoding}",
+    )
+    assert data.pg_version.startswith(
+        f"PostgreSQL {str(postgresql.info.server_version)[:2]}"
+    )
+
+
 def test_filters_dbname(data, execute):
     data_filtered = attr.evolve(data, filters=types.Filters(dbname="temp"))
     execute("SELECT pg_sleep(2)", dbname="template1", autocommit=True)
