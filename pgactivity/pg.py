@@ -20,10 +20,12 @@ try:
 
     import psycopg
     from psycopg import sql as sql
+    from psycopg._encodings import pg2pyenc
     from psycopg.adapt import Buffer, Loader
     from psycopg.conninfo import make_conninfo, conninfo_to_dict
     from psycopg.rows import dict_row
     from psycopg.errors import (
+        NotSupportedError,
         FeatureNotSupported as FeatureNotSupported,
         InterfaceError as InterfaceError,
         InvalidPassword as InvalidPassword,
@@ -170,7 +172,19 @@ try:
         with cursor(conn, mkrow, text_as_bytes) as cur:
             return cur.execute(query, args, prepare=True).fetchall()
 
+    def decode(value: bytes, pgenc: bytes, *, errors: str) -> str:
+        """Decode 'value' with PostgreSQL encoding 'pgenc' converted to Python encoding
+        name if available.
+        """
+        try:
+            pyenc = pg2pyenc(pgenc)
+        except NotSupportedError:
+            pyenc = "utf-8"
+        return value.decode(pyenc, errors=errors)
+
 except ImportError:
+    import codecs
+
     import psycopg2
     import psycopg2.extensions
     from psycopg2.extras import DictCursor
@@ -247,6 +261,16 @@ except ImportError:
             return [mkrow(**row) for row in rows]
         return rows
 
+    def decode(value: bytes, pgenc: bytes, *, errors: str) -> str:
+        """Decode 'value' with PostgreSQL encoding 'pgenc' converted to Python encoding
+        name if available.
+        """
+        try:
+            pyenc = codecs.lookup(pgenc.decode()).name
+        except LookupError:
+            pyenc = "utf-8"
+        return value.decode(pyenc, errors=errors)
+
 
 __all__ = [
     "__version__",
@@ -260,6 +284,7 @@ __all__ = [
     "QueryCanceled",
     "connect",
     "connection_parameters",
+    "decode",
     "execute",
     "fetchall",
     "fetchone",

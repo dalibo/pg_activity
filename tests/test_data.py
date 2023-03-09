@@ -1,4 +1,5 @@
 import time
+from typing import Optional
 
 import attr
 import pytest
@@ -154,17 +155,18 @@ def test_client_encoding(postgresql, encoding: str) -> None:
 
 
 @pytest.mark.parametrize(
-    "pyenc, pgenc",
+    "pyenc, pgenc, locale",
     [
-        ("utf8", "UTF8"),
-        pytest.param("ascii", "SQL_ASCII", marks=pytest.mark.xfail),
+        ("utf8", "UTF8", None),
+        ("ascii", "SQL_ASCII", None),
+        ("unknown", "EUC_TW", "zh_TW.euctw"),
     ],
 )
 def test_postgres_and_python_encoding(
-    database_factory, pyenc: str, pgenc: str, data, postgresql
+    database_factory, pyenc: str, pgenc: str, locale: Optional[str], data, postgresql
 ) -> None:
     dbname = pyenc
-    database_factory(dbname, encoding=pgenc)
+    database_factory(dbname, encoding=pgenc, locale=locale)
     with psycopg.connect(
         postgresql.info.dsn, dbname=dbname, client_encoding="utf-8"
     ) as conn:

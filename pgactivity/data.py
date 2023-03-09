@@ -69,7 +69,7 @@ class Data:
     pg_conn: Connection
     pg_version: str
     pg_num_version: int
-    server_encoding: str
+    server_encoding: bytes
     min_duration: float
     filters: Filters
     dsn_parameters: Dict[str, str]
@@ -111,7 +111,7 @@ class Data:
             pg_conn,
             pg_version,
             pg.server_version(pg_conn),
-            server_encoding,
+            server_encoding.encode(),
             min_duration=min_duration,
             failed_queries=FailedQueriesInfo(),
             filters=filters,

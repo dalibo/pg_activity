@@ -23,7 +23,7 @@ import attr
 import psutil
 from attr import validators
 
-from . import compat, colors, utils
+from . import compat, colors, utils, pg
 
 
 class Pct(float):
@@ -917,7 +917,7 @@ class BaseProcess:
     @classmethod
     def from_bytes(
         cls: Type[_P],
-        server_encoding: str,
+        server_encoding: bytes,
         *,
         encoding: Optional[Union[str, bytes]],
         **kwargs: Any,
@@ -925,12 +925,12 @@ class BaseProcess:
         if encoding is None:
             enc = server_encoding
         elif isinstance(encoding, bytes):  # psycopg2
-            enc = encoding = encoding.decode()
-        else:
-            enc = encoding
+            enc, encoding = encoding, encoding.decode()
+        elif isinstance(encoding, str):
+            enc = encoding.encode()
         for name, value in kwargs.items():
             if isinstance(value, bytes):
-                kwargs[name] = value.decode(enc, errors="replace")
+                kwargs[name] = pg.decode(value, enc, errors="replace")
         return cls(encoding=encoding, **kwargs)
 
 

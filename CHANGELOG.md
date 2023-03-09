@@ -1,8 +1,12 @@
 # Change log
 
-## pg\_activity 3.1.2 - UNRELEASED
+## pg\_activity 3.2.0 - UNRELEASED
 
 ### Fixed
+
+* Handle conversion between PostgreSQL encoding names and Python ones while
+  decoding the `query` column from `pg_stat_activity` with
+  `pg_database.encoding` (#348).
 
 * Fix typos in man pages, spotted by codespell.
 

@@ -24,9 +24,9 @@ jobs:
           python-version: ${{ matrix.python }}
       - name: Install tox
         run: pip install tox
-      - name: Add fr_FR ISO-8859-1 for test purposes
+      - name: Add fr_FR and zh_TW for test purposes
         run: |
-           sudo locale-gen fr_FR
+           sudo locale-gen fr_FR zh_TW.EUC-TW
            sudo update-locale
       - name: Test
         run: tox -e py-${{ matrix.psycopg }}
