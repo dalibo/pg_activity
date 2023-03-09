@@ -20,6 +20,7 @@ try:
     import psycopg
     from psycopg import sql as sql
     from psycopg.adapt import Buffer, Loader
+    from psycopg.conninfo import make_conninfo, conninfo_to_dict
     from psycopg.rows import dict_row
     from psycopg.errors import (
         FeatureNotSupported as FeatureNotSupported,
@@ -42,6 +43,11 @@ try:
             return data
 
     def connect(dsn: str, **kwargs: Any) -> Connection:
+        # Set client_encoding to 'auto', if unset by the user.
+        # This is (more or less) what's done by psql.
+        conninfo = conninfo_to_dict(dsn)
+        conninfo.setdefault("client_encoding", "auto")
+        dsn = make_conninfo(**conninfo)
         return psycopg.connect(dsn, autocommit=True, row_factory=dict_row, **kwargs)
 
     def server_version(conn: Connection) -> int:

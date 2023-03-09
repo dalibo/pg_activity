@@ -6,6 +6,13 @@
 
 * Fix typos in man pages, spotted by codespell.
 
+### Added
+
+* When using the psycopg backend, set `client_encoding` to `auto` if unspecified
+  in the connection string. This will help getting the appropriate client
+  encoding from locale settings, even if the connection database has a different
+  one.
+
 ## pg\_activity 3.1.1 - 2023-03-06
 
 ### Fixed
