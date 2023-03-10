@@ -17,14 +17,13 @@ def configure_logger(debug_file: Optional[str] = None) -> StringIO:
     logger = logging.getLogger("pgactivity")
     logger.setLevel(logging.DEBUG)
 
-    # The steamhandler is used to print hints to the user at exit.
-    # The INFO log level is reserved for this.
+    # The steamhandler is used to print all messages at exit.
     memory_string = StringIO()
     c_handler = logging.StreamHandler(memory_string)
     c_handler.setLevel(logging.INFO)
     c_handler.name = "stream_handler"
 
-    c_format = logging.Formatter("Hint - %(message)s")
+    c_format = logging.Formatter("%(levelname)s - %(message)s")
     c_handler.setFormatter(c_format)
 
     logger.addHandler(c_handler)

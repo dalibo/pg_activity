@@ -21,6 +21,9 @@
 * Add compatibility with old humanize (>= 0.5.1), to make packaging easier on
   old platforms such as RHEL 8.
 
+* Adjust log messages prefix, removing the "Hint" word and adding the level
+  name, as we now emit messages for different purposes.
+
 ## pg\_activity 3.1.1 - 2023-03-06
 
 ### Fixed
