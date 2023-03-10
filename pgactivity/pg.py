@@ -50,11 +50,12 @@ try:
             return data.decode(errors="replace")
 
     def connect(dsn: str, **kwargs: Any) -> Connection:
-        # Set client_encoding to 'auto', if unset by the user.
-        # This is (more or less) what's done by psql.
-        conninfo = conninfo_to_dict(dsn)
-        conninfo.setdefault("client_encoding", "auto")
-        dsn = make_conninfo(**conninfo)
+        if "PGCLIENTENCODING" not in os.environ:
+            # Set client_encoding to 'auto', if not set by the user.
+            # This is (more or less) what's done by psql.
+            conninfo = conninfo_to_dict(dsn)
+            conninfo.setdefault("client_encoding", "auto")
+            dsn = make_conninfo(**conninfo)
         conn = psycopg.connect(dsn, autocommit=True, row_factory=dict_row, **kwargs)
         if conn.info.encoding == "ascii":
             # If client encoding is still 'ascii', fall back to a loader with a replace
