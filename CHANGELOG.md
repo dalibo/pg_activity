@@ -16,6 +16,11 @@
 * Fall back to a permissive-but-hopefully-more-robust loader for character type
   values if client encoding is really `ascii`, when using the psycopg backend.
 
+### Misc.
+
+* Add compatibility with old humanize (>= 0.5.1), to make packaging easier on
+  old platforms such as RHEL 8.
+
 ## pg\_activity 3.1.1 - 2023-03-06
 
 ### Fixed

@@ -8,12 +8,29 @@ import humanize
 
 
 naturalsize = functools.partial(humanize.naturalsize, gnu=True, format="%.2f")
-naturaltimedelta = functools.partial(
-    humanize.precisedelta,
-    minimum_unit="minutes",
-    format="%.0f",
-    suppress=["months", "years"],
-)
+try:
+    precisedelta = humanize.precisedelta
+except AttributeError:  # humanize < 2.6
+
+    def naturaltimedelta(d: timedelta) -> str:
+        """Render a timedelta with seconds truncated.
+
+        >>> d = timedelta(days=5, seconds=15182, microseconds=129198)
+        >>> naturaltimedelta(d)
+        '5 days, 4:13:00'
+        >>> str(d)
+        '5 days, 4:13:02.129198'
+        """
+        d = timedelta(days=d.days, seconds=d.seconds // 60 * 60)
+        return str(d)
+
+else:
+    naturaltimedelta = functools.partial(
+        humanize.precisedelta,
+        minimum_unit="minutes",
+        format="%.0f",
+        suppress=["months", "years"],
+    )
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
