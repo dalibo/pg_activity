@@ -123,11 +123,11 @@ Remote host:
 ...        system_info=None, pg_version="PostgreSQL 9.6",
 ...        width=200)
 PostgreSQL 9.6 - server - pgadm@server.prod.tld:5433/app - Ref.: 10s - Duration mode: backend
- * Global: 132 days, 3 hours and 21 minutes uptime ⋅ 19.53M dbs size - 1.00K/s growth ⋅ 90.12% cache hit ratio
-   Sessions: 6/100 total ⋅ 1 active ⋅ 1 idle ⋅ 10 idle in txn ⋅ 0 idle in txn abrt ⋅ 3 waiting
-   Activity: 15 tps ⋅ 10 insert/s ⋅ 20 update/s ⋅ 30 delete/s ⋅ 40 tuples returned/s ⋅ 5 temp files ⋅ 11.50M temp size
- * Worker processes: 3/8 total ⋅ 1/8 logical workers ⋅ 2/8 parallel workers
-   Other processes & info: 3/3 autovacuum workers ⋅ 1/10 wal senders ⋅ 0 wal receivers ⋅ 10/10 repl. slots
+ * Global: 132 days, 3 hours and 21 minutes uptime, 19.53M dbs size - 1.00K/s growth, 90.12% cache hit ratio
+   Sessions: 6/100 total, 1 active, 1 idle, 10 idle in txn, 0 idle in txn abrt, 3 waiting
+   Activity: 15 tps, 10 insert/s, 20 update/s, 30 delete/s, 40 tuples returned/s, 5 temp files, 11.50M temp size
+ * Worker processes: 3/8 total, 1/8 logical workers, 2/8 parallel workers
+   Other processes & info: 3/3 autovacuum workers, 1/10 wal senders, 0 wal receivers, 10/10 repl. slots
 
 Local host, with privileged access:
 
@@ -143,14 +143,14 @@ Local host, with privileged access:
 ...        system_info=sysinfo, pg_version="PostgreSQL 9.6",
 ...        width=200)
 PostgreSQL 9.6 - localhost - tester@host:5432/postgres - Ref.: 10s - Duration mode: backend
- * Global: 132 days, 3 hours and 21 minutes uptime ⋅ 19.53M dbs size - 1.00K/s growth ⋅ 90.12% cache hit ratio
-   Sessions: 6/100 total ⋅ 1 active ⋅ 1 idle ⋅ 10 idle in txn ⋅ 0 idle in txn abrt ⋅ 3 waiting
-   Activity: 15 tps ⋅ 10 insert/s ⋅ 20 update/s ⋅ 30 delete/s ⋅ 40 tuples returned/s ⋅ 5 temp files ⋅ 11.50M temp size
- * Worker processes: 3/8 total ⋅ 1/8 logical workers ⋅ 2/8 parallel workers
-   Other processes & info: 3/3 autovacuum workers ⋅ 1/10 wal senders ⋅ 0 wal receivers ⋅ 10/10 repl. slots
- * Mem.: 8B total ⋅ 2B (25.00%) free ⋅ 2B (25.00%) used ⋅ 4B (50.00%) buff+cached
-   Swap: 2B total ⋅ 1B (50.00%) free ⋅ 1B (50.00%) used
-   IO: 300/s max iops ⋅ 200B/s - 100/s read ⋅ 300B/s - 200/s write
+ * Global: 132 days, 3 hours and 21 minutes uptime, 19.53M dbs size - 1.00K/s growth, 90.12% cache hit ratio
+   Sessions: 6/100 total, 1 active, 1 idle, 10 idle in txn, 0 idle in txn abrt, 3 waiting
+   Activity: 15 tps, 10 insert/s, 20 update/s, 30 delete/s, 40 tuples returned/s, 5 temp files, 11.50M temp size
+ * Worker processes: 3/8 total, 1/8 logical workers, 2/8 parallel workers
+   Other processes & info: 3/3 autovacuum workers, 1/10 wal senders, 0 wal receivers, 10/10 repl. slots
+ * Mem.: 8B total, 2B (25.00%) free, 2B (25.00%) used, 4B (50.00%) buff+cached
+   Swap: 2B total, 1B (50.00%) free, 1B (50.00%) used
+   IO: 300/s max iops, 200B/s - 100/s read, 300B/s - 200/s write
    Load average: 1 5 15
 
 >>> ui.toggle_system_info_in_header()
@@ -158,11 +158,11 @@ PostgreSQL 9.6 - localhost - tester@host:5432/postgres - Ref.: 10s - Duration mo
 ...        system_info=sysinfo, pg_version="PostgreSQL 9.6",
 ...        width=200)
 PostgreSQL 9.6 - localhost - tester@host:5432/postgres - Ref.: 10s - Duration mode: backend
- * Global: 132 days, 3 hours and 21 minutes uptime ⋅ 19.53M dbs size - 1.00K/s growth ⋅ 90.12% cache hit ratio
-   Sessions: 6/100 total ⋅ 1 active ⋅ 1 idle ⋅ 10 idle in txn ⋅ 0 idle in txn abrt ⋅ 3 waiting
-   Activity: 15 tps ⋅ 10 insert/s ⋅ 20 update/s ⋅ 30 delete/s ⋅ 40 tuples returned/s ⋅ 5 temp files ⋅ 11.50M temp size
- * Worker processes: 3/8 total ⋅ 1/8 logical workers ⋅ 2/8 parallel workers
-   Other processes & info: 3/3 autovacuum workers ⋅ 1/10 wal senders ⋅ 0 wal receivers ⋅ 10/10 repl. slots
+ * Global: 132 days, 3 hours and 21 minutes uptime, 19.53M dbs size - 1.00K/s growth, 90.12% cache hit ratio
+   Sessions: 6/100 total, 1 active, 1 idle, 10 idle in txn, 0 idle in txn abrt, 3 waiting
+   Activity: 15 tps, 10 insert/s, 20 update/s, 30 delete/s, 40 tuples returned/s, 5 temp files, 11.50M temp size
+ * Worker processes: 3/8 total, 1/8 logical workers, 2/8 parallel workers
+   Other processes & info: 3/3 autovacuum workers, 1/10 wal senders, 0 wal receivers, 10/10 repl. slots
 
 >>> ui = UI.make(refresh_time=10, duration_mode=DurationMode.query)
 >>> ui.toggle_system_info_in_header()
@@ -171,9 +171,9 @@ PostgreSQL 9.6 - localhost - tester@host:5432/postgres - Ref.: 10s - Duration mo
 ...        system_info=sysinfo, pg_version="PostgreSQL 9.6",
 ...        width=200)
 PostgreSQL 9.6 - localhost - tester@host:5432/postgres - Ref.: 10s - Duration mode: query
- * Global: 132 days, 3 hours and 21 minutes uptime ⋅ 19.53M dbs size - 1.00K/s growth ⋅ 90.12% cache hit ratio
-   Sessions: 6/100 total ⋅ 1 active ⋅ 1 idle ⋅ 10 idle in txn ⋅ 0 idle in txn abrt ⋅ 3 waiting
-   Activity: 15 tps ⋅ 10 insert/s ⋅ 20 update/s ⋅ 30 delete/s ⋅ 40 tuples returned/s ⋅ 5 temp files ⋅ 11.50M temp size
+ * Global: 132 days, 3 hours and 21 minutes uptime, 19.53M dbs size - 1.00K/s growth, 90.12% cache hit ratio
+   Sessions: 6/100 total, 1 active, 1 idle, 10 idle in txn, 0 idle in txn abrt, 3 waiting
+   Activity: 15 tps, 10 insert/s, 20 update/s, 30 delete/s, 40 tuples returned/s, 5 temp files, 11.50M temp size
 
 >>> ui = UI.make(refresh_time=2, min_duration=1.2, duration_mode=DurationMode.transaction)
 >>> ui.toggle_system_info_in_header()
@@ -196,9 +196,9 @@ PostgreSQL 9.6 - localhost - tester@host:5432/postgres - Ref.: 2s - Duration mod
 ...        system_info=sysinfo, pg_version="PostgreSQL 9.6",
 ...        width=200)
 PostgreSQL 9.6 - localhost - tester@host:5432/postgres - Ref.: 2s - Duration mode: transaction - Min. duration: 1.2s
- * Mem.: 0B total ⋅ 0B (-) free ⋅ 0B (-) used ⋅ 0B (-) buff+cached
-   Swap: 0B total ⋅ 0B (-) free ⋅ 0B (-) used
-   IO: 0/s max iops ⋅ 0B/s - 0/s read ⋅ 0B/s - 0/s write
+ * Mem.: 0B total, 0B (-) free, 0B (-) used, 0B (-) buff+cached
+   Swap: 0B total, 0B (-) free, 0B (-) used
+   IO: 0/s max iops, 0B/s - 0/s read, 0B/s - 0/s write
    Load average: 0 0 0
 
 Tests for processes_rows()
@@ -506,14 +506,14 @@ Tests for screen()
 ...     width=150,
 ... )
 PostgreSQL 13 - localhost - tester@host:5432/postgres - Ref.: 10s - Duration mode: backend - Min. duration: 1s
- * Global: 132 days, 3 hours and 21 minutes uptime ⋅ 19.53M dbs size - 1.00K/s growth ⋅ 90.12% cache hit ratio
-   Sessions: 6/100 total ⋅ 1 active ⋅ 1 idle ⋅ 10 idle in txn ⋅ 0 idle in txn abrt ⋅ 3 waiting
-   Activity: 15 tps ⋅ 10 insert/s ⋅ 20 update/s ⋅ 30 delete/s ⋅ 40 tuples returned/s ⋅ 5 temp files ⋅ 11.50M temp size
- * Worker processes: 3/8 total ⋅ 1/8 logical workers ⋅ 2/8 parallel workers
-   Other processes & info: 3/3 autovacuum workers ⋅ 1/10 wal senders ⋅ 0 wal receivers ⋅ 10/10 repl. slots
- * Mem.: 8B total ⋅ 2B (25.00%) free ⋅ 2B (25.00%) used ⋅ 4B (50.00%) buff+cached
-   Swap: 2B total ⋅ 1B (50.00%) free ⋅ 1B (50.00%) used
-   IO: 300/s max iops ⋅ 200B/s - 100/s read ⋅ 300B/s - 200/s write
+ * Global: 132 days, 3 hours and 21 minutes uptime, 19.53M dbs size - 1.00K/s growth, 90.12% cache hit ratio
+   Sessions: 6/100 total, 1 active, 1 idle, 10 idle in txn, 0 idle in txn abrt, 3 waiting
+   Activity: 15 tps, 10 insert/s, 20 update/s, 30 delete/s, 40 tuples returned/s, 5 temp files, 11.50M temp size
+ * Worker processes: 3/8 total, 1/8 logical workers, 2/8 parallel workers
+   Other processes & info: 3/3 autovacuum workers, 1/10 wal senders, 0 wal receivers, 10/10 repl. slots
+ * Mem.: 8B total, 2B (25.00%) free, 2B (25.00%) used, 4B (50.00%) buff+cached
+   Swap: 2B total, 1B (50.00%) free, 1B (50.00%) used
+   IO: 300/s max iops, 200B/s - 100/s read, 300B/s - 200/s write
    Load average: 1 5 15
                                 RUNNING QUERIES
 PID    DATABASE         CPU%   MEM%             state Query
@@ -542,14 +542,14 @@ F1/1 Running queries    F2/2 Waiting queries    F3/3 Blocking queries   Space Pa
 ...     message=f"Process {processes3[-1].pid} killed",
 ... )
 PostgreSQL 13 - localhost - tester@host:5432/postgres - Ref.: 10s - Duration
- * Global: 132 days, 3 hours and 21 minutes uptime ⋅ 19.53M dbs size - 1.00K/s
-   Sessions: 6/100 total ⋅ 1 active ⋅ 1 idle ⋅ 10 idle in txn ⋅ 0 idle in txn
-   Activity: 15 tps ⋅ 10 insert/s ⋅ 20 update/s ⋅ 30 delete/s ⋅ 40 tuples
- * Worker processes: 3/8 total ⋅ 1/8 logical workers ⋅ 2/8 parallel workers
-   Other processes & info: 3/3 autovacuum workers ⋅ 1/10 wal senders ⋅ 0 wal
- * Mem.: 8B total ⋅ 2B (25.00%) free ⋅ 2B (25.00%) used ⋅ 4B (50.00%)
-   Swap: 2B total ⋅ 1B (50.00%) free ⋅ 1B (50.00%) used
-   IO: 300/s max iops ⋅ 200B/s - 100/s read ⋅ 300B/s - 200/s write
+ * Global: 132 days, 3 hours and 21 minutes uptime, 19.53M dbs size - 1.00K/s
+   Sessions: 6/100 total, 1 active, 1 idle, 10 idle in txn, 0 idle in txn abrt,
+   Activity: 15 tps, 10 insert/s, 20 update/s, 30 delete/s, 40 tuples
+ * Worker processes: 3/8 total, 1/8 logical workers, 2/8 parallel workers
+   Other processes & info: 3/3 autovacuum workers, 1/10 wal senders, 0 wal
+ * Mem.: 8B total, 2B (25.00%) free, 2B (25.00%) used, 4B (50.00%) buff+cached
+   Swap: 2B total, 1B (50.00%) free, 1B (50.00%) used
+   IO: 300/s max iops, 200B/s - 100/s read, 300B/s - 200/s write
    Load average: 1 5 15
                                 RUNNING QUERIES
 PID    DATABASE         CPU%   MEM%             state Query

@@ -1,5 +1,13 @@
 # Change log
 
+## UNRELEASED
+
+### Fixed
+
+* Replace the previous header column separator (`⋅`) by a comma to improve user
+  experience in situations where that character did not render well (#356,
+  #230).
+
 ## pg\_activity 3.2.0 - 2023-03-06
 
 ### Fixed

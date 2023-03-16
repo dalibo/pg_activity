@@ -188,7 +188,7 @@ def header(
         return f"{term.bold_green(hbytes)} - {term.bold_green(counts)}"
 
     def render_columns(
-        columns: Sequence[List[str]], *, delimiter: str
+        columns: Sequence[List[str]], *, delimiter: str = f"{term.blue(',')} "
     ) -> Iterator[str]:
         column_widths = [
             max(len(column_row) for column_row in column) for column in columns
@@ -237,7 +237,7 @@ def header(
             [f"{render(total_size)} dbs size - {render(size_ev)} growth"],
             [f"{render(si.cache_hit_ratio_last_snap)} cache hit ratio"],
         ]
-        yield from render_columns(columns, delimiter=f" {term.bold_blue('⋅')} ")
+        yield from render_columns(columns)
 
         columns = [
             [f"  Sessions: {render(si.total)}/{render(si.max_connections)} total"],
@@ -247,7 +247,7 @@ def header(
             [f"{render(si.idle_in_transaction_aborted)} idle in txn abrt"],
             [f"{render(si.waiting)} waiting"],
         ]
-        yield from render_columns(columns, delimiter=f" {term.bold_blue('⋅')} ")
+        yield from render_columns(columns)
 
         if si.temporary_file is not None:
             temp_files = si.temporary_file.temp_files
@@ -264,7 +264,7 @@ def header(
             [f"{render(temp_files)} temp files"],
             [f"{render(temp_size)} temp size"],
         ]
-        yield from render_columns(columns, delimiter=f" {term.bold_blue('⋅')} ")
+        yield from render_columns(columns)
     if ui.show_worker_info_in_header:
         columns = [
             [
@@ -277,7 +277,7 @@ def header(
                 f"{render(si.parallel_workers)}/{render(si.max_parallel_workers)} parallel workers"
             ],
         ]
-        yield from render_columns(columns, delimiter=f" {term.bold_blue('⋅')} ")
+        yield from render_columns(columns)
 
         columns = [
             [
@@ -289,7 +289,7 @@ def header(
                 f"{render(si.replication_slots)}/{render(si.max_replication_slots)} repl. slots"
             ],
         ]
-        yield from render_columns(columns, delimiter=f" {term.bold_blue('⋅')} ")
+        yield from render_columns(columns)
 
     # System information, only available in "local" mode.
     if system_info is not None and ui.show_system_info_in_header:
@@ -305,7 +305,7 @@ def header(
             [f"{render(used)} ({render(system_info.memory.pct_used)}) used"],
             [f"{render(bc)} ({render(system_info.memory.pct_bc)}) buff+cached"],
         ]
-        yield from render_columns(system_columns, delimiter=f" {term.bold_blue('⋅')} ")
+        yield from render_columns(system_columns)
 
         used, free, total = (
             utils.naturalsize(system_info.swap.used),
@@ -317,7 +317,7 @@ def header(
             [f"{render(free)} ({render(system_info.swap.pct_free)}) free"],
             [f"{render(used)} ({render(system_info.swap.pct_used)}) used"],
         ]
-        yield from render_columns(system_columns, delimiter=f" {term.bold_blue('⋅')} ")
+        yield from render_columns(system_columns)
 
         iops = f"{system_info.max_iops}/s"
         system_columns = [
@@ -325,7 +325,7 @@ def header(
             [f"{render(system_info.io_read)} read"],
             [f"{render(system_info.io_write)} write"],
         ]
-        yield from render_columns(system_columns, delimiter=f" {term.bold_blue('⋅')} ")
+        yield from render_columns(system_columns)
 
         load = system_info.load
         system_columns = [
@@ -333,7 +333,7 @@ def header(
                 f"  Load average: {render(load.avg1)} {render(load.avg5)} {render(load.avg15)}"
             ],
         ]
-        yield from render_columns(system_columns, delimiter=f" {term.bold_blue('⋅')} ")
+        yield from render_columns(system_columns)
 
 
 @limit
