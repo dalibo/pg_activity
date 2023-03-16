@@ -1,11 +1,10 @@
 import functools
 import re
 from datetime import datetime, timedelta
-from typing import Any, IO, Iterable, List, Mapping, Optional, Tuple, Union
+from typing import IO, Any, Iterable, List, Mapping, Optional, Tuple, Union
 
 import attr
 import humanize
-
 
 naturalsize = functools.partial(humanize.naturalsize, gnu=True, format="%.2f")
 try:

@@ -11,8 +11,8 @@ from pgactivity.types import (
     LoadAverage,
     MemoryInfo,
     RunningProcess,
-    SystemProcess,
     SwapInfo,
+    SystemProcess,
 )
 
 

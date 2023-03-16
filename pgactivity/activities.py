@@ -9,15 +9,15 @@ import psutil
 
 from .types import (
     BlockingProcess,
-    WaitingProcess,
     IOCounter,
     LoadAverage,
     LocalRunningProcess,
     MemoryInfo,
     RunningProcess,
     SortKey,
-    SystemProcess,
     SwapInfo,
+    SystemProcess,
+    WaitingProcess,
 )
 
 

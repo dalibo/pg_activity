@@ -1,6 +1,5 @@
 from . import utils
 
-
 FIELD_BY_MODE = {
     "pid": {"default": "cyan", "cursor": "cyan_reverse", "yellow": "yellow_bold"},
     "database": {

@@ -55,6 +55,7 @@ setup(
             "check-manifest",
             "codespell",
             "flake8",
+            "isort",
             "mypy",
         ],
         "psycopg2": [

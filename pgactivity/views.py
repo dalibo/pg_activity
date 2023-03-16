@@ -2,33 +2,26 @@ import functools
 import inspect
 import itertools
 from textwrap import TextWrapper, dedent
-from typing import (
-    Any,
-    Callable,
-    Iterable,
-    Iterator,
-    List,
-    Optional,
-    Tuple,
-    Sequence,
-)
+from typing import Any, Callable, Iterable, Iterator, List, Optional, Sequence, Tuple
 
 from blessed import Terminal
 
+from . import colors, utils
+from .activities import sorted as sorted_processes
 from .compat import link
+from .keys import BINDINGS, EXIT_KEY
+from .keys import HELP as HELP_KEY
 from .keys import (
-    BINDINGS,
-    EXIT_KEY,
-    HELP as HELP_KEY,
     KEYS_BY_QUERYMODE,
-    Key,
     MODES,
     PAUSE_KEY,
     PROCESS_CANCEL,
     PROCESS_KILL,
     PROCESS_PIN,
+    Key,
 )
 from .types import (
+    UI,
     ActivityStats,
     Column,
     Host,
@@ -37,10 +30,7 @@ from .types import (
     SelectableProcesses,
     ServerInformation,
     SystemInfo,
-    UI,
 )
-from . import colors, utils
-from .activities import sorted as sorted_processes
 
 
 class line_counter:

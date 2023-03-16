@@ -22,18 +22,16 @@ try:
     from psycopg import sql as sql
     from psycopg._encodings import pg2pyenc
     from psycopg.adapt import Buffer, Loader
-    from psycopg.conninfo import make_conninfo, conninfo_to_dict
+    from psycopg.conninfo import conninfo_to_dict, make_conninfo
+    from psycopg.errors import FeatureNotSupported as FeatureNotSupported
+    from psycopg.errors import InsufficientPrivilege as InsufficientPrivilege
+    from psycopg.errors import InterfaceError as InterfaceError
+    from psycopg.errors import InvalidPassword as InvalidPassword
+    from psycopg.errors import NotSupportedError
+    from psycopg.errors import OperationalError as OperationalError
+    from psycopg.errors import ProgrammingError as ProgrammingError
+    from psycopg.errors import QueryCanceled as QueryCanceled
     from psycopg.rows import dict_row
-    from psycopg.errors import (
-        NotSupportedError,
-        FeatureNotSupported as FeatureNotSupported,
-        InterfaceError as InterfaceError,
-        InvalidPassword as InvalidPassword,
-        InsufficientPrivilege as InsufficientPrivilege,
-        OperationalError as OperationalError,
-        ProgrammingError as ProgrammingError,
-        QueryCanceled as QueryCanceled,
-    )
 
     __version__ = psycopg.__version__
 
@@ -187,19 +185,20 @@ except ImportError:
 
     import psycopg2
     import psycopg2.extensions
-    from psycopg2.extras import DictCursor
     from psycopg2 import sql as sql  # type: ignore[no-redef]
-    from psycopg2.errors import (  # type: ignore[no-redef]
-        FeatureNotSupported as FeatureNotSupported,
-        InterfaceError as InterfaceError,
-        InvalidPassword as InvalidPassword,
-        InsufficientPrivilege as InsufficientPrivilege,
-        OperationalError as OperationalError,
-        ProgrammingError as ProgrammingError,
-        QueryCanceled as QueryCanceled,
-    )
 
+    # isort: off
+    from psycopg2.errors import FeatureNotSupported as FeatureNotSupported  # type: ignore[no-redef]
+    from psycopg2.errors import InsufficientPrivilege as InsufficientPrivilege  # type: ignore[no-redef]
+    from psycopg2.errors import InterfaceError as InterfaceError  # type: ignore[no-redef]
+    from psycopg2.errors import InvalidPassword as InvalidPassword  # type: ignore[no-redef]
+    from psycopg2.errors import OperationalError as OperationalError  # type: ignore[no-redef]
+    from psycopg2.errors import ProgrammingError as ProgrammingError  # type: ignore[no-redef]
+    from psycopg2.errors import QueryCanceled as QueryCanceled  # type: ignore[no-redef]
+
+    # isort: on
     from psycopg2.extensions import connection as Connection  # type: ignore[no-redef]
+    from psycopg2.extras import DictCursor
 
     __version__ = psycopg2.__version__
 

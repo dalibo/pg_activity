@@ -8,21 +8,20 @@ from typing import Dict, List, Optional
 import attr
 import psutil
 
-from . import queries, pg
-from .pg import sql, Connection
+from . import pg, queries
+from .pg import Connection, sql
 from .types import (
+    NO_FILTER,
     BlockingProcess,
     FailedQueriesInfo,
     Filters,
-    WaitingProcess,
     Pct,
     RunningProcess,
     ServerInformation,
     TempFileInfo,
-    NO_FILTER,
+    WaitingProcess,
 )
 from .utils import clean_str
-
 
 logger = logging.getLogger("pgactivity")
 

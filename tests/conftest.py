@@ -4,10 +4,10 @@ import threading
 from typing import Any, List, Optional
 
 import psycopg
-from psycopg.conninfo import make_conninfo
-from psycopg import sql
 import psycopg.errors
 import pytest
+from psycopg import sql
+from psycopg.conninfo import make_conninfo
 
 from pgactivity import pg
 

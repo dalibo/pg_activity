@@ -3,7 +3,6 @@ from typing import Any, Dict
 import attr
 import blessed
 
-
 ATTR_VERSION = tuple(int(x) for x in attr.__version__.split(".", 2)[:2])
 BLESSED_VERSION = tuple(int(x) for x in blessed.__version__.split(".", 2)[:2])
 

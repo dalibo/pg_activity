@@ -11,19 +11,19 @@ from typing import (
     Mapping,
     MutableSet,
     Optional,
-    overload,
     Sequence,
     Tuple,
     Type,
     TypeVar,
     Union,
+    overload,
 )
 
 import attr
 import psutil
 from attr import validators
 
-from . import compat, colors, utils, pg
+from . import colors, compat, pg, utils
 
 
 class Pct(float):

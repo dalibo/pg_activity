@@ -2,8 +2,8 @@ import time
 from typing import Optional
 
 import attr
-import pytest
 import psycopg
+import pytest
 from psycopg.errors import WrongObjectType
 
 from pgactivity import types
