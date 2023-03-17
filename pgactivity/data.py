@@ -143,7 +143,7 @@ class Data:
 
         pid_file = f"{ret['data_directory']}/postmaster.pid"
         try:
-            with open(pid_file, "r") as fd:
+            with open(pid_file) as fd:
                 pid = fd.readline().strip()
         except OSError as e:
             logger.info(

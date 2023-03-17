@@ -153,9 +153,9 @@ def format_duration(duration: Optional[float]) -> Tuple[str, str]:
             color = "time_red"
         duration_d = timedelta(seconds=float(duration))
         mic = "%.6d" % duration_d.microseconds
-        ctime = "%s:%s.%s" % (
-            str((duration_d.seconds // 60)).zfill(2),
-            str((duration_d.seconds % 60)).zfill(2),
+        ctime = "{}:{}.{}".format(
+            str(duration_d.seconds // 60).zfill(2),
+            str(duration_d.seconds % 60).zfill(2),
             mic[:2],
         )
     else:

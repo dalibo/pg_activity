@@ -136,8 +136,7 @@ def help(term: Terminal, version: str, is_local: bool) -> Iterable[str]:
             yield f"{term.bright_cyan}{key_name.rjust(10)}{term.normal}: {key.description}"
 
     footer = "Press any key to exit."
-    for line in intro.splitlines():
-        yield line
+    yield from intro.splitlines()
     yield ""
 
     bindings = BINDINGS
@@ -468,8 +467,7 @@ def processes_rows(
 
             cell(query_value, ui.column("query"))
 
-        for line in (" ".join(text) + term.normal).splitlines():
-            yield line
+        yield from (" ".join(text) + term.normal).splitlines()
 
 
 def footer_message(term: Terminal, message: str, width: Optional[int] = None) -> None:
