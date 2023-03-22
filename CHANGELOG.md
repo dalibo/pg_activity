@@ -1,6 +1,6 @@
 # Change log
 
-## UNRELEASED
+## pg\_activity 3.3.0 - 2023-03-22
 
 ### Fixed
 
