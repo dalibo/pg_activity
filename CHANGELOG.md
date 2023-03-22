@@ -8,7 +8,7 @@
   experience in situations where that character did not render well (#356,
   #230).
 
-## pg\_activity 3.2.0 - 2023-03-06
+## pg\_activity 3.2.0 - 2023-03-15
 
 ### Fixed
 
