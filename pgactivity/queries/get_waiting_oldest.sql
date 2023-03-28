@@ -4,10 +4,7 @@ SELECT
       '<unknown>' AS application_name,
       a.datname AS database,
       a.usename AS user,
-      CASE WHEN a.client_addr IS NULL
-          THEN 'local'
-          ELSE a.client_addr::TEXT
-      END AS client,
+      a.client_addr AS client,
       pg_locks.mode AS mode,
       pg_locks.locktype AS type,
       pg_locks.relation::regclass AS relation,

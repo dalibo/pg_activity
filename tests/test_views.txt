@@ -1,3 +1,4 @@
+>>> from ipaddress import ip_address, ip_interface
 >>> import attr
 >>> from blessed import Terminal
 >>> import os
@@ -210,7 +211,7 @@ Tests for processes_rows()
 ...         application_name="pgbench",
 ...         database="pgbench",
 ...         user="postgres",
-...         client="local",
+...         client=None,
 ...         cpu=0.1,
 ...         mem=0.993_254_939_413_836,
 ...         read=7,
@@ -229,7 +230,7 @@ Tests for processes_rows()
 ...         application_name="pgbench",
 ...         database="pgbench",
 ...         user="postgres",
-...         client="local",
+...         client=None,
 ...         cpu=0.2,
 ...         mem=1.024_758_418_061_11,
 ...         read=0.2,
@@ -248,7 +249,7 @@ Tests for processes_rows()
 ...         application_name="accounting",
 ...         database="business",
 ...         user="bob",
-...         client="local",
+...         client=None,
 ...         cpu=2.4,
 ...         mem=1.031_191_760_016_45,
 ...         read=9_876_543.21,
@@ -330,7 +331,7 @@ Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 ...         application_name="pgbench",
 ...         database="pgbench",
 ...         user="postgres",
-...         client="1.2.3.4",
+...         client=ip_address("1.2.3.4"),
 ...         mode="ExclusiveLock",
 ...         type="transactionid",
 ...         relation="None",
@@ -345,7 +346,7 @@ Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 ...         application_name="pgbench",
 ...         database="pgbench",
 ...         user="postgres",
-...         client="local",
+...         client=ip_interface("2001:4f8:3:ba:2e0:81ff:fe22:d1f1/128"),
 ...         mode="RowExclusiveLock",
 ...         type="tuple",
 ...         relation="ahah",
@@ -364,7 +365,7 @@ Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 >>> ui = UI.make(query_mode=QueryMode.blocking, flag=allflags)
 >>> processes_rows(term, ui, SelectableProcesses(processes2), 100, width=250)
 6239   pgbench                   pgbench         postgres          1.2.3.4      None    transactionid    ExclusiveLock  11:06.00      Client Read            active END;
-6228   pgbench                   pgbench         postgres            local      ahah            tuple RowExclusiveLock  0.000413      Client Read     idle in trans UPDATE pgbench_branches SET bbalance = bbalance + 1788 WHERE bid = 68;
+6228   pgbench                   pgbench         postgres 2001:4f8:3:ba:2e      ahah            tuple RowExclusiveLock  0.000413      Client Read     idle in trans UPDATE pgbench_branches SET bbalance = bbalance + 1788 WHERE bid = 68;
 
 >>> processes1b = [
 ...     RunningProcess(
@@ -372,7 +373,7 @@ Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 ...         application_name="pgbench",
 ...         database="pgbench",
 ...         user="postgres",
-...         client="local",
+...         client=ip_interface("2001:db8::1/96"),
 ...         state="idle in transaction",
 ...         query="UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;",
 ...         encoding="UTF-8",
@@ -386,7 +387,7 @@ Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 ...         application_name="none",
 ...         database="pgbench",
 ...         user="postgres",
-...         client="local",
+...         client=ip_interface("10.1.0.0/16"),
 ...         state="active",
 ...         query="UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;",
 ...         encoding="UTF-8",
@@ -400,7 +401,7 @@ Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 ...         application_name="accounting",
 ...         database="business",
 ...         user="bob",
-...         client="192.168.0.47",
+...         client=ip_address("192.168.0.47"),
 ...         state="active",
 ...         query="SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id) WHERE s.date > CURRENT_DATE - INTERVAL '4 weeks' GROUP BY product_id, p.name, p.price, p.cost HAVING sum(p.price * s.units) > 5000;",
 ...         encoding="UTF-8",
@@ -413,8 +414,8 @@ Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 >>> all_but_local_flags = Flag.PID|Flag.DATABASE|Flag.APPNAME|Flag.USER|Flag.CLIENT|Flag.TIME|Flag.WAIT
 >>> ui = UI.make(query_mode=QueryMode.activities,flag=all_but_local_flags)
 >>> processes_rows(term, ui, SelectableProcesses(processes1b), 100, width=200)
-6239   pgbench                   pgbench         postgres            local  0.000000                N     idle in trans UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
-6228   pgbench                      none         postgres            local  0.000413                Y            active \_ UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
+6239   pgbench                   pgbench         postgres   2001:db8::1/96  0.000000                N     idle in trans UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
+6228   pgbench                      none         postgres      10.1.0.0/16  0.000413                Y            active \_ UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
 1234   business               accounting              bob     192.168.0.47  20:34.00             clog            active SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id)
 
 Tests for footer_*()

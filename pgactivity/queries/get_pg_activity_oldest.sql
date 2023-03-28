@@ -3,10 +3,7 @@ SELECT
       a.procpid AS pid,
       '<unknown>' AS application_name,
       a.datname AS database,
-      CASE WHEN a.client_addr IS NULL
-          THEN 'local'
-          ELSE a.client_addr::TEXT
-      END AS client,
+      a.client_addr AS client,
       EXTRACT(epoch FROM (NOW() - a.{duration_column})) AS duration,
       a.waiting AS wait,
       a.usename AS user,

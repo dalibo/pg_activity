@@ -3,7 +3,7 @@
     "new_processes": {
         "6221": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.002731,
@@ -56,7 +56,7 @@
         },
         "6222": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.003539,
@@ -109,7 +109,7 @@
         },
         "6223": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.002385,
@@ -162,7 +162,7 @@
         },
         "6224": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.00302,
@@ -215,7 +215,7 @@
         },
         "6225": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.002305,
@@ -268,7 +268,7 @@
         },
         "6226": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.002623,
@@ -321,7 +321,7 @@
         },
         "6227": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.002693,
@@ -374,7 +374,7 @@
         },
         "6228": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.003339,
@@ -427,7 +427,7 @@
         },
         "6229": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.003353,
@@ -480,7 +480,7 @@
         },
         "6230": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.003495,
@@ -533,7 +533,7 @@
         },
         "6231": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.003384,
@@ -586,7 +586,7 @@
         },
         "6232": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.002212,
@@ -639,7 +639,7 @@
         },
         "6233": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.002273,
@@ -692,7 +692,7 @@
         },
         "6234": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.002408,
@@ -745,7 +745,7 @@
         },
         "6235": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.002635,
@@ -798,7 +798,7 @@
         },
         "6237": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.003559,
@@ -851,7 +851,7 @@
         },
         "6238": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.003481,
@@ -904,7 +904,7 @@
         },
         "6239": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.003428,
@@ -957,7 +957,7 @@
         },
         "6240": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.002256,
@@ -1012,7 +1012,7 @@
     "processes": {
         "6221": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.002794,
@@ -1065,7 +1065,7 @@
         },
         "6222": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.003188,
@@ -1118,7 +1118,7 @@
         },
         "6223": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.00347,
@@ -1171,7 +1171,7 @@
         },
         "6224": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.003245,
@@ -1224,7 +1224,7 @@
         },
         "6225": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.003286,
@@ -1277,7 +1277,7 @@
         },
         "6226": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.003431,
@@ -1330,7 +1330,7 @@
         },
         "6227": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.002061,
@@ -1383,7 +1383,7 @@
         },
         "6228": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.003475,
@@ -1436,7 +1436,7 @@
         },
         "6229": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.003226,
@@ -1489,7 +1489,7 @@
         },
         "6230": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.002711,
@@ -1542,7 +1542,7 @@
         },
         "6231": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.001462,
@@ -1595,7 +1595,7 @@
         },
         "6232": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.003435,
@@ -1648,7 +1648,7 @@
         },
         "6233": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.00339,
@@ -1701,7 +1701,7 @@
         },
         "6234": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.003179,
@@ -1754,7 +1754,7 @@
         },
         "6235": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.003405,
@@ -1807,7 +1807,7 @@
         },
         "6236": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.002822,
@@ -1860,7 +1860,7 @@
         },
         "6237": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.002788,
@@ -1913,7 +1913,7 @@
         },
         "6238": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.003436,
@@ -1966,7 +1966,7 @@
         },
         "6239": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.00305,
@@ -2019,7 +2019,7 @@
         },
         "6240": {
             "application_name": "pgbench",
-            "client": "local",
+            "client": null,
             "cpu": null,
             "database": "pgbench",
             "duration": -0.003586,

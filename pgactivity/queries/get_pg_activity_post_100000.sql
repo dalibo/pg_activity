@@ -5,10 +5,7 @@ SELECT
       a.pid AS pid,
       a.application_name AS application_name,
       a.datname AS database,
-      CASE WHEN a.client_addr IS NULL
-          THEN 'local'
-          ELSE a.client_addr::TEXT
-      END AS client,
+      a.client_addr AS client,
       EXTRACT(epoch FROM (NOW() - a.{duration_column})) AS duration,
       a.wait_event as wait,
       a.usename AS user,

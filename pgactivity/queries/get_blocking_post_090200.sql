@@ -27,10 +27,7 @@ SELECT
             pg_stat_activity.datname,
             pg_stat_activity.datid,
             pg_stat_activity.usename,
-            CASE WHEN pg_stat_activity.client_addr IS NULL
-                THEN 'local'
-                ELSE pg_stat_activity.client_addr::TEXT
-            END AS client,
+            pg_stat_activity.client_addr AS client,
             blocking.locktype,
             EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
             pg_stat_activity.state as state,
@@ -60,10 +57,7 @@ SELECT
             pg_stat_activity.datname,
             pg_stat_activity.datid,
             pg_stat_activity.usename,
-            CASE WHEN pg_stat_activity.client_addr IS NULL
-                THEN 'local'
-                ELSE pg_stat_activity.client_addr::TEXT
-            END AS client,
+            pg_stat_activity.client_addr AS client,
             blocking.locktype,
             EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
             pg_stat_activity.state as state,
@@ -93,10 +87,7 @@ SELECT
             pg_stat_activity.datname,
             pg_stat_activity.datid,
             pg_stat_activity.usename,
-            CASE WHEN pg_stat_activity.client_addr IS NULL
-                THEN 'local'
-                ELSE pg_stat_activity.client_addr::TEXT
-            END AS client,
+            pg_stat_activity.client_addr AS client,
             blocking.locktype,
             EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
             pg_stat_activity.state as state,

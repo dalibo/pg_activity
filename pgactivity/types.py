@@ -1,6 +1,7 @@
 import enum
 import functools
 from datetime import timedelta
+from ipaddress import IPv4Address, IPv6Address
 from typing import (
     Any,
     Callable,
@@ -193,6 +194,15 @@ class DurationMode(enum.IntEnum):
 _color_key_marker = f"{id(object())}"
 
 
+def if_none(default: str) -> Callable[[Any], str]:
+    def transform(value: Any) -> str:
+        if value is None:
+            return default
+        return str(value)
+
+    return transform
+
+
 @attr.s(auto_attribs=True, frozen=True, slots=True)
 class Column:
     """A column in stats table.
@@ -231,9 +241,7 @@ class Column:
     justify: str = attr.ib(
         "left", validator=validators.in_(["left", "center", "right"])
     )
-    transform: Callable[[Any], str] = attr.ib(
-        default=lambda v: str(v) if v is not None else "", repr=False
-    )
+    transform: Callable[[Any], str] = attr.ib(default=if_none(""), repr=False)
     color_key: Union[str, Callable[[Any], str]] = attr.ib(
         default=_color_key_marker, repr=False
     )
@@ -327,6 +335,7 @@ class UI:
                 min_width=16,
                 max_width=16,
                 justify="right",
+                transform=if_none("local"),
             )
         if Flag.CPU & flag:
             add_column(
@@ -904,7 +913,7 @@ class BaseProcess:
     application_name: str
     database: Optional[str]
     user: str
-    client: str
+    client: Union[None, IPv4Address, IPv6Address]
     duration: Optional[float]
     state: str
     query: Optional[str]

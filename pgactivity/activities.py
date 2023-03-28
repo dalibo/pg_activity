@@ -1,6 +1,7 @@
 import builtins
 import os
 import time
+from ipaddress import IPv4Interface, ip_address
 from typing import Dict, List, Optional, Sequence, Tuple, TypeVar
 from warnings import catch_warnings, simplefilter
 
@@ -156,7 +157,7 @@ def sorted(processes: List[T], *, key: SortKey, reverse: bool = False) -> List[T
     ...         application_name="pgbench",
     ...         database="pgbench",
     ...         user="postgres",
-    ...         client="local",
+    ...         client=ip_address("127.0.0.2"),
     ...         cpu=0.1,
     ...         mem=0.993_254_939_413_836,
     ...         read=0.1,
@@ -175,7 +176,7 @@ def sorted(processes: List[T], *, key: SortKey, reverse: bool = False) -> List[T
     ...         application_name="pgbench",
     ...         database="pgbench",
     ...         user="postgres",
-    ...         client="local",
+    ...         client=IPv4Interface("192.0.2.5/24"),
     ...         cpu=0.1,
     ...         mem=0.994_254_939_413_836,
     ...         read=0.1,
@@ -194,7 +195,7 @@ def sorted(processes: List[T], *, key: SortKey, reverse: bool = False) -> List[T
     ...         application_name="pgbench",
     ...         database="pgbench",
     ...         user="postgres",
-    ...         client="local",
+    ...         client=ip_address("2001:db8::"),
     ...         cpu=0.2,
     ...         mem=1.024_758_418_061_11,
     ...         read=0.2,
@@ -230,7 +231,7 @@ def sorted(processes: List[T], *, key: SortKey, reverse: bool = False) -> List[T
     ...         application_name="pgbench",
     ...         database="pgbench",
     ...         user="postgres",
-    ...         client="local",
+    ...         client=ip_address("192.168.1.2"),
     ...         cpu=0.1,
     ...         mem=0.993_254_939_413_836,
     ...         read=0.1,
@@ -249,7 +250,7 @@ def sorted(processes: List[T], *, key: SortKey, reverse: bool = False) -> List[T
     ...         application_name="pgbench",
     ...         database="pgbench",
     ...         user="postgres",
-    ...         client="local",
+    ...         client=ip_address("0000:0000:0000:0000:0000:0abc:0007:0def"),
     ...         cpu=0.1,
     ...         mem=0.994_254_939_413_836,
     ...         read=0.1,
@@ -268,7 +269,7 @@ def sorted(processes: List[T], *, key: SortKey, reverse: bool = False) -> List[T
     ...         application_name="pgbench",
     ...         database="pgbench",
     ...         user="postgres",
-    ...         client="local",
+    ...         client=None,
     ...         cpu=0.2,
     ...         mem=1.024_758_418_061_11,
     ...         read=0.2,

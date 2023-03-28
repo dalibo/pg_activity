@@ -15,7 +15,7 @@ Tests scrolling in processes_rows()
 ...         application_name="pgbench",
 ...         database="pgbench",
 ...         user="postgres",
-...         client="local",
+...         client=None,
 ...         state="active",
 ...         query=f"SELECT {x}",
 ...         encoding=None,

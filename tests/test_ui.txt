@@ -437,7 +437,7 @@ change query mode then quit:
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s - Duration mode: query
                                 RUNNING QUERIES
 DATABASE                     USER           CLIENT             state Query
-tests                    postgres     127.0.0.1/32     idle in trans SELECT pg_sleep(0)
+tests                    postgres        127.0.0.1     idle in trans SELECT pg_sleep(0)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -463,7 +463,7 @@ tests                    postgres     127.0.0.1/32     idle in trans SELECT pg_s
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 1s - Duration mode: query
                                 RUNNING QUERIES
 DATABASE                     USER           CLIENT             state Query
-tests                    postgres     127.0.0.1/32     idle in trans SELECT pg_sleep(0)
+tests                    postgres        127.0.0.1     idle in trans SELECT pg_sleep(0)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -489,7 +489,7 @@ tests                    postgres     127.0.0.1/32     idle in trans SELECT pg_s
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 0.5s - Duration mode: query
                                 RUNNING QUERIES
 DATABASE                     USER           CLIENT             state Query
-tests                    postgres     127.0.0.1/32     idle in trans SELECT pg_sleep(0)
+tests                    postgres        127.0.0.1     idle in trans SELECT pg_sleep(0)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -515,7 +515,7 @@ tests                    postgres     127.0.0.1/32     idle in trans SELECT pg_s
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 1s - Duration mode: query
                                 RUNNING QUERIES
 DATABASE                     USER           CLIENT             state Query
-tests                    postgres     127.0.0.1/32     idle in trans SELECT pg_sleep(0)
+tests                    postgres        127.0.0.1     idle in trans SELECT pg_sleep(0)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -541,7 +541,7 @@ tests                    postgres     127.0.0.1/32     idle in trans SELECT pg_s
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 1s - Duration mode: query
                                      PAUSE
 DATABASE                     USER           CLIENT             state Query
-tests                    postgres     127.0.0.1/32     idle in trans SELECT pg_sleep(0)
+tests                    postgres        127.0.0.1     idle in trans SELECT pg_sleep(0)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -567,7 +567,7 @@ tests                    postgres     127.0.0.1/32     idle in trans SELECT pg_s
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 1s - Duration mode: query
                                      PAUSE
 DATABASE                     USER           CLIENT             state Query
-tests                    postgres     127.0.0.1/32     idle in trans SELECT pg_sleep(0)
+tests                    postgres        127.0.0.1     idle in trans SELECT pg_sleep(0)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -593,7 +593,7 @@ tests                    postgres     127.0.0.1/32     idle in trans SELECT pg_s
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 1s - Duration mode: query
                                      PAUSE
 DATABASE                     USER           CLIENT             state Query
-tests                    postgres     127.0.0.1/32     idle in trans SELECT pg_sleep(0)
+tests                    postgres        127.0.0.1     idle in trans SELECT pg_sleep(0)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -619,7 +619,7 @@ tests                    postgres     127.0.0.1/32     idle in trans SELECT pg_s
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 1s - Duration mode: query
                                      PAUSE
 DATABASE                     USER           CLIENT             state Query
-tests                    postgres     127.0.0.1/32     idle in trans SELECT pg_sleep(0)
+tests                    postgres        127.0.0.1     idle in trans SELECT pg_sleep(0)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -645,7 +645,7 @@ tests                    postgres     127.0.0.1/32     idle in trans SELECT pg_s
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 1s - Duration mode: query
                                 RUNNING QUERIES
 DATABASE                     USER           CLIENT             state Query
-tests                    postgres     127.0.0.1/32     idle in trans SELECT pg_sleep(0)
+tests                    postgres        127.0.0.1     idle in trans SELECT pg_sleep(0)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -671,7 +671,7 @@ tests                    postgres     127.0.0.1/32     idle in trans SELECT pg_s
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 1s - Duration mode: transaction
                                 RUNNING QUERIES
 DATABASE                     USER           CLIENT             state Query
-tests                    postgres     127.0.0.1/32     idle in trans SELECT pg_sleep(0)
+tests                    postgres        127.0.0.1     idle in trans SELECT pg_sleep(0)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -697,7 +697,7 @@ tests                    postgres     127.0.0.1/32     idle in trans SELECT pg_s
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 1s - Duration mode: transaction
                                 RUNNING QUERIES
 DATABASE                     USER           CLIENT             state Query
-tests                    postgres     127.0.0.1/32     idle in trans SELECT pg_sleep(0)
+tests                    postgres        127.0.0.1     idle in trans SELECT pg_sleep(0)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -749,7 +749,7 @@ DATABASE                     USER           CLIENT  RELATION             TYPE   
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 1s - Duration mode: transaction
                                 RUNNING QUERIES
 DATABASE                     USER           CLIENT             state Query
-tests                    postgres     127.0.0.1/32     idle in trans SELECT pg_sleep(0)
+tests                    postgres        127.0.0.1     idle in trans SELECT pg_sleep(0)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>

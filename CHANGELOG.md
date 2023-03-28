@@ -2,6 +2,11 @@
 
 ## UNRELEASED
 
+### Added
+
+* Improve rendering of the `client` column by possibly abbreviating IP
+  addresses.
+
 ### Fixed
 
 * Fix a crash when trying to reconnect.
