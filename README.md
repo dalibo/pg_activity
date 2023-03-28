@@ -12,21 +12,30 @@ Command line tool for PostgreSQL server activity monitoring.
 
 ## From distribution packages
 
-pg\_activity is available in many Linux distributions; the PostgreSQL Global
-Development Group (PGDG) also provides packages for RPM-based
-(https://yum.postgresql.org/) and Debian-based distributions
-(https://wiki.postgresql.org/wiki/Apt):
-
-    $ sudo yum install pg_activity
+The simplest way to install pg\_activity is through the package manager of your
+Linux distribution, if it ships with a package. E.g., on Debian-based
+distributions (e.g. Debian, Ubuntu, Mint...):
 
     $ sudo apt install pg-activity
 
-Using distribution packages is the recommended way to install pg\_activity.
+(on Debian bullseye, the current stable version, a backport is available: `apt
+install pg-activity/bullseye-backports`).
+
+The PostgreSQL Global Development Group (PGDG) also provides packages for
+RPM-based (https://yum.postgresql.org/) and Debian-based distributions
+(https://wiki.postgresql.org/wiki/Apt).
+
+**Note:** distribution packages may not be up to date with the latest
+pg\_activity releases. Before submitting a bug report here:
+-   check the package version, compare that to our latest release and then
+    review the [change log][changelog] to see if the bug has been fixed;
+-   if the issue is about packaging, e.g. missing dependencies, reach out
+    the package maintainer (or PGDG) first.
 
 ## From source, using pip
 
-Alternatively, pg\_activity can be installed using pip on Python 3.7 or later
-along with psycopg:
+pg\_activity can be installed using pip on Python 3.7 or later along with
+psycopg:
 
     $ python3 -m pip install "pg_activity[psycopg]"
 
@@ -213,4 +222,6 @@ the OS). Please avoid password in connection strings at all cost.
 
 # Change log
 
-See [CHANGELOG.md](https://github.com/dalibo/pg_activity/blob/master/CHANGELOG.md).
+See [CHANGELOG.md][changelog].
+
+[changelog]: https://github.com/dalibo/pg_activity/blob/master/CHANGELOG.md
