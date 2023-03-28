@@ -1,5 +1,11 @@
 # Change log
 
+## UNRELEASED
+
+### Fixed
+
+* Fix a crash when trying to reconnect.
+
 ## pg\_activity 3.3.0 - 2023-03-22
 
 ### Fixed

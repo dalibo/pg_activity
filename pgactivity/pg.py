@@ -49,7 +49,7 @@ try:
                 data = bytes(data)
             return data.decode(errors="replace")
 
-    def connect(dsn: str, **kwargs: Any) -> Connection:
+    def connect(dsn: str = "", **kwargs: Any) -> Connection:
         if "PGCLIENTENCODING" not in os.environ:
             # Set client_encoding to 'auto', if not set by the user.
             # This is (more or less) what's done by psql.
@@ -202,7 +202,7 @@ except ImportError:
 
     __version__ = psycopg2.__version__
 
-    def connect(dsn: str, **kwargs: Any) -> Connection:
+    def connect(dsn: str = "", **kwargs: Any) -> Connection:
         try:
             kwargs.setdefault("database", kwargs.pop("dbname"))
         except KeyError:
