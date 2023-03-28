@@ -2,6 +2,10 @@
 
 ## UNRELEASED
 
+### Fixed
+
+* Avoid truncating IPv6 addresses in the `client` column.
+
 ### Added
 
 * Possibly shorten IPv6 addresses in the `client` column.

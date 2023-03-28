@@ -326,7 +326,8 @@ class UI:
                 key="client",
                 name="CLIENT",
                 min_width=16,
-                max_width=16,
+                # max length of an IPv6 address
+                max_width=8 * 4 + 7,
                 justify="right",
             )
         if Flag.CPU & flag:
