@@ -345,7 +345,7 @@ Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 ...         application_name="pgbench",
 ...         database="pgbench",
 ...         user="postgres",
-...         client="local",
+...         client="0000:0000:0000:0000:0000:0abc:0007:0def",
 ...         mode="RowExclusiveLock",
 ...         type="tuple",
 ...         relation="ahah",
@@ -364,7 +364,7 @@ Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 >>> ui = UI.make(query_mode=QueryMode.blocking, flag=allflags)
 >>> processes_rows(term, ui, SelectableProcesses(processes2), 100, width=250)
 6239   pgbench                   pgbench         postgres          1.2.3.4      None    transactionid    ExclusiveLock  11:06.00      Client Read            active END;
-6228   pgbench                   pgbench         postgres            local      ahah            tuple RowExclusiveLock  0.000413      Client Read     idle in trans UPDATE pgbench_branches SET bbalance = bbalance + 1788 WHERE bid = 68;
+6228   pgbench                   pgbench         postgres      ::abc:7:def      ahah            tuple RowExclusiveLock  0.000413      Client Read     idle in trans UPDATE pgbench_branches SET bbalance = bbalance + 1788 WHERE bid = 68;
 
 >>> processes1b = [
 ...     RunningProcess(

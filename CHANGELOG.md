@@ -1,5 +1,11 @@
 # Change log
 
+## UNRELEASED
+
+### Added
+
+* Possibly shorten IPv6 addresses in the `client` column.
+
 ## pg\_activity 3.3.0 - 2023-03-22
 
 ### Fixed

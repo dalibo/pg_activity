@@ -1,5 +1,6 @@
 import enum
 import functools
+import ipaddress
 from datetime import timedelta
 from typing import (
     Any,
@@ -898,13 +899,31 @@ def locktype(value: str) -> LockType:
         raise ValueError(f"invalid lock type {exc}") from None
 
 
+def from_ipaddress(
+    value: str,
+) -> Union[str, ipaddress.IPv4Address, ipaddress.IPv6Address]:
+    """Possibly parse 'value' as an IP address.
+
+    >>> from_ipaddress("0000:0000:0000:0000:0000:0abc:0007:0def")
+    IPv6Address('::abc:7:def')
+    >>> from_ipaddress("blah")
+    'blah'
+    """
+    try:
+        return ipaddress.ip_address(value)
+    except ValueError:
+        return value
+
+
 @attr.s(auto_attribs=True, slots=True)
 class BaseProcess:
     pid: int
     application_name: str
     database: Optional[str]
     user: str
-    client: str
+    client: Union[str, ipaddress.IPv4Address, ipaddress.IPv6Address] = attr.ib(
+        converter=from_ipaddress
+    )
     duration: Optional[float]
     state: str
     query: Optional[str]
