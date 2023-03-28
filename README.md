@@ -8,8 +8,9 @@ Command line tool for PostgreSQL server activity monitoring.
 
 ![pg_activity screenshot](https://raw.github.com/dalibo/pg_activity/master/docs/imgs/screenshot.png)
 
-Installation from packages (recommended)
-----------------------------------------
+# Installation
+
+## From distribution packages
 
 pg\_activity is available in many Linux distributions; the PostgreSQL Global
 Development Group (PGDG) also provides packages for RPM-based
@@ -22,8 +23,7 @@ Development Group (PGDG) also provides packages for RPM-based
 
 Using distribution packages is the recommended way to install pg\_activity.
 
-Installation from pip
----------------------
+## From source, using pip
 
 Alternatively, pg\_activity can be installed using pip on Python 3.7 or later
 along with psycopg:
@@ -34,8 +34,7 @@ In case your `$PATH` does not already contain it, the full path is:
 
     $ ~/.local/bin/pg_activity
 
-Installation from the git repository
-------------------------------------
+## From source, using git
 
 This is only necessary to test development versions. First, clone the repository:
 
@@ -55,8 +54,7 @@ To quit this env and destroy it:
     $ deactivate
     $ rm -r .venv
 
-Usage
------
+# Usage
 
 `pg_activity` works locally or remotely. In local execution context, to obtain
 sufficient rights to display system information, the system user running
@@ -70,8 +68,7 @@ ex:
 
     sudo -u postgres pg_activity -U postgres
 
-Options
--------
+## Options
 
     pg_activity [options] [connection string]
 
@@ -127,8 +124,7 @@ Options
       --no-proc-info        Display workers process information in header.
       --refresh REFRESH     Refresh rate. Values: 0.5, 1, 2, 3, 4, 5 (default: 2).
 
-Notes
------
+## Notes
 
 Length of SQL query text that `pg_activity` reports relies on PostgreSQL
 parameter `track_activity_query_size`. Default value is `1024` (expressed in
@@ -136,8 +132,7 @@ bytes). If your SQL query text look truncated, you should increase
 `track_activity_query_size`.
 
 
-Interactives commands
----------------------
+## Interactives commands
 
 | Key       | Action                                                           |
 |-----------|------------------------------------------------------------------|
@@ -164,8 +159,7 @@ Interactives commands
 | `i`       | Display general instance information in header                   |
 | `o`       | Display worker information in header                             |
 
-Navigation mode
----------------
+## Navigation mode
 
 | Key        | Action                                        |
 |------------|-----------------------------------------------|
@@ -177,8 +171,7 @@ Navigation mode
 | `q`        | Quit                                          |
 | `Other`    | Back to activity                              |
 
-FAQ
----
+## FAQ
 
 **I can't see my queries only TPS is shown**
 
@@ -218,7 +211,6 @@ Information can also be given via PostgreSQL's environment variables
 The password file is preferred since it's more secure (security is deferred to
 the OS). Please avoid password in connection strings at all cost.
 
-Change log
-----------
+# Change log
 
 See [CHANGELOG.md](https://github.com/dalibo/pg_activity/blob/master/CHANGELOG.md).
