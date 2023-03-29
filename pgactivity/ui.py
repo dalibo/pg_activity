@@ -43,6 +43,7 @@ def main(
         wrap_query=options.wrap_query,
         max_db_length=min(max(server_information.max_dbname_length, 8), 16),
         filters=data.filters,
+        widths=options.widths or (),
         show_instance_info_in_header=options.show_instance_info_in_header,
         show_worker_info_in_header=options.show_worker_info_in_header,
         show_system_info_in_header=options.show_system_info_in_header,

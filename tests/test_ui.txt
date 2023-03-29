@@ -26,6 +26,7 @@ Default CLI options, passed to ui.main():
 ...     "refresh": 2,
 ...     "minduration": 0,
 ...     "filters": [],
+...     "widths": [("database", 9), ("client", 12)],
 ...     "noappname": True,
 ...     "noclient": False,
 ...     "nocolor": False,

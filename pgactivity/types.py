@@ -12,6 +12,7 @@ from typing import (
     MutableSet,
     Optional,
     Sequence,
+    Set,
     Tuple,
     Type,
     TypeVar,
@@ -304,11 +305,17 @@ class UI:
         *,
         max_db_length: int = 16,
         filters: Filters = NO_FILTER,
+        widths: Sequence[Tuple[str, int]] = (),
         **kwargs: Any,
     ) -> "UI":
+        widths_by_column = dict(widths)
         possible_columns: Dict[str, Column] = {}
 
         def add_column(key: str, name: str, **kwargs: Any) -> None:
+            try:
+                kwargs["max_width"] = widths_by_column.pop(key)
+            except KeyError:
+                pass
             assert key not in possible_columns, f"duplicated key {key}"
             possible_columns[key] = Column(key=key, name=name, **kwargs)
 
@@ -675,6 +682,16 @@ class UI:
         ['PID', 'DATABASE', 'APP', 'state', 'Query']
         """
         return self.columns_by_querymode[self.query_mode]
+
+    def known_columns(self) -> Set[Column]:
+        """Return the set of known columns for all modes.
+
+        >>> flag = Flag.DATABASE | Flag.APPNAME | Flag.CLIENT
+        >>> ui = UI.make(flag=flag)
+        >>> sorted([c.name for c in ui.known_columns()])
+        ['APP', 'CLIENT', 'DATABASE', 'Query', 'state']
+        """
+        return set(sum(self.columns_by_querymode.values(), ()))
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)

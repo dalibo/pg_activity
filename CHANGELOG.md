@@ -6,6 +6,13 @@
 
 * Fix a crash when trying to reconnect.
 
+### Added
+
+* Option `--width=COLUMN:VALUE` may be used to set the width of specified
+  `COLUMN` to `VALUE` (an integer) in the process table. This might be useful to
+  increase default values, e.g. in the `CLIENT` column to display full IPv6
+  addresses with `--width=client=43`.
+
 ## pg\_activity 3.3.0 - 2023-03-22
 
 ### Fixed
