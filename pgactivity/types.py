@@ -1,5 +1,6 @@
 import enum
 import functools
+import re
 from datetime import timedelta
 from ipaddress import IPv4Address, IPv6Address
 from typing import (
@@ -13,6 +14,7 @@ from typing import (
     MutableSet,
     Optional,
     Sequence,
+    Set,
     Tuple,
     Type,
     TypeVar,
@@ -312,11 +314,20 @@ class UI:
         *,
         max_db_length: int = 16,
         filters: Filters = NO_FILTER,
+        widths: Sequence[Tuple[str, int]] = (),
         **kwargs: Any,
     ) -> "UI":
+        widths_by_column = dict(widths)
         possible_columns: Dict[str, Column] = {}
 
         def add_column(key: str, name: str, **kwargs: Any) -> None:
+            m = re.match(r"[a-zA-Z]+", name)
+            if m:
+                w = m.group().lower()
+                try:
+                    kwargs["min_width"] = kwargs["max_width"] = widths_by_column.pop(w)
+                except KeyError:
+                    pass
             assert key not in possible_columns, f"duplicated key {key}"
             possible_columns[key] = Column(key=key, name=name, **kwargs)
 
@@ -513,7 +524,11 @@ class UI:
                     pass
 
         columns_by_querymode = {qm: tuple(make_columns_for(qm)) for qm in QueryMode}
-        return cls(columns_by_querymode=columns_by_querymode, **kwargs)
+        self = cls(columns_by_querymode=columns_by_querymode, **kwargs)
+        unknown_columns = set(widths_by_column) - {c.name for c in self.known_columns()}
+        if unknown_columns:
+            raise ValueError(f"unknown columns: {', '.join(sorted(unknown_columns))}")
+        return self
 
     def interactive(self) -> bool:
         return self.interactive_timeout is not None
@@ -684,6 +699,16 @@ class UI:
         ['PID', 'DATABASE', 'APP', 'state', 'Query']
         """
         return self.columns_by_querymode[self.query_mode]
+
+    def known_columns(self) -> Set[Column]:
+        """Return the set of known columns for all modes.
+
+        >>> flag = Flag.DATABASE | Flag.APPNAME | Flag.CLIENT | Flag.TIME
+        >>> ui = UI.make(flag=flag)
+        >>> sorted([c.name for c in ui.known_columns()])
+        ['APP', 'CLIENT', 'DATABASE', 'Query', 'TIME+', 'state']
+        """
+        return set(sum(self.columns_by_querymode.values(), ()))
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)

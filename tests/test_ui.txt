@@ -26,6 +26,7 @@ Default CLI options, passed to ui.main():
 ...     "refresh": 2,
 ...     "minduration": 0,
 ...     "filters": [],
+...     "widths": [("database", 9), ("client", 12)],
 ...     "noappname": True,
 ...     "noclient": False,
 ...     "nocolor": False,
@@ -180,7 +181,7 @@ PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s - Duration mode:
    IO: 300/s max iops, 200B/s - 100/s read, 300B/s - 200/s write
    Load average: 1 5 15
                                 RUNNING QUERIES
-PID    DATABASE                     USER           CLIENT IOW              state Query
+PID    DATABASE              USER       CLIENT IOW              state Query
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -203,7 +204,7 @@ PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s - Duration mode:
  * Worker processes: 3/8 total, 1/8 logical workers, 2/8 parallel workers
    Other processes & info: 3/3 autovacuum workers, 1/10 wal senders, 0 wal receivers, 10/10 repl. slots
                                 RUNNING QUERIES
-PID    DATABASE                     USER           CLIENT IOW              state Query
+PID    DATABASE              USER       CLIENT IOW              state Query
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -228,7 +229,7 @@ PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s - Duration mode:
    Sessions: 6/100 total, 1 active, 1 idle, 10 idle in txn, 0 idle in txn abrt, 3 waiting
    Activity: 15 tps, 10 insert/s, 20 update/s, 30 delete/s, 40 tuples returned/s, 5 temp files, 11.50M temp size
                                 RUNNING QUERIES
-PID    DATABASE                     USER           CLIENT IOW              state Query
+PID    DATABASE              USER       CLIENT IOW              state Query
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -252,7 +253,7 @@ PID    DATABASE                     USER           CLIENT IOW              state
 ------------------------------------------------------------------------------------------- sending key 'i' --------------------------------------------------------------------------------------------
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s - Duration mode: query
                                 RUNNING QUERIES
-PID    DATABASE                     USER           CLIENT IOW              state Query
+PID    DATABASE              USER       CLIENT IOW              state Query
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -306,7 +307,7 @@ Press any key to exit.
 ------------------------------------------------------------------------------------------- sending key 'z' --------------------------------------------------------------------------------------------
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s - Duration mode: query
                                 RUNNING QUERIES
-PID    DATABASE                     USER           CLIENT IOW              state Query
+PID    DATABASE              USER       CLIENT IOW              state Query
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -351,7 +352,7 @@ PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s - Duration mode:
  * Worker processes: 3/8 total, 1/8 logical workers, 2/8 parallel workers
    Other processes & info: 3/3 autovacuum workers, 1/10 wal senders, 0 wal receivers, 10/10 repl. slots
                                 RUNNING QUERIES
-PID    DATABASE                     USER           CLIENT             state Query
+PID    DATABASE              USER       CLIENT             state Query
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -398,7 +399,7 @@ PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s - Duration mode:
  * Worker processes: 3/8 total, 1/8 logical workers, 2/8 parallel workers
    Other processes & info: 3/3 autovacuum workers, 1/10 wal senders, 0 wal receivers, 10/10 repl. slots
                                 RUNNING QUERIES
-PID    DATABASE                     USER           CLIENT             state Query
+PID    DATABASE              USER       CLIENT             state Query
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -436,8 +437,8 @@ change query mode then quit:
 >>> run_ui(options, keys, expected_timeouts=expected_timeouts)  # doctest: +ELLIPSIS
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s - Duration mode: query
                                 RUNNING QUERIES
-DATABASE                     USER           CLIENT             state Query
-tests                    postgres        127.0.0.1     idle in trans SELECT pg_sleep(0)
+DATABASE              USER       CLIENT             state Query
+tests             postgres    127.0.0.1     idle in trans SELECT pg_sleep(0)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -462,8 +463,8 @@ tests                    postgres        127.0.0.1     idle in trans SELECT pg_s
 ------------------------------------------------------------------------------------------- sending key '-' --------------------------------------------------------------------------------------------
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 1s - Duration mode: query
                                 RUNNING QUERIES
-DATABASE                     USER           CLIENT             state Query
-tests                    postgres        127.0.0.1     idle in trans SELECT pg_sleep(0)
+DATABASE              USER       CLIENT             state Query
+tests             postgres    127.0.0.1     idle in trans SELECT pg_sleep(0)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -488,8 +489,8 @@ tests                    postgres        127.0.0.1     idle in trans SELECT pg_s
 ------------------------------------------------------------------------------------------- sending key '-' --------------------------------------------------------------------------------------------
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 0.5s - Duration mode: query
                                 RUNNING QUERIES
-DATABASE                     USER           CLIENT             state Query
-tests                    postgres        127.0.0.1     idle in trans SELECT pg_sleep(0)
+DATABASE              USER       CLIENT             state Query
+tests             postgres    127.0.0.1     idle in trans SELECT pg_sleep(0)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -514,8 +515,8 @@ tests                    postgres        127.0.0.1     idle in trans SELECT pg_s
 ------------------------------------------------------------------------------------------- sending key '+' --------------------------------------------------------------------------------------------
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 1s - Duration mode: query
                                 RUNNING QUERIES
-DATABASE                     USER           CLIENT             state Query
-tests                    postgres        127.0.0.1     idle in trans SELECT pg_sleep(0)
+DATABASE              USER       CLIENT             state Query
+tests             postgres    127.0.0.1     idle in trans SELECT pg_sleep(0)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -540,8 +541,8 @@ tests                    postgres        127.0.0.1     idle in trans SELECT pg_s
 ------------------------------------------------------------------------------------------- sending key ' ' --------------------------------------------------------------------------------------------
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 1s - Duration mode: query
                                      PAUSE
-DATABASE                     USER           CLIENT             state Query
-tests                    postgres        127.0.0.1     idle in trans SELECT pg_sleep(0)
+DATABASE              USER       CLIENT             state Query
+tests             postgres    127.0.0.1     idle in trans SELECT pg_sleep(0)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -566,8 +567,8 @@ tests                    postgres        127.0.0.1     idle in trans SELECT pg_s
 ------------------------------------------------------------------------------------------- sending key 'T' --------------------------------------------------------------------------------------------
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 1s - Duration mode: query
                                      PAUSE
-DATABASE                     USER           CLIENT             state Query
-tests                    postgres        127.0.0.1     idle in trans SELECT pg_sleep(0)
+DATABASE              USER       CLIENT             state Query
+tests             postgres    127.0.0.1     idle in trans SELECT pg_sleep(0)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -592,8 +593,8 @@ tests                    postgres        127.0.0.1     idle in trans SELECT pg_s
 ------------------------------------------------------------------------------------------- sending key '3' --------------------------------------------------------------------------------------------
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 1s - Duration mode: query
                                      PAUSE
-DATABASE                     USER           CLIENT             state Query
-tests                    postgres        127.0.0.1     idle in trans SELECT pg_sleep(0)
+DATABASE              USER       CLIENT             state Query
+tests             postgres    127.0.0.1     idle in trans SELECT pg_sleep(0)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -618,8 +619,8 @@ tests                    postgres        127.0.0.1     idle in trans SELECT pg_s
 ------------------------------------------------------------------------------------------- sending key 'r' --------------------------------------------------------------------------------------------
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 1s - Duration mode: query
                                      PAUSE
-DATABASE                     USER           CLIENT             state Query
-tests                    postgres        127.0.0.1     idle in trans SELECT pg_sleep(0)
+DATABASE              USER       CLIENT             state Query
+tests             postgres    127.0.0.1     idle in trans SELECT pg_sleep(0)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -644,8 +645,8 @@ tests                    postgres        127.0.0.1     idle in trans SELECT pg_s
 ------------------------------------------------------------------------------------------- sending key ' ' --------------------------------------------------------------------------------------------
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 1s - Duration mode: query
                                 RUNNING QUERIES
-DATABASE                     USER           CLIENT             state Query
-tests                    postgres        127.0.0.1     idle in trans SELECT pg_sleep(0)
+DATABASE              USER       CLIENT             state Query
+tests             postgres    127.0.0.1     idle in trans SELECT pg_sleep(0)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -670,8 +671,8 @@ tests                    postgres        127.0.0.1     idle in trans SELECT pg_s
 ------------------------------------------------------------------------------------------- sending key 'T' --------------------------------------------------------------------------------------------
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 1s - Duration mode: transaction
                                 RUNNING QUERIES
-DATABASE                     USER           CLIENT             state Query
-tests                    postgres        127.0.0.1     idle in trans SELECT pg_sleep(0)
+DATABASE              USER       CLIENT             state Query
+tests             postgres    127.0.0.1     idle in trans SELECT pg_sleep(0)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -696,8 +697,8 @@ tests                    postgres        127.0.0.1     idle in trans SELECT pg_s
 ------------------------------------------------------------------------------------------- sending key 'c' --------------------------------------------------------------------------------------------
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 1s - Duration mode: transaction
                                 RUNNING QUERIES
-DATABASE                     USER           CLIENT             state Query
-tests                    postgres        127.0.0.1     idle in trans SELECT pg_sleep(0)
+DATABASE              USER       CLIENT             state Query
+tests             postgres    127.0.0.1     idle in trans SELECT pg_sleep(0)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -722,7 +723,7 @@ tests                    postgres        127.0.0.1     idle in trans SELECT pg_s
 ------------------------------------------------------------------------------------------- sending key '2' --------------------------------------------------------------------------------------------
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 1s - Duration mode: transaction
                                 WAITING QUERIES
-DATABASE                     USER           CLIENT  RELATION             TYPE             MODE             state Query
+DATABASE              USER       CLIENT  RELATION             TYPE             MODE             state Query
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -748,8 +749,8 @@ DATABASE                     USER           CLIENT  RELATION             TYPE   
 ------------------------------------------------------------------------------------------- sending key '1' --------------------------------------------------------------------------------------------
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 1s - Duration mode: transaction
                                 RUNNING QUERIES
-DATABASE                     USER           CLIENT             state Query
-tests                    postgres        127.0.0.1     idle in trans SELECT pg_sleep(0)
+DATABASE              USER       CLIENT             state Query
+tests             postgres    127.0.0.1     idle in trans SELECT pg_sleep(0)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -774,7 +775,7 @@ tests                    postgres        127.0.0.1     idle in trans SELECT pg_s
 ------------------------------------------------------------------------------------------- sending key '3' --------------------------------------------------------------------------------------------
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 1s - Duration mode: transaction
                                 BLOCKING QUERIES
-DATABASE                     USER           CLIENT  RELATION             TYPE             MODE             state Query
+DATABASE              USER       CLIENT  RELATION             TYPE             MODE             state Query
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -815,14 +816,15 @@ Use another set of options:
 ...         nodbsize=True,
 ...         notempfiles=False,
 ...         nowalreceiver=False,
+...         widths=[("state", 6), ("database", 10)],
 ...         output=str(output),
 ...     ),
 ... )
->>> run_ui(options, ["D", "v", "q"], width=100, render_header=False)
+>>> run_ui(options, ["D", "v", "q"], width=80, render_header=False)
                                 RUNNING QUERIES
-DATABASE                     state Query
-tests                idle in trans CREATE TABLE persons (firstname text, lastname text, age int,
-                                    address text)
+DATABASE    state Query
+tests      idle i CREATE TABLE persons (firstname text, lastname text, age int,
+                   address text)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -844,11 +846,11 @@ tests                idle in trans CREATE TABLE persons (firstname text, lastnam
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
------------------------------------------ sending key 'D' ------------------------------------------
+------------------------------- sending key 'D' --------------------------------
                                 RUNNING QUERIES
-DATABASE                     state Query
-tests                idle in trans CREATE TABLE persons (firstname text, lastname text, age int,
-                                    address text)
+DATABASE    state Query
+tests      idle i CREATE TABLE persons (firstname text, lastname text, age int,
+                   address text)
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -870,10 +872,10 @@ tests                idle in trans CREATE TABLE persons (firstname text, lastnam
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
------------------------------------------ sending key 'v' ------------------------------------------
+------------------------------- sending key 'v' --------------------------------
                                 RUNNING QUERIES
-DATABASE                     state Query
-tests                idle in trans CREATE TABLE persons (firstname text, lastname text, age int, ad
+DATABASE    state Query
+tests      idle i CREATE TABLE persons (firstname text, lastname text, age int,
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
@@ -896,7 +898,7 @@ tests                idle in trans CREATE TABLE persons (firstname text, lastnam
 <BLANKLINE>
 <BLANKLINE>
 <BLANKLINE>
------------------------------------------ sending key 'q' ------------------------------------------
+------------------------------- sending key 'q' --------------------------------
 >>> with output.open() as f:
 ...     lines = f.readlines()
 >>> len(lines)
@@ -925,6 +927,7 @@ Interactive mode:
 ...         nopid=False,
 ...         noclient=True,
 ...         nouser=True,
+...         widths=[("state", 20), ("database", 8)],
 ...         output=None,
 ...     ),
 ... )
