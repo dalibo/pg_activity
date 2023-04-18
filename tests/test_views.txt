@@ -2,6 +2,7 @@
 >>> import attr
 >>> from blessed import Terminal
 >>> import os
+>>> from pgactivity.config import Flag
 >>> from pgactivity.types import *
 >>> from pgactivity.views import *
 

@@ -3,7 +3,8 @@ from typing import Optional
 from blessed.keyboard import Keystroke
 
 from . import keys
-from .types import DurationMode, Flag, QueryMode, SortKey, enum_next
+from .config import Flag
+from .types import DurationMode, QueryMode, SortKey, enum_next
 
 
 def refresh_time(

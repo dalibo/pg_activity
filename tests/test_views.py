@@ -2,7 +2,8 @@ import pytest
 from blessed import Terminal
 
 from pgactivity import views
-from pgactivity.types import UI, Flag, QueryMode, SortKey
+from pgactivity.config import Flag
+from pgactivity.types import UI, QueryMode, SortKey
 
 
 @pytest.fixture

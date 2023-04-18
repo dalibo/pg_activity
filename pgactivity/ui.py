@@ -7,6 +7,7 @@ import attr
 from blessed import Terminal
 
 from . import __version__, activities, handlers, keys, types, utils, views, widgets
+from .config import Flag
 from .data import Data
 
 
@@ -34,7 +35,7 @@ def main(
         skip_walreceiver=options.nowalreceiver,
     )
 
-    flag = types.Flag.from_options(is_local=is_local, **vars(options))
+    flag = Flag.from_options(is_local=is_local, **vars(options))
     ui = types.UI.make(
         flag=flag,
         refresh_time=options.refresh,

@@ -371,7 +371,8 @@ def columns_header(term: Terminal, ui: UI) -> Iterator[str]:
 def get_indent(ui: UI) -> str:
     """Return indentation for Query column.
 
-    >>> from pgactivity.types import Flag, UI
+    >>> from pgactivity.config import Flag
+    >>> from pgactivity.types import UI
     >>> ui = UI.make(flag=Flag.CPU)
     >>> get_indent(ui)
     '                         '
