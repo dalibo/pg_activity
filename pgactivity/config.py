@@ -2,29 +2,35 @@ import enum
 from typing import Any
 
 
-@enum.unique
-class Flag(enum.IntFlag):
-    """Column flag."""
+class Flag(enum.Flag):
+    """Column flag.
 
-    DATABASE = 1
-    APPNAME = 2
-    CLIENT = 4
-    USER = 8
-    CPU = 16
-    MEM = 32
-    READ = 64
-    WRITE = 128
-    TIME = 256
-    WAIT = 512
-    RELATION = 1024
-    TYPE = 2048
-    MODE = 4096
-    IOWAIT = 8192
-    PID = 16384
+    >>> Flag.all()  # doctest: +ELLIPSIS
+    <Flag...: 32767>
+    """
+
+    DATABASE = enum.auto()
+    APPNAME = enum.auto()
+    CLIENT = enum.auto()
+    USER = enum.auto()
+    CPU = enum.auto()
+    MEM = enum.auto()
+    READ = enum.auto()
+    WRITE = enum.auto()
+    TIME = enum.auto()
+    WAIT = enum.auto()
+    RELATION = enum.auto()
+    TYPE = enum.auto()
+    MODE = enum.auto()
+    IOWAIT = enum.auto()
+    PID = enum.auto()
 
     @classmethod
     def all(cls) -> "Flag":
-        return cls(sum(cls))
+        value = cls(0)
+        for f in cls:
+            value |= f
+        return value
 
     @classmethod
     def from_options(
