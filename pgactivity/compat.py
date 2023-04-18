@@ -1,10 +1,16 @@
+import sys
 from typing import Any, Dict
 
 import attr
 import blessed
 
-ATTR_VERSION = tuple(int(x) for x in attr.__version__.split(".", 2)[:2])
-BLESSED_VERSION = tuple(int(x) for x in blessed.__version__.split(".", 2)[:2])
+if sys.version_info < (3, 8):
+    from importlib_metadata import version
+else:
+    from importlib.metadata import version
+
+ATTR_VERSION = tuple(int(x) for x in version("attrs").split(".", 2)[:2])
+BLESSED_VERSION = tuple(int(x) for x in version("blessed").split(".", 2)[:2])
 
 if ATTR_VERSION < (18, 1):
 

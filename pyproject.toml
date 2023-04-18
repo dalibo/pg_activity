@@ -39,6 +39,7 @@ dependencies = [
     "attrs >= 17, !=21.1",
     "blessed >= 1.15.0",
     "humanize >= 0.5.1",
+    "importlib_metadata; python_version < '3.8'",
     "psutil >= 2.0.0",
 ]
 
