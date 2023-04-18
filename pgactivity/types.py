@@ -25,7 +25,7 @@ import psutil
 from attr import validators
 
 from . import colors, compat, pg, utils
-from .config import Flag
+from .config import Configuration, Flag
 
 
 class Pct(float):
@@ -228,6 +228,7 @@ class UI:
     @classmethod
     def make(
         cls,
+        config: Optional[Configuration] = None,
         flag: Flag = Flag.all(),
         *,
         max_db_length: int = 16,
@@ -237,6 +238,14 @@ class UI:
         possible_columns: Dict[str, Column] = {}
 
         def add_column(key: str, name: str, **kwargs: Any) -> None:
+            if config is not None:
+                try:
+                    cfg = config[name.lower()]
+                except KeyError:
+                    pass
+                else:
+                    if cfg.width is not None:
+                        kwargs["min_width"] = kwargs["max_width"] = cfg.width
             assert key not in possible_columns, f"duplicated key {key}"
             possible_columns[key] = Column(key=key, name=name, **kwargs)
 

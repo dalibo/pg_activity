@@ -6,6 +6,13 @@
 
 * Improve rendering of the `client` column by possibly abbreviating IP
   addresses.
+* Add support for configuring pg\_activity from a configuration file in INI
+  format and installed at `${XDG_CONFIG_HOME:~/.config}/pg_activity.conf` or
+  `/etc/pg_activity.conf`.
+* Determine which columns to hide from reading the configuration file (`hidden =
+  yes|no` option).
+* Determine columns width from the configuration file (`width = <positive
+  integer>` option).
 
 ### Fixed
 

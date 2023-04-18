@@ -7,12 +7,13 @@ import attr
 from blessed import Terminal
 
 from . import __version__, activities, handlers, keys, types, utils, views, widgets
-from .config import Flag
+from .config import Configuration, Flag
 from .data import Data
 
 
 def main(
     term: Terminal,
+    config: Optional[Configuration],
     data: Data,
     host: types.Host,
     options: Namespace,
@@ -35,8 +36,9 @@ def main(
         skip_walreceiver=options.nowalreceiver,
     )
 
-    flag = Flag.from_options(is_local=is_local, **vars(options))
+    flag = Flag.load(config, is_local=is_local, **vars(options))
     ui = types.UI.make(
+        config=config,
         flag=flag,
         refresh_time=options.refresh,
         min_duration=options.minduration,

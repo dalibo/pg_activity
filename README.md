@@ -138,6 +138,23 @@ ex:
       --no-proc-info        Display workers process information in header.
       --refresh REFRESH     Refresh rate. Values: 0.5, 1, 2, 3, 4, 5 (default: 2).
 
+## Configuration
+
+`pg_activity` may be configured through configuration file, in [INI format][],
+read from `${XDG_CONFIG_HOME:~/.config}/pg_activity.conf` or
+`/etc/pg_activity.conf` in that order. Command-line options may override
+configuration file settings.
+This is used to control how columns in the processes table are rendered, e.g.:
+```ini
+[client]
+hidden = yes
+
+[database]
+width = 9
+```
+
+[INI format]: https://docs.python.org/3/library/configparser.html#supported-ini-file-structure
+
 ## Notes
 
 Length of SQL query text that `pg_activity` reports relies on PostgreSQL

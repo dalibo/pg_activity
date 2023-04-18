@@ -10,6 +10,7 @@ from typing import Optional
 from blessed import Terminal
 
 from . import __version__, data, types, ui
+from .config import Configuration, ConfigurationError
 from .pg import OperationalError
 
 
@@ -385,6 +386,11 @@ def main() -> None:
     if args.rds:
         args.notempfile = True
 
+    try:
+        cfg = Configuration.lookup()
+    except ConfigurationError as e:
+        parser.error(str(e))
+
     dataobj = data.pg_connect(
         args,
         args.connection_string,
@@ -404,7 +410,7 @@ def main() -> None:
     term = Terminal()
     while True:
         try:
-            ui.main(term, dataobj, host, args)
+            ui.main(term, cfg, dataobj, host, args)
         except OperationalError:
             while True:
                 print(term.clear + term.home, end="")

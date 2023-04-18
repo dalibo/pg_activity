@@ -1,4 +1,4 @@
-from pgactivity.config import Flag
+from pgactivity.config import Configuration, Flag, UISection
 
 
 def test_flag():
@@ -9,7 +9,7 @@ def test_flag():
     assert f == Flag.DATABASE
 
 
-def test_flag_from_options():
+def test_flag_load():
     options = {
         "noappname": False,
         "noclient": False,
@@ -23,7 +23,7 @@ def test_flag_from_options():
         "nowait": False,
         "nowrite": False,
     }
-    flag = Flag.from_options(is_local=True, **options)
+    flag = Flag.load(None, is_local=True, **options)
     assert (
         flag
         == Flag.PID
@@ -42,11 +42,11 @@ def test_flag_from_options():
         | Flag.APPNAME
         | Flag.DATABASE
     )
-    flag = Flag.from_options(is_local=False, **options)
+    cfg = Configuration(pid=UISection(hidden=True), relation=UISection(hidden=False))
+    flag = Flag.load(cfg, is_local=False, **options)
     assert (
         flag
-        == Flag.PID
-        | Flag.MODE
+        == Flag.MODE
         | Flag.TYPE
         | Flag.RELATION
         | Flag.WAIT
@@ -59,14 +59,11 @@ def test_flag_from_options():
     options["nodb"] = True
     options["notime"] = True
     options["nopid"] = True
-    flag = Flag.from_options(is_local=False, **options)
+    cfg = Configuration(
+        database=UISection(hidden=False), relation=UISection(hidden=True)
+    )
+    flag = Flag.load(cfg, is_local=False, **options)
     assert (
         flag
-        == Flag.MODE
-        | Flag.TYPE
-        | Flag.RELATION
-        | Flag.WAIT
-        | Flag.USER
-        | Flag.CLIENT
-        | Flag.APPNAME
+        == Flag.MODE | Flag.TYPE | Flag.WAIT | Flag.USER | Flag.CLIENT | Flag.APPNAME
     )
