@@ -32,12 +32,17 @@ pg\_activity releases. Before submitting a bug report here:
 -   if the issue is about packaging, e.g. missing dependencies, reach out
     the package maintainer (or PGDG) first.
 
-## From source, using pip
+## From PyPI
 
 pg\_activity can be installed using pip on Python 3.7 or later along with
 psycopg:
 
     $ python3 -m pip install "pg_activity[psycopg]"
+
+Alternatively, [pipx](https://pypi.org/project/pipx/) can be used to install
+and run pg\_activity in an isolated environment:
+
+    $ pipx install "pg_activity[psycopg]"
 
 In case your `$PATH` does not already contain it, the full path is:
 
