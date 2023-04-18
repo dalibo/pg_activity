@@ -11,6 +11,10 @@
 
 * Fix a crash when trying to reconnect.
 
+### Misc.
+
+* Move packaging metadata to `pyproject.toml`.
+
 ## pg\_activity 3.3.0 - 2023-03-22
 
 ### Fixed

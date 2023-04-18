@@ -1,3 +1,84 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pg-activity"
+dynamic = ["version"]
+description = "Command line tool for PostgreSQL server activity monitoring."
+readme = "README.md"
+license = { text = "PostgreSQL" }
+requires-python = ">=3.7"
+authors = [
+    { name = "Julien Tachoires", email = "julmon@gmail.com" },
+    { name = "Benoit Lobréau", email = "benoit.lobreau@dalibo.com" },
+    { name = "Denis Laxalde", email = "denis.laxalde@dalibo.com" },
+    { name = "Dalibo", email = "contact@dalibo.com" },
+]
+maintainers = [
+    { name = "Denis Laxalde", email = "denis.laxalde@dalibo.com" },
+    { name = "Benoit Lobréau", email = "benoit.lobreau@dalibo.com" },
+]
+keywords = [
+    "activity",
+    "cli",
+    "monitoring",
+    "postgresql",
+    "sql",
+    "top",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Environment :: Console :: Curses",
+    "License :: OSI Approved :: PostgreSQL License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Database",
+]
+dependencies = [
+    "attrs >= 17, !=21.1",
+    "blessed >= 1.15.0",
+    "humanize >= 0.5.1",
+    "psutil >= 2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pg-activity[psycopg,psycopg2,testing]",
+    "black >= 23.1.0",
+    "check-manifest",
+    "codespell",
+    "flake8",
+    "isort",
+    "mypy",
+]
+psycopg = [
+    "psycopg[binary]",
+]
+psycopg2 = [
+    "psycopg2-binary >= 2.8",
+]
+testing = [
+    "psycopg[binary]",
+    "pytest",
+    "pytest-postgresql >= 4.0",
+]
+
+[project.scripts]
+pg_activity = "pgactivity.cli:main"
+
+[project.urls]
+"Bug Tracker" = "https://github.com/dalibo/pg_activity/issues/"
+Changelog = "https://github.com/dalibo/pg_activity/blob/master/CHANGELOG.md"
+Homepage = "https://github.com/dalibo/pg_activity"
+"Source code" = "https://github.com/dalibo/pg_activity/"
+
+[tool.setuptools.dynamic]
+version = { attr = "pgactivity.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["."]
+
 [tool.black]
 line-length = 88
 include = '\.pyi?$'
