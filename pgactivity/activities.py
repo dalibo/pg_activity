@@ -1,7 +1,6 @@
 import builtins
 import os
 import time
-from ipaddress import IPv4Interface, ip_address
 from typing import Dict, List, Optional, Sequence, Tuple, TypeVar
 from warnings import catch_warnings, simplefilter
 
@@ -149,6 +148,8 @@ T = TypeVar("T", RunningProcess, WaitingProcess, BlockingProcess, LocalRunningPr
 
 def sorted(processes: List[T], *, key: SortKey, reverse: bool = False) -> List[T]:
     """Return processes sorted.
+
+    >>> from ipaddress import IPv4Interface, ip_address
 
     PostgreSQL 13+
     >>> processes = [
