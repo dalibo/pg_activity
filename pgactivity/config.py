@@ -170,7 +170,7 @@ class UISection:
     @classmethod
     def from_config_section(cls: Type[_T], section: configparser.SectionProxy) -> _T:
         values: Dict[str, Any] = {}
-        known_options = {f.alias: f for f in attr.fields(cls)}
+        known_options = {f.name: f for f in attr.fields(cls)}
         unknown_options = set(section) - set(known_options)
         if unknown_options:
             raise ValueError(f"invalid option(s): {', '.join(sorted(unknown_options))}")
