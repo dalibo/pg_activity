@@ -1,5 +1,11 @@
 # Change log
 
+## Unreleased
+
+### Fixed
+
+* Add more compatibility for old attr versions (#376).
+
 ## pg\_activity 3.4.0 - 2023-05-15
 
 ### Added

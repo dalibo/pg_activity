@@ -7,6 +7,8 @@ from typing import IO, Any, Dict, List, Optional, Type, TypeVar
 import attr
 from attr import validators
 
+from .compat import gt
+
 
 class ConfigurationError(Exception):
     def __init__(self, filename: str, *args: Any) -> None:
@@ -161,9 +163,7 @@ class Flag(enum.Flag):
 @attr.s(auto_attribs=True, frozen=True, slots=True)
 class UISection:
     hidden: bool = False
-    width: Optional[int] = attr.ib(
-        default=None, validator=validators.optional(validators.gt(0))
-    )
+    width: Optional[int] = attr.ib(default=None, validator=validators.optional(gt(0)))
 
     _T = TypeVar("_T", bound="UISection")
 
