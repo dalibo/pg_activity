@@ -36,7 +36,7 @@ classifiers = [
     "Topic :: Database",
 ]
 dependencies = [
-    "attrs >= 17, !=21.1",
+    "attrs >= 17.4, !=21.1",
     "blessed >= 1.15.0",
     "humanize >= 0.5.1",
     "importlib_metadata; python_version < '3.8'",
