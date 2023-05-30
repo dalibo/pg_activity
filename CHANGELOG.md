@@ -1,5 +1,12 @@
 # Change log
 
+## pg\_activity 3.4.2 - 2023-06-01
+
+### Fixed
+
+* Fix package installation by not installing `tests` and `docs` directories
+  (#378).
+
 ## pg\_activity 3.4.1 - 2023-05-30
 
 ### Fixed
