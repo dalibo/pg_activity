@@ -188,19 +188,19 @@ except ImportError:
     from psycopg2 import sql as sql  # type: ignore[no-redef]
 
     # isort: off
-    from psycopg2.errors import FeatureNotSupported as FeatureNotSupported  # type: ignore[no-redef]
-    from psycopg2.errors import InsufficientPrivilege as InsufficientPrivilege  # type: ignore[no-redef]
-    from psycopg2.errors import InterfaceError as InterfaceError  # type: ignore[no-redef]
-    from psycopg2.errors import InvalidPassword as InvalidPassword  # type: ignore[no-redef]
-    from psycopg2.errors import OperationalError as OperationalError  # type: ignore[no-redef]
-    from psycopg2.errors import ProgrammingError as ProgrammingError  # type: ignore[no-redef]
-    from psycopg2.errors import QueryCanceled as QueryCanceled  # type: ignore[no-redef]
+    from psycopg2.errors import FeatureNotSupported as FeatureNotSupported  # type: ignore[assignment]
+    from psycopg2.errors import InsufficientPrivilege as InsufficientPrivilege  # type: ignore[assignment]
+    from psycopg2.errors import InterfaceError as InterfaceError  # type: ignore[assignment]
+    from psycopg2.errors import InvalidPassword as InvalidPassword  # type: ignore[assignment]
+    from psycopg2.errors import OperationalError as OperationalError  # type: ignore[assignment]
+    from psycopg2.errors import ProgrammingError as ProgrammingError  # type: ignore[assignment]
+    from psycopg2.errors import QueryCanceled as QueryCanceled  # type: ignore[assignment]
 
     # isort: on
-    from psycopg2.extensions import connection as Connection  # type: ignore[no-redef]
+    from psycopg2.extensions import connection as Connection  # type: ignore[assignment]
     from psycopg2.extras import DictCursor
 
-    __version__ = psycopg2.__version__
+    __version__ = psycopg2.__version__  # type: ignore[attr-defined]
 
     def connect(dsn: str = "", **kwargs: Any) -> Connection:
         try:
@@ -209,7 +209,7 @@ except ImportError:
             pass
         conn = psycopg2.connect(dsn, cursor_factory=DictCursor, **kwargs)
         conn.autocommit = True
-        return conn  # type: ignore[no-any-return]
+        return conn  # type: ignore[return-value]
 
     def server_version(conn: Connection) -> int:
         return conn.server_version  # type: ignore[attr-defined, no-any-return]
@@ -235,7 +235,7 @@ except ImportError:
     ) -> Union[Dict[str, Any], Row]:
         with conn.cursor() as cur:
             if text_as_bytes:
-                psycopg2.extensions.register_type(psycopg2.extensions.BYTES, cur)
+                psycopg2.extensions.register_type(psycopg2.extensions.BYTES, cur)  # type: ignore[no-untyped-call]
             cur.execute(query, args)
             row = cur.fetchone()
         assert row is not None
@@ -253,7 +253,7 @@ except ImportError:
     ) -> Union[List[Dict[str, Any]], List[Row]]:
         with conn.cursor() as cur:
             if text_as_bytes:
-                psycopg2.extensions.register_type(psycopg2.extensions.BYTES, cur)
+                psycopg2.extensions.register_type(psycopg2.extensions.BYTES, cur)  # type: ignore[no-untyped-call]
             cur.execute(query, args)
             rows = cur.fetchall()
         if mkrow is not None:

@@ -55,6 +55,7 @@ dev = [
 typing = [
     "mypy",
     "types-psutil",
+    "types-psycopg2",
 ]
 psycopg = [
     "psycopg[binary]",
