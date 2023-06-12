@@ -155,7 +155,7 @@ class Data:
 
         try:
             proc = psutil.Process(int(pid))
-            proc.io_counters()  # type: ignore[no-untyped-call]
+            proc.io_counters()
             proc.cpu_times()
             return True
         except psutil.AccessDenied:

@@ -54,7 +54,7 @@ dev = [
 ]
 typing = [
     "mypy",
-    "types-psutil",
+    "types-psutil >= 5.9.5.15",
     "types-psycopg2",
 ]
 psycopg = [

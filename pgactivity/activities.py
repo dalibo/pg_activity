@@ -38,7 +38,7 @@ def sys_get_proc(pid: int) -> Optional[SystemProcess]:
             write_bytes,
             read_chars,
             write_chars,
-        ) = psproc.io_counters()  # type: ignore[no-untyped-call]
+        ) = psproc.io_counters()
         status_iow = str(psproc.status())
     except (psutil.NoSuchProcess, psutil.AccessDenied):
         return None
