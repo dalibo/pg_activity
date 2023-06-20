@@ -13,9 +13,9 @@ jobs:
           - python: "3.11"
             psycopg: "psycopg3"
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python }}
       - name: Install tox
