@@ -236,6 +236,7 @@ def header(
             [f"* Global: {render(uptime)} uptime"],
             [f"{render(total_size)} dbs size - {render(size_ev)} growth"],
             [f"{render(si.cache_hit_ratio_last_snap)} cache hit ratio"],
+            [f"{render(si.rollback_ratio_last_snap)} rollback ratio"],
         ]
         yield from render_columns(columns)
 

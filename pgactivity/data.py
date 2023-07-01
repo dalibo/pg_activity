@@ -349,6 +349,7 @@ class Data:
         replication_slots = self.pg_get_replication_slots()
 
         hr: Optional[Pct] = None
+        rr: Optional[Pct] = None
         tps, ips, ups, dps, rps = 0, 0, 0, 0, 0
         size_ev = 0.0
         if prev_server_info is not None:
@@ -367,6 +368,10 @@ class Data:
                 deltahit = ret["blks_hit"] - prev_server_info.blks_hit
                 if deltaread + deltahit != 0:
                     hr = Pct(100 * deltahit / (deltaread + deltahit))
+                deltacommit = ret["xact_commit"] - prev_server_info.xact_commit
+                deltarollback = ret["xact_rollback"] - prev_server_info.xact_rollback
+                if deltacommit + deltahit > 0:
+                    rr = Pct(100 * deltarollback / (deltacommit + deltarollback))
             except ZeroDivisionError:
                 pass
 
@@ -378,6 +383,7 @@ class Data:
             delete_per_second=dps,
             tuples_returned_per_second=rps,
             cache_hit_ratio_last_snap=hr,
+            rollback_ratio_last_snap=rr,
             temporary_file=temporary_file_info,
             wal_senders=wal_senders,
             wal_receivers=wal_receivers,

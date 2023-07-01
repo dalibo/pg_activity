@@ -760,6 +760,8 @@ class ServerInformation:
     total_size: int
     blks_read: int
     blks_hit: int
+    xact_commit: int
+    xact_rollback: int
     max_dbname_length: int
     uptime: timedelta
     epoch: int  # an epoch,  used for the calculation of the tps & size_evolution
@@ -791,6 +793,9 @@ class ServerInformation:
     delete_per_second: int
     tuples_returned_per_second: int
     cache_hit_ratio_last_snap: Optional[Pct] = attr.ib(
+        converter=attr.converters.optional(Pct)
+    )
+    rollback_ratio_last_snap: Optional[Pct] = attr.ib(
         converter=attr.converters.optional(Pct)
     )
 

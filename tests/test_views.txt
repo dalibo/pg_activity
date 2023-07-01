@@ -103,6 +103,9 @@ Remote host:
 ...     blks_read=1,
 ...     blks_hit=9,
 ...     cache_hit_ratio_last_snap=90.1222,
+...     xact_commit=12,
+...     xact_rollback=87,
+...     rollback_ratio_last_snap=12.345,
 ...     epoch=10000,
 ...     uptime=timedelta(days=125, seconds=25, minutes=21, hours=3, weeks=1),
 ...     tps=15,
@@ -125,7 +128,7 @@ Remote host:
 ...        system_info=None, pg_version="PostgreSQL 9.6",
 ...        width=200)
 PostgreSQL 9.6 - server - pgadm@server.prod.tld:5433/app - Ref.: 10s - Duration mode: backend
- * Global: 132 days, 3 hours and 21 minutes uptime, 19.53M dbs size - 1.00K/s growth, 90.12% cache hit ratio
+ * Global: 132 days, 3 hours and 21 minutes uptime, 19.53M dbs size - 1.00K/s growth, 90.12% cache hit ratio, 12.35% rollback ratio
    Sessions: 6/100 total, 1 active, 1 idle, 10 idle in txn, 0 idle in txn abrt, 3 waiting
    Activity: 15 tps, 10 insert/s, 20 update/s, 30 delete/s, 40 tuples returned/s, 5 temp files, 11.50M temp size
  * Worker processes: 3/8 total, 1/8 logical workers, 2/8 parallel workers
@@ -145,7 +148,7 @@ Local host, with privileged access:
 ...        system_info=sysinfo, pg_version="PostgreSQL 9.6",
 ...        width=200)
 PostgreSQL 9.6 - localhost - tester@host:5432/postgres - Ref.: 10s - Duration mode: backend
- * Global: 132 days, 3 hours and 21 minutes uptime, 19.53M dbs size - 1.00K/s growth, 90.12% cache hit ratio
+ * Global: 132 days, 3 hours and 21 minutes uptime, 19.53M dbs size - 1.00K/s growth, 90.12% cache hit ratio, 12.35% rollback ratio
    Sessions: 6/100 total, 1 active, 1 idle, 10 idle in txn, 0 idle in txn abrt, 3 waiting
    Activity: 15 tps, 10 insert/s, 20 update/s, 30 delete/s, 40 tuples returned/s, 5 temp files, 11.50M temp size
  * Worker processes: 3/8 total, 1/8 logical workers, 2/8 parallel workers
@@ -160,7 +163,7 @@ PostgreSQL 9.6 - localhost - tester@host:5432/postgres - Ref.: 10s - Duration mo
 ...        system_info=sysinfo, pg_version="PostgreSQL 9.6",
 ...        width=200)
 PostgreSQL 9.6 - localhost - tester@host:5432/postgres - Ref.: 10s - Duration mode: backend
- * Global: 132 days, 3 hours and 21 minutes uptime, 19.53M dbs size - 1.00K/s growth, 90.12% cache hit ratio
+ * Global: 132 days, 3 hours and 21 minutes uptime, 19.53M dbs size - 1.00K/s growth, 90.12% cache hit ratio, 12.35% rollback ratio
    Sessions: 6/100 total, 1 active, 1 idle, 10 idle in txn, 0 idle in txn abrt, 3 waiting
    Activity: 15 tps, 10 insert/s, 20 update/s, 30 delete/s, 40 tuples returned/s, 5 temp files, 11.50M temp size
  * Worker processes: 3/8 total, 1/8 logical workers, 2/8 parallel workers
@@ -173,7 +176,7 @@ PostgreSQL 9.6 - localhost - tester@host:5432/postgres - Ref.: 10s - Duration mo
 ...        system_info=sysinfo, pg_version="PostgreSQL 9.6",
 ...        width=200)
 PostgreSQL 9.6 - localhost - tester@host:5432/postgres - Ref.: 10s - Duration mode: query
- * Global: 132 days, 3 hours and 21 minutes uptime, 19.53M dbs size - 1.00K/s growth, 90.12% cache hit ratio
+ * Global: 132 days, 3 hours and 21 minutes uptime, 19.53M dbs size - 1.00K/s growth, 90.12% cache hit ratio, 12.35% rollback ratio
    Sessions: 6/100 total, 1 active, 1 idle, 10 idle in txn, 0 idle in txn abrt, 3 waiting
    Activity: 15 tps, 10 insert/s, 20 update/s, 30 delete/s, 40 tuples returned/s, 5 temp files, 11.50M temp size
 
@@ -462,6 +465,9 @@ Tests for screen()
 ...     blks_read=1,
 ...     blks_hit=9,
 ...     cache_hit_ratio_last_snap=90.1222,
+...     xact_commit=5,
+...     xact_rollback=91,
+...     rollback_ratio_last_snap=0.09,
 ...     epoch=10000,
 ...     uptime=timedelta(days=125, seconds=25, minutes=21, hours=3, weeks=1),
 ...     tps=15,
@@ -508,7 +514,7 @@ Tests for screen()
 ...     width=150,
 ... )
 PostgreSQL 13 - localhost - tester@host:5432/postgres - Ref.: 10s - Duration mode: backend - Min. duration: 1s
- * Global: 132 days, 3 hours and 21 minutes uptime, 19.53M dbs size - 1.00K/s growth, 90.12% cache hit ratio
+ * Global: 132 days, 3 hours and 21 minutes uptime, 19.53M dbs size - 1.00K/s growth, 90.12% cache hit ratio, 0.09% rollback ratio
    Sessions: 6/100 total, 1 active, 1 idle, 10 idle in txn, 0 idle in txn abrt, 3 waiting
    Activity: 15 tps, 10 insert/s, 20 update/s, 30 delete/s, 40 tuples returned/s, 5 temp files, 11.50M temp size
  * Worker processes: 3/8 total, 1/8 logical workers, 2/8 parallel workers

@@ -1,5 +1,11 @@
 # Change log
 
+## Unreleased
+
+### Added
+
+* The *rollback ration* is now displayed in the "global" header (#385).
+
 ## pg\_activity 3.4.2 - 2023-06-01
 
 ### Fixed

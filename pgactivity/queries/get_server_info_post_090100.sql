@@ -2,6 +2,8 @@
 -- NEW guc max_wal_senders
 WITH dbinfo AS(
         SELECT COALESCE(SUM(sd.xact_commit + sd.xact_rollback)::BIGINT, 0) AS xact_count,
+               COALESCE(SUM(sd.xact_commit), 0) AS xact_commit,
+               COALESCE(SUM(sd.xact_rollback), 0) AS xact_rollback,
                COALESCE(SUM(tup_inserted)::BIGINT, 0) AS insert,
                COALESCE(SUM(tup_updated)::BIGINT, 0) AS update,
                COALESCE(SUM(tup_deleted)::BIGINT, 0) AS delete,
