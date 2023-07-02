@@ -3,7 +3,7 @@ import os
 import socket
 import sys
 import time
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Namespace
 from io import StringIO
 from typing import Optional
 
@@ -347,6 +347,14 @@ def get_parser() -> ArgumentParser:
         help="Display workers process information in header.",
         default=True,
     )
+    # --queries-only
+    group.add_argument(
+        "--queries-only",
+        dest="queries_only",
+        action="store_true",
+        help="Show only PID, user, time, waiting and query columns without any information headers.",
+        default=False,
+    )
     # --refresh
     group.add_argument(
         "--refresh",
@@ -359,6 +367,22 @@ def get_parser() -> ArgumentParser:
     )
 
     return parser
+
+
+def set_queries_only_flags(args: Namespace):
+    args.show_instance_info_in_header = False
+    args.show_system_info_in_header = False
+    args.show_worker_info_in_header = False
+    args.nodbsize = True
+    args.notempfiles = True
+    args.nowalreceiver = True
+    args.nodb = True
+    args.noclient = True
+    args.nocpu = True
+    args.nomem = True
+    args.noread = True
+    args.nowrite = True
+    args.noappname = True
 
 
 def exit(msg: str) -> None:
@@ -385,6 +409,8 @@ def main() -> None:
         parser.error(str(e))
     if args.rds:
         args.notempfile = True
+    if args.queries_only:
+        set_queries_only_flags(args)
 
     try:
         cfg = Configuration.lookup()
