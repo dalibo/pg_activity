@@ -369,7 +369,7 @@ def get_parser() -> ArgumentParser:
     return parser
 
 
-def set_queries_only_flags(args: Namespace):
+def set_queries_only_flags(args: Namespace) -> None:
     args.show_instance_info_in_header = False
     args.show_system_info_in_header = False
     args.show_worker_info_in_header = False
