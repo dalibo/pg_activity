@@ -56,6 +56,7 @@ typing = [
     "mypy",
     "types-psutil >= 5.9.5.15",
     "types-psycopg2",
+    "types-setuptools",
 ]
 psycopg = [
     "psycopg[binary]",
