@@ -237,7 +237,7 @@
 ### Fixed
 
 * Define pg\_activity script as an entry point, fixing installation in
-  virtualenvs and `/usr/local` in particular (#197, #196) 
+  virtualenvs and `/usr/local` in particular (#197, #196)
 
 ### Added
 
@@ -467,7 +467,7 @@
 * psutils v2 API support.
 * #33: Catch also TypeError error when trying to fetch process name.
 * #13: Man page is not installed by default, have to use option --with-man.
-* bug fix on infinite recursion loop due to bad method wrapping. 
+* bug fix on infinite recursion loop due to bad method wrapping.
 
 ## pg\_activity 1.1.1 - 2014-01-07
 

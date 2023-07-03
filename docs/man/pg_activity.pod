@@ -128,7 +128,7 @@ The last group displays B<system information>:
 
 =head2 THE RUNNING QUERIES PANEL
 
-The running queries panel shows all running queries, transactions or backends 
+The running queries panel shows all running queries, transactions or backends
 (depending on the B<DURATION_MODE> setting) which have lasted for more than
 B<min duration> seconds. It displays the following information:
 
@@ -273,7 +273,7 @@ required by another session. It shows following information:
 =item B<--filter=FIELD:REGEX>
 
 	Filter activities with a (case insensitive) regular expression applied on selected fields. Known fields are: dbname.
-	
+
 	Note: It's possible to filter out a database with negative lookahead, eg: '^(?!database_name)'
 
 =item B<--help>

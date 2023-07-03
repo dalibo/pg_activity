@@ -32,7 +32,7 @@ copy respective change log section as a description.
 
 ## Create a news article on postgresql.org and submit it
 
-Example for release 1.6.0 : 
+Example for release 1.6.0 :
 ```
 pg_activity (https://github.com/dalibo/pg_activity) 1.6.0 has been released.
 
