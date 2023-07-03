@@ -6,6 +6,10 @@
 
 * The *rollback ration* is now displayed in the "global" header (#385).
 
+### Misc
+
+* Document how to *hack* on pg\_activity in the `README`.
+
 ## pg\_activity 3.4.2 - 2023-06-01
 
 ### Fixed

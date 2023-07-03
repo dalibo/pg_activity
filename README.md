@@ -242,6 +242,65 @@ Information can also be given via PostgreSQL's environment variables
 The password file is preferred since it's more secure (security is deferred to
 the OS). Please avoid password in connection strings at all cost.
 
+# Hacking
+
+In order to work on pg\_activity source code, in particular to run the tests
+suite, a temporary PostgreSQL database cluster will be created; accordingly,
+PostgreSQL server binaries (e.g. `initdb`, `pg_ctl`) need to be available. For
+instance, on a Debian system, this means simply having the `postgresql` package
+installed.
+
+To set up a development environment, get the source repository:
+
+    $ git clone https://github.com/dalibo/pg_activity
+    $ cd pg_activity
+
+and then create a [virtual environment][venv], activate it and install the
+project along with development dependencies:
+
+    $ python3 -m venv .venv
+    $ .venv/bin/activate
+    (.venv) $ pip install -e ".[dev]"
+
+The source code is formatted with [black][] and [isort][] and typed checked with
+[mypy][] (all those are included in the development environment). Make sure to
+respect this, e.g. by configuring your editor, before committing changes.
+
+[venv]: https://docs.python.org/3/library/venv.html
+[black]: https://black.readthedocs.io/
+[isort]: https://pycqa.github.io/isort/
+[mypy]: https://mypy.readthedocs.io/
+
+To run the tests suite, simply invoke:
+
+    (.venv) $ pytest
+    ================================ test session starts =================================
+    platform linux -- Python 3.11.2, pytest-7.3.1, pluggy-1.0.0
+    psycopg: 3.1.8
+    configfile: pytest.ini
+    plugins: cov-4.0.0, accept-0.1.9, postgresql-4.1.1
+    collected 70 items
+
+    pgactivity/activities.py ..                                                    [  2%]
+    pgactivity/config.py ..                                                        [  5%]
+    pgactivity/data.py ..                                                          [  8%]
+    pgactivity/handlers.py .....                                                   [ 15%]
+    pgactivity/keys.py .                                                           [ 17%]
+    pgactivity/types.py ..............                                             [ 37%]
+    pgactivity/utils.py .........                                                  [ 50%]
+    pgactivity/views.py .....                                                      [ 57%]
+    tests/test_activities.py ...                                                   [ 61%]
+    tests/test_config.py ..                                                        [ 64%]
+    tests/test_data.py ................                                            [ 87%]
+    tests/test_scroll.txt .                                                        [ 88%]
+    tests/test_types.py .                                                          [ 90%]
+    tests/test_ui.txt .                                                            [ 91%]
+    tests/test_views.py ....                                                       [ 97%]
+    tests/test_views.txt .                                                         [ 98%]
+    tests/test_widgets.txt .                                                       [100%]
+
+    ================================ 70 passed in 11.89s =================================
+
 # Change log
 
 See [CHANGELOG.md][changelog].
