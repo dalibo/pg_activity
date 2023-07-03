@@ -122,7 +122,7 @@ def test_encoding(postgresql, data, execute):
             else:
                 break
         else:
-            pytest.fail(
+            pytest.skip(
                 f"could not create a database with encoding amongst {', '.join(encodings)}"
             )
 
@@ -166,7 +166,10 @@ def test_postgres_and_python_encoding(
     database_factory, pyenc: str, pgenc: str, locale: Optional[str], data, postgresql
 ) -> None:
     dbname = pyenc
-    database_factory(dbname, encoding=pgenc, locale=locale)
+    try:
+        database_factory(dbname, encoding=pgenc, locale=locale)
+    except WrongObjectType:
+        pytest.skip(f"could not create a database with encoding '{pgenc}'")
     with psycopg.connect(
         postgresql.info.dsn, dbname=dbname, client_encoding="utf-8"
     ) as conn:
