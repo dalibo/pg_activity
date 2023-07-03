@@ -9,6 +9,7 @@
 ### Misc
 
 * Document how to *hack* on pg\_activity in the `README`.
+* Add a [pre-commit](https://pre-commit.com/) configuration.
 
 ## pg\_activity 3.4.2 - 2023-06-01
 

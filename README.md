@@ -265,11 +265,16 @@ project along with development dependencies:
 The source code is formatted with [black][] and [isort][] and typed checked with
 [mypy][] (all those are included in the development environment). Make sure to
 respect this, e.g. by configuring your editor, before committing changes.
+Alternatively, you can install [pre-commit][] hooks so that this will be checked
+automatically:
+
+    (.venv) $ pre-commit install
 
 [venv]: https://docs.python.org/3/library/venv.html
 [black]: https://black.readthedocs.io/
 [isort]: https://pycqa.github.io/isort/
 [mypy]: https://mypy.readthedocs.io/
+[pre-commit]: https://pre-commit.com/
 
 To run the tests suite, simply invoke:
 

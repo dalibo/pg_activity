@@ -1,0 +1,40 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: check-added-large-files
+      - id: debug-statements
+      - id: end-of-file-fixer
+        files: text
+        exclude: tests/test_*.txt
+      - id: trailing-whitespace
+        files: text
+        exclude: tests/test_*.txt
+  - repo: local
+    hooks:
+      - id: black
+        name: black
+        entry: black --check .
+        language: system
+        types: [python]
+      - id: flake8
+        name: flake8
+        entry: flake8 .
+        language: system
+        types: [python]
+      - id: isort
+        name: isort
+        entry: isort --check --diff .
+        language: system
+        types: [python]
+      - id: mypy
+        name: mypy
+        entry: mypy
+        language: system
+        types: [python]
+        exclude: tests
+      - id: codespell
+        name: codespell
+        entry: codespell
+        language: system
+        types: [file]

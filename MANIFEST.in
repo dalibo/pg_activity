@@ -8,6 +8,7 @@ include .editorconfig
 include .codespellrc
 include .coveragerc
 include .flake8
+include .pre-commit-config.yaml
 include mypy.ini
 include pyproject.toml
 include pytest.ini
