@@ -537,7 +537,7 @@ def pg_connect(
             if nb_try < 1 and (
                 isinstance(err, pg.InvalidPassword)
                 or errmsg.startswith("FATAL:  password authentication failed for user")
-                or errmsg == "fe_sendauth: no password supplied"
+                or "fe_sendauth: no password supplied" in errmsg
             ):
                 password = getpass.getpass()
             elif exit_on_failed:
