@@ -15,6 +15,8 @@
 
 * Document how to *hack* on pg\_activity in the `README`.
 * Add a [pre-commit](https://pre-commit.com/) configuration.
+* Require psycopg >= 3.1 (when using the psycopg backend) to get a more robust
+  detection of connection password need.
 
 ## pg\_activity 3.4.2 - 2023-06-01
 

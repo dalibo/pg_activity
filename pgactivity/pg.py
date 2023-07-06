@@ -180,6 +180,10 @@ try:
             pyenc = "utf-8"
         return value.decode(pyenc, errors=errors)
 
+    def needs_password(exc: OperationalError) -> bool:
+        assert exc.pgconn is not None
+        return exc.pgconn.needs_password
+
 except ImportError:
     import codecs
 
@@ -270,15 +274,14 @@ except ImportError:
             pyenc = "utf-8"
         return value.decode(pyenc, errors=errors)
 
-
-def needs_password(exc: OperationalError) -> bool:
-    if isinstance(exc, InvalidPassword):
-        return True
-    msg = str(exc)
-    return (
-        msg.startswith("FATAL:  password authentication failed for user")
-        or "fe_sendauth: no password supplied" in msg
-    )
+    def needs_password(exc: OperationalError) -> bool:
+        if isinstance(exc, InvalidPassword):
+            return True
+        msg = str(exc)
+        return (
+            msg.startswith("FATAL:  password authentication failed for user")
+            or "fe_sendauth: no password supplied" in msg
+        )
 
 
 __all__ = [

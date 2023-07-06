@@ -60,7 +60,7 @@ typing = [
     "types-setuptools",
 ]
 psycopg = [
-    "psycopg[binary]",
+    "psycopg[binary] >= 3.1",
 ]
 psycopg2 = [
     "psycopg2-binary >= 2.8",
