@@ -391,12 +391,15 @@ def main() -> None:
     except ConfigurationError as e:
         parser.error(str(e))
 
-    dataobj = data.pg_connect(
-        args,
-        args.connection_string,
-        min_duration=args.minduration,
-        filters=filters,
-    )
+    try:
+        dataobj = data.pg_connect(
+            args,
+            args.connection_string,
+            min_duration=args.minduration,
+            filters=filters,
+        )
+    except OperationalError as e:
+        parser.exit(status=1, message=f"could not connect to PostgreSQL: {e}")
     hostname = socket.gethostname()
     conninfo = dataobj.pg_conn.info
     host = types.Host(

@@ -6,6 +6,10 @@
 
 * The *rollback ration* is now displayed in the "global" header (#385).
 
+### Fixed
+
+* At startup, do not show a traceback upon failure to connect to PostgreSQL.
+
 ### Misc
 
 * Document how to *hack* on pg\_activity in the `README`.

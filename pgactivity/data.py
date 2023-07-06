@@ -544,7 +544,7 @@ def pg_connect(
                 msg = str(err).replace("FATAL:", "")
                 raise SystemExit("pg_activity: FATAL: %s" % clean_str(msg))
             else:
-                raise Exception("Could not connect to PostgreSQL")
+                raise
         except pg.ProgrammingError as err:
             errmsg = str(err).strip()
             if errmsg.startswith("invalid dsn"):
