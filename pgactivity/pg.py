@@ -271,6 +271,16 @@ except ImportError:
         return value.decode(pyenc, errors=errors)
 
 
+def needs_password(exc: OperationalError) -> bool:
+    if isinstance(exc, InvalidPassword):
+        return True
+    msg = str(exc)
+    return (
+        msg.startswith("FATAL:  password authentication failed for user")
+        or "fe_sendauth: no password supplied" in msg
+    )
+
+
 __all__ = [
     "__version__",
     "Connection",

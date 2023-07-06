@@ -531,12 +531,7 @@ def pg_connect(
                 hide_queries_in_logs=options.hide_queries_in_logs,
             )
         except pg.OperationalError as err:
-            errmsg = str(err).strip()
-            if nb_try < 1 and (
-                isinstance(err, pg.InvalidPassword)
-                or errmsg.startswith("FATAL:  password authentication failed for user")
-                or "fe_sendauth: no password supplied" in errmsg
-            ):
+            if nb_try < 1 and pg.needs_password(err):
                 password = getpass.getpass()
             else:
                 raise
