@@ -21,7 +21,6 @@ from .types import (
     TempFileInfo,
     WaitingProcess,
 )
-from .utils import clean_str
 
 logger = logging.getLogger("pgactivity")
 
@@ -512,7 +511,6 @@ class Data:
 
 def pg_connect(
     options: Namespace,
-    exit_on_failed: bool = True,
     min_duration: float = 0.0,
     filters: Filters = NO_FILTER,
 ) -> Data:
@@ -540,9 +538,6 @@ def pg_connect(
                 or "fe_sendauth: no password supplied" in errmsg
             ):
                 password = getpass.getpass()
-            elif exit_on_failed:
-                msg = str(err).replace("FATAL:", "")
-                raise SystemExit("pg_activity: FATAL: %s" % clean_str(msg))
             else:
                 raise
         except pg.ProgrammingError as err:
