@@ -604,8 +604,8 @@ access the pid file in the \s-1PGDATA\s0 directory, the \fBsystem information \s
 group will not be displayed. The \fB\f(CB%CPU\fB\fR, \fB\f(CB%MEM\fB\fR, \fBRead/s\fR and \fBWrite/s\fR
 columns will also be missing from the \fB\s-1ACTIVITY PANEL\s0\fR.
 .PP
-On some \s-1OS\s0 like MacOS, psutils.\fBio_counters()\fR is not implemented. The effect are
-the same as those described when data_directory is not readable.
+On some \s-1OS\s0 like MacOS, psutil's \fBio_counters()\fR is not implemented. The effects
+are the same as those described when data_directory is not readable.
 .PP
 pg_activity needs to access the pgsql_tmp directory stored in all tablespaces
 in order to compute the number and size of the temporary files. This requires

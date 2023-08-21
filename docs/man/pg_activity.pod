@@ -479,8 +479,8 @@ access the pid file in the PGDATA directory, the B<system information HEADER>
 group will not be displayed. The B<%CPU>, B<%MEM>, B<Read/s> and B<Write/s>
 columns will also be missing from the B<ACTIVITY PANEL>.
 
-On some OS like MacOS, psutils.io_counters() is not implemented. The effect are
-the same as those described when data_directory is not readable.
+On some OS like MacOS, psutil's io_counters() is not implemented. The effects
+are the same as those described when data_directory is not readable.
 
 pg_activity needs to access the pgsql_tmp directory stored in all tablespaces
 in order to compute the number and size of the temporary files. This requires
