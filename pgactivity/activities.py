@@ -31,22 +31,15 @@ def sys_get_proc(pid: int) -> Optional[SystemProcess]:
         mem_percent = psproc.memory_percent()
         cpu_percent = psproc.cpu_percent(interval=0)
         cpu_times = psproc.cpu_times()
-        (
-            read_count,
-            write_count,
-            read_bytes,
-            write_bytes,
-            read_chars,
-            write_chars,
-        ) = psproc.io_counters()
+        io_counters = psproc.io_counters()
         status_iow = str(psproc.status())
     except (psutil.NoSuchProcess, psutil.AccessDenied):
         return None
 
     return SystemProcess(
         meminfo=meminfo,
-        io_read=IOCounter(read_count, read_bytes, read_chars),
-        io_write=IOCounter(write_count, write_bytes, write_chars),
+        io_read=IOCounter(io_counters.read_count, io_counters.read_bytes),
+        io_write=IOCounter(io_counters.write_count, io_counters.write_bytes),
         io_time=time.time(),
         mem_percent=mem_percent,
         cpu_percent=cpu_percent,

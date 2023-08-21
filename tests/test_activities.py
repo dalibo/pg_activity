@@ -32,9 +32,11 @@ def system_processes(datadir):
     def system_process(extras):
         for k in ("io_read", "io_write"):
             try:
-                extras[k] = IOCounter(**extras.pop(k))
+                counter = extras.pop(k)
             except KeyError:
                 pass
+            else:
+                extras[k] = IOCounter(counter["count"], counter["bytes"])
         return SystemProcess(**extras)
 
     for new_proc in input_data["new_processes"].values():

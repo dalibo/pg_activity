@@ -10,6 +10,7 @@
 
 * At startup, do not show a traceback upon failure to connect to PostgreSQL.
 * Fix password prompt not shown with psycopg2 backend.
+* Fix retrieval of I/O statistics on BSD systems (#393).
 
 ### Misc
 
