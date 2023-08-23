@@ -1,3 +1,8 @@
+from pathlib import Path
+from typing import Any, Dict
+
+import attr
+
 from pgactivity.config import Configuration, Flag, UISection
 
 
@@ -67,3 +72,15 @@ def test_flag_load():
         flag
         == Flag.MODE | Flag.TYPE | Flag.WAIT | Flag.USER | Flag.CLIENT | Flag.APPNAME
     )
+
+
+def test_lookup(tmp_path: Path) -> None:
+    def asdict(cfg: Configuration) -> Dict[str, Any]:
+        return {k: attr.asdict(v) for k, v in cfg.items()}
+
+    cfg = Configuration.lookup(user_config_home=tmp_path)
+    assert cfg is None
+
+    (tmp_path / "pg_activity.conf").write_text("\n".join(["[client]", "width=5"]))
+    cfg = Configuration.lookup(user_config_home=tmp_path)
+    assert cfg is not None and asdict(cfg) == {"client": {"hidden": None, "width": 5}}

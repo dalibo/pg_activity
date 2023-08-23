@@ -182,13 +182,11 @@ class UISection:
         return cls(**values)
 
 
-class Configuration(Dict[str, UISection]):
-    _name: str = "pg_activity.conf"
-    _user_file = (
-        Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / _name
-    )
-    _system_file = Path("/etc") / _name
+USER_CONFIG_HOME = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
+ETC = Path("/etc")
 
+
+class Configuration(Dict[str, UISection]):
     _T = TypeVar("_T", bound="Configuration")
 
     @classmethod
@@ -255,8 +253,14 @@ class Configuration(Dict[str, UISection]):
         return cls(**config)
 
     @classmethod
-    def lookup(cls: Type[_T]) -> Optional[_T]:
-        for fpath in (cls._user_file, cls._system_file):
+    def lookup(
+        cls: Type[_T],
+        *,
+        user_config_home: Path = USER_CONFIG_HOME,
+        etc: Path = ETC,
+    ) -> Optional[_T]:
+        for base in (user_config_home, etc):
+            fpath = base / "pg_activity.conf"
             if fpath.exists():
                 with fpath.open() as f:
                     value = cls.parse(f, str(fpath))
