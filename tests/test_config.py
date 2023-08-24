@@ -83,4 +83,4 @@ def test_lookup(tmp_path: Path) -> None:
 
     (tmp_path / "pg_activity.conf").write_text("\n".join(["[client]", "width=5"]))
     cfg = Configuration.lookup(user_config_home=tmp_path)
-    assert cfg is not None and asdict(cfg) == {"client": {"hidden": None, "width": 5}}
+    assert cfg is not None and asdict(cfg) == {"client": {"hidden": False, "width": 5}}

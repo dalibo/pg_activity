@@ -174,11 +174,17 @@ class UISection:
         unknown_options = set(section) - set(known_options)
         if unknown_options:
             raise ValueError(f"invalid option(s): {', '.join(sorted(unknown_options))}")
-        for opt, getter in (("hidden", section.getboolean), ("width", section.getint)):
-            try:
-                values[opt] = getter(opt)
-            except configparser.NoOptionError:
-                pass
+        try:
+            hidden = section.getboolean("hidden")
+        except configparser.NoOptionError:
+            pass
+        else:
+            if hidden is not None:
+                values["hidden"] = hidden
+        try:
+            values["width"] = section.getint("width")
+        except configparser.NoOptionError:
+            pass
         return cls(**values)
 
 
