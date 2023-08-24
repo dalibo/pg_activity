@@ -7,6 +7,10 @@
 * The *rollback ratio* is now displayed in the "global" header (#385).
 * Make header's sections display configurable through the `[header]` section of
   the configuration file.
+* Configuration profiles can now be defined at
+  `${XDG_CONFIG_HOME:~/.config}/pg_activity/<profile>.conf` or
+  `/etc/pg_activity/<profile>.conf` as selected from the command line through
+  `--profile <profile>`.
 
 ### Changed
 

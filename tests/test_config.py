@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any
 
 import attr
+import pytest
 
 from pgactivity.config import Configuration, Flag, UISection
 
@@ -80,7 +81,7 @@ def test_lookup(tmp_path: Path) -> None:
     def asdict(cfg: Configuration) -> dict[str, Any]:
         return {k: attr.asdict(v) for k, v in cfg.items()}
 
-    cfg = Configuration.lookup(user_config_home=tmp_path)
+    cfg = Configuration.lookup(None, user_config_home=tmp_path)
     assert cfg is None
 
     (tmp_path / "pg_activity.conf").write_text(
@@ -93,8 +94,23 @@ def test_lookup(tmp_path: Path) -> None:
             ]
         )
     )
-    cfg = Configuration.lookup(user_config_home=tmp_path)
+    cfg = Configuration.lookup(None, user_config_home=tmp_path)
     assert cfg is not None and asdict(cfg) == {
         "client": {"hidden": False, "width": 5},
         "header": {"show_instance": False, "show_system": True, "show_workers": True},
     }
+
+    (tmp_path / "pg_activity").mkdir()
+    (tmp_path / "pg_activity" / "x.conf").write_text(
+        "\n".join(
+            ["[database]", "hidden= on", "width = 3 ", "[header]", "show_workers=no"]
+        )
+    )
+    cfg = Configuration.lookup("x", user_config_home=tmp_path)
+    assert cfg is not None and asdict(cfg) == {
+        "database": {"hidden": True, "width": 3},
+        "header": {"show_instance": True, "show_system": True, "show_workers": False},
+    }
+
+    with pytest.raises(FileNotFoundError):
+        Configuration.lookup("y", user_config_home=tmp_path)

@@ -296,14 +296,25 @@ class Configuration(Dict[str, Union[HeaderSection, UISection]]):
     @classmethod
     def lookup(
         cls: type[_T],
+        profile: str | None,
         *,
         user_config_home: Path = USER_CONFIG_HOME,
         etc: Path = ETC,
     ) -> _T | None:
-        for base in (user_config_home, etc):
-            fpath = base / "pg_activity.conf"
+        if profile is None:
+            for base in (user_config_home, etc):
+                fpath = base / "pg_activity.conf"
+                if fpath.exists():
+                    with fpath.open() as f:
+                        return cls.parse(f, str(fpath))
+            return None
+
+        assert profile  # per argument validation
+        fname = f"{profile}.conf"
+        bases = (user_config_home / "pg_activity", etc / "pg_activity")
+        for base in bases:
+            fpath = base / fname
             if fpath.exists():
                 with fpath.open() as f:
-                    value = cls.parse(f, str(fpath))
-                    return value
-        return None
+                    return cls.parse(f, str(fpath))
+        raise FileNotFoundError(f"profile {profile!r} not found")

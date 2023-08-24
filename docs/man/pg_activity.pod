@@ -230,6 +230,16 @@ required by another session. It shows following information:
 
 =head1 COMMAND-LINE OPTIONS
 
+=head2 CONFIGURATION
+
+=over 2
+
+=item B<--profile=PROFILE>
+
+	Configuration profile matching a PROFILE.conf file in ${XDG_CONFIG_HOME:~/.config}/pg_activity/ or /etc/pg_activity/.
+
+=back
+
 =head2 OPTIONS
 
 =over 2

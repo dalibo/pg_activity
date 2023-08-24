@@ -61,6 +61,17 @@ def get_parser() -> ArgumentParser:
     )
 
     group = parser.add_argument_group(
+        "Configuration",
+    )
+    group.add_argument(
+        "--profile",
+        help=(
+            "Configuration profile matching a PROFILE.conf file in "
+            "${XDG_CONFIG_HOME:~/.config}/pg_activity/ or /etc/pg_activity/."
+        ),
+    )
+
+    group = parser.add_argument_group(
         "Options",
     )
     # --blocksize
@@ -390,8 +401,8 @@ def main() -> None:
         args.notempfile = True
 
     try:
-        cfg = Configuration.lookup()
-    except ConfigurationError as e:
+        cfg = Configuration.lookup(args.profile)
+    except (ConfigurationError, FileNotFoundError) as e:
         parser.error(str(e))
 
     try:

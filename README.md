@@ -86,6 +86,11 @@ ex:
 
     pg_activity [options] [connection string]
 
+    Configuration:
+      --profile PROFILE     Configuration profile matching a PROFILE.conf file in
+                            ${XDG_CONFIG_HOME:~/.config}/pg_activity/ or
+                            /etc/pg_activity/.
+
     Options:
       --blocksize BLOCKSIZE
                             Filesystem blocksize (default: 4096).
@@ -142,7 +147,7 @@ ex:
 
 ## Configuration
 
-`pg_activity` may be configured through configuration file, in [INI format][],
+`pg_activity` may be configured through a configuration file, in [INI format][],
 read from `${XDG_CONFIG_HOME:~/.config}/pg_activity.conf` or
 `/etc/pg_activity.conf` in that order. Command-line options may override
 configuration file settings.
@@ -160,6 +165,13 @@ hidden = yes
 [database]
 width = 9
 ```
+
+Alternatively, the user might define *configuration profiles* in the form of
+files located at `${XDG_CONFIG_HOME:~/.config}/pg_activity/<my-profile>.conf` or
+`/etc/pg_activity/<my-profile>.conf`; these can then be used through the
+`--profile <my-profile>` command-line option. The format of these files is the
+same as the main configuration file.
+
 
 [INI format]: https://docs.python.org/3/library/configparser.html#supported-ini-file-structure
 
