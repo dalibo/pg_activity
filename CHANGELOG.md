@@ -4,7 +4,7 @@
 
 ### Added
 
-* The *rollback ration* is now displayed in the "global" header (#385).
+* The *rollback ratio* is now displayed in the "global" header (#385).
 
 ### Fixed
 
