@@ -120,7 +120,7 @@ The last group displays B<system information>:
 
 =item - B<Swap>: total / free / used swap;
 
-=item - B<IO>: the number of IO per second, current Read and Write thoughput (aggregated data gathered with the psutil library);
+=item - B<IO>: the number of IO per second, current Read and Write throughput (aggregated data gathered with the psutil library);
 
 =item - B<Load>: CPU load for the last 1, 5, 15 minutes;
 
