@@ -428,7 +428,7 @@ Tests for footer_*()
 >>> footer_help(term, width=85)
 F1/1 Running  F2/2 Waiting  F3/3 Blocking Space Pause/u q Quit        h Help         
 >>> footer_interative_help(term)
-C Cancel curre K Terminate cu Space Tag/unta Other Back to  q Quit              
+C Cancel curre K Terminate un Space Tag/unta Other Back to  q Quit              
 >>> footer_message(term, "process 123 cancelled")
                              process 123 cancelled                              
 

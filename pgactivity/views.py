@@ -519,7 +519,7 @@ def footer_interative_help(term: Terminal, width: Optional[int] = None) -> None:
     assert PROCESS_PIN.name is not None
     footer_values = [
         (PROCESS_CANCEL, "cancel current query"),
-        (PROCESS_KILL, "terminate current query"),
+        (PROCESS_KILL, "terminate underlying session"),
         (PROCESS_PIN.name, PROCESS_PIN.description),
         ("Other", "back to activities"),
         (EXIT_KEY.value, EXIT_KEY.description),
