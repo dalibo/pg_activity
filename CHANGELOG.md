@@ -6,6 +6,11 @@
 
 * The *rollback ratio* is now displayed in the "global" header (#385).
 
+### Changed
+
+* The help text for `K` action, displayed in the footer, has been rephrased as
+  "terminate underlying session".
+
 ### Fixed
 
 * At startup, do not show a traceback upon failure to connect to PostgreSQL.
