@@ -213,7 +213,7 @@ except ImportError:
             pass
         conn = psycopg2.connect(dsn, cursor_factory=DictCursor, **kwargs)
         conn.autocommit = True
-        return conn  # type: ignore[return-value]
+        return conn  # type: ignore[no-any-return]
 
     def server_version(conn: Connection) -> int:
         return conn.server_version  # type: ignore[attr-defined, no-any-return]
@@ -239,7 +239,7 @@ except ImportError:
     ) -> Union[Dict[str, Any], Row]:
         with conn.cursor() as cur:
             if text_as_bytes:
-                psycopg2.extensions.register_type(psycopg2.extensions.BYTES, cur)  # type: ignore[no-untyped-call]
+                psycopg2.extensions.register_type(psycopg2.extensions.BYTES, cur)  # type: ignore[arg-type]
             cur.execute(query, args)
             row = cur.fetchone()
         assert row is not None
@@ -257,7 +257,7 @@ except ImportError:
     ) -> Union[List[Dict[str, Any]], List[Row]]:
         with conn.cursor() as cur:
             if text_as_bytes:
-                psycopg2.extensions.register_type(psycopg2.extensions.BYTES, cur)  # type: ignore[no-untyped-call]
+                psycopg2.extensions.register_type(psycopg2.extensions.BYTES, cur)  # type: ignore[arg-type]
             cur.execute(query, args)
             rows = cur.fetchall()
         if mkrow is not None:
