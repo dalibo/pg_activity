@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import configparser
 import enum
+import io
 import os
 from pathlib import Path
 from typing import IO, Any, Dict, TypeVar, Union
@@ -9,7 +10,7 @@ from typing import IO, Any, Dict, TypeVar, Union
 import attr
 from attr import validators
 
-from .compat import gt
+from .compat import gt, read_resource
 
 
 class ConfigurationError(Exception):
@@ -214,6 +215,19 @@ class UISection(BaseSectionMixin):
         return cls(**values)
 
 
+@attr.s(auto_attribs=True, frozen=True, slots=True)
+class BuiltinProfile:
+    name: str
+    content: IO[str]
+
+    @classmethod
+    def get(cls, name: str) -> BuiltinProfile | None:
+        content = read_resource("pgactivity", "profiles", f"{name}.conf")
+        if content is not None:
+            return cls(name, io.StringIO(content))
+        return None
+
+
 USER_CONFIG_HOME = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
 ETC = Path("/etc")
 
@@ -317,4 +331,9 @@ class Configuration(Dict[str, Union[HeaderSection, UISection]]):
             if fpath.exists():
                 with fpath.open() as f:
                     return cls.parse(f, str(fpath))
+
+        builtin_profile = BuiltinProfile.get(profile)
+        if builtin_profile is not None:
+            return cls.parse(builtin_profile.content, builtin_profile.name)
+
         raise FileNotFoundError(f"profile {profile!r} not found")

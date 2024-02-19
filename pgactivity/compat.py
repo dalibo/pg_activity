@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib.resources
 import operator
 import sys
 from importlib.metadata import version
@@ -32,6 +33,26 @@ if sys.version_info >= (3, 9):
     Dict = dict
 else:
     from typing import Callable, Dict, Iterable, Iterator, Mapping, MutableSet, Sequence
+
+if sys.version_info >= (3, 11):
+
+    def read_resource(pkgname: str, dirname: str, *args: str) -> str | None:
+        resource = importlib.resources.files(pkgname).joinpath(dirname)
+        for arg in args:
+            resource = resource.joinpath(arg)
+        if resource.is_file():
+            return resource.read_text()
+        return None
+
+else:
+
+    def read_resource(pkgname: str, dirname: str, *args: str) -> str | None:
+        with importlib.resources.path(pkgname, dirname) as dirp:
+            f = dirp.joinpath(*args)
+            if f.is_file():
+                return f.read_text()
+            return None
+
 
 ATTR_VERSION = tuple(int(x) for x in version("attrs").split(".", 2)[:2])
 BLESSED_VERSION = tuple(int(x) for x in version("blessed").split(".", 2)[:2])

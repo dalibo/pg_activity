@@ -77,10 +77,11 @@ def test_flag_load():
     )
 
 
-def test_lookup(tmp_path: Path) -> None:
-    def asdict(cfg: Configuration) -> dict[str, Any]:
-        return {k: attr.asdict(v) for k, v in cfg.items()}
+def asdict(cfg: Configuration) -> dict[str, Any]:
+    return {k: attr.asdict(v) for k, v in cfg.items()}
 
+
+def test_lookup(tmp_path: Path) -> None:
     cfg = Configuration.lookup(None, user_config_home=tmp_path)
     assert cfg is None
 
@@ -114,3 +115,27 @@ def test_lookup(tmp_path: Path) -> None:
 
     with pytest.raises(FileNotFoundError):
         Configuration.lookup("y", user_config_home=tmp_path)
+
+
+no_header = {
+    "header": {k: False for k in ("show_instance", "show_system", "show_workers")}
+}
+columns = ("database", "user", "client", "cpu", "mem", "read", "write", "appname")
+narrow = {k: {"hidden": True, "width": None} for k in columns}
+wide = {k: {"hidden": False, "width": None} for k in columns}
+minimal = {**no_header, **narrow}
+
+
+@pytest.mark.parametrize(
+    "profile, expected",
+    [
+        ("minimal", minimal),
+        ("narrow", narrow),
+        ("wide", wide),
+    ],
+)
+def test_lookup_builtin_profiles(
+    tmp_path: Path, profile: str, expected: dict[str, Any]
+) -> None:
+    cfg = Configuration.lookup(profile, user_config_home=tmp_path)
+    assert cfg is not None and asdict(cfg) == expected

@@ -1,5 +1,5 @@
 include docs/man/pg_activity.1
-recursive-include pgactivity *.py *.sql
+recursive-include pgactivity *.py *.sql *.conf
 recursive-include docs *.png *.pod *.sh *.svg
 recursive-include tests *.py *.json *.txt
 include *.md

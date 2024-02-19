@@ -67,7 +67,8 @@ def get_parser() -> ArgumentParser:
         "--profile",
         help=(
             "Configuration profile matching a PROFILE.conf file in "
-            "${XDG_CONFIG_HOME:~/.config}/pg_activity/ or /etc/pg_activity/."
+            "${XDG_CONFIG_HOME:~/.config}/pg_activity/ or /etc/pg_activity/, "
+            "or a built-in profile."
         ),
     )
 

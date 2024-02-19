@@ -11,6 +11,7 @@
   `${XDG_CONFIG_HOME:~/.config}/pg_activity/<profile>.conf` or
   `/etc/pg_activity/<profile>.conf` as selected from the command line through
   `--profile <profile>`.
+  Some built-in profiles are distributed with pg\_activity.
 
 ### Changed
 

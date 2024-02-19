@@ -172,6 +172,13 @@ files located at `${XDG_CONFIG_HOME:~/.config}/pg_activity/<my-profile>.conf` or
 `--profile <my-profile>` command-line option. The format of these files is the
 same as the main configuration file.
 
+`pg_activity` ships with a few built-in profiles:
+
+- `narrow`, providing a narrow user interface with most non-essential
+  columns in the process table hidden,
+- `wide`, providing a wide user interface (the inverse of `narrow`), and,
+- `minimal`, providing an even more minimal user interface with header
+  information hidden
 
 [INI format]: https://docs.python.org/3/library/configparser.html#supported-ini-file-structure
 
