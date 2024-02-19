@@ -1058,12 +1058,10 @@ class SelectableProcesses:
         return iter(self.items)
 
     @overload
-    def __getitem__(self, i: int) -> BaseProcess:
-        ...
+    def __getitem__(self, i: int) -> BaseProcess: ...
 
     @overload
-    def __getitem__(self, s: slice) -> List[BaseProcess]:
-        ...
+    def __getitem__(self, s: slice) -> List[BaseProcess]: ...
 
     def __getitem__(
         self, val: Union[int, slice]

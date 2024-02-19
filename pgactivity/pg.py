@@ -84,14 +84,12 @@ try:
     @overload
     def cursor(
         conn: Connection, mkrow: Callable[..., Row], text_as_bytes: bool
-    ) -> psycopg.Cursor[Row]:
-        ...
+    ) -> psycopg.Cursor[Row]: ...
 
     @overload
     def cursor(
         conn: Connection, mkrow: None, text_as_bytes: bool
-    ) -> psycopg.Cursor[psycopg.rows.DictRow]:
-        ...
+    ) -> psycopg.Cursor[psycopg.rows.DictRow]: ...
 
     def cursor(
         conn: Connection, mkrow: Optional[Callable[..., Row]], text_as_bytes: bool
@@ -112,8 +110,7 @@ try:
         *,
         mkrow: Callable[..., Row],
         text_as_bytes: bool = False,
-    ) -> Row:
-        ...
+    ) -> Row: ...
 
     @overload
     def fetchone(
@@ -122,8 +119,7 @@ try:
         args: Union[None, Sequence[Any], Dict[str, Any]] = None,
         *,
         text_as_bytes: bool = False,
-    ) -> Dict[str, Any]:
-        ...
+    ) -> Dict[str, Any]: ...
 
     def fetchone(
         conn: Connection,
@@ -146,8 +142,7 @@ try:
         *,
         mkrow: Callable[..., Row],
         text_as_bytes: bool = False,
-    ) -> List[Row]:
-        ...
+    ) -> List[Row]: ...
 
     @overload
     def fetchall(
@@ -156,8 +151,7 @@ try:
         args: Union[None, Sequence[Any], Dict[str, Any]] = None,
         *,
         text_as_bytes: bool = False,
-    ) -> List[Dict[str, Any]]:
-        ...
+    ) -> List[Dict[str, Any]]: ...
 
     def fetchall(
         conn: Connection,

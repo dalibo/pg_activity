@@ -46,7 +46,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pg-activity[psycopg,psycopg2,testing,typing]",
-    "black >= 23.1.0",
+    "black >= 24.2.0",
     "check-manifest",
     "codespell",
     "flake8",

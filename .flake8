@@ -5,6 +5,8 @@ ignore =
   E203,
   # line too long
   E501,
+  # multiple statements on one line (def)
+  E704,
   # line break before binary operator
   W503,
 exclude =
