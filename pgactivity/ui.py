@@ -40,6 +40,11 @@ def main(
 
     flag = Flag.load(config, is_local=is_local, **vars(options))
     ui = types.UI.make(
+        header=types.UIHeader(
+            show_instance=options.header_show_instance,
+            show_system=options.header_show_system,
+            show_workers=options.header_show_workers,
+        ),
         config=config,
         flag=flag,
         refresh_time=options.refresh,
@@ -48,9 +53,6 @@ def main(
         wrap_query=options.wrap_query,
         max_db_length=min(max(server_information.max_dbname_length, 8), 16),
         filters=data.filters,
-        show_instance_info_in_header=options.show_instance_info_in_header,
-        show_worker_info_in_header=options.show_worker_info_in_header,
-        show_system_info_in_header=options.show_system_info_in_header,
     )
 
     key, in_help = None, False
@@ -97,12 +99,12 @@ def main(
                 elif key.name == keys.CANCEL_SELECTION:
                     pg_procs.reset()
                     ui.end_interactive()
-                elif keys.is_toggle_header_sys_info(key):
-                    ui.toggle_system_info_in_header()
-                elif keys.is_toggle_header_inst_info(key):
-                    ui.toggle_instance_info_in_header()
-                elif keys.is_toggle_header_worker_info(key):
-                    ui.toggle_worker_info_in_header()
+                elif keys.is_toggle_header_system(key):
+                    ui.header.toggle_system()
+                elif keys.is_toggle_header_instance(key):
+                    ui.header.toggle_instance()
+                elif keys.is_toggle_header_workers(key):
+                    ui.header.toggle_workers()
                 elif pg_procs.selected and key in (
                     keys.PROCESS_CANCEL,
                     keys.PROCESS_KILL,

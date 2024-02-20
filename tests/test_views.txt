@@ -158,7 +158,7 @@ PostgreSQL 9.6 - localhost - tester@host:5432/postgres - Ref.: 10s - Duration mo
    IO: 300/s max iops, 200B/s - 100/s read, 300B/s - 200/s write
    Load average: 1 5 15
 
->>> ui.toggle_system_info_in_header()
+>>> ui.header.toggle_system()
 >>> header(term, ui, host=host, server_information=serverinfo,
 ...        system_info=sysinfo, pg_version="PostgreSQL 9.6",
 ...        width=200)
@@ -170,8 +170,8 @@ PostgreSQL 9.6 - localhost - tester@host:5432/postgres - Ref.: 10s - Duration mo
    Other processes & info: 3/3 autovacuum workers, 1/10 wal senders, 0 wal receivers, 10/10 repl. slots
 
 >>> ui = UI.make(refresh_time=10, duration_mode=DurationMode.query)
->>> ui.toggle_system_info_in_header()
->>> ui.toggle_worker_info_in_header()
+>>> ui.header.toggle_system()
+>>> ui.header.toggle_workers()
 >>> header(term, ui, host=host, server_information=serverinfo,
 ...        system_info=sysinfo, pg_version="PostgreSQL 9.6",
 ...        width=200)
@@ -181,9 +181,9 @@ PostgreSQL 9.6 - localhost - tester@host:5432/postgres - Ref.: 10s - Duration mo
    Activity: 15 tps, 10 insert/s, 20 update/s, 30 delete/s, 40 tuples returned/s, 5 temp files, 11.50M temp size
 
 >>> ui = UI.make(refresh_time=2, min_duration=1.2, duration_mode=DurationMode.transaction)
->>> ui.toggle_system_info_in_header()
->>> ui.toggle_worker_info_in_header()
->>> ui.toggle_instance_info_in_header()
+>>> ui.header.toggle_system()
+>>> ui.header.toggle_workers()
+>>> ui.header.toggle_instance()
 >>> header(term, ui, host=host, server_information=serverinfo,
 ...        system_info=sysinfo, pg_version="PostgreSQL 9.6",
 ...        width=200)
@@ -196,7 +196,7 @@ PostgreSQL 9.6 - localhost - tester@host:5432/postgres - Ref.: 2s - Duration mod
 ...     io_read=IOCounter(0,0),
 ...     io_write=IOCounter(0,0),
 ...     max_iops=0)
->>> ui.toggle_system_info_in_header()
+>>> ui.header.toggle_system()
 >>> header(term, ui, host=host, server_information=serverinfo,
 ...        system_info=sysinfo, pg_version="PostgreSQL 9.6",
 ...        width=200)

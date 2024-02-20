@@ -319,7 +319,7 @@ def get_parser() -> ArgumentParser:
     # --no-inst-info
     group.add_argument(
         "--no-inst-info",
-        dest="show_instance_info_in_header",
+        dest="header_show_instance",
         action="store_false",
         help="Hide instance information.",
         default=True,
@@ -327,7 +327,7 @@ def get_parser() -> ArgumentParser:
     # --no-sys-info
     group.add_argument(
         "--no-sys-info",
-        dest="show_system_info_in_header",
+        dest="header_show_system",
         action="store_false",
         help="Hide system information.",
         default=True,
@@ -335,7 +335,7 @@ def get_parser() -> ArgumentParser:
     # --no-proc-info
     group.add_argument(
         "--no-proc-info",
-        dest="show_worker_info_in_header",
+        dest="header_show_workers",
         action="store_false",
         help="Hide workers process information.",
         default=True,

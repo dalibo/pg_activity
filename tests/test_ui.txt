@@ -46,9 +46,9 @@ Default CLI options, passed to ui.main():
 ...     "rds": False,
 ...     "username": f"{postgres.info.user}",
 ...     "wrap_query": False,
-...     "show_instance_info_in_header": True,
-...     "show_worker_info_in_header": True,
-...     "show_system_info_in_header": True,
+...     "header_show_instance": True,
+...     "header_show_workers": True,
+...     "header_show_system": True,
 ... }
 >>> options = argparse.Namespace(**defaults)
 
@@ -428,9 +428,9 @@ PID    DATABASE              USER       CLIENT             state Query
 ------------------------------------------------------------------------------------------- sending key 'q' --------------------------------------------------------------------------------------------
 
 >>> defaults["nopid"] = True
->>> defaults["show_instance_info_in_header"] = False
->>> defaults["show_worker_info_in_header"] = False
->>> defaults["show_system_info_in_header"] = False
+>>> defaults["header_show_instance"] = False
+>>> defaults["header_show_workers"] = False
+>>> defaults["header_show_system"] = False
 >>> options = argparse.Namespace(**defaults)
 
 One query, idle in transaction:

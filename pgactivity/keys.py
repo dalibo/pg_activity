@@ -49,7 +49,7 @@ SORTBY_TIME = "t"
 SORTBY_CPU = "c"
 HEADER_TOGGLE_SYSTEM = "s"
 HEADER_TOGGLE_INSTANCE = "i"
-HEADER_TOGGLE_WORKER = "o"
+HEADER_TOGGLE_WORKERS = "o"
 
 
 def is_process_next(key: Keystroke) -> bool:
@@ -84,16 +84,16 @@ def is_process_last(key: Keystroke) -> bool:
     return key.name == PROCESS_LAST
 
 
-def is_toggle_header_sys_info(key: Keystroke) -> bool:
+def is_toggle_header_system(key: Keystroke) -> bool:
     return key == HEADER_TOGGLE_SYSTEM
 
 
-def is_toggle_header_inst_info(key: Keystroke) -> bool:
+def is_toggle_header_instance(key: Keystroke) -> bool:
     return key == HEADER_TOGGLE_INSTANCE
 
 
-def is_toggle_header_worker_info(key: Keystroke) -> bool:
-    return key == HEADER_TOGGLE_WORKER
+def is_toggle_header_workers(key: Keystroke) -> bool:
+    return key == HEADER_TOGGLE_WORKERS
 
 
 EXIT_KEY = Key(EXIT, "quit")
@@ -115,7 +115,7 @@ BINDINGS: list[Key] = [
     Key("R", "force refresh"),
     Key(HEADER_TOGGLE_SYSTEM, "Display system information in header", local_only=True),
     Key(HEADER_TOGGLE_INSTANCE, "Display general instance information in header"),
-    Key(HEADER_TOGGLE_WORKER, "Display worker information in header"),
+    Key(HEADER_TOGGLE_WORKERS, "Display worker information in header"),
     EXIT_KEY,
 ]
 

@@ -194,9 +194,64 @@ class Column:
 
 
 @attr.s(auto_attribs=True, slots=True)
+class UIHeader:
+    """Configuration for the header of the UI."""
+
+    show_instance: bool = True
+    show_system: bool = True
+    show_workers: bool = True
+
+    def toggle_system(self) -> None:
+        """Toggle the 'show_system' attribute.
+
+        >>> h = UIHeader()
+        >>> h.show_system
+        True
+        >>> h.toggle_system()
+        >>> h.show_system
+        False
+        >>> h.toggle_system()
+        >>> h.show_system
+        True
+        """
+        self.show_system = not self.show_system
+
+    def toggle_instance(self) -> None:
+        """Toggle the 'show_instance' attribute.
+
+        >>> h = UIHeader()
+        >>> h.show_instance
+        True
+        >>> h.toggle_instance()
+        >>> h.show_instance
+        False
+        >>> h.toggle_instance()
+        >>> h.show_instance
+        True
+        """
+        self.show_instance = not self.show_instance
+
+    def toggle_workers(self) -> None:
+        """Toggle the 'show_workers' attribute.
+
+        >>> h = UIHeader()
+        >>> h.show_workers
+        True
+        >>> h.toggle_workers()
+        >>> h.show_workers
+        False
+        >>> h.toggle_workers()
+        >>> h.show_workers
+        True
+        """
+        self.show_workers = not self.show_workers
+
+
+@attr.s(auto_attribs=True, slots=True)
 class UI:
     """State of the UI."""
 
+    header: UIHeader
     columns_by_querymode: Mapping[QueryMode, tuple[Column, ...]]
     min_duration: float = 0.0
     duration_mode: DurationMode = attr.ib(
@@ -208,13 +263,11 @@ class UI:
     refresh_time: float | int = 2
     in_pause: bool = False
     interactive_timeout: int | None = None
-    show_instance_info_in_header: bool = True
-    show_system_info_in_header: bool = True
-    show_worker_info_in_header: bool = True
 
     @classmethod
     def make(
         cls,
+        header: UIHeader | None = None,
         config: Configuration | None = None,
         flag: Flag = Flag.all(),
         *,
@@ -222,6 +275,9 @@ class UI:
         filters: Filters = NO_FILTER,
         **kwargs: Any,
     ) -> UI:
+        if header is None:
+            header = UIHeader()
+
         possible_columns: dict[str, Column] = {}
 
         def add_column(key: str, name: str, **kwargs: Any) -> None:
@@ -429,7 +485,7 @@ class UI:
                     pass
 
         columns_by_querymode = {qm: tuple(make_columns_for(qm)) for qm in QueryMode}
-        return cls(columns_by_querymode=columns_by_querymode, **kwargs)
+        return cls(header=header, columns_by_querymode=columns_by_querymode, **kwargs)
 
     def interactive(self) -> bool:
         return self.interactive_timeout is not None
@@ -499,51 +555,6 @@ class UI:
         False
         """
         self.in_pause = not self.in_pause
-
-    def toggle_system_info_in_header(self) -> None:
-        """Toggle the 'show_system_info_in_header' attribute.
-
-        >>> ui = UI.make()
-        >>> ui.show_system_info_in_header
-        True
-        >>> ui.toggle_system_info_in_header()
-        >>> ui.show_system_info_in_header
-        False
-        >>> ui.toggle_system_info_in_header()
-        >>> ui.show_system_info_in_header
-        True
-        """
-        self.show_system_info_in_header = not self.show_system_info_in_header
-
-    def toggle_instance_info_in_header(self) -> None:
-        """Toggle the 'show_instance_info_in_header' attribute.
-
-        >>> ui = UI.make()
-        >>> ui.show_instance_info_in_header
-        True
-        >>> ui.toggle_instance_info_in_header()
-        >>> ui.show_instance_info_in_header
-        False
-        >>> ui.toggle_instance_info_in_header()
-        >>> ui.show_instance_info_in_header
-        True
-        """
-        self.show_instance_info_in_header = not self.show_instance_info_in_header
-
-    def toggle_worker_info_in_header(self) -> None:
-        """Toggle the 'show_worker_info_in_header' attribute.
-
-        >>> ui = UI.make()
-        >>> ui.show_worker_info_in_header
-        True
-        >>> ui.toggle_worker_info_in_header()
-        >>> ui.show_worker_info_in_header
-        False
-        >>> ui.toggle_worker_info_in_header()
-        >>> ui.show_worker_info_in_header
-        True
-        """
-        self.show_worker_info_in_header = not self.show_worker_info_in_header
 
     def evolve(self, **changes: Any) -> None:
         """Return a new UI with 'changes' applied.

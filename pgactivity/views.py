@@ -232,7 +232,7 @@ def header(
     size_ev = f"{utils.naturalsize(si.size_evolution)}/s"
     uptime = utils.naturaltimedelta(si.uptime)
 
-    if ui.show_instance_info_in_header:
+    if ui.header.show_instance:
         # First rows are always displayed, as the underlying data is always available.
         columns = [
             [f"* Global: {render(uptime)} uptime"],
@@ -268,7 +268,7 @@ def header(
             [f"{render(temp_size)} temp size"],
         ]
         yield from render_columns(columns)
-    if ui.show_worker_info_in_header:
+    if ui.header.show_workers:
         columns = [
             [
                 f"* Worker processes: {render(si.worker_processes)}/{render(si.max_worker_processes)} total"
@@ -295,7 +295,7 @@ def header(
         yield from render_columns(columns)
 
     # System information, only available in "local" mode.
-    if system_info is not None and ui.show_system_info_in_header:
+    if system_info is not None and ui.header.show_system:
         used, bc, free, total = (
             utils.naturalsize(system_info.memory.used),
             utils.naturalsize(system_info.memory.buff_cached),
