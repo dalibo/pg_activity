@@ -5,6 +5,8 @@
 ### Added
 
 * The *rollback ratio* is now displayed in the "global" header (#385).
+* Make header's sections display configurable through the `[header]` section of
+  the configuration file.
 
 ### Changed
 

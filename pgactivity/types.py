@@ -12,7 +12,7 @@ from attr import validators
 
 from . import colors, compat, pg, utils
 from .compat import Callable, Iterable, Iterator, Mapping, MutableSet, Sequence
-from .config import Configuration, Flag
+from .config import Configuration, Flag, HeaderSection, UISection
 
 
 class Pct(float):
@@ -201,6 +201,22 @@ class UIHeader:
     show_system: bool = True
     show_workers: bool = True
 
+    @classmethod
+    def make(cls, config: HeaderSection | None, **options: bool | None) -> UIHeader:
+        """Return a UIHeader built from configuration and command-line options.
+
+        Command-line options take precedence over configuration.
+
+        >>> config = HeaderSection(show_instance=False, show_system=False)
+        >>> UIHeader.make(config, show_instance=True, show_workers=False)
+        UIHeader(show_instance=True, show_system=False, show_workers=False)
+        """
+        values = {}
+        if config is not None:
+            values.update(attr.asdict(config))
+        values.update({k: v for k, v in options.items() if v is not None})
+        return cls(**values)
+
     def toggle_system(self) -> None:
         """Toggle the 'show_system' attribute.
 
@@ -276,7 +292,7 @@ class UI:
         **kwargs: Any,
     ) -> UI:
         if header is None:
-            header = UIHeader()
+            header = UIHeader.make(config.header() if config else None)
 
         possible_columns: dict[str, Column] = {}
 
@@ -287,6 +303,7 @@ class UI:
                 except KeyError:
                     pass
                 else:
+                    assert isinstance(cfg, UISection), cfg
                     if cfg.width is not None:
                         kwargs["min_width"] = kwargs["max_width"] = cfg.width
             assert key not in possible_columns, f"duplicated key {key}"

@@ -146,8 +146,14 @@ ex:
 read from `${XDG_CONFIG_HOME:~/.config}/pg_activity.conf` or
 `/etc/pg_activity.conf` in that order. Command-line options may override
 configuration file settings.
-This is used to control how columns in the processes table are rendered, e.g.:
+This is used to control how columns in the processes table are rendered or which
+items of the header should be displayed, e.g.:
 ```ini
+[header]
+show_instance = yes
+show_system = yes
+show_workers = no
+
 [client]
 hidden = yes
 

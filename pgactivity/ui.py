@@ -40,7 +40,8 @@ def main(
 
     flag = Flag.load(config, is_local=is_local, **vars(options))
     ui = types.UI.make(
-        header=types.UIHeader(
+        header=types.UIHeader.make(
+            config.header() if config else None,
             show_instance=options.header_show_instance,
             show_system=options.header_show_system,
             show_workers=options.header_show_workers,

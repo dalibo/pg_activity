@@ -322,7 +322,7 @@ def get_parser() -> ArgumentParser:
         dest="header_show_instance",
         action="store_false",
         help="Hide instance information.",
-        default=True,
+        default=None,
     )
     # --no-sys-info
     group.add_argument(
@@ -330,7 +330,7 @@ def get_parser() -> ArgumentParser:
         dest="header_show_system",
         action="store_false",
         help="Hide system information.",
-        default=True,
+        default=None,
     )
     # --no-proc-info
     group.add_argument(
@@ -338,7 +338,7 @@ def get_parser() -> ArgumentParser:
         dest="header_show_workers",
         action="store_false",
         help="Hide workers process information.",
-        default=True,
+        default=None,
     )
 
     group = parser.add_argument_group("Other display options")

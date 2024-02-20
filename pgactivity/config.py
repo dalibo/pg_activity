@@ -4,7 +4,7 @@ import configparser
 import enum
 import os
 from pathlib import Path
-from typing import IO, Any, Dict, TypeVar
+from typing import IO, Any, Dict, TypeVar, Union
 
 import attr
 from attr import validators
@@ -96,6 +96,7 @@ class Flag(enum.Flag):
             except KeyError:
                 pass
             else:
+                assert isinstance(cfg, UISection)
                 if cfg.hidden:
                     continue
             value |= f
@@ -162,8 +163,44 @@ class Flag(enum.Flag):
         return flag
 
 
+class BaseSectionMixin:
+    @classmethod
+    def check_options(
+        cls: type[attr.AttrsInstance], section: configparser.SectionProxy
+    ) -> list[str]:
+        """Check that items of 'section' conform to known attributes of this class and
+        return the list of know options.
+        """
+        known_options = {f.name for f in attr.fields(cls)}
+        unknown_options = set(section) - set(known_options)
+        if unknown_options:
+            raise ValueError(f"invalid option(s): {', '.join(sorted(unknown_options))}")
+        return list(sorted(known_options))
+
+
 @attr.s(auto_attribs=True, frozen=True, slots=True)
-class UISection:
+class HeaderSection(BaseSectionMixin):
+    show_instance: bool = True
+    show_system: bool = True
+    show_workers: bool = True
+
+    _T = TypeVar("_T", bound="HeaderSection")
+
+    @classmethod
+    def from_config_section(cls: type[_T], section: configparser.SectionProxy) -> _T:
+        values: dict[str, bool] = {}
+        for optname in cls.check_options(section):
+            try:
+                value = section.getboolean(optname)
+            except configparser.NoOptionError:
+                continue
+            if value is not None:
+                values[optname] = value
+        return cls(**values)
+
+
+@attr.s(auto_attribs=True, frozen=True, slots=True)
+class UISection(BaseSectionMixin):
     hidden: bool = False
     width: int | None = attr.ib(default=None, validator=validators.optional(gt(0)))
 
@@ -171,11 +208,8 @@ class UISection:
 
     @classmethod
     def from_config_section(cls: type[_T], section: configparser.SectionProxy) -> _T:
+        cls.check_options(section)
         values: dict[str, Any] = {}
-        known_options = {f.name: f for f in attr.fields(cls)}
-        unknown_options = set(section) - set(known_options)
-        if unknown_options:
-            raise ValueError(f"invalid option(s): {', '.join(sorted(unknown_options))}")
         try:
             hidden = section.getboolean("hidden")
         except configparser.NoOptionError:
@@ -194,18 +228,24 @@ USER_CONFIG_HOME = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config
 ETC = Path("/etc")
 
 
-class Configuration(Dict[str, UISection]):
+class Configuration(Dict[str, Union[HeaderSection, UISection]]):
     _T = TypeVar("_T", bound="Configuration")
+
+    def header(self) -> HeaderSection | None:
+        return self.get("header")  # type: ignore[return-value]
 
     @classmethod
     def parse(cls: type[_T], f: IO[str], name: str) -> _T:
         r"""Parse configuration from 'f'.
 
         >>> from io import StringIO
+        >>> from pprint import pprint
 
-        >>> f = StringIO('[client]\nhidden=true\n')
-        >>> Configuration.parse(f, "f.ini")
-        {'client': UISection(hidden=True, width=None)}
+        >>> f = StringIO('[header]\nshow_workers=false\n[client]\nhidden=true\n')
+        >>> cfg = Configuration.parse(f, "f.ini")
+        >>> pprint(cfg)
+        {'client': UISection(hidden=True, width=None),
+         'header': HeaderSection(show_instance=True, show_system=True, show_workers=False)}
 
         >>> bad = StringIO("[global]\nx=1")
         >>> Configuration.parse(bad, "bad.ini")
@@ -246,11 +286,14 @@ class Configuration(Dict[str, UISection]):
         except configparser.Error as e:
             raise ConfigurationError(name, f"failed to parse INI: {e}") from None
         known_sections = set(Flag.names())
-        config = {}
+        config: dict[str, HeaderSection | UISection] = {}
         for sname, section in p.items():
             if sname == p.default_section:
                 if section:
                     raise InvalidSection(p.default_section, name)
+                continue
+            if sname == "header":
+                config[sname] = HeaderSection.from_config_section(section)
                 continue
             if sname not in known_sections:
                 raise InvalidSection(sname, name)
