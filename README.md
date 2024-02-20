@@ -130,12 +130,14 @@ ex:
       --no-wait             Disable W.
       --no-app-name         Disable App.
 
+    Header display options:
+      --no-inst-info        Display instance information.
+      --no-sys-info         Display system information.
+      --no-proc-info        Display workers process information.
+
     Other display options:
       --hide-queries-in-logs
                             Disable log_min_duration_statements and log_min_duration_sample for pg_activity.
-      --no-inst-info        Display instance information in header.
-      --no-sys-info         Display system information in header.
-      --no-proc-info        Display workers process information in header.
       --refresh REFRESH     Refresh rate. Values: 0.5, 1, 2, 3, 4, 5 (default: 2).
 
 ## Configuration

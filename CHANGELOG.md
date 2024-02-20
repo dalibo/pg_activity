@@ -10,6 +10,8 @@
 
 * The help text for `K` action, displayed in the footer, has been rephrased as
   "terminate underlying session".
+* Rephrase the help text of `--no-{inst,sys,proc}-info` options and group them
+  into a dedicated section of `--help` output.
 
 ### Fixed
 

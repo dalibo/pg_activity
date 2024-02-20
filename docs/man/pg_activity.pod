@@ -358,21 +358,27 @@ required by another session. It shows following information:
 
 =back
 
-=head2 OTHER DISPLAY OPTIONS
+=head2 HEADER DISPLAY OPTIONS
 
 =over 2
 
 =item B<--no-inst-info>
 
-	Display instance information in header.
+	Hide instance information.
 
 =item B<--no-sys-info>
 
-	Display system information in header.
+	Hide system information.
 
 =item B<--no-proc-info>
 
-	Display workers process information in header.
+	Hide workers process information.
+
+=back
+
+=head2 OTHER DISPLAY OPTIONS
+
+=over 2
 
 =item B<--refresh>
 

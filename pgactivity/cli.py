@@ -315,6 +315,32 @@ def get_parser() -> ArgumentParser:
         default=False,
     )
 
+    group = parser.add_argument_group("Header display options")
+    # --no-inst-info
+    group.add_argument(
+        "--no-inst-info",
+        dest="show_instance_info_in_header",
+        action="store_false",
+        help="Hide instance information.",
+        default=True,
+    )
+    # --no-sys-info
+    group.add_argument(
+        "--no-sys-info",
+        dest="show_system_info_in_header",
+        action="store_false",
+        help="Hide system information.",
+        default=True,
+    )
+    # --no-proc-info
+    group.add_argument(
+        "--no-proc-info",
+        dest="show_worker_info_in_header",
+        action="store_false",
+        help="Hide workers process information.",
+        default=True,
+    )
+
     group = parser.add_argument_group("Other display options")
     # --hide-queries-in-logs
     group.add_argument(
@@ -323,30 +349,6 @@ def get_parser() -> ArgumentParser:
         action="store_true",
         help="Disable log_min_duration_statements and log_min_duration_sample for pg_activity.",
         default=False,
-    )
-    # --no-inst-info
-    group.add_argument(
-        "--no-inst-info",
-        dest="show_instance_info_in_header",
-        action="store_false",
-        help="Display instance information in header.",
-        default=True,
-    )
-    # --no-sys-info
-    group.add_argument(
-        "--no-sys-info",
-        dest="show_system_info_in_header",
-        action="store_false",
-        help="Display system information in header.",
-        default=True,
-    )
-    # --no-proc-info
-    group.add_argument(
-        "--no-proc-info",
-        dest="show_worker_info_in_header",
-        action="store_false",
-        help="Display workers process information in header.",
-        default=True,
     )
     # --refresh
     group.add_argument(
