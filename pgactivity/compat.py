@@ -1,12 +1,37 @@
 from __future__ import annotations
 
 import operator
+import sys
 from importlib.metadata import version
 from typing import Any
 
 import attr
 import attr.validators
 import blessed
+
+__all__ = [
+    "Callable",
+    "Dict",
+    "Iterable",
+    "Iterator",
+    "Mapping",
+    "MutableSet",
+    "Sequence",
+]
+
+if sys.version_info >= (3, 9):
+    from collections.abc import (
+        Callable,
+        Iterable,
+        Iterator,
+        Mapping,
+        MutableSet,
+        Sequence,
+    )
+
+    Dict = dict
+else:
+    from typing import Callable, Dict, Iterable, Iterator, Mapping, MutableSet, Sequence
 
 ATTR_VERSION = tuple(int(x) for x in version("attrs").split(".", 2)[:2])
 BLESSED_VERSION = tuple(int(x) for x in version("blessed").split(".", 2)[:2])

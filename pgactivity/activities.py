@@ -3,12 +3,13 @@ from __future__ import annotations
 import builtins
 import os
 import time
-from typing import Sequence, TypeVar
+from typing import TypeVar
 from warnings import catch_warnings, simplefilter
 
 import attr
 import psutil
 
+from .compat import Sequence
 from .types import (
     BlockingProcess,
     IOCounter,

@@ -4,25 +4,14 @@ import enum
 import functools
 from datetime import timedelta
 from ipaddress import IPv4Address, IPv6Address
-from typing import (
-    Any,
-    Callable,
-    Iterable,
-    Iterator,
-    Mapping,
-    MutableSet,
-    Sequence,
-    Tuple,
-    TypeVar,
-    Union,
-    overload,
-)
+from typing import Any, Tuple, TypeVar, Union, overload
 
 import attr
 import psutil
 from attr import validators
 
 from . import colors, compat, pg, utils
+from .compat import Callable, Iterable, Iterator, Mapping, MutableSet, Sequence
 from .config import Configuration, Flag
 
 

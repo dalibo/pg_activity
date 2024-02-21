@@ -4,13 +4,13 @@ import functools
 import inspect
 import itertools
 from textwrap import TextWrapper, dedent
-from typing import Any, Callable, Iterable, Iterator, Sequence
+from typing import Any
 
 from blessed import Terminal
 
 from . import colors, utils
 from .activities import sorted as sorted_processes
-from .compat import link
+from .compat import Callable, Iterable, Iterator, Sequence, link
 from .keys import BINDINGS, EXIT_KEY
 from .keys import HELP as HELP_KEY
 from .keys import (
