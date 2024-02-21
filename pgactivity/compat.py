@@ -1,15 +1,10 @@
 import operator
-import sys
+from importlib.metadata import version
 from typing import Any, Dict
 
 import attr
 import attr.validators
 import blessed
-
-if sys.version_info < (3, 8):
-    from importlib_metadata import version
-else:
-    from importlib.metadata import version
 
 ATTR_VERSION = tuple(int(x) for x in version("attrs").split(".", 2)[:2])
 BLESSED_VERSION = tuple(int(x) for x in version("blessed").split(".", 2)[:2])

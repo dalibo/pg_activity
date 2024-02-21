@@ -34,7 +34,7 @@ pg\_activity releases. Before submitting a bug report here:
 
 ## From PyPI
 
-pg\_activity can be installed using pip on Python 3.7 or later along with
+pg\_activity can be installed using pip on Python 3.8 or later along with
 psycopg:
 
     $ python3 -m pip install "pg_activity[psycopg]"

@@ -18,6 +18,10 @@
 * Fix retrieval of I/O statistics on BSD systems (#393).
 * Fix spelling mistakes in the man page.
 
+### Removed
+
+* Python 3.7 is no longer supported.
+
 ### Misc
 
 * Document how to *hack* on pg\_activity in the `README`.

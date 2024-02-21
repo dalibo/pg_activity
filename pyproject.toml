@@ -8,7 +8,7 @@ dynamic = ["version"]
 description = "Command line tool for PostgreSQL server activity monitoring."
 readme = "README.md"
 license = { text = "PostgreSQL" }
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 authors = [
     { name = "Julien Tachoires", email = "julmon@gmail.com" },
     { name = "Benoit Lobréau", email = "benoit.lobreau@dalibo.com" },
