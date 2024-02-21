@@ -1,4 +1,4 @@
-from typing import Optional
+from __future__ import annotations
 
 from blessed.keyboard import Keystroke
 
@@ -8,7 +8,7 @@ from .types import DurationMode, QueryMode, SortKey, enum_next
 
 
 def refresh_time(
-    key: Optional[str], value: float, minimum: float = 0.5, maximum: float = 5
+    key: str | None, value: float, minimum: float = 0.5, maximum: float = 5
 ) -> float:
     """Return an updated refresh time interval from input key respecting bounds.
 
@@ -66,7 +66,7 @@ def wrap_query(key: Keystroke, wrap: bool) -> bool:
     return wrap
 
 
-def query_mode(key: Keystroke) -> Optional[QueryMode]:
+def query_mode(key: Keystroke) -> QueryMode | None:
     """Return the query mode matching input key or None.
 
     >>> import curses
@@ -86,9 +86,7 @@ def query_mode(key: Keystroke) -> Optional[QueryMode]:
     return keys.QUERYMODE_FROM_KEYS.get(key)
 
 
-def sort_key_for(
-    key: Keystroke, query_mode: QueryMode, flag: Flag
-) -> Optional[SortKey]:
+def sort_key_for(key: Keystroke, query_mode: QueryMode, flag: Flag) -> SortKey | None:
     """Return the sort key matching input key or None.
 
     >>> from blessed.keyboard import Keystroke as k

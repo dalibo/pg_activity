@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import enum
 import functools
 from datetime import timedelta
@@ -5,16 +7,12 @@ from ipaddress import IPv4Address, IPv6Address
 from typing import (
     Any,
     Callable,
-    Dict,
     Iterable,
     Iterator,
-    List,
     Mapping,
     MutableSet,
-    Optional,
     Sequence,
     Tuple,
-    Type,
     TypeVar,
     Union,
     overload,
@@ -57,10 +55,10 @@ def enum_next(e: E) -> E:
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
 class Filters:
-    dbname: Optional[str] = None
+    dbname: str | None = None
 
     @classmethod
-    def from_options(cls, filters: Sequence[str]) -> "Filters":
+    def from_options(cls, filters: Sequence[str]) -> Filters:
         fields = compat.fields_dict(cls)
         attrs = {}
         for f in filters:
@@ -89,7 +87,7 @@ class SortKey(enum.Enum):
     duration = enum.auto()
 
     @classmethod
-    def default(cls) -> "SortKey":
+    def default(cls) -> SortKey:
         return cls.duration
 
 
@@ -100,7 +98,7 @@ class QueryMode(enum.Enum):
     blocking = "blocking queries"
 
     @classmethod
-    def default(cls) -> "QueryMode":
+    def default(cls) -> QueryMode:
         return cls.activities
 
 
@@ -155,14 +153,14 @@ class Column:
     key: str = attr.ib(repr=False)
     name: str
     mandatory: bool = False
-    sort_key: Optional[SortKey] = None
+    sort_key: SortKey | None = None
     min_width: int = attr.ib(default=0, repr=False)
-    max_width: Optional[int] = attr.ib(default=None, repr=False)
+    max_width: int | None = attr.ib(default=None, repr=False)
     justify: str = attr.ib(
         "left", validator=validators.in_(["left", "center", "right"])
     )
     transform: Callable[[Any], str] = attr.ib(default=if_none(""), repr=False)
-    color_key: Union[str, Callable[[Any], str]] = attr.ib(
+    color_key: str | Callable[[Any], str] = attr.ib(
         default=_color_key_marker, repr=False
     )
 
@@ -210,7 +208,7 @@ class Column:
 class UI:
     """State of the UI."""
 
-    columns_by_querymode: Mapping[QueryMode, Tuple[Column, ...]]
+    columns_by_querymode: Mapping[QueryMode, tuple[Column, ...]]
     min_duration: float = 0.0
     duration_mode: DurationMode = attr.ib(
         default=DurationMode.query, converter=DurationMode
@@ -218,9 +216,9 @@ class UI:
     wrap_query: bool = False
     sort_key: SortKey = attr.ib(default=SortKey.default(), converter=SortKey)
     query_mode: QueryMode = attr.ib(default=QueryMode.activities, converter=QueryMode)
-    refresh_time: Union[float, int] = 2
+    refresh_time: float | int = 2
     in_pause: bool = False
-    interactive_timeout: Optional[int] = None
+    interactive_timeout: int | None = None
     show_instance_info_in_header: bool = True
     show_system_info_in_header: bool = True
     show_worker_info_in_header: bool = True
@@ -228,14 +226,14 @@ class UI:
     @classmethod
     def make(
         cls,
-        config: Optional[Configuration] = None,
+        config: Configuration | None = None,
         flag: Flag = Flag.all(),
         *,
         max_db_length: int = 16,
         filters: Filters = NO_FILTER,
         **kwargs: Any,
-    ) -> "UI":
-        possible_columns: Dict[str, Column] = {}
+    ) -> UI:
+        possible_columns: dict[str, Column] = {}
 
         def add_column(key: str, name: str, **kwargs: Any) -> None:
             if config is not None:
@@ -388,7 +386,7 @@ class UI:
                 transform=utils.naturalsize,
             )
 
-        columns_key_by_querymode: Mapping[QueryMode, List[str]] = {
+        columns_key_by_querymode: Mapping[QueryMode, list[str]] = {
             QueryMode.activities: [
                 "pid",
                 "database",
@@ -604,7 +602,7 @@ class UI:
         else:
             raise ValueError(key)
 
-    def columns(self) -> Tuple[Column, ...]:
+    def columns(self) -> tuple[Column, ...]:
         """Return the tuple of Column for current mode.
 
         >>> flag = Flag.PID | Flag.DATABASE | Flag.APPNAME | Flag.RELATION
@@ -631,18 +629,18 @@ class SwapInfo:
     total: int
 
     @classmethod
-    def default(cls) -> "SwapInfo":
+    def default(cls) -> SwapInfo:
         return cls(0, 0, 0)
 
     @property
-    def pct_used(self) -> Optional[Pct]:
+    def pct_used(self) -> Pct | None:
         if self.total == 0:
             # account for the zero swap case (#318)
             return None
         return Pct(self.used * 100 / self.total)
 
     @property
-    def pct_free(self) -> Optional[Pct]:
+    def pct_free(self) -> Pct | None:
         if self.total == 0:
             # account for the zero swap case (#318)
             return None
@@ -657,23 +655,23 @@ class MemoryInfo:
     total: int
 
     @classmethod
-    def default(cls) -> "MemoryInfo":
+    def default(cls) -> MemoryInfo:
         return cls(0, 0, 0, 0)
 
     @property
-    def pct_used(self) -> Optional[Pct]:
+    def pct_used(self) -> Pct | None:
         if self.total == 0:
             return None
         return Pct(self.used * 100 / self.total)
 
     @property
-    def pct_free(self) -> Optional[Pct]:
+    def pct_free(self) -> Pct | None:
         if self.total == 0:
             return None
         return Pct(self.free * 100 / self.total)
 
     @property
-    def pct_bc(self) -> Optional[Pct]:
+    def pct_bc(self) -> Pct | None:
         if self.total == 0:
             return None
         return Pct(self.buff_cached * 100 / self.total)
@@ -686,7 +684,7 @@ class LoadAverage:
     avg15: float
 
     @classmethod
-    def default(cls) -> "LoadAverage":
+    def default(cls) -> LoadAverage:
         return cls(0.0, 0.0, 0.0)
 
 
@@ -696,7 +694,7 @@ class IOCounter:
     bytes: int
 
     @classmethod
-    def default(cls) -> "IOCounter":
+    def default(cls) -> IOCounter:
         return cls(0, 0)
 
 
@@ -713,10 +711,10 @@ class SystemInfo:
     def default(
         cls,
         *,
-        memory: Optional[MemoryInfo] = None,
-        swap: Optional[SwapInfo] = None,
-        load: Optional[LoadAverage] = None,
-    ) -> "SystemInfo":
+        memory: MemoryInfo | None = None,
+        swap: SwapInfo | None = None,
+        load: LoadAverage | None = None,
+    ) -> SystemInfo:
         """Zero-value builder.
 
         >>> SystemInfo.default()  # doctest: +NORMALIZE_WHITESPACE
@@ -771,19 +769,19 @@ class ServerInformation:
     total: int
     waiting: int
     max_connections: int
-    autovacuum_workers: Optional[int]
+    autovacuum_workers: int | None
     autovacuum_max_workers: int
-    logical_replication_workers: Optional[int]
-    parallel_workers: Optional[int]
-    max_logical_replication_workers: Optional[int]
-    max_parallel_workers: Optional[int]
-    max_worker_processes: Optional[int]
-    max_wal_senders: Optional[int]
-    max_replication_slots: Optional[int]
-    wal_senders: Optional[int]
-    wal_receivers: Optional[int]
-    replication_slots: Optional[int]
-    temporary_file: Optional[TempFileInfo]
+    logical_replication_workers: int | None
+    parallel_workers: int | None
+    max_logical_replication_workers: int | None
+    max_parallel_workers: int | None
+    max_worker_processes: int | None
+    max_wal_senders: int | None
+    max_replication_slots: int | None
+    wal_senders: int | None
+    wal_receivers: int | None
+    replication_slots: int | None
+    temporary_file: TempFileInfo | None
     # Computed in data.pg_get_server_information()
     size_evolution: float
     tps: int
@@ -791,15 +789,15 @@ class ServerInformation:
     update_per_second: int
     delete_per_second: int
     tuples_returned_per_second: int
-    cache_hit_ratio_last_snap: Optional[Pct] = attr.ib(
+    cache_hit_ratio_last_snap: Pct | None = attr.ib(
         converter=attr.converters.optional(Pct)
     )
-    rollback_ratio_last_snap: Optional[Pct] = attr.ib(
+    rollback_ratio_last_snap: Pct | None = attr.ib(
         converter=attr.converters.optional(Pct)
     )
 
     @property
-    def worker_processes(self) -> Optional[int]:
+    def worker_processes(self) -> int | None:
         if self.parallel_workers is None and self.logical_replication_workers is None:
             return None
         else:
@@ -844,24 +842,24 @@ def locktype(value: str) -> LockType:
 class BaseProcess:
     pid: int
     application_name: str
-    database: Optional[str]
+    database: str | None
     user: str
-    client: Union[None, IPv4Address, IPv6Address]
-    duration: Optional[float]
+    client: None | IPv4Address | IPv6Address
+    duration: float | None
     state: str
-    query: Optional[str]
-    encoding: Optional[str]
-    query_leader_pid: Optional[int]
+    query: str | None
+    encoding: str | None
+    query_leader_pid: int | None
     is_parallel_worker: bool
 
     _P = TypeVar("_P", bound="BaseProcess")
 
     @classmethod
     def from_bytes(
-        cls: Type[_P],
+        cls: type[_P],
         server_encoding: bytes,
         *,
-        encoding: Optional[Union[str, bytes]],
+        encoding: str | bytes | None,
         **kwargs: Any,
     ) -> _P:
         if encoding is None:
@@ -880,8 +878,8 @@ class BaseProcess:
 class RunningProcess(BaseProcess):
     """Process for a running query."""
 
-    wait: Union[bool, None, str]
-    query_leader_pid: Optional[int]
+    wait: bool | None | str
+    query_leader_pid: int | None
     is_parallel_worker: bool
 
 
@@ -896,7 +894,7 @@ class WaitingProcess(BaseProcess):
     relation: str
 
     # TODO: update queries to select/compute these column.
-    query_leader_pid: Optional[int] = attr.ib(default=None, init=False)
+    query_leader_pid: int | None = attr.ib(default=None, init=False)
     is_parallel_worker: bool = attr.ib(default=False, init=False)
 
 
@@ -909,26 +907,26 @@ class BlockingProcess(BaseProcess):
     mode: str
     type: LockType = attr.ib(converter=locktype)
     relation: str
-    wait: Union[bool, None, str]
+    wait: bool | None | str
 
     # TODO: update queries to select/compute these column.
-    query_leader_pid: Optional[int] = attr.ib(default=None, init=False)
+    query_leader_pid: int | None = attr.ib(default=None, init=False)
     is_parallel_worker: bool = attr.ib(default=False, init=False)
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
 class SystemProcess:
-    meminfo: Tuple[int, ...]
+    meminfo: tuple[int, ...]
     io_read: IOCounter
     io_write: IOCounter
     io_time: float
     mem_percent: float
     cpu_percent: float
-    cpu_times: Tuple[float, ...]
+    cpu_times: tuple[float, ...]
     read_delta: float
     write_delta: float
     io_wait: bool
-    psutil_proc: Optional[psutil.Process]
+    psutil_proc: psutil.Process | None
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
@@ -941,8 +939,8 @@ class LocalRunningProcess(RunningProcess):
 
     @classmethod
     def from_process(
-        cls, process: RunningProcess, **kwargs: Union[float, str]
-    ) -> "LocalRunningProcess":
+        cls, process: RunningProcess, **kwargs: float | str
+    ) -> LocalRunningProcess:
         return cls(**dict(attr.asdict(process), **kwargs))
 
 
@@ -1047,8 +1045,8 @@ class SelectableProcesses:
 
     """
 
-    items: List[BaseProcess]
-    focused: Optional[int] = None
+    items: list[BaseProcess]
+    focused: int | None = None
     pinned: MutableSet[int] = attr.ib(default=attr.Factory(set))
 
     def __len__(self) -> int:
@@ -1061,15 +1059,13 @@ class SelectableProcesses:
     def __getitem__(self, i: int) -> BaseProcess: ...
 
     @overload
-    def __getitem__(self, s: slice) -> List[BaseProcess]: ...
+    def __getitem__(self, s: slice) -> list[BaseProcess]: ...
 
-    def __getitem__(
-        self, val: Union[int, slice]
-    ) -> Union[BaseProcess, List[BaseProcess]]:
+    def __getitem__(self, val: int | slice) -> BaseProcess | list[BaseProcess]:
         return self.items[val]
 
     @property
-    def selected(self) -> List[int]:
+    def selected(self) -> list[int]:
         if self.pinned:
             return list(self.pinned)
         elif self.focused:
@@ -1084,7 +1080,7 @@ class SelectableProcesses:
     def set_items(self, new_items: Sequence[BaseProcess]) -> None:
         self.items[:] = list(new_items)
 
-    def position(self) -> Optional[int]:
+    def position(self) -> int | None:
         if self.focused is None:
             return None
         for idx, proc in enumerate(self.items):

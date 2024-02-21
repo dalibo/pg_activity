@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import functools
 import inspect
 import itertools
 from textwrap import TextWrapper, dedent
-from typing import Any, Callable, Iterable, Iterator, List, Optional, Sequence, Tuple
+from typing import Any, Callable, Iterable, Iterator, Sequence
 
 from blessed import Terminal
 
@@ -47,7 +49,7 @@ class line_counter:
 
 
 @functools.lru_cache(maxsize=512)
-def shorten(term: Terminal, text: str, width: Optional[int] = None) -> str:
+def shorten(term: Terminal, text: str, width: int | None = None) -> str:
     r"""Truncate 'text' to fit in the given 'width' (or term.width).
 
     This is similar to textwrap.shorten() but sequence-aware.
@@ -157,7 +159,7 @@ def header(
     host: Host,
     pg_version: str,
     server_information: ServerInformation,
-    system_info: Optional[SystemInfo] = None,
+    system_info: SystemInfo | None = None,
 ) -> Iterator[str]:
     @functools.singledispatch
     def render(x: Any) -> str:
@@ -188,7 +190,7 @@ def header(
         return f"{term.bold_green(hbytes)} - {term.bold_green(counts)}"
 
     def render_columns(
-        columns: Sequence[List[str]], *, delimiter: str = f"{term.blue(',')} "
+        columns: Sequence[list[str]], *, delimiter: str = f"{term.blue(',')} "
     ) -> Iterator[str]:
         column_widths = [
             max(len(column_row) for column_row in column) for column in columns
@@ -402,7 +404,7 @@ def processes_rows(
     ui: UI,
     processes: SelectableProcesses,
     maxlines: int,
-    width: Optional[int],
+    width: int | None,
 ) -> Iterator[str]:
     """Display table rows with processes information."""
 
@@ -449,7 +451,7 @@ def processes_rows(
             color_type = "yellow"
         else:
             color_type = "default"
-        text: List[str] = []
+        text: list[str] = []
         for column in ui.columns():
             field = column.key
             if field != "query":
@@ -472,13 +474,13 @@ def processes_rows(
         yield from (" ".join(text) + term.normal).splitlines()
 
 
-def footer_message(term: Terminal, message: str, width: Optional[int] = None) -> None:
+def footer_message(term: Terminal, message: str, width: int | None = None) -> None:
     if width is None:
         width = term.width
     print(term.center(message[:width]) + term.normal, end="")
 
 
-def footer_help(term: Terminal, width: Optional[int] = None) -> None:
+def footer_help(term: Terminal, width: int | None = None) -> None:
     """Footer line with help keys."""
     query_modes_help = [
         ("/".join(keys[:-1]), qm.value) for qm, keys in KEYS_BY_QUERYMODE.items()
@@ -493,7 +495,7 @@ def footer_help(term: Terminal, width: Optional[int] = None) -> None:
 
 
 def render_footer(
-    term: Terminal, footer_values: List[Tuple[str, str]], width: Optional[int]
+    term: Terminal, footer_values: list[tuple[str, str]], width: int | None
 ) -> None:
     if width is None:
         width = term.width
@@ -514,7 +516,7 @@ def render_footer(
     print(term.ljust(row, width=width, fillchar=term.cyan_reverse(" ")), end="")
 
 
-def footer_interative_help(term: Terminal, width: Optional[int] = None) -> None:
+def footer_interative_help(term: Terminal, width: int | None = None) -> None:
     """Footer line with help keys for interactive mode."""
     assert PROCESS_PIN.name is not None
     footer_values = [
@@ -535,14 +537,14 @@ def screen(
     pg_version: str,
     server_information: ServerInformation,
     activity_stats: ActivityStats,
-    message: Optional[str],
+    message: str | None,
     render_header: bool = True,
     render_footer: bool = True,
-    width: Optional[int] = None,
+    width: int | None = None,
 ) -> None:
     """Display the screen."""
 
-    system_info: Optional[SystemInfo]
+    system_info: SystemInfo | None
     if isinstance(activity_stats, tuple):
         processes, system_info = activity_stats
     else:

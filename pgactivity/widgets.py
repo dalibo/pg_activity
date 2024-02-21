@@ -1,4 +1,4 @@
-from typing import Optional
+from __future__ import annotations
 
 from blessed import Terminal
 
@@ -10,7 +10,7 @@ def boxed(
     border: bool = True,
     border_color: str = "white",
     center: bool = False,
-    width: Optional[int] = None,
+    width: int | None = None,
 ) -> str:
     if border:
         border_width = term.length(content) + 2

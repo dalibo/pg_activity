@@ -1,16 +1,8 @@
+from __future__ import annotations
+
 import logging
 import os
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    List,
-    Optional,
-    Sequence,
-    TypeVar,
-    Union,
-    overload,
-)
+from typing import Any, Callable, Dict, Sequence, TypeVar, overload
 
 Row = TypeVar("Row")
 
@@ -71,13 +63,13 @@ try:
     def server_version(conn: Connection) -> int:
         return conn.info.server_version
 
-    def connection_parameters(conn: Connection) -> Dict[str, Any]:
+    def connection_parameters(conn: Connection) -> dict[str, Any]:
         return conn.info.get_parameters()
 
     def execute(
         conn: Connection,
-        query: Union[str, sql.Composed],
-        args: Union[None, Sequence[Any], Dict[str, Any]] = None,
+        query: str | sql.Composed,
+        args: None | Sequence[Any] | dict[str, Any] = None,
     ) -> None:
         conn.execute(query, args, prepare=True)
 
@@ -92,8 +84,8 @@ try:
     ) -> psycopg.Cursor[psycopg.rows.DictRow]: ...
 
     def cursor(
-        conn: Connection, mkrow: Optional[Callable[..., Row]], text_as_bytes: bool
-    ) -> Union[psycopg.Cursor[psycopg.rows.DictRow], psycopg.Cursor[Row]]:
+        conn: Connection, mkrow: Callable[..., Row] | None, text_as_bytes: bool
+    ) -> psycopg.Cursor[psycopg.rows.DictRow] | psycopg.Cursor[Row]:
         if mkrow is not None:
             cur = conn.cursor(row_factory=psycopg.rows.kwargs_row(mkrow))
         else:
@@ -105,8 +97,8 @@ try:
     @overload
     def fetchone(
         conn: Connection,
-        query: Union[str, sql.Composed],
-        args: Union[None, Sequence[Any], Dict[str, Any]] = None,
+        query: str | sql.Composed,
+        args: None | Sequence[Any] | dict[str, Any] = None,
         *,
         mkrow: Callable[..., Row],
         text_as_bytes: bool = False,
@@ -115,20 +107,20 @@ try:
     @overload
     def fetchone(
         conn: Connection,
-        query: Union[str, sql.Composed],
-        args: Union[None, Sequence[Any], Dict[str, Any]] = None,
+        query: str | sql.Composed,
+        args: None | Sequence[Any] | dict[str, Any] = None,
         *,
         text_as_bytes: bool = False,
-    ) -> Dict[str, Any]: ...
+    ) -> dict[str, Any]: ...
 
     def fetchone(
         conn: Connection,
-        query: Union[str, sql.Composed],
-        args: Union[None, Sequence[Any], Dict[str, Any]] = None,
+        query: str | sql.Composed,
+        args: None | Sequence[Any] | dict[str, Any] = None,
         *,
-        mkrow: Optional[Callable[..., Row]] = None,
+        mkrow: Callable[..., Row] | None = None,
         text_as_bytes: bool = False,
-    ) -> Union[Dict[str, Any], Row]:
+    ) -> dict[str, Any] | Row:
         with cursor(conn, mkrow, text_as_bytes) as cur:
             row = cur.execute(query, args, prepare=True).fetchone()
         assert row is not None
@@ -137,30 +129,30 @@ try:
     @overload
     def fetchall(
         conn: Connection,
-        query: Union[str, sql.Composed],
-        args: Union[None, Sequence[Any], Dict[str, Any]] = None,
+        query: str | sql.Composed,
+        args: None | Sequence[Any] | dict[str, Any] = None,
         *,
         mkrow: Callable[..., Row],
         text_as_bytes: bool = False,
-    ) -> List[Row]: ...
+    ) -> list[Row]: ...
 
     @overload
     def fetchall(
         conn: Connection,
-        query: Union[str, sql.Composed],
-        args: Union[None, Sequence[Any], Dict[str, Any]] = None,
+        query: str | sql.Composed,
+        args: None | Sequence[Any] | dict[str, Any] = None,
         *,
         text_as_bytes: bool = False,
-    ) -> List[Dict[str, Any]]: ...
+    ) -> list[dict[str, Any]]: ...
 
     def fetchall(
         conn: Connection,
-        query: Union[str, sql.Composed],
-        args: Union[None, Sequence[Any], Dict[str, Any]] = None,
+        query: str | sql.Composed,
+        args: None | Sequence[Any] | dict[str, Any] = None,
         *,
         text_as_bytes: bool = False,
-        mkrow: Optional[Callable[..., Row]] = None,
-    ) -> Union[List[Dict[str, Any]], List[Row]]:
+        mkrow: Callable[..., Row] | None = None,
+    ) -> list[dict[str, Any]] | list[Row]:
         with cursor(conn, mkrow, text_as_bytes) as cur:
             return cur.execute(query, args, prepare=True).fetchall()
 
@@ -212,25 +204,25 @@ except ImportError:
     def server_version(conn: Connection) -> int:
         return conn.server_version  # type: ignore[attr-defined, no-any-return]
 
-    def connection_parameters(conn: Connection) -> Dict[str, Any]:
+    def connection_parameters(conn: Connection) -> dict[str, Any]:
         return conn.info.dsn_parameters  # type: ignore[attr-defined, no-any-return]
 
     def execute(
         conn: Connection,
-        query: Union[str, sql.Composed],
-        args: Union[None, Sequence[Any], Dict[str, Any]] = None,
+        query: str | sql.Composed,
+        args: None | Sequence[Any] | dict[str, Any] = None,
     ) -> None:
         with conn.cursor() as cur:
             cur.execute(query, args)
 
     def fetchone(  # type: ignore[no-redef]
         conn: Connection,
-        query: Union[str, sql.Composed],
-        args: Union[None, Sequence[Any], Dict[str, Any]] = None,
+        query: str | sql.Composed,
+        args: None | Sequence[Any] | dict[str, Any] = None,
         *,
-        mkrow: Optional[Callable[..., Row]] = None,
+        mkrow: Callable[..., Row] | None = None,
         text_as_bytes: bool = False,
-    ) -> Union[Dict[str, Any], Row]:
+    ) -> dict[str, Any] | Row:
         with conn.cursor() as cur:
             if text_as_bytes:
                 psycopg2.extensions.register_type(psycopg2.extensions.BYTES, cur)  # type: ignore[arg-type]
@@ -243,12 +235,12 @@ except ImportError:
 
     def fetchall(  # type: ignore[no-redef]
         conn: Connection,
-        query: Union[str, sql.Composed],
-        args: Union[None, Sequence[Any], Dict[str, Any]] = None,
+        query: str | sql.Composed,
+        args: None | Sequence[Any] | dict[str, Any] = None,
         *,
-        mkrow: Optional[Callable[..., Row]] = None,
+        mkrow: Callable[..., Row] | None = None,
         text_as_bytes: bool = False,
-    ) -> Union[List[Dict[str, Any]], List[Row]]:
+    ) -> list[dict[str, Any]] | list[Row]:
         with conn.cursor() as cur:
             if text_as_bytes:
                 psycopg2.extensions.register_type(psycopg2.extensions.BYTES, cur)  # type: ignore[arg-type]

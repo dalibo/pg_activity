@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import functools
 import re
 from datetime import datetime, timedelta
-from typing import IO, Any, Iterable, List, Mapping, Optional, Tuple, Union
+from typing import IO, Any, Iterable, Mapping
 
 import attr
 import humanize
@@ -49,12 +51,12 @@ class MessagePile:
     """
 
     n: int
-    messages: List[str] = attr.ib(default=attr.Factory(list), init=False)
+    messages: list[str] = attr.ib(default=attr.Factory(list), init=False)
 
     def send(self, message: str) -> None:
         self.messages[:] = [message] * self.n
 
-    def get(self) -> Optional[str]:
+    def get(self) -> str | None:
         if self.messages:
             return self.messages.pop()
         return None
@@ -106,7 +108,7 @@ def ellipsis(v: str, width: int) -> str:
     return v[: wl + 1] + "..." + v[-wl:]
 
 
-def get_duration(duration: Optional[float]) -> float:
+def get_duration(duration: float | None) -> float:
     """Return 0 if the given duration is negative else, return the duration.
 
     >>> get_duration(None)
@@ -122,7 +124,7 @@ def get_duration(duration: Optional[float]) -> float:
 
 
 @functools.lru_cache(maxsize=2)
-def format_duration(duration: Optional[float]) -> Tuple[str, str]:
+def format_duration(duration: float | None) -> tuple[str, str]:
     """Return a string from 'duration' value along with the color for rendering.
 
     >>> format_duration(None)
@@ -165,7 +167,7 @@ def format_duration(duration: Optional[float]) -> Tuple[str, str]:
     return ctime, color
 
 
-def wait_status(value: Union[None, bool, str]) -> str:
+def wait_status(value: None | bool | str) -> str:
     """Display the waiting status of query.
 
     >>> wait_status(None)
@@ -272,7 +274,7 @@ def csv_write(
             + "\n"
         )
 
-    def yn_na(value: Optional[bool]) -> str:
+    def yn_na(value: bool | None) -> str:
         if value is None:
             return "N/A"
         return yn(value)

@@ -1,5 +1,6 @@
+from __future__ import annotations
+
 import time
-from typing import Optional
 
 import attr
 import psycopg
@@ -163,7 +164,7 @@ def test_client_encoding(postgresql, encoding: str) -> None:
     ],
 )
 def test_postgres_and_python_encoding(
-    database_factory, pyenc: str, pgenc: str, locale: Optional[str], data, postgresql
+    database_factory, pyenc: str, pgenc: str, locale: str | None, data, postgresql
 ) -> None:
     dbname = pyenc
     try:

@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import configparser
 import enum
 import os
 from pathlib import Path
-from typing import IO, Any, Dict, List, Optional, Type, TypeVar
+from typing import IO, Any, Dict, TypeVar
 
 import attr
 from attr import validators
@@ -70,7 +72,7 @@ class Flag(enum.Flag):
     PID = enum.auto()
 
     @classmethod
-    def names(cls) -> List[str]:
+    def names(cls) -> list[str]:
         rv = []
         for f in cls:
             assert f.name
@@ -78,14 +80,14 @@ class Flag(enum.Flag):
         return rv
 
     @classmethod
-    def all(cls) -> "Flag":
+    def all(cls) -> Flag:
         value = cls(0)
         for f in cls:
             value |= f
         return value
 
     @classmethod
-    def from_config(cls, config: "Configuration") -> "Flag":
+    def from_config(cls, config: Configuration) -> Flag:
         value = cls(0)
         for f in cls:
             assert f.name is not None
@@ -102,7 +104,7 @@ class Flag(enum.Flag):
     @classmethod
     def load(
         cls,
-        config: Optional["Configuration"],
+        config: Configuration | None,
         *,
         is_local: bool,
         noappname: bool,
@@ -117,7 +119,7 @@ class Flag(enum.Flag):
         nowait: bool,
         nowrite: bool,
         **kwargs: Any,
-    ) -> "Flag":
+    ) -> Flag:
         """Build a Flag value from command line options."""
         if config:
             flag = cls.from_config(config)
@@ -163,13 +165,13 @@ class Flag(enum.Flag):
 @attr.s(auto_attribs=True, frozen=True, slots=True)
 class UISection:
     hidden: bool = False
-    width: Optional[int] = attr.ib(default=None, validator=validators.optional(gt(0)))
+    width: int | None = attr.ib(default=None, validator=validators.optional(gt(0)))
 
     _T = TypeVar("_T", bound="UISection")
 
     @classmethod
-    def from_config_section(cls: Type[_T], section: configparser.SectionProxy) -> _T:
-        values: Dict[str, Any] = {}
+    def from_config_section(cls: type[_T], section: configparser.SectionProxy) -> _T:
+        values: dict[str, Any] = {}
         known_options = {f.name: f for f in attr.fields(cls)}
         unknown_options = set(section) - set(known_options)
         if unknown_options:
@@ -196,7 +198,7 @@ class Configuration(Dict[str, UISection]):
     _T = TypeVar("_T", bound="Configuration")
 
     @classmethod
-    def parse(cls: Type[_T], f: IO[str], name: str) -> _T:
+    def parse(cls: type[_T], f: IO[str], name: str) -> _T:
         r"""Parse configuration from 'f'.
 
         >>> from io import StringIO
@@ -260,11 +262,11 @@ class Configuration(Dict[str, UISection]):
 
     @classmethod
     def lookup(
-        cls: Type[_T],
+        cls: type[_T],
         *,
         user_config_home: Path = USER_CONFIG_HOME,
         etc: Path = ETC,
-    ) -> Optional[_T]:
+    ) -> _T | None:
         for base in (user_config_home, etc):
             fpath = base / "pg_activity.conf"
             if fpath.exists():

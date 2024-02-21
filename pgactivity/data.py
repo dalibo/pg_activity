@@ -1,9 +1,10 @@
+from __future__ import annotations
+
 import getpass
 import logging
 import re
 from argparse import Namespace
 from functools import partial
-from typing import Dict, List, Optional
 
 import attr
 import psutil
@@ -70,7 +71,7 @@ class Data:
     server_encoding: bytes
     min_duration: float
     filters: Filters
-    dsn_parameters: Dict[str, str]
+    dsn_parameters: dict[str, str]
     failed_queries: FailedQueriesInfo
 
     @classmethod
@@ -78,16 +79,16 @@ class Data:
         cls,
         min_duration: float = 0.0,
         *,
-        host: Optional[str] = None,
+        host: str | None = None,
         port: int = 5432,
         user: str = "postgres",
-        password: Optional[str] = None,
+        password: str | None = None,
         database: str = "postgres",
         rds_mode: bool = False,
         dsn: str = "",
         hide_queries_in_logs: bool = False,
         filters: Filters = NO_FILTER,
-    ) -> "Data":
+    ) -> Data:
         """Create an instance by connecting to a PostgreSQL server."""
         pg_conn = pg.connect(
             dsn,
@@ -116,7 +117,7 @@ class Data:
             dsn_parameters=pg.connection_parameters(pg_conn),
         )
 
-    def try_reconnect(self) -> Optional["Data"]:
+    def try_reconnect(self) -> Data | None:
         try:
             pg_conn = pg.connect(**self.dsn_parameters)
         except (pg.InterfaceError, pg.OperationalError):
@@ -189,7 +190,7 @@ class Data:
         ret = pg.fetchone(self.pg_conn, query, {"pid": pid})
         return ret["is_stopped"]  # type: ignore[no-any-return]
 
-    def pg_get_temporary_file(self) -> Optional[TempFileInfo]:
+    def pg_get_temporary_file(self) -> TempFileInfo | None:
         """
         Count the number of temporary files and get their total size
         """
@@ -233,7 +234,7 @@ class Data:
         finally:
             pg.execute(self.pg_conn, queries.get("reset_statement_timeout"))
 
-    def pg_get_wal_senders(self) -> Optional[int]:
+    def pg_get_wal_senders(self) -> int | None:
         """
         Count the number of wal senders
         """
@@ -244,7 +245,7 @@ class Data:
         ret = pg.fetchone(self.pg_conn, query)
         return int(ret["wal_senders"])
 
-    def pg_get_wal_receivers(self) -> Optional[int]:
+    def pg_get_wal_receivers(self) -> int | None:
         """
         Count the number of wal receivers
         """
@@ -271,7 +272,7 @@ class Data:
 
         return int(ret["wal_receivers"])
 
-    def pg_get_replication_slots(self) -> Optional[int]:
+    def pg_get_replication_slots(self) -> int | None:
         """
         Count the number of replication slots
         """
@@ -290,7 +291,7 @@ class Data:
 
     def pg_get_server_information(
         self,
-        prev_server_info: Optional[ServerInformation] = None,
+        prev_server_info: ServerInformation | None = None,
         using_rds: bool = False,
         skip_db_size: bool = False,
         skip_tempfile: bool = False,
@@ -338,17 +339,17 @@ class Data:
             )
             raise
 
-        temporary_file_info: Optional[TempFileInfo] = None
+        temporary_file_info: TempFileInfo | None = None
         if not skip_tempfile:
             temporary_file_info = self.pg_get_temporary_file()
         wal_senders = self.pg_get_wal_senders()
-        wal_receivers: Optional[int] = None
+        wal_receivers: int | None = None
         if not skip_walreceiver:
             wal_receivers = self.pg_get_wal_receivers()
         replication_slots = self.pg_get_replication_slots()
 
-        hr: Optional[Pct] = None
-        rr: Optional[Pct] = None
+        hr: Pct | None = None
+        rr: Pct | None = None
         tps, ips, ups, dps, rps = 0, 0, 0, 0, 0
         size_ev = 0.0
         if prev_server_info is not None:
@@ -390,7 +391,7 @@ class Data:
             **ret,
         )
 
-    def pg_get_activities(self, duration_mode: int = 1) -> List[RunningProcess]:
+    def pg_get_activities(self, duration_mode: int = 1) -> list[RunningProcess]:
         """
         Get activity from pg_stat_activity view.
         """
@@ -425,7 +426,7 @@ class Data:
             text_as_bytes=True,
         )
 
-    def pg_get_waiting(self, duration_mode: int = 1) -> List[WaitingProcess]:
+    def pg_get_waiting(self, duration_mode: int = 1) -> list[WaitingProcess]:
         """
         Get waiting queries.
         """
@@ -452,7 +453,7 @@ class Data:
             text_as_bytes=True,
         )
 
-    def pg_get_blocking(self, duration_mode: int = 1) -> List[BlockingProcess]:
+    def pg_get_blocking(self, duration_mode: int = 1) -> list[BlockingProcess]:
         """
         Get blocking queries
         """

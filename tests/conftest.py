@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import logging
 import pathlib
 import threading
-from typing import Any, List, Optional
+from typing import Any
 
 import psycopg
 import psycopg.errors
@@ -15,7 +17,7 @@ LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.DEBUG)
 
 
-def pytest_report_header(config: Any) -> List[str]:
+def pytest_report_header(config: Any) -> list[str]:
     return [f"psycopg: {pg.__version__}"]
 
 
@@ -28,7 +30,7 @@ def datadir() -> pathlib.Path:
 def database_factory(postgresql):
     dbnames = set()
 
-    def createdb(dbname: str, encoding: str, locale: Optional[str] = None) -> None:
+    def createdb(dbname: str, encoding: str, locale: str | None = None) -> None:
         with psycopg.connect(postgresql.info.dsn, autocommit=True) as conn:
             qs = sql.SQL(
                 "CREATE DATABASE {dbname} ENCODING {encoding} TEMPLATE template0"
@@ -67,7 +69,7 @@ def execute(postgresql):
         query: str,
         commit: bool = False,
         autocommit: bool = False,
-        dbname: Optional[str] = None,
+        dbname: str | None = None,
     ) -> None:
         dsn, kwargs = postgresql.info.dsn, {}
         if dbname:

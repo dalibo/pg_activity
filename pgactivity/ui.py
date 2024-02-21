@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import time
 from argparse import Namespace
 from functools import partial
-from typing import Dict, List, Optional, cast
+from typing import List, cast
 
 import attr
 from blessed import Terminal
@@ -13,15 +15,15 @@ from .data import Data
 
 def main(
     term: Terminal,
-    config: Optional[Configuration],
+    config: Configuration | None,
     data: Data,
     host: types.Host,
     options: Namespace,
     *,
     render_header: bool = True,
     render_footer: bool = True,
-    width: Optional[int] = None,
-    wait_on_actions: Optional[float] = None,
+    width: int | None = None,
+    wait_on_actions: float | None = None,
 ) -> None:
     fs_blocksize = options.blocksize
 
@@ -52,7 +54,7 @@ def main(
     )
 
     key, in_help = None, False
-    sys_procs: Dict[int, types.SystemProcess] = {}
+    sys_procs: dict[int, types.SystemProcess] = {}
     pg_procs = types.SelectableProcesses([])
     activity_stats: types.ActivityStats
 

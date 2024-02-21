@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import operator
 from importlib.metadata import version
-from typing import Any, Dict
+from typing import Any
 
 import attr
 import attr.validators
@@ -11,7 +13,7 @@ BLESSED_VERSION = tuple(int(x) for x in version("blessed").split(".", 2)[:2])
 
 if ATTR_VERSION < (18, 1):
 
-    def fields_dict(cls: Any) -> Dict[str, Any]:
+    def fields_dict(cls: Any) -> dict[str, Any]:
         return {a.name: a for a in cls.__attrs_attrs__}
 
 else:

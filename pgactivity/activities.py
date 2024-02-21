@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import builtins
 import os
 import time
-from typing import Dict, List, Optional, Sequence, Tuple, TypeVar
+from typing import Sequence, TypeVar
 from warnings import catch_warnings, simplefilter
 
 import attr
@@ -21,7 +23,7 @@ from .types import (
 )
 
 
-def sys_get_proc(pid: int) -> Optional[SystemProcess]:
+def sys_get_proc(pid: int) -> SystemProcess | None:
     """Return a SystemProcess instance matching given pid or None if access with psutil
     is not possible.
     """
@@ -53,9 +55,9 @@ def sys_get_proc(pid: int) -> Optional[SystemProcess]:
 
 def ps_complete(
     pg_processes: Sequence[RunningProcess],
-    processes: Dict[int, SystemProcess],
+    processes: dict[int, SystemProcess],
     fs_blocksize: int,
-) -> Tuple[List[LocalRunningProcess], IOCounter, IOCounter]:
+) -> tuple[list[LocalRunningProcess], IOCounter, IOCounter]:
     """Transform the sequence of 'pg_processes' (RunningProcess) as LocalRunningProcess
     with local system information from the 'processes' map. Return LocalRunningProcess
     list, as well as read and write IO counters.
@@ -139,7 +141,7 @@ def ps_complete(
 T = TypeVar("T", RunningProcess, WaitingProcess, BlockingProcess, LocalRunningProcess)
 
 
-def sorted(processes: List[T], *, key: SortKey, reverse: bool = False) -> List[T]:
+def sorted(processes: list[T], *, key: SortKey, reverse: bool = False) -> list[T]:
     """Return processes sorted.
 
     >>> from ipaddress import IPv4Interface, ip_address
@@ -314,12 +316,12 @@ def update_max_iops(max_iops: int, read_count: float, write_count: float) -> int
     return max(int(read_count + write_count), max_iops)
 
 
-def get_load_average() -> Tuple[float, float, float]:
+def get_load_average() -> tuple[float, float, float]:
     """Get load average"""
     return os.getloadavg()
 
 
-def get_mem_swap() -> Tuple[MemoryInfo, SwapInfo]:
+def get_mem_swap() -> tuple[MemoryInfo, SwapInfo]:
     """Get memory and swap usage"""
     with catch_warnings():
         simplefilter("ignore", RuntimeWarning)
@@ -335,7 +337,7 @@ def get_mem_swap() -> Tuple[MemoryInfo, SwapInfo]:
     )
 
 
-def mem_swap_load() -> Tuple[MemoryInfo, SwapInfo, LoadAverage]:
+def mem_swap_load() -> tuple[MemoryInfo, SwapInfo, LoadAverage]:
     """Read memory, swap and load average from Data object."""
     memory, swap = get_mem_swap()
     load = LoadAverage(*get_load_average())

@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import attr
 
@@ -75,7 +77,7 @@ def test_flag_load():
 
 
 def test_lookup(tmp_path: Path) -> None:
-    def asdict(cfg: Configuration) -> Dict[str, Any]:
+    def asdict(cfg: Configuration) -> dict[str, Any]:
         return {k: attr.asdict(v) for k, v in cfg.items()}
 
     cfg = Configuration.lookup(user_config_home=tmp_path)

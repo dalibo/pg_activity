@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 import os
 import socket
@@ -5,7 +7,6 @@ import sys
 import time
 from argparse import ArgumentParser
 from io import StringIO
-from typing import Optional
 
 from blessed import Terminal
 
@@ -14,7 +15,7 @@ from .config import Configuration, ConfigurationError
 from .pg import OperationalError
 
 
-def configure_logger(debug_file: Optional[str] = None) -> StringIO:
+def configure_logger(debug_file: str | None = None) -> StringIO:
     logger = logging.getLogger("pgactivity")
     logger.setLevel(logging.DEBUG)
 

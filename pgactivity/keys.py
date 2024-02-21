@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import curses
-from typing import Any, List, Optional, Tuple
+from typing import Any
 
 import attr
 from blessed.keyboard import Keystroke
@@ -11,7 +13,7 @@ from .types import QueryMode
 class Key:
     value: str
     description: str
-    name: Optional[str] = None
+    name: str | None = None
     local_only: bool = False
 
     def __eq__(self, other: Any) -> bool:
@@ -97,7 +99,7 @@ def is_toggle_header_worker_info(key: Keystroke) -> bool:
 EXIT_KEY = Key(EXIT, "quit")
 PAUSE_KEY = Key(SPACE, "pause/unpause", "Space")
 
-BINDINGS: List[Key] = [
+BINDINGS: list[Key] = [
     Key("Up/Down", "scroll process list"),
     PAUSE_KEY,
     Key(SORTBY_CPU, "sort by CPU% desc. (activities)", local_only=True),
@@ -118,7 +120,7 @@ BINDINGS: List[Key] = [
 ]
 
 
-def _sequence_by_int(v: int) -> Tuple[str, str, int]:
+def _sequence_by_int(v: int) -> tuple[str, str, int]:
     """
     >>> _sequence_by_int(11)
     ('F11', '11', 275)
@@ -137,6 +139,6 @@ QUERYMODE_FROM_KEYS = {
 }
 
 
-MODES: List[Key] = [
+MODES: list[Key] = [
     Key("/".join(KEYS_BY_QUERYMODE[qm][:-1]), qm.value) for qm in QueryMode
 ]
