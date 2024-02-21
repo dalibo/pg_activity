@@ -52,6 +52,7 @@ dev = [
     "flake8",
     "isort",
     "pre-commit",
+    "pyupgrade",
 ]
 typing = [
     "mypy",

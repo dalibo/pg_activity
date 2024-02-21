@@ -278,7 +278,7 @@ class UI:
                 key="database",
                 name="DATABASE(*)" if filters.dbname else "DATABASE",
                 min_width=max_db_length,
-                transform=functools.lru_cache()(
+                transform=functools.lru_cache(
                     lambda v: utils.ellipsis(v, width=16) if v else "",
                 ),
                 sort_key=None,

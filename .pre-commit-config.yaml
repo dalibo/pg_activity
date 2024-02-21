@@ -12,6 +12,11 @@ repos:
         exclude: tests/test_*.txt
   - repo: local
     hooks:
+      - id: pyupgrade
+        name: pyupgrade
+        entry: pyupgrade --py38-plus --exit-zero-even-if-changed
+        language: system
+        types: [python]
       - id: black
         name: black
         entry: black --check .
