@@ -190,10 +190,7 @@ class HeaderSection(BaseSectionMixin):
     def from_config_section(cls: type[_T], section: configparser.SectionProxy) -> _T:
         values: dict[str, bool] = {}
         for optname in cls.check_options(section):
-            try:
-                value = section.getboolean(optname)
-            except configparser.NoOptionError:
-                continue
+            value = section.getboolean(optname)
             if value is not None:
                 values[optname] = value
         return cls(**values)
@@ -210,17 +207,10 @@ class UISection(BaseSectionMixin):
     def from_config_section(cls: type[_T], section: configparser.SectionProxy) -> _T:
         cls.check_options(section)
         values: dict[str, Any] = {}
-        try:
-            hidden = section.getboolean("hidden")
-        except configparser.NoOptionError:
-            pass
-        else:
-            if hidden is not None:
-                values["hidden"] = hidden
-        try:
-            values["width"] = section.getint("width")
-        except configparser.NoOptionError:
-            pass
+        hidden = section.getboolean("hidden")
+        if hidden is not None:
+            values["hidden"] = hidden
+        values["width"] = section.getint("width")
         return cls(**values)
 
 
