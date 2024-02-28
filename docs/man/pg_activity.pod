@@ -234,7 +234,7 @@ required by another session. It shows following information:
 
 =over 2
 
-=item B<--profile=PROFILE>
+=item B<-P PROFILE>, B<--profile=PROFILE>
 
 	Configuration profile matching a PROFILE.conf file in ${XDG_CONFIG_HOME:~/.config}/pg_activity/ or /etc/pg_activity/, or a built-in profile.
 

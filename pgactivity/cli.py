@@ -64,6 +64,7 @@ def get_parser() -> ArgumentParser:
         "Configuration",
     )
     group.add_argument(
+        "-P",
         "--profile",
         help=(
             "Configuration profile matching a PROFILE.conf file in "
