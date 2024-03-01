@@ -1,6 +1,6 @@
 # Change log
 
-## Unreleased
+## pg\_activity 3.5.0 - 2024-03-01
 
 ### Added
 
