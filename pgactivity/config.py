@@ -201,6 +201,7 @@ class HeaderSection(BaseSectionMixin):
 class UISection(BaseSectionMixin):
     hidden: bool = False
     width: int | None = attr.ib(default=None, validator=validators.optional(gt(0)))
+    color: str | None = attr.ib(default=None)
 
     _T = TypeVar("_T", bound="UISection")
 
@@ -212,6 +213,7 @@ class UISection(BaseSectionMixin):
         if hidden is not None:
             values["hidden"] = hidden
         values["width"] = section.getint("width")
+        values["color"] = section.get("color")
         return cls(**values)
 
 
@@ -245,10 +247,10 @@ class Configuration(Dict[str, Union[HeaderSection, UISection]]):
         >>> from io import StringIO
         >>> from pprint import pprint
 
-        >>> f = StringIO('[header]\nshow_workers=false\n[client]\nhidden=true\n')
+        >>> f = StringIO('[header]\nshow_workers=false\n[client]\nhidden=true\ncolor=green\n')
         >>> cfg = Configuration.parse(f, "f.ini")
         >>> pprint(cfg)
-        {'client': UISection(hidden=True, width=None),
+        {'client': UISection(hidden=True, width=None, color='green'),
          'header': HeaderSection(show_instance=True, show_system=True, show_workers=False)}
 
         >>> bad = StringIO("[global]\nx=1")
