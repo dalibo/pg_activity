@@ -448,7 +448,7 @@ def processes_rows(
         if process.pid == focused:
             color_type = "cursor"
         elif process.pid in pinned:
-            color_type = "yellow"
+            color_type = "pinned"
         else:
             color_type = "default"
         text: list[str] = []
