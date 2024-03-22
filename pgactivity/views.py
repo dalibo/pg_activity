@@ -4,7 +4,7 @@ import functools
 import inspect
 import itertools
 from textwrap import TextWrapper, dedent
-from typing import Any
+from typing import Any, Literal
 
 from blessed import Terminal
 
@@ -414,8 +414,18 @@ def processes_rows(
     def cell(
         value: Any,
         column: Column,
+        cursor: Literal["pinned", "focused"] | None,
     ) -> None:
-        color = getattr(term, colors.FIELD_BY_MODE[column.color(value)][color_type])
+        if cursor is not None:
+            if cursor == "pinned":
+                color_name = colors.PINNED_COLOR
+            elif cursor == "focused":
+                color_name = colors.FOCUSED_COLOR
+            else:
+                raise AssertionError(cursor)
+        else:
+            color_name = column.color(value) or "normal"
+        color = getattr(term, color_name or "normal")
         # We also restore 'normal' style so that the next item does not
         # inherit from that of the previous one.
         text.append(f"{color}{column.render(value)}{term.normal}")
@@ -445,17 +455,16 @@ def processes_rows(
     focused, pinned = processes.focused, processes.pinned
 
     for process in display_processes:
+        cursor: Literal["focused", "pinned"] | None = None
         if process.pid == focused:
-            color_type = "cursor"
+            cursor = "focused"
         elif process.pid in pinned:
-            color_type = "pinned"
-        else:
-            color_type = "default"
+            cursor = "pinned"
         text: list[str] = []
         for column in ui.columns():
             field = column.key
             if field != "query":
-                cell(getattr(process, field), column)
+                cell(getattr(process, field), column, cursor=cursor)
 
         indent = get_indent(ui) + " "
         qwidth = width - len(indent)
@@ -469,7 +478,7 @@ def processes_rows(
                 wrapped_lines = TextWrapper(qwidth).wrap(query)
                 query_value = f"\n{indent}".join(wrapped_lines)
 
-            cell(query_value, ui.column("query"))
+            cell(query_value, ui.column("query"), cursor=cursor)
 
         yield from (" ".join(text) + term.normal).splitlines()
 
