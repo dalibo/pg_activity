@@ -128,31 +128,31 @@ def format_duration(duration: float | None) -> tuple[str, str]:
     """Return a string from 'duration' value along with the color for rendering.
 
     >>> format_duration(None)
-    ('N/A     ', 'time_green')
+    ('N/A     ', 'green')
     >>> format_duration(-0.000062)
-    ('0.000000', 'time_green')
+    ('0.000000', 'green')
     >>> format_duration(0.1)
-    ('0.100000', 'time_green')
+    ('0.100000', 'green')
     >>> format_duration(1.2)
-    ('00:01.20', 'time_yellow')
+    ('00:01.20', 'yellow')
     >>> format_duration(12345)
-    ('205:45.00', 'time_red')
+    ('205:45.00', 'red')
     >>> format_duration(60001)
-    ('16 h', 'time_red')
+    ('16 h', 'red')
     """
     if duration is None:
-        return "N/A".ljust(8), "time_green"
+        return "N/A".ljust(8), "green"
 
     if duration < 1:
         if duration < 0:
             duration = 0
         ctime = f"{duration:.6f}"
-        color = "time_green"
+        color = "green"
     elif duration < 60000:
         if duration < 3:
-            color = "time_yellow"
+            color = "yellow"
         else:
-            color = "time_red"
+            color = "red"
         duration_d = timedelta(seconds=float(duration))
         mic = "%.6d" % duration_d.microseconds
         ctime = "{}:{}.{}".format(
@@ -162,7 +162,7 @@ def format_duration(duration: float | None) -> tuple[str, str]:
         )
     else:
         ctime = "%s h" % str(int(duration / 3600))
-        color = "time_red"
+        color = "red"
 
     return ctime, color
 

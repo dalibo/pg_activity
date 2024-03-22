@@ -98,9 +98,6 @@ class DurationMode(enum.IntEnum):
     backend = 3
 
 
-_color_key_marker = f"{id(object())}"
-
-
 def if_none(default: str) -> Callable[[Any], str]:
     def transform(value: Any) -> str:
         if value is None:
@@ -127,8 +124,6 @@ class Column:
     '4321  '
     >>> c.render('12345678')
     '876543'
-    >>> c.color_key
-    'pid'
 
     >>> c = attr.evolve(c, justify="right", min_width=4, max_width=5)
     >>> c.title_render()
@@ -149,16 +144,14 @@ class Column:
         "left", validator=validators.in_(["left", "center", "right"])
     )
     transform: Callable[[Any], str] = attr.ib(default=if_none(""), repr=False)
-    color_key: str | Callable[[Any], str] = attr.ib(
-        default=_color_key_marker, repr=False
-    )
+    default_color: str | None = attr.ib(default=None, repr=False)
+    value_color: Callable[[Any], str | None] | None = attr.ib(default=None, repr=False)
+    # A callable returning a color name given a cell value or None to fall back to
+    # "default_color"
 
     _justify: Callable[[str], str] = attr.ib(init=False)
 
     def __attrs_post_init__(self) -> None:
-        if self.color_key == _color_key_marker:
-            object.__setattr__(self, "color_key", self.key)
-
         if self.justify == "left":
 
             def _justify(value: str) -> str:
@@ -187,10 +180,12 @@ class Column:
     def render(self, value: Any) -> str:
         return self._justify(self.transform(value))
 
-    def color(self, value: Any) -> str:
-        if callable(self.color_key):
-            return self.color_key(value)
-        return self.color_key
+    def color(self, value: Any) -> str | None:
+        if callable(self.value_color):
+            color = self.value_color(value)
+            if color is not None:
+                return color
+        return self.default_color
 
 
 @attr.s(auto_attribs=True, slots=True)
@@ -316,6 +311,7 @@ class UI:
                 min_width=16,
                 max_width=16,
                 justify="right",
+                default_color="bold_black",
             )
         if Flag.CLIENT & flag:
             add_column(
@@ -325,6 +321,7 @@ class UI:
                 max_width=16,
                 justify="right",
                 transform=if_none("local"),
+                default_color="cyan",
             )
         if Flag.CPU & flag:
             add_column(
@@ -342,6 +339,7 @@ class UI:
                     lambda v: utils.ellipsis(v, width=16) if v else "",
                 ),
                 sort_key=None,
+                default_color="bold_black",
             )
         if Flag.IOWAIT & flag:
             add_column(
@@ -349,7 +347,7 @@ class UI:
                 name="IOW",
                 min_width=4,
                 transform=utils.yn,
-                color_key=colors.wait,
+                value_color=colors.wait,
             )
         if Flag.MEM & flag:
             add_column(
@@ -366,13 +364,14 @@ class UI:
                 min_width=16,
                 max_width=16,
                 justify="right",
-                color_key=colors.lock_mode,
+                value_color=colors.lock_mode,
             )
         if Flag.PID & flag:
             add_column(
                 key="pid",
                 name="PID",
                 min_width=6,
+                default_color="cyan",
             )
         add_column(
             key="query",
@@ -394,6 +393,7 @@ class UI:
                 min_width=9,
                 max_width=9,
                 justify="right",
+                default_color="cyan",
             )
         add_column(
             key="state",
@@ -401,7 +401,7 @@ class UI:
             min_width=17,
             justify="right",
             transform=utils.short_state,
-            color_key=colors.short_state,
+            value_color=colors.short_state,
         )
         if Flag.TIME & flag:
             add_column(
@@ -411,7 +411,7 @@ class UI:
                 justify="right",
                 sort_key=SortKey.duration,
                 transform=lambda v: utils.format_duration(v)[0],
-                color_key=lambda v: utils.format_duration(v)[1],
+                value_color=lambda v: utils.format_duration(v)[1],
             )
         if Flag.TYPE & flag:
             add_column(
@@ -428,6 +428,7 @@ class UI:
                 min_width=16,
                 max_width=16,
                 justify="right",
+                default_color="bold_black",
             )
         if Flag.WAIT & flag:
             add_column(
@@ -437,7 +438,7 @@ class UI:
                 max_width=16,
                 justify="right",
                 transform=utils.wait_status,
-                color_key=colors.wait,
+                value_color=colors.wait,
             )
         if Flag.WRITE & flag:
             add_column(
