@@ -6,7 +6,7 @@ from typing import Any
 import attr
 import pytest
 
-from pgactivity.config import Configuration, Flag, UISection
+from pgactivity.config import Configuration, ConfigurationError, Flag, UISection
 
 
 def test_flag():
@@ -83,6 +83,13 @@ def test_flag_load():
 
 def asdict(cfg: Configuration) -> dict[str, Any]:
     return {k: attr.asdict(v) for k, v in cfg.items()}
+
+
+def test_error() -> None:
+    cfg = Configuration(name="test", values={})
+    with pytest.raises(ConfigurationError, match="test error") as cm:
+        raise cfg.error("test error")
+    assert cm.value.filename == "test"
 
 
 def test_lookup(tmp_path: Path) -> None:

@@ -356,3 +356,6 @@ class Configuration:
             return cls.parse(builtin_profile.content, builtin_profile.name)
 
         raise FileNotFoundError(f"profile {profile!r} not found")
+
+    def error(self, message: str) -> ConfigurationError:
+        return ConfigurationError(self.name, message)
