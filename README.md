@@ -180,6 +180,24 @@ same as the main configuration file.
 - `minimal`, providing an even more minimal user interface with header
   information hidden
 
+Columns of the process table in pg\_activity user interface can be assigned a
+custom color in the configuration file, e.g.:
+```ini
+[client]
+color = magenta
+
+[relation]
+color = red
+```
+
+The `color` option illustrated above defines the color used to render the cell
+independently of its value, i.e. the "normal" color. Some columns may be
+colorized differently depending on the value of their cells; for example, the
+`time` column can handle tree colors depending on whether the time value is
+*high*, *medium* or *low*. The color of such columns cannot be currently
+customized and attempting to do so will result in pg\_activity to exit early
+with an error message.
+
 [INI format]: https://docs.python.org/3/library/configparser.html#supported-ini-file-structure
 
 ## Notes

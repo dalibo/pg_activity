@@ -425,6 +425,8 @@ def main() -> None:
     while True:
         try:
             ui.main(term, cfg, dataobj, host, args)
+        except ConfigurationError as e:
+            parser.exit(1, f"error: {e}")
         except OperationalError:
             while True:
                 print(term.clear + term.home, end="")

@@ -301,6 +301,12 @@ class UI:
                     assert isinstance(cfg, UISection), cfg
                     if cfg.width is not None:
                         kwargs["min_width"] = kwargs["max_width"] = cfg.width
+                    if cfg.color is not None:
+                        if kwargs.get("value_color"):
+                            raise config.error(
+                                f"the color for '{name}' column (option '{key}') cannot be configured"
+                            )
+                        kwargs["default_color"] = cfg.color
             assert key not in possible_columns, f"duplicated key {key}"
             possible_columns[key] = Column(key=key, name=name, **kwargs)
 

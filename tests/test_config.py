@@ -101,6 +101,7 @@ def test_lookup(tmp_path: Path) -> None:
             [
                 "[client]",
                 "width=5",
+                "color=cyan",
                 "[header]",
                 "show_instance=no",
             ]
@@ -108,7 +109,7 @@ def test_lookup(tmp_path: Path) -> None:
     )
     cfg = Configuration.lookup(None, user_config_home=tmp_path)
     assert cfg is not None and asdict(cfg) == {
-        "client": {"hidden": False, "width": 5},
+        "client": {"hidden": False, "width": 5, "color": "cyan"},
         "header": {"show_instance": False, "show_system": True, "show_workers": True},
     }
 
@@ -120,7 +121,7 @@ def test_lookup(tmp_path: Path) -> None:
     )
     cfg = Configuration.lookup("x", user_config_home=tmp_path)
     assert cfg is not None and asdict(cfg) == {
-        "database": {"hidden": True, "width": 3},
+        "database": {"hidden": True, "width": 3, "color": None},
         "header": {"show_instance": True, "show_system": True, "show_workers": False},
     }
 
@@ -132,8 +133,8 @@ no_header = {
     "header": {k: False for k in ("show_instance", "show_system", "show_workers")}
 }
 columns = ("database", "user", "client", "cpu", "mem", "read", "write", "appname")
-narrow = {k: {"hidden": True, "width": None} for k in columns}
-wide = {k: {"hidden": False, "width": None} for k in columns}
+narrow = {k: {"hidden": True, "width": None, "color": None} for k in columns}
+wide = {k: {"hidden": False, "width": None, "color": None} for k in columns}
 minimal = {**no_header, **narrow}
 
 

@@ -2,6 +2,11 @@
 
 ## pg\_activity 3.6.0 - UNRELEASED
 
+### Added
+
+* The color of cells in the process table can now be customized through the
+  configuration file.
+
 ### Changed
 
 * Exit with status 0 upon keyboard interrupt.
