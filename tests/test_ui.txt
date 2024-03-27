@@ -59,7 +59,8 @@ Default CLI options, passed to ui.main():
 
 >>> def mkconfig(value):
 ...     return config.Configuration(
-...         **{k: config.UISection(**v) for k, v in value.items()}
+...         name="ui-tests",
+...         values={k: config.UISection(**v) for k, v in value.items()},
 ... )
 >>> CONFIG = mkconfig({"database": {"width": 9}, "client": {"width": 12}})
 

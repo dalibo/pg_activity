@@ -50,7 +50,10 @@ def test_flag_load():
         | Flag.APPNAME
         | Flag.DATABASE
     )
-    cfg = Configuration(pid=UISection(hidden=True), relation=UISection(hidden=False))
+    cfg = Configuration(
+        name="test",
+        values=dict(pid=UISection(hidden=True), relation=UISection(hidden=False)),
+    )
     flag = Flag.load(cfg, is_local=False, **options)
     assert (
         flag
@@ -68,7 +71,8 @@ def test_flag_load():
     options["notime"] = True
     options["nopid"] = True
     cfg = Configuration(
-        database=UISection(hidden=False), relation=UISection(hidden=True)
+        name="test",
+        values=dict(database=UISection(hidden=False), relation=UISection(hidden=True)),
     )
     flag = Flag.load(cfg, is_local=False, **options)
     assert (
