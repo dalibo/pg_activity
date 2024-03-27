@@ -425,6 +425,10 @@ def main() -> None:
     while True:
         try:
             ui.main(term, cfg, dataobj, host, args)
+        except ConfigurationError as e:
+            logging.getLogger("pgactivity").error(str(e))
+            print(f"error: {e}", file=sys.stderr)
+            sys.exit(1)
         except OperationalError:
             while True:
                 print(term.clear + term.home, end="")
