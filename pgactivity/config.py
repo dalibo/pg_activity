@@ -234,11 +234,24 @@ USER_CONFIG_HOME = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config
 ETC = Path("/etc")
 
 
-class Configuration(Dict[str, Union[HeaderSection, UISection]]):
-    _T = TypeVar("_T", bound="Configuration")
+Value = Union[HeaderSection, UISection]
+
+
+@attr.s(auto_attribs=True, frozen=True, slots=True)
+class Configuration:
+    name: str
+    values: Dict[str, Value]
+
+    def __getitem__(self, name: str) -> Value:
+        return self.values.__getitem__(name)
+
+    def get(self, name: str, default: Value | None = None) -> Value | None:
+        return self.values.get(name, default)
 
     def header(self) -> HeaderSection | None:
         return self.get("header")  # type: ignore[return-value]
+
+    _T = TypeVar("_T", bound="Configuration")
 
     @classmethod
     def parse(cls: type[_T], f: IO[str], name: str) -> _T:
@@ -249,7 +262,9 @@ class Configuration(Dict[str, Union[HeaderSection, UISection]]):
 
         >>> f = StringIO('[header]\nshow_workers=false\n[client]\nhidden=true\ncolor=green\n')
         >>> cfg = Configuration.parse(f, "f.ini")
-        >>> pprint(cfg)
+        >>> cfg.name
+        'f.ini'
+        >>> pprint(cfg.values)
         {'client': UISection(hidden=True, width=None, color='green'),
          'header': HeaderSection(show_instance=True, show_system=True, show_workers=False)}
 
@@ -307,7 +322,7 @@ class Configuration(Dict[str, Union[HeaderSection, UISection]]):
                 config[sname] = UISection.from_config_section(section)
             except ValueError as e:
                 raise InvalidOptions(sname, str(e), name) from None
-        return cls(**config)
+        return cls(name=name, values=config)
 
     @classmethod
     def lookup(
