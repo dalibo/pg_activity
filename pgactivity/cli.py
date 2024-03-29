@@ -438,7 +438,7 @@ def main() -> None:
                     dataobj = newdataobj
                     break
         except KeyboardInterrupt:
-            sys.exit(1)
+            sys.exit(0)
         else:
             break
         finally:

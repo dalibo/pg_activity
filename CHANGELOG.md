@@ -1,5 +1,11 @@
 # Change log
 
+## pg\_activity 3.6.0 - UNRELEASED
+
+### Changed
+
+* Exit with status 0 upon keyboard interrupt.
+
 ## pg\_activity 3.5.1 - 2024-04-03
 
 ### Fixed
