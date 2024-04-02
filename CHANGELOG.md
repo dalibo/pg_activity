@@ -1,5 +1,12 @@
 # Change log
 
+## pg\_activity UNRELEASED
+
+### Fixed
+
+* Resolve a warning about usage of a deprecated Python `datetime` API from
+  Python 3.12.
+
 ## pg\_activity 3.5.0 - 2024-03-01
 
 ### Added

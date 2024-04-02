@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import functools
 import re
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import IO, Any, Iterable, Mapping
 
 import attr
@@ -280,7 +280,7 @@ def csv_write(
         return yn(value)
 
     for p in procs:
-        dt = datetime.utcnow().strftime("%Y-%m-%dT%H:%m:%SZ")
+        dt = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%m:%SZ")
         pid = p.get("pid", "N/A")
         database = p.get("database", "N/A") or ""
         appname = p.get("application_name", "N/A")
