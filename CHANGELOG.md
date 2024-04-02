@@ -7,6 +7,10 @@
 * Resolve a warning about usage of a deprecated Python `datetime` API from
   Python 3.12.
 
+### Misc
+
+* Turn Python warnings into errors when running the test suite.
+
 ## pg\_activity 3.5.0 - 2024-03-01
 
 ### Added
