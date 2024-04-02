@@ -27,12 +27,14 @@ def wait_for_data(fct, msg: str, timeout: int = 2):
 
 @pytest.fixture
 def data(postgresql):
-    return Data.pg_connect(
+    obj = Data.pg_connect(
         host=postgresql.info.host,
         port=postgresql.info.port,
         database=postgresql.info.dbname,
         user=postgresql.info.user,
     )
+    yield obj
+    obj.pg_conn.close()
 
 
 def test_pg_is_local(postgresql, data):
@@ -150,9 +152,12 @@ def test_client_encoding(postgresql, encoding: str) -> None:
         user=postgresql.info.user,
         dsn=f"client_encoding={encoding}",
     )
-    assert data.pg_version.startswith(
-        f"PostgreSQL {str(postgresql.info.server_version)[:2]}"
-    )
+    try:
+        assert data.pg_version.startswith(
+            f"PostgreSQL {str(postgresql.info.server_version)[:2]}"
+        )
+    finally:
+        data.pg_conn.close()
 
 
 @pytest.mark.parametrize(

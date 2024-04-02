@@ -57,21 +57,6 @@ Default CLI options, passed to ui.main():
 >>> term.width, term.height
 (80, 26)
 
->>> host = types.Host(
-...     "test",
-...     postgres.info.user,
-...     postgres.info.host,
-...     postgres.info.port,
-...     postgres.info.dbname,
-... )
->>> dataobj = data.Data.pg_connect(
-...     host=postgres.info.host,
-...     port=postgres.info.port,
-...     user=postgres.info.user,
-...     database=postgres.info.dbname,
-...     min_duration=options.minduration,
-... )
-
 >>> def mkconfig(value):
 ...     return config.Configuration(
 ...         **{k: config.UISection(**v) for k, v in value.items()}
@@ -82,6 +67,21 @@ Default CLI options, passed to ui.main():
 ...            render_header=True, render_footer=False,
 ...            width=200):
 ...     """Wrapper to ui.main() with a fake term.inkey()."""
+...
+...     host = types.Host(
+...         "test",
+...         postgres.info.user,
+...         postgres.info.host,
+...         postgres.info.port,
+...         postgres.info.dbname,
+...     )
+...     dataobj = data.Data.pg_connect(
+...         host=postgres.info.host,
+...         port=postgres.info.port,
+...         user=postgres.info.user,
+...         database=postgres.info.dbname,
+...         min_duration=options.minduration,
+...     )
 ...
 ...     call_args_list = []
 ...
@@ -98,9 +98,12 @@ Default CLI options, passed to ui.main():
 ...         return ks
 ...
 ...     with patch.object(term, "inkey", new=inkey):
-...         ui.main(term, config, dataobj, host, options,
-...                 render_header=render_header, render_footer=render_footer,
-...                 width=width, wait_on_actions=1)
+...         try:
+...             ui.main(term, config, dataobj, host, options,
+...                     render_header=render_header, render_footer=render_footer,
+...                     width=width, wait_on_actions=1)
+...         finally:
+...             dataobj.pg_conn.close()
 ...
 ...     if expected_timeouts is not None:
 ...         assert call_args_list == expected_timeouts
