@@ -11,18 +11,14 @@ from pgactivity import types
 from pgactivity.data import Data
 
 
-def wait_for_data(fct, msg: str, timeout: int = 2):
+def retry(fct, msg: str, timeout: int = 2):
     count = int(timeout / 0.1)
     for _ in range(count):
         time.sleep(0.1)
-        data = fct()
-
-        if not data:
-            continue
-        break
-    else:
-        raise AssertionError(msg)
-    return data
+        value = fct()
+        if value:
+            return value
+    pytest.fail(msg)
 
 
 @pytest.fixture
@@ -67,9 +63,7 @@ def test_blocking_waiting(postgresql, data, execute):
     execute("UPDATE t SET s = 'blocking'")
     execute("UPDATE t SET s = 'waiting 1'", commit=True)
     execute("UPDATE t SET s = 'waiting 2'", commit=True)
-    blocking = wait_for_data(
-        data.pg_get_blocking, msg="could not fetch blocking queries"
-    )
+    blocking = retry(data.pg_get_blocking, msg="could not fetch blocking queries")
     waiting = data.pg_get_waiting()
     assert len(blocking) == 2
     assert len(waiting) == 2
@@ -87,9 +81,7 @@ def test_pg_get_blocking_virtualxid(postgresql, data, execute):
     postgresql.commit()
     execute("UPDATE t SET s = 'blocking'")
     execute("CREATE INDEX CONCURRENTLY ON t(s)", autocommit=True)
-    (blocking,) = wait_for_data(
-        data.pg_get_blocking, msg="could not fetch blocking queries"
-    )
+    (blocking,) = retry(data.pg_get_blocking, msg="could not fetch blocking queries")
     (waiting,) = data.pg_get_waiting()
     assert "blocking" in blocking.query
     assert "CREATE INDEX CONCURRENTLY ON t(s)" in waiting.query
@@ -135,9 +127,9 @@ def test_encoding(postgresql, data, execute):
 
     execute("UPDATE tbl SET s = 'blocking éléphant'", dbname="latin1")
     execute("UPDATE tbl SET s = 'waiting éléphant'", dbname="latin1", commit=True)
-    running = wait_for_data(data.pg_get_activities, msg="could not fetch activities")
+    running = retry(data.pg_get_activities, msg="could not fetch activities")
     assert "blocking éléphant" in running[0].query
-    (waiting,) = wait_for_data(data.pg_get_waiting, "no waiting process")
+    (waiting,) = retry(data.pg_get_waiting, "no waiting process")
     assert waiting.query and "waiting éléphant" in waiting.query
     (blocking,) = data.pg_get_blocking()
     assert blocking.query and "blocking éléphant" in blocking.query
@@ -189,11 +181,11 @@ def test_postgres_and_python_encoding(
 def test_filters_dbname(data, execute):
     data_filtered = attr.evolve(data, filters=types.Filters(dbname="temp"))
     execute("SELECT pg_sleep(2)", dbname="template1", autocommit=True)
-    nbconn = wait_for_data(
+    nbconn = retry(
         data.pg_get_server_information,
         msg="could not get active connections for filtered DBNAME",
     )
-    nbconn_filtered = wait_for_data(
+    nbconn_filtered = retry(
         data_filtered.pg_get_server_information,
         msg="could not get active connections for filtered DBNAME",
     )
