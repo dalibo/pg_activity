@@ -6,6 +6,9 @@
 
 * Resolve a warning about usage of a deprecated Python `datetime` API from
   Python 3.12.
+* Resolve setuptools warnings about packages 'pgactivity.profiles' and
+  'pgactivity.queries' being absent from `packages` configuration by getting
+  back to setuptools "automatic discovery" (#411).
 
 ### Misc
 

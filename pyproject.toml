@@ -84,9 +84,6 @@ Homepage = "https://github.com/dalibo/pg_activity"
 [tool.setuptools.dynamic]
 version = { attr = "pgactivity.__version__" }
 
-[tool.setuptools]
-packages = ["pgactivity"]
-
 [tool.black]
 line-length = 88
 include = '\.pyi?$'
