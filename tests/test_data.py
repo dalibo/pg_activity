@@ -98,7 +98,7 @@ def test_terminate_backend(postgresql, data):
     postgresql.execute("SELECT pg_sleep(1)")
     (running,) = data.pg_get_activities()
     assert data.pg_terminate_backend(running.pid)
-    assert not data.pg_get_activities()
+    retry(lambda: not data.pg_get_activities(), msg="some processes are still active")
 
 
 def test_encoding(postgresql, data, execute):
