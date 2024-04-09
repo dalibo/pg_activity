@@ -19,17 +19,17 @@ def test_flag():
 
 def test_flag_load():
     options = {
-        "noappname": False,
-        "noclient": False,
-        "nocpu": False,
-        "nodb": False,
-        "nomem": False,
-        "nopid": False,
-        "noread": False,
-        "notime": False,
-        "nouser": False,
-        "nowait": False,
-        "nowrite": False,
+        "appname": True,
+        "client": True,
+        "cpu": True,
+        "database": True,
+        "mem": True,
+        "pid": True,
+        "read": True,
+        "time": True,
+        "user": True,
+        "wait": True,
+        "write": True,
     }
     flag = Flag.load(None, is_local=True, **options)
     assert (
@@ -67,9 +67,9 @@ def test_flag_load():
         | Flag.APPNAME
         | Flag.DATABASE
     )
-    options["nodb"] = True
-    options["notime"] = True
-    options["nopid"] = True
+    options["database"] = False
+    options["time"] = False
+    options["pid"] = False
     cfg = Configuration(
         name="test",
         values=dict(database=UISection(hidden=False), relation=UISection(hidden=True)),

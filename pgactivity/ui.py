@@ -29,13 +29,13 @@ def main(
 
     is_local = data.pg_is_local() and data.pg_is_local_access()
 
-    skip_db_size = options.nodbsize
+    skip_db_size = not options.dbsize
     server_information = data.pg_get_server_information(
         prev_server_info=None,
         using_rds=options.rds,
-        skip_db_size=options.nodbsize,
-        skip_tempfile=options.notempfiles,
-        skip_walreceiver=options.nowalreceiver,
+        skip_db_size=skip_db_size,
+        skip_tempfile=not options.tempfiles,
+        skip_walreceiver=not options.walreceiver,
     )
 
     flag = Flag.load(config, is_local=is_local, **vars(options))
@@ -74,7 +74,7 @@ def main(
                 break
             elif not ui.interactive() and key == keys.SPACE:
                 ui.toggle_pause()
-            elif options.nodbsize and key == keys.REFRESH_DB_SIZE:
+            elif not options.dbsize and key == keys.REFRESH_DB_SIZE:
                 skip_db_size = False
             elif key is not None:
                 if keys.is_process_next(key):
@@ -184,15 +184,15 @@ def main(
 
             else:
                 if not ui.in_pause and not ui.interactive():
-                    if options.nodbsize and not skip_db_size:
+                    if not options.dbsize and not skip_db_size:
                         skip_db_size = True
 
                     server_information = data.pg_get_server_information(
                         prev_server_info=server_information,
                         using_rds=options.rds,
                         skip_db_size=skip_db_size,
-                        skip_tempfile=options.notempfiles,
-                        skip_walreceiver=options.nowalreceiver,
+                        skip_tempfile=not options.tempfiles,
+                        skip_walreceiver=not options.walreceiver,
                     )
                     memory, swap, load = activities.mem_swap_load()
                     system_info = types.SystemInfo.default(
