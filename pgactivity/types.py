@@ -291,10 +291,17 @@ class UI:
 
         possible_columns: dict[str, Column] = {}
 
-        def add_column(key: str, name: str, **kwargs: Any) -> None:
+        def add_column(
+            flag: Flag | str, key: str, name: str | None = None, **kwargs: Any
+        ) -> None:
+            if isinstance(flag, Flag):
+                assert flag.name is not None, f"invalid flag: {flag}"
+                fname = flag.name
+            else:
+                fname = flag
             if config is not None:
                 try:
-                    cfg = config[name.lower()]
+                    cfg = config[fname.lower()]
                 except KeyError:
                     pass
                 else:
@@ -308,10 +315,13 @@ class UI:
                             )
                         kwargs["default_color"] = cfg.color
             assert key not in possible_columns, f"duplicated key {key}"
-            possible_columns[key] = Column(key=key, name=name, **kwargs)
+            possible_columns[key] = Column(
+                key=key, name=name if name is not None else fname, **kwargs
+            )
 
         if Flag.APPNAME & flag:
             add_column(
+                Flag.APPNAME,
                 key="application_name",
                 name="APP",
                 min_width=16,
@@ -321,8 +331,8 @@ class UI:
             )
         if Flag.CLIENT & flag:
             add_column(
+                Flag.CLIENT,
                 key="client",
-                name="CLIENT",
                 min_width=16,
                 max_width=16,
                 justify="right",
@@ -331,6 +341,7 @@ class UI:
             )
         if Flag.CPU & flag:
             add_column(
+                Flag.CPU,
                 key="cpu",
                 name="CPU%",
                 min_width=6,
@@ -338,6 +349,7 @@ class UI:
             )
         if Flag.DATABASE & flag:
             add_column(
+                Flag.DATABASE,
                 key="database",
                 name="DATABASE(*)" if filters.dbname else "DATABASE",
                 min_width=max_db_length,
@@ -349,6 +361,7 @@ class UI:
             )
         if Flag.IOWAIT & flag:
             add_column(
+                Flag.IOWAIT,
                 key="io_wait",
                 name="IOW",
                 min_width=4,
@@ -357,6 +370,7 @@ class UI:
             )
         if Flag.MEM & flag:
             add_column(
+                Flag.MEM,
                 key="mem",
                 name="MEM%",
                 min_width=4,
@@ -365,8 +379,8 @@ class UI:
             )
         if Flag.MODE & flag:
             add_column(
+                Flag.MODE,
                 key="mode",
-                name="MODE",
                 min_width=16,
                 max_width=16,
                 justify="right",
@@ -374,18 +388,20 @@ class UI:
             )
         if Flag.PID & flag:
             add_column(
+                Flag.PID,
                 key="pid",
-                name="PID",
                 min_width=6,
                 default_color="cyan",
             )
         add_column(
+            "query",
             key="query",
             name="Query",
             min_width=2,
         )
         if Flag.READ & flag:
             add_column(
+                Flag.READ,
                 key="read",
                 name="READ/s",
                 min_width=8,
@@ -394,16 +410,16 @@ class UI:
             )
         if Flag.RELATION & flag:
             add_column(
+                Flag.RELATION,
                 key="relation",
-                name="RELATION",
                 min_width=9,
                 max_width=9,
                 justify="right",
                 default_color="cyan",
             )
         add_column(
+            "state",
             key="state",
-            name="state",
             min_width=17,
             justify="right",
             transform=utils.short_state,
@@ -411,6 +427,7 @@ class UI:
         )
         if Flag.TIME & flag:
             add_column(
+                Flag.TIME,
                 key="duration",
                 name="TIME+",
                 min_width=9,
@@ -421,16 +438,16 @@ class UI:
             )
         if Flag.TYPE & flag:
             add_column(
+                Flag.TYPE,
                 key="type",
-                name="TYPE",
                 min_width=16,
                 max_width=16,
                 justify="right",
             )
         if Flag.USER & flag:
             add_column(
+                Flag.USER,
                 key="user",
-                name="USER",
                 min_width=16,
                 max_width=16,
                 justify="right",
@@ -438,6 +455,7 @@ class UI:
             )
         if Flag.WAIT & flag:
             add_column(
+                Flag.WAIT,
                 key="wait",
                 name="Waiting",
                 min_width=16,
@@ -448,6 +466,7 @@ class UI:
             )
         if Flag.WRITE & flag:
             add_column(
+                Flag.WRITE,
                 key="write",
                 name="WRITE/s",
                 min_width=8,

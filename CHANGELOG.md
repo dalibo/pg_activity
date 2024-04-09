@@ -7,6 +7,10 @@
 * The color of cells in the process table can now be customized through the
   configuration file.
 
+### Fixed
+
+* Fix configuration of the color of `appname` column (#415).
+
 ### Changed
 
 * Exit with status 0 upon keyboard interrupt.
