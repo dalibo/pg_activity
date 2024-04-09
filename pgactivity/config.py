@@ -110,17 +110,17 @@ class Flag(enum.Flag):
         config: Configuration | None,
         *,
         is_local: bool,
-        noappname: bool,
-        noclient: bool,
-        nocpu: bool,
-        nodb: bool,
-        nomem: bool,
-        nopid: bool,
-        noread: bool,
-        notime: bool,
-        nouser: bool,
-        nowait: bool,
-        nowrite: bool,
+        appname: bool,
+        client: bool,
+        cpu: bool,
+        database: bool,
+        mem: bool,
+        pid: bool,
+        read: bool,
+        time: bool,
+        user: bool,
+        wait: bool,
+        write: bool,
         **kwargs: Any,
     ) -> Flag:
         """Build a Flag value from command line options."""
@@ -128,28 +128,28 @@ class Flag(enum.Flag):
             flag = cls.from_config(config)
         else:
             flag = cls.all()
-        if nodb:
-            flag ^= cls.DATABASE
-        if nouser:
-            flag ^= cls.USER
-        if nocpu:
-            flag ^= cls.CPU
-        if noclient:
-            flag ^= cls.CLIENT
-        if nomem:
-            flag ^= cls.MEM
-        if noread:
-            flag ^= cls.READ
-        if nowrite:
-            flag ^= cls.WRITE
-        if notime:
-            flag ^= cls.TIME
-        if nowait:
-            flag ^= cls.WAIT
-        if noappname:
-            flag ^= cls.APPNAME
-        if nopid:
+        if not pid:
             flag ^= cls.PID
+        if not database:
+            flag ^= cls.DATABASE
+        if not user:
+            flag ^= cls.USER
+        if not client:
+            flag ^= cls.CLIENT
+        if not cpu:
+            flag ^= cls.CPU
+        if not mem:
+            flag ^= cls.MEM
+        if not read:
+            flag ^= cls.READ
+        if not write:
+            flag ^= cls.WRITE
+        if not time:
+            flag ^= cls.TIME
+        if not wait:
+            flag ^= cls.WAIT
+        if not appname:
+            flag ^= cls.APPNAME
 
         # Remove some if no running against local pg server.
         if not is_local and (flag & cls.CPU):

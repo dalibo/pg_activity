@@ -26,21 +26,21 @@ Default CLI options, passed to ui.main():
 ...     "refresh": 2,
 ...     "minduration": 0,
 ...     "filters": [],
-...     "noappname": True,
-...     "noclient": False,
-...     "nocolor": False,
-...     "nocpu": True,
-...     "nodb": False,
-...     "nodbsize": False,
-...     "notempfiles": False,
-...     "nowalreceiver": False,
-...     "nomem": True,
-...     "nopid": False,
-...     "noread": True,
-...     "notime": True,
-...     "nouser": False,
-...     "nowait": True,
-...     "nowrite": True,
+...     "appname": False,
+...     "client": True,
+...     "color": True,
+...     "cpu": False,
+...     "database": True,
+...     "dbsize": True,
+...     "tempfiles": True,
+...     "walreceiver": True,
+...     "mem": False,
+...     "pid": True,
+...     "read": False,
+...     "time": False,
+...     "user": True,
+...     "wait": False,
+...     "write": False,
 ...     "output": None,
 ...     "port": f"{postgres.info.port}",
 ...     "rds": False,
@@ -431,7 +431,7 @@ PID    DATABASE              USER       CLIENT             state Query
 <BLANKLINE>
 ------------------------------------------------------------------------------------------- sending key 'q' --------------------------------------------------------------------------------------------
 
->>> defaults["nopid"] = True
+>>> defaults["pid"] = False
 >>> defaults["header_show_instance"] = False
 >>> defaults["header_show_workers"] = False
 >>> defaults["header_show_system"] = False
@@ -823,10 +823,10 @@ Use another set of options:
 ...         defaults,
 ...         durationmode="2",
 ...         wrap_query=True,
-...         noclient=True,
-...         nodbsize=True,
-...         notempfiles=False,
-...         nowalreceiver=False,
+...         client=False,
+...         dbsize=False,
+...         tempfiles=True,
+...         walreceiver=True,
 ...         output=str(output),
 ...     ),
 ... )
@@ -940,9 +940,9 @@ Interactive mode:
 ...         defaults,
 ...         durationmode="1",
 ...         wrap_query=True,
-...         nopid=False,
-...         noclient=True,
-...         nouser=True,
+...         pid=True,
+...         client=False,
+...         user=False,
 ...         output=None,
 ...     ),
 ... )

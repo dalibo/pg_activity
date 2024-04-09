@@ -7,6 +7,7 @@ import sys
 import time
 from argparse import ArgumentParser
 from io import StringIO
+from typing import Any
 
 from blessed import Terminal
 
@@ -42,6 +43,10 @@ def configure_logger(debug_file: str | None = None) -> StringIO:
         logger.addHandler(f_handler)
 
     return memory_string
+
+
+def flag(p: Any, spec: str, *, dest: str, help: str) -> None:
+    p.add_argument(spec, dest=dest, help=help, action="store_false", default=True)
 
 
 def get_parser() -> ArgumentParser:
@@ -102,29 +107,13 @@ def get_parser() -> ArgumentParser:
         default=None,
     )
     # --no-db-size
-    group.add_argument(
-        "--no-db-size",
-        dest="nodbsize",
-        action="store_true",
-        help="Skip total size of DB.",
-        default=False,
-    )
+    flag(group, "--no-db-size", dest="dbsize", help="Skip total size of DB.")
     # --no-tempfiles
-    group.add_argument(
-        "--no-tempfiles",
-        dest="notempfiles",
-        action="store_true",
-        help="Skip tempfile count and size.",
-        default=False,
+    flag(
+        group, "--no-tempfiles", dest="tempfiles", help="Skip tempfile count and size."
     )
     # --no-walreceiver
-    group.add_argument(
-        "--no-walreceiver",
-        dest="nowalreceiver",
-        action="store_true",
-        help="Skip walreceiver checks.",
-        default=False,
-    )
+    flag(group, "--no-walreceiver", dest="walreceiver", help="Skip walreceiver checks.")
     # --wrap-query
     group.add_argument(
         "-w",
@@ -239,94 +228,29 @@ def get_parser() -> ArgumentParser:
         "Process table display options",
         "These options may be used hide some columns from the processes table.",
     )
+
     # --no-pid
-    group.add_argument(
-        "--no-pid",
-        dest="nopid",
-        action="store_true",
-        help="Disable PID.",
-        default=False,
-    )
+    flag(group, "--no-pid", dest="pid", help="Disable PID.")
     # --no-database
-    group.add_argument(
-        "--no-database",
-        dest="nodb",
-        action="store_true",
-        help="Disable DATABASE.",
-        default=False,
-    )
+    flag(group, "--no-database", dest="database", help="Disable DATABASE.")
     # --no-user
-    group.add_argument(
-        "--no-user",
-        dest="nouser",
-        action="store_true",
-        help="Disable USER.",
-        default=False,
-    )
+    flag(group, "--no-user", dest="user", help="Disable USER.")
     # --no-client
-    group.add_argument(
-        "--no-client",
-        dest="noclient",
-        action="store_true",
-        help="Disable CLIENT.",
-        default=False,
-    )
+    flag(group, "--no-client", dest="client", help="Disable CLIENT.")
     # --no-cpu
-    group.add_argument(
-        "--no-cpu",
-        dest="nocpu",
-        action="store_true",
-        help="Disable CPU%%.",
-        default=False,
-    )
+    flag(group, "--no-cpu", dest="cpu", help="Disable CPU%%.")
     # --no-mem
-    group.add_argument(
-        "--no-mem",
-        dest="nomem",
-        action="store_true",
-        help="Disable MEM%%.",
-        default=False,
-    )
+    flag(group, "--no-mem", dest="mem", help="Disable MEM%%.")
     # --no-read
-    group.add_argument(
-        "--no-read",
-        dest="noread",
-        action="store_true",
-        help="Disable READ/s.",
-        default=False,
-    )
+    flag(group, "--no-read", dest="read", help="Disable READ/s.")
     # --no-write
-    group.add_argument(
-        "--no-write",
-        dest="nowrite",
-        action="store_true",
-        help="Disable WRITE/s.",
-        default=False,
-    )
+    flag(group, "--no-write", dest="write", help="Disable WRITE/s.")
     # --no-time
-    group.add_argument(
-        "--no-time",
-        dest="notime",
-        action="store_true",
-        help="Disable TIME+.",
-        default=False,
-    )
+    flag(group, "--no-time", dest="time", help="Disable TIME+.")
     # --no-wait
-    group.add_argument(
-        "--no-wait",
-        dest="nowait",
-        action="store_true",
-        help="Disable W.",
-        default=False,
-    )
+    flag(group, "--no-wait", dest="wait", help="Disable W.")
     # --no-app-name
-    group.add_argument(
-        "--no-app-name",
-        dest="noappname",
-        action="store_true",
-        help="Disable APP.",
-        default=False,
-    )
+    flag(group, "--no-app-name", dest="appname", help="Disable APP.")
 
     group = parser.add_argument_group("Header display options")
     # --no-inst-info
