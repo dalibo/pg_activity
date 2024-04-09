@@ -81,7 +81,6 @@ def get_parser() -> ArgumentParser:
     group = parser.add_argument_group(
         "Options",
     )
-    # --blocksize
     group.add_argument(
         "--blocksize",
         dest="blocksize",
@@ -90,7 +89,6 @@ def get_parser() -> ArgumentParser:
         type=int,
         default=4096,
     )
-    # --rds
     group.add_argument(
         "--rds",
         dest="rds",
@@ -98,7 +96,6 @@ def get_parser() -> ArgumentParser:
         help="Enable support for AWS RDS (implies --no-tempfiles and filters out the rdsadmin database from space calculation).",
         default=False,
     )
-    # --output
     group.add_argument(
         "--output",
         dest="output",
@@ -106,15 +103,11 @@ def get_parser() -> ArgumentParser:
         metavar="FILEPATH",
         default=None,
     )
-    # --no-db-size
     flag(group, "--no-db-size", dest="dbsize", help="Skip total size of DB.")
-    # --no-tempfiles
     flag(
         group, "--no-tempfiles", dest="tempfiles", help="Skip tempfile count and size."
     )
-    # --no-walreceiver
     flag(group, "--no-walreceiver", dest="walreceiver", help="Skip walreceiver checks.")
-    # --wrap-query
     group.add_argument(
         "-w",
         "--wrap-query",
@@ -123,7 +116,6 @@ def get_parser() -> ArgumentParser:
         help="Wrap query column instead of truncating.",
         default=False,
     )
-    # --duration-mode
     group.add_argument(
         "--duration-mode",
         dest="durationmode",
@@ -132,7 +124,6 @@ def get_parser() -> ArgumentParser:
         choices=["1", "2", "3"],
         default="1",
     )
-    # --min-duration
     group.add_argument(
         "--min-duration",
         dest="minduration",
@@ -141,7 +132,6 @@ def get_parser() -> ArgumentParser:
         type=float,
         default=0,
     )
-    # --filter
     group.add_argument(
         "--filter",
         dest="filters",
@@ -153,7 +143,6 @@ def get_parser() -> ArgumentParser:
         metavar="FIELD:REGEX",
         default=[],
     )
-    # --debug-file
     group.add_argument(
         "--debug-file",
         dest="debug_file",
@@ -161,14 +150,12 @@ def get_parser() -> ArgumentParser:
         help="Enable debug and write it to DEBUG_FILE.",
         default=None,
     )
-    # --version
     group.add_argument(
         "--version",
         help="show program's version number and exit.",
         action="version",
         version=f"%(prog)s {__version__}",
     )
-    # --help
     group.add_argument(
         "--help",
         dest="help",
@@ -228,32 +215,19 @@ def get_parser() -> ArgumentParser:
         "Process table display options",
         "These options may be used hide some columns from the processes table.",
     )
-
-    # --no-pid
     flag(group, "--no-pid", dest="pid", help="Disable PID.")
-    # --no-database
     flag(group, "--no-database", dest="database", help="Disable DATABASE.")
-    # --no-user
     flag(group, "--no-user", dest="user", help="Disable USER.")
-    # --no-client
     flag(group, "--no-client", dest="client", help="Disable CLIENT.")
-    # --no-cpu
     flag(group, "--no-cpu", dest="cpu", help="Disable CPU%%.")
-    # --no-mem
     flag(group, "--no-mem", dest="mem", help="Disable MEM%%.")
-    # --no-read
     flag(group, "--no-read", dest="read", help="Disable READ/s.")
-    # --no-write
     flag(group, "--no-write", dest="write", help="Disable WRITE/s.")
-    # --no-time
     flag(group, "--no-time", dest="time", help="Disable TIME+.")
-    # --no-wait
     flag(group, "--no-wait", dest="wait", help="Disable W.")
-    # --no-app-name
     flag(group, "--no-app-name", dest="appname", help="Disable APP.")
 
     group = parser.add_argument_group("Header display options")
-    # --no-inst-info
     group.add_argument(
         "--no-inst-info",
         dest="header_show_instance",
@@ -261,7 +235,6 @@ def get_parser() -> ArgumentParser:
         help="Hide instance information.",
         default=None,
     )
-    # --no-sys-info
     group.add_argument(
         "--no-sys-info",
         dest="header_show_system",
@@ -269,7 +242,6 @@ def get_parser() -> ArgumentParser:
         help="Hide system information.",
         default=None,
     )
-    # --no-proc-info
     group.add_argument(
         "--no-proc-info",
         dest="header_show_workers",
@@ -279,7 +251,6 @@ def get_parser() -> ArgumentParser:
     )
 
     group = parser.add_argument_group("Other display options")
-    # --hide-queries-in-logs
     group.add_argument(
         "--hide-queries-in-logs",
         dest="hide_queries_in_logs",
@@ -287,7 +258,6 @@ def get_parser() -> ArgumentParser:
         help="Disable log_min_duration_statements and log_min_duration_sample for pg_activity.",
         default=False,
     )
-    # --refresh
     group.add_argument(
         "--refresh",
         dest="refresh",
