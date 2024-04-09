@@ -290,133 +290,130 @@ class UI:
             header = UIHeader.make(config.header() if config else None)
 
         possible_columns: dict[str, Column] = {}
+        config_values = (
+            {k: v for k, v in config.items() if isinstance(v, UISection)}
+            if config is not None
+            else {}
+        )
 
         def add_column(
-            flag: Flag | str, key: str, name: str | None = None, **kwargs: Any
+            f: Flag | str, key: str, name: str | None = None, **kwargs: Any
         ) -> None:
-            if isinstance(flag, Flag):
-                assert flag.name is not None, f"invalid flag: {flag}"
-                fname = flag.name
+            if isinstance(f, Flag):
+                assert f.name is not None, f"invalid flag: {flag}"
+                cfgkey = f.name
             else:
-                fname = flag
-            if config is not None:
-                try:
-                    cfg = config[fname.lower()]
-                except KeyError:
-                    pass
-                else:
-                    assert isinstance(cfg, UISection), cfg
-                    if cfg.width is not None:
-                        kwargs["min_width"] = kwargs["max_width"] = cfg.width
-                    if cfg.color is not None:
-                        if kwargs.get("value_color"):
-                            raise config.error(
-                                f"the color for '{name}' column (option '{key}') cannot be configured"
-                            )
-                        kwargs["default_color"] = cfg.color
+                cfgkey = f
+            try:
+                cfg = config_values.pop(cfgkey.lower())
+            except KeyError:
+                pass
+            else:
+                assert isinstance(cfg, UISection), cfg
+                if cfg.width is not None:
+                    kwargs["min_width"] = kwargs["max_width"] = cfg.width
+                if cfg.color is not None:
+                    if kwargs.get("value_color"):
+                        assert config is not None
+                        raise config.error(
+                            f"the color for '{name}' column (option '{key}') cannot be configured"
+                        )
+                    kwargs["default_color"] = cfg.color
             assert key not in possible_columns, f"duplicated key {key}"
-            possible_columns[key] = Column(
-                key=key, name=name if name is not None else fname, **kwargs
-            )
+            if isinstance(f, Flag) and not f & flag:
+                return
+            if name is None:
+                name = cfgkey
+            possible_columns[key] = Column(key=key, name=name, **kwargs)
 
-        if Flag.APPNAME & flag:
-            add_column(
-                Flag.APPNAME,
-                key="application_name",
-                name="APP",
-                min_width=16,
-                max_width=16,
-                justify="right",
-                default_color="bold_black",
-            )
-        if Flag.CLIENT & flag:
-            add_column(
-                Flag.CLIENT,
-                key="client",
-                min_width=16,
-                max_width=16,
-                justify="right",
-                transform=if_none("local"),
-                default_color="cyan",
-            )
-        if Flag.CPU & flag:
-            add_column(
-                Flag.CPU,
-                key="cpu",
-                name="CPU%",
-                min_width=6,
-                sort_key=SortKey.cpu,
-            )
-        if Flag.DATABASE & flag:
-            add_column(
-                Flag.DATABASE,
-                key="database",
-                name="DATABASE(*)" if filters.dbname else "DATABASE",
-                min_width=max_db_length,
-                transform=functools.lru_cache(
-                    lambda v: utils.ellipsis(v, width=16) if v else "",
-                ),
-                sort_key=None,
-                default_color="bold_black",
-            )
-        if Flag.IOWAIT & flag:
-            add_column(
-                Flag.IOWAIT,
-                key="io_wait",
-                name="IOW",
-                min_width=4,
-                transform=utils.yn,
-                value_color=colors.wait,
-            )
-        if Flag.MEM & flag:
-            add_column(
-                Flag.MEM,
-                key="mem",
-                name="MEM%",
-                min_width=4,
-                sort_key=SortKey.mem,
-                transform=lambda v: str(round(v, 1)),
-            )
-        if Flag.MODE & flag:
-            add_column(
-                Flag.MODE,
-                key="mode",
-                min_width=16,
-                max_width=16,
-                justify="right",
-                value_color=colors.lock_mode,
-            )
-        if Flag.PID & flag:
-            add_column(
-                Flag.PID,
-                key="pid",
-                min_width=6,
-                default_color="cyan",
-            )
+        add_column(
+            Flag.APPNAME,
+            key="application_name",
+            name="APP",
+            min_width=16,
+            max_width=16,
+            justify="right",
+            default_color="bold_black",
+        )
+        add_column(
+            Flag.CLIENT,
+            key="client",
+            min_width=16,
+            max_width=16,
+            justify="right",
+            transform=if_none("local"),
+            default_color="cyan",
+        )
+        add_column(
+            Flag.CPU,
+            key="cpu",
+            name="CPU%",
+            min_width=6,
+            sort_key=SortKey.cpu,
+        )
+        add_column(
+            Flag.DATABASE,
+            key="database",
+            name="DATABASE(*)" if filters.dbname else "DATABASE",
+            min_width=max_db_length,
+            transform=functools.lru_cache(
+                lambda v: utils.ellipsis(v, width=16) if v else "",
+            ),
+            sort_key=None,
+            default_color="bold_black",
+        )
+        add_column(
+            Flag.IOWAIT,
+            key="io_wait",
+            name="IOW",
+            min_width=4,
+            transform=utils.yn,
+            value_color=colors.wait,
+        )
+        add_column(
+            Flag.MEM,
+            key="mem",
+            name="MEM%",
+            min_width=4,
+            sort_key=SortKey.mem,
+            transform=lambda v: str(round(v, 1)),
+        )
+        add_column(
+            Flag.MODE,
+            key="mode",
+            min_width=16,
+            max_width=16,
+            justify="right",
+            value_color=colors.lock_mode,
+        )
+        add_column(
+            Flag.PID,
+            key="pid",
+            min_width=6,
+            default_color="cyan",
+        )
         add_column(
             "query",
             key="query",
             name="Query",
             min_width=2,
         )
-        if Flag.READ & flag:
-            add_column(
-                Flag.READ,
-                key="read",
-                name="READ/s",
-                min_width=8,
-                sort_key=SortKey.read,
-                transform=utils.naturalsize,
-            )
-        if Flag.RELATION & flag:
-            add_column(
-                Flag.RELATION,
-                key="relation",
-                min_width=9,
-                max_width=9,
-                justify="right",
-                default_color="cyan",
-            )
+        add_column(
+            Flag.READ,
+            key="read",
+            name="READ/s",
+            min_width=8,
+            sort_key=SortKey.read,
+            transform=utils.naturalsize,
+        )
+        add_column(
+            Flag.RELATION,
+            key="relation",
+            min_width=9,
+            max_width=9,
+            justify="right",
+            default_color="cyan",
+        )
         add_column(
             "state",
             key="state",
@@ -425,54 +422,49 @@ class UI:
             transform=utils.short_state,
             value_color=colors.short_state,
         )
-        if Flag.TIME & flag:
-            add_column(
-                Flag.TIME,
-                key="duration",
-                name="TIME+",
-                min_width=9,
-                justify="right",
-                sort_key=SortKey.duration,
-                transform=lambda v: utils.format_duration(v)[0],
-                value_color=lambda v: utils.format_duration(v)[1],
-            )
-        if Flag.TYPE & flag:
-            add_column(
-                Flag.TYPE,
-                key="type",
-                min_width=16,
-                max_width=16,
-                justify="right",
-            )
-        if Flag.USER & flag:
-            add_column(
-                Flag.USER,
-                key="user",
-                min_width=16,
-                max_width=16,
-                justify="right",
-                default_color="bold_black",
-            )
-        if Flag.WAIT & flag:
-            add_column(
-                Flag.WAIT,
-                key="wait",
-                name="Waiting",
-                min_width=16,
-                max_width=16,
-                justify="right",
-                transform=utils.wait_status,
-                value_color=colors.wait,
-            )
-        if Flag.WRITE & flag:
-            add_column(
-                Flag.WRITE,
-                key="write",
-                name="WRITE/s",
-                min_width=8,
-                sort_key=SortKey.write,
-                transform=utils.naturalsize,
-            )
+        add_column(
+            Flag.TIME,
+            key="duration",
+            name="TIME+",
+            min_width=9,
+            justify="right",
+            sort_key=SortKey.duration,
+            transform=lambda v: utils.format_duration(v)[0],
+            value_color=lambda v: utils.format_duration(v)[1],
+        )
+        add_column(
+            Flag.TYPE,
+            key="type",
+            min_width=16,
+            max_width=16,
+            justify="right",
+        )
+        add_column(
+            Flag.USER,
+            key="user",
+            min_width=16,
+            max_width=16,
+            justify="right",
+            default_color="bold_black",
+        )
+        add_column(
+            Flag.WAIT,
+            key="wait",
+            name="Waiting",
+            min_width=16,
+            max_width=16,
+            justify="right",
+            transform=utils.wait_status,
+            value_color=colors.wait,
+        )
+        add_column(
+            Flag.WRITE,
+            key="write",
+            name="WRITE/s",
+            min_width=8,
+            sort_key=SortKey.write,
+            transform=utils.naturalsize,
+        )
 
         columns_key_by_querymode: Mapping[QueryMode, list[str]] = {
             QueryMode.activities: [
@@ -528,6 +520,9 @@ class UI:
                     pass
 
         columns_by_querymode = {qm: tuple(make_columns_for(qm)) for qm in QueryMode}
+        assert (
+            not config_values
+        ), f"unprocessed configuration entries: {', '.join(sorted(config_values))}"
         return cls(header=header, columns_by_querymode=columns_by_querymode, **kwargs)
 
     def interactive(self) -> bool:
