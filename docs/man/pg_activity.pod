@@ -364,7 +364,7 @@ required by another session. It shows following information:
 
 =item B<--no-app-name>
 
-	Disable App.
+	Disable APP.
 
 =back
 

@@ -324,7 +324,7 @@ def get_parser() -> ArgumentParser:
         "--no-app-name",
         dest="noappname",
         action="store_true",
-        help="Disable App.",
+        help="Disable APP.",
         default=False,
     )
 

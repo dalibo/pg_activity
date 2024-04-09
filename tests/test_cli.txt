@@ -60,7 +60,7 @@ Process table display options:
   --no-write            Disable WRITE/s.
   --no-time             Disable TIME+.
   --no-wait             Disable W.
-  --no-app-name         Disable App.
+  --no-app-name         Disable APP.
 <BLANKLINE>
 Header display options:
   --no-inst-info        Hide instance information.
