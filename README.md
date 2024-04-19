@@ -134,17 +134,20 @@ ex:
     Process table display options:
       These options may be used hide some columns from the processes table.
 
-      --no-pid              Disable PID.
-      --no-database         Disable DATABASE.
-      --no-user             Disable USER.
-      --no-client           Disable CLIENT.
-      --no-cpu              Disable CPU%.
-      --no-mem              Disable MEM%.
-      --no-read             Disable READ/s.
-      --no-write            Disable WRITE/s.
-      --no-time             Disable TIME+.
-      --no-wait             Disable W.
-      --no-app-name         Disable APP.
+      --pid, --no-pid       Enable/disable PID.
+      --database, --no-database
+                            Enable/disable DATABASE.
+      --user, --no-user     Enable/disable USER.
+      --client, --no-client
+                            Enable/disable CLIENT.
+      --cpu, --no-cpu       Enable/disable CPU%.
+      --mem, --no-mem       Enable/disable MEM%.
+      --read, --no-read     Enable/disable READ/s.
+      --write, --no-write   Enable/disable WRITE/s.
+      --time, --no-time     Enable/disable TIME+.
+      --wait, --no-wait     Enable/disable W.
+      --app-name, --no-app-name
+                            Enable/disable APP.
 
     Header display options:
       --no-inst-info        Display instance information.

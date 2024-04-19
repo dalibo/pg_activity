@@ -1,3 +1,7 @@
+import sys
+
+import pytest
+
 from pgactivity import cli
 
 
@@ -12,8 +16,8 @@ def test_parser() -> None:
         "rds": False,
         "output": None,
         "dbsize": False,
-        "tempfiles": True,
-        "walreceiver": True,
+        "tempfiles": None,
+        "walreceiver": None,
         "wrap_query": True,
         "durationmode": "1",
         "minduration": 0,
@@ -26,15 +30,15 @@ def test_parser() -> None:
         "username": None,
         "dbname": None,
         "pid": False,
-        "database": True,
-        "user": True,
-        "client": True,
-        "cpu": True,
-        "mem": True,
-        "read": True,
-        "write": True,
-        "time": True,
-        "wait": True,
+        "database": None,
+        "user": None,
+        "client": None,
+        "cpu": None,
+        "mem": None,
+        "read": None,
+        "write": None,
+        "time": None,
+        "wait": None,
         "appname": False,
         "header_show_instance": None,
         "header_show_system": None,
@@ -42,3 +46,12 @@ def test_parser() -> None:
         "hide_queries_in_logs": False,
         "refresh": 2,
     }
+
+
+@pytest.mark.skipif(sys.version_info < (3, 9), reason="require python >= 3.9")
+def test_parser_flag_on() -> None:
+    parser = cli.get_parser()
+    ns = parser.parse_args(["--pid", "--no-app-name"])
+    assert ns.pid is True
+    assert ns.appname is False
+    assert ns.wait is None

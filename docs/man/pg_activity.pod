@@ -256,21 +256,17 @@ required by another session. It shows following information:
 
 	Store running queries as CSV.
 
-=item B<--no-db-size>
+=item B<--db-size>, B<--no-db-size>
 
-	Skip total size of DB.
+	Enable/disable total size of DB.
 
-=item B<--no-tempfiles>
+=item B<--tempfiles>, B<--no-tempfiles>
 
-	Skip tempfile count and size.
+	Enable/disable tempfile count and size.
 
-=item B<--no-walreceiver>
+=item B<--walreceiver>, B<--no-walreceiver>
 
-	Skip walreceiver checks.
-
-=item B<--no-walreceiver>
-
-	Skip walreceiver checks.
+	Enable/disable walreceiver checks.
 
 =item B<-w, --wrap-query>
 
@@ -322,49 +318,49 @@ required by another session. It shows following information:
 
 =over 2
 
-=item B<--no-pid>
+=item B<--pid>, B<--no-pid>
 
-	Disable PID.
+	Enable/disable PID.
 
-=item B<--no-database>
+=item B<--database>, B<--no-database>
 
-	Disable DATABASE.
+	Enable/disable DATABASE.
 
-=item B<--no-user>
+=item B<--user>, B<--no-user>
 
-	Disable USER.
+	Enable/disable USER.
 
-=item B<--no-client>
+=item B<--client>, B<--no-client>
 
-	Disable CLIENT.
+	Enable/disable CLIENT.
 
-=item B<--no-cpu>
+=item B<--cpu>, B<--no-cpu>
 
-	Disable CPU%.
+	Enable/disable CPU%.
 
-=item B<--no-mem>
+=item B<--mem>, B<--no-mem>
 
-	Disable MEM%.
+	Enable/disable MEM%.
 
-=item B<--no-read>
+=item B<--read>, B<--no-read>
 
-	Disable READ/s.
+	Enable/disable READ/s.
 
-=item B<--no-write>
+=item B<--write>, B<--no-write>
 
-	Disable WRITE/s.
+	Enable/disable WRITE/s.
 
-=item B<--no-time>
+=item B<--time>, B<--no-time>
 
-	Disable TIME+.
+	Enable/disable TIME+.
 
-=item B<--no-wait>
+=item B<--wait>, B<--no-wait>
 
-	Disable W.
+	Enable/disable W.
 
-=item B<--no-app-name>
+=item B<--app-name>, B<--no-app-name>
 
-	Disable APP.
+	Enable/disable APP.
 
 =back
 

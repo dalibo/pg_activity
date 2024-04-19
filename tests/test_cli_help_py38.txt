@@ -1,0 +1,86 @@
+>>> import sys
+>>> import pytest
+>>> if sys.version_info >= (3, 9):
+...     pytest.skip("only applies for Python version < 3.9")
+...
+
+>>> from pgactivity import cli
+>>> parser = cli.get_parser()
+>>> parser.print_help()
+usage: pytest [options] [connection string]
+<BLANKLINE>
+htop like application for PostgreSQL server activity monitoring.
+<BLANKLINE>
+Configuration:
+  -P PROFILE, --profile PROFILE
+                        Configuration profile matching a PROFILE.conf file in
+                        ${XDG_CONFIG_HOME:~/.config}/pg_activity/ or
+                        /etc/pg_activity/, or a built-in profile.
+<BLANKLINE>
+Options:
+  --blocksize BLOCKSIZE
+                        Filesystem blocksize (default: 4096).
+  --rds                 Enable support for AWS RDS (implies --no-tempfiles and
+                        filters out the rdsadmin database from space
+                        calculation).
+  --output FILEPATH     Store running queries as CSV.
+  --no-db-size          Disable total size of DB.
+  --no-tempfiles        Disable tempfile count and size.
+  --no-walreceiver      Disable walreceiver checks.
+  -w, --wrap-query      Wrap query column instead of truncating.
+  --duration-mode DURATION_MODE
+                        Duration mode. Values: 1-QUERY(default),
+                        2-TRANSACTION, 3-BACKEND.
+  --min-duration SECONDS
+                        Don't display queries with smaller than specified
+                        duration (in seconds).
+  --filter FIELD:REGEX  Filter activities with a (case insensitive) regular
+                        expression applied on selected fields. Known fields
+                        are: dbname.
+  --debug-file DEBUG_FILE
+                        Enable debug and write it to DEBUG_FILE.
+  --version             show program's version number and exit.
+  --help                Show this help message and exit.
+<BLANKLINE>
+Connection Options:
+  connection string     A valid connection string to the database, e.g.:
+                        'host=HOSTNAME port=PORT user=USER dbname=DBNAME'.
+  -h HOSTNAME, --host HOSTNAME
+                        Database server host or socket directory.
+  -p PORT, --port PORT  Database server port.
+  -U USERNAME, --username USERNAME
+                        Database user name.
+  -d DBNAME, --dbname DBNAME
+                        Database name to connect to.
+<BLANKLINE>
+Process table display options:
+  These options may be used hide some columns from the processes table.
+<BLANKLINE>
+  --no-pid              Disable PID.
+  --no-database         Disable DATABASE.
+  --no-user             Disable USER.
+  --no-client           Disable CLIENT.
+  --no-cpu              Disable CPU%.
+  --no-mem              Disable MEM%.
+  --no-read             Disable READ/s.
+  --no-write            Disable WRITE/s.
+  --no-time             Disable TIME+.
+  --no-wait             Disable W.
+  --no-app-name         Disable APP.
+<BLANKLINE>
+Header display options:
+  --no-inst-info        Hide instance information.
+  --no-sys-info         Hide system information.
+  --no-proc-info        Hide workers process information.
+<BLANKLINE>
+Other display options:
+  --hide-queries-in-logs
+                        Disable log_min_duration_statements and
+                        log_min_duration_sample for pg_activity.
+  --refresh REFRESH     Refresh rate. Values: 0.5, 1, 2, 3, 4, 5 (default: 2).
+<BLANKLINE>
+The connection string can be in the form of a list of Key/Value parameters or
+an URI as described in the PostgreSQL documentation. The parsing is delegated
+to the libpq: different versions of the client library may support different
+formats or parameters (for example, connection URIs are only supported from
+libpq 9.2).

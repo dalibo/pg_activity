@@ -110,17 +110,17 @@ class Flag(enum.Flag):
         config: Configuration | None,
         *,
         is_local: bool,
-        appname: bool,
-        client: bool,
-        cpu: bool,
-        database: bool,
-        mem: bool,
-        pid: bool,
-        read: bool,
-        time: bool,
-        user: bool,
-        wait: bool,
-        write: bool,
+        appname: bool | None,
+        client: bool | None,
+        cpu: bool | None,
+        database: bool | None,
+        mem: bool | None,
+        pid: bool | None,
+        read: bool | None,
+        time: bool | None,
+        user: bool | None,
+        wait: bool | None,
+        write: bool | None,
         **kwargs: Any,
     ) -> Flag:
         """Build a Flag value from command line options."""
@@ -128,29 +128,23 @@ class Flag(enum.Flag):
             flag = cls.from_config(config)
         else:
             flag = cls.all()
-        if not pid:
-            flag ^= cls.PID
-        if not database:
-            flag ^= cls.DATABASE
-        if not user:
-            flag ^= cls.USER
-        if not client:
-            flag ^= cls.CLIENT
-        if not cpu:
-            flag ^= cls.CPU
-        if not mem:
-            flag ^= cls.MEM
-        if not read:
-            flag ^= cls.READ
-        if not write:
-            flag ^= cls.WRITE
-        if not time:
-            flag ^= cls.TIME
-        if not wait:
-            flag ^= cls.WAIT
-        if not appname:
-            flag ^= cls.APPNAME
-
+        for opt, value in (
+            (appname, cls.APPNAME),
+            (client, cls.CLIENT),
+            (cpu, cls.CPU),
+            (database, cls.DATABASE),
+            (mem, cls.MEM),
+            (pid, cls.PID),
+            (read, cls.READ),
+            (time, cls.TIME),
+            (user, cls.USER),
+            (wait, cls.WAIT),
+            (write, cls.WRITE),
+        ):
+            if opt is True:
+                flag |= value
+            elif opt is False:
+                flag ^= value
         # Remove some if no running against local pg server.
         if not is_local and (flag & cls.CPU):
             flag ^= cls.CPU

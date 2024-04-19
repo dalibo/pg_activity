@@ -826,6 +826,7 @@ Use another set of options:
 ...         client=False,
 ...         dbsize=False,
 ...         tempfiles=True,
+...         user=None,
 ...         walreceiver=True,
 ...         output=str(output),
 ...     ),

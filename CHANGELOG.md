@@ -6,6 +6,9 @@
 
 * The color of cells in the process table can now be customized through the
   configuration file.
+* Add non-negative counterparts of many `--no-...` command-line option, thus
+  allowing to enable respective feature/behaviour even if disabled in the
+  configuration.  (Requires Python 3.9 or higher.)
 
 ### Fixed
 

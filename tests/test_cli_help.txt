@@ -1,3 +1,9 @@
+>>> import sys
+>>> import pytest
+>>> if sys.version_info < (3, 9):
+...     pytest.skip("only applies for Python version >= 3.9")
+...
+
 >>> from pgactivity import cli
 >>> parser = cli.get_parser()
 >>> parser.print_help()
@@ -18,9 +24,12 @@ Options:
                         filters out the rdsadmin database from space
                         calculation).
   --output FILEPATH     Store running queries as CSV.
-  --no-db-size          Skip total size of DB.
-  --no-tempfiles        Skip tempfile count and size.
-  --no-walreceiver      Skip walreceiver checks.
+  --db-size, --no-db-size
+                        Enable/disable total size of DB.
+  --tempfiles, --no-tempfiles
+                        Enable/disable tempfile count and size.
+  --walreceiver, --no-walreceiver
+                        Enable/disable walreceiver checks.
   -w, --wrap-query      Wrap query column instead of truncating.
   --duration-mode DURATION_MODE
                         Duration mode. Values: 1-QUERY(default),
@@ -50,17 +59,20 @@ Connection Options:
 Process table display options:
   These options may be used hide some columns from the processes table.
 <BLANKLINE>
-  --no-pid              Disable PID.
-  --no-database         Disable DATABASE.
-  --no-user             Disable USER.
-  --no-client           Disable CLIENT.
-  --no-cpu              Disable CPU%.
-  --no-mem              Disable MEM%.
-  --no-read             Disable READ/s.
-  --no-write            Disable WRITE/s.
-  --no-time             Disable TIME+.
-  --no-wait             Disable W.
-  --no-app-name         Disable APP.
+  --pid, --no-pid       Enable/disable PID.
+  --database, --no-database
+                        Enable/disable DATABASE.
+  --user, --no-user     Enable/disable USER.
+  --client, --no-client
+                        Enable/disable CLIENT.
+  --cpu, --no-cpu       Enable/disable CPU%.
+  --mem, --no-mem       Enable/disable MEM%.
+  --read, --no-read     Enable/disable READ/s.
+  --write, --no-write   Enable/disable WRITE/s.
+  --time, --no-time     Enable/disable TIME+.
+  --wait, --no-wait     Enable/disable W.
+  --app-name, --no-app-name
+                        Enable/disable APP.
 <BLANKLINE>
 Header display options:
   --no-inst-info        Hide instance information.

@@ -1,11 +1,11 @@
 from __future__ import annotations
 
+import argparse
 import logging
 import os
 import socket
 import sys
 import time
-from argparse import ArgumentParser
 from io import StringIO
 from typing import Any
 
@@ -45,12 +45,20 @@ def configure_logger(debug_file: str | None = None) -> StringIO:
     return memory_string
 
 
-def flag(p: Any, spec: str, *, dest: str, help: str) -> None:
-    p.add_argument(spec, dest=dest, help=help, action="store_false", default=True)
+def flag(p: Any, spec: str, *, dest: str, feature: str) -> None:
+    assert not spec.startswith("--no-") and spec.startswith("--"), spec
+    if sys.version_info < (3, 9):
+        spec = f"--no-{spec[2:]}"
+        action = "store_false"
+        help = f"Disable {feature}."
+    else:
+        action = argparse.BooleanOptionalAction
+        help = f"Enable/disable {feature}."
+    p.add_argument(spec, dest=dest, help=help, action=action, default=None)
 
 
-def get_parser() -> ArgumentParser:
-    parser = ArgumentParser(
+def get_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
         usage="%(prog)s [options] [connection string]",
         description=(
             "htop like application for PostgreSQL server activity monitoring."
@@ -103,11 +111,9 @@ def get_parser() -> ArgumentParser:
         metavar="FILEPATH",
         default=None,
     )
-    flag(group, "--no-db-size", dest="dbsize", help="Skip total size of DB.")
-    flag(
-        group, "--no-tempfiles", dest="tempfiles", help="Skip tempfile count and size."
-    )
-    flag(group, "--no-walreceiver", dest="walreceiver", help="Skip walreceiver checks.")
+    flag(group, "--db-size", dest="dbsize", feature="total size of DB")
+    flag(group, "--tempfiles", dest="tempfiles", feature="tempfile count and size")
+    flag(group, "--walreceiver", dest="walreceiver", feature="walreceiver checks")
     group.add_argument(
         "-w",
         "--wrap-query",
@@ -215,17 +221,17 @@ def get_parser() -> ArgumentParser:
         "Process table display options",
         "These options may be used hide some columns from the processes table.",
     )
-    flag(group, "--no-pid", dest="pid", help="Disable PID.")
-    flag(group, "--no-database", dest="database", help="Disable DATABASE.")
-    flag(group, "--no-user", dest="user", help="Disable USER.")
-    flag(group, "--no-client", dest="client", help="Disable CLIENT.")
-    flag(group, "--no-cpu", dest="cpu", help="Disable CPU%%.")
-    flag(group, "--no-mem", dest="mem", help="Disable MEM%%.")
-    flag(group, "--no-read", dest="read", help="Disable READ/s.")
-    flag(group, "--no-write", dest="write", help="Disable WRITE/s.")
-    flag(group, "--no-time", dest="time", help="Disable TIME+.")
-    flag(group, "--no-wait", dest="wait", help="Disable W.")
-    flag(group, "--no-app-name", dest="appname", help="Disable APP.")
+    flag(group, "--pid", dest="pid", feature="PID")
+    flag(group, "--database", dest="database", feature="DATABASE")
+    flag(group, "--user", dest="user", feature="USER")
+    flag(group, "--client", dest="client", feature="CLIENT")
+    flag(group, "--cpu", dest="cpu", feature="CPU%%")
+    flag(group, "--mem", dest="mem", feature="MEM%%")
+    flag(group, "--read", dest="read", feature="READ/s")
+    flag(group, "--write", dest="write", feature="WRITE/s")
+    flag(group, "--time", dest="time", feature="TIME+")
+    flag(group, "--wait", dest="wait", feature="W")
+    flag(group, "--app-name", dest="appname", feature="APP")
 
     group = parser.add_argument_group("Header display options")
     group.add_argument(

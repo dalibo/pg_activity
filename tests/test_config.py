@@ -24,11 +24,12 @@ def test_flag_load() -> None:
         "cpu": True,
         "database": True,
         "mem": True,
-        "pid": True,
+        "pid": None,
         "read": True,
+        "relation": True,
         "time": True,
         "user": True,
-        "wait": True,
+        "wait": None,
         "write": True,
     }
     flag = Flag.load(None, is_local=True, **options)
@@ -52,7 +53,11 @@ def test_flag_load() -> None:
     )
     cfg = Configuration(
         name="test",
-        values=dict(pid=UISection(hidden=True), relation=UISection(hidden=False)),
+        values=dict(
+            pid=UISection(hidden=True),
+            relation=UISection(hidden=False),
+            wait=UISection(hidden=False),
+        ),
     )
     flag = Flag.load(cfg, is_local=False, **options)
     assert (
