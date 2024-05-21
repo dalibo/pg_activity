@@ -377,12 +377,6 @@ def get_parser() -> ArgumentParser:
     return parser
 
 
-def exit(msg: str) -> None:
-    print("pg_activity: error: %s" % msg)
-    print('Try "pg_activity --help" for more information.')
-    sys.exit(1)
-
-
 def main() -> None:
     if os.name != "posix":
         sys.exit("FATAL: Platform not supported.")
