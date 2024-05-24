@@ -90,9 +90,9 @@ Worker processes:
 
 =over 2
 
-=item - B<total>: total worker count / maximum number of worker slots, parallel workers and logical replication wokers are taken from this amount (filtered);
+=item - B<total>: total worker count / maximum number of worker slots, parallel workers and logical replication workers are taken from this amount (filtered);
 
-=item - B<logical wokers>: logical replication worker count / maximum number of logical replication wokers (filtered);
+=item - B<logical workers>: logical replication worker count / maximum number of logical replication workers (filtered);
 
 =item - B<parallel workers>: parallel worker count for maintenance & queries / maximum number of parallel workers (filtered).
 
