@@ -87,31 +87,42 @@ ex:
     pg_activity [options] [connection string]
 
     Configuration:
-      --profile PROFILE     Configuration profile matching a PROFILE.conf file in
+      -P PROFILE, --profile PROFILE
+                            Configuration profile matching a PROFILE.conf file in
                             ${XDG_CONFIG_HOME:~/.config}/pg_activity/ or
-                            /etc/pg_activity/.
+                            /etc/pg_activity/, or a built-in profile.
 
     Options:
       --blocksize BLOCKSIZE
                             Filesystem blocksize (default: 4096).
-      --rds                 Enable support for AWS RDS (implies --no-tempfiles and filters out the rdsadmin database from space calculation).
+      --rds                 Enable support for AWS RDS (implies --no-tempfiles and
+                            filters out the rdsadmin database from space
+                            calculation).
       --output FILEPATH     Store running queries as CSV.
-      --no-db-size          Skip total size of DB.
-      --no-tempfiles        Skip tempfile count and size.
-      --no-walreceiver      Skip walreceiver checks.
+      --db-size, --no-db-size
+                            Enable/disable total size of DB.
+      --tempfiles, --no-tempfiles
+                            Enable/disable tempfile count and size.
+      --walreceiver, --no-walreceiver
+                            Enable/disable walreceiver checks.
       -w, --wrap-query      Wrap query column instead of truncating.
       --duration-mode DURATION_MODE
-                            Duration mode. Values: 1-QUERY(default), 2-TRANSACTION, 3-BACKEND.
+                            Duration mode. Values: 1-QUERY(default),
+                            2-TRANSACTION, 3-BACKEND.
       --min-duration SECONDS
-                            Don't display queries with smaller than specified duration (in seconds).
-      --filter FIELD:REGEX  Filter activities with a (case insensitive) regular expression applied on selected fields. Known fields are: dbname.
+                            Don't display queries with smaller than specified
+                            duration (in seconds).
+      --filter FIELD:REGEX  Filter activities with a (case insensitive) regular
+                            expression applied on selected fields. Known fields
+                            are: dbname.
       --debug-file DEBUG_FILE
                             Enable debug and write it to DEBUG_FILE.
       --version             show program's version number and exit.
       --help                Show this help message and exit.
 
     Connection Options:
-      connection string     A valid connection string to the database, e.g.: 'host=HOSTNAME port=PORT user=USER dbname=DBNAME'.
+      connection string     A valid connection string to the database, e.g.:
+                            'host=HOSTNAME port=PORT user=USER dbname=DBNAME'.
       -h HOSTNAME, --host HOSTNAME
                             Database server host or socket directory.
       -p PORT, --port PORT  Database server port.
@@ -133,7 +144,7 @@ ex:
       --no-write            Disable WRITE/s.
       --no-time             Disable TIME+.
       --no-wait             Disable W.
-      --no-app-name         Disable App.
+      --no-app-name         Disable APP.
 
     Header display options:
       --no-inst-info        Display instance information.
@@ -142,7 +153,8 @@ ex:
 
     Other display options:
       --hide-queries-in-logs
-                            Disable log_min_duration_statements and log_min_duration_sample for pg_activity.
+                            Disable log_min_duration_statements and
+                            log_min_duration_sample for pg_activity.
       --refresh REFRESH     Refresh rate. Values: 0.5, 1, 2, 3, 4, 5 (default: 2).
 
 ## Configuration
