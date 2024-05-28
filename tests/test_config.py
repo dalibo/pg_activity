@@ -9,7 +9,7 @@ import pytest
 from pgactivity.config import Configuration, ConfigurationError, Flag, UISection
 
 
-def test_flag():
+def test_flag() -> None:
     f = Flag(3)
     assert f == Flag.APPNAME | Flag.DATABASE
     assert f | Flag.CLIENT == Flag.CLIENT | Flag.APPNAME | Flag.DATABASE
@@ -17,7 +17,7 @@ def test_flag():
     assert f == Flag.DATABASE
 
 
-def test_flag_load():
+def test_flag_load() -> None:
     options = {
         "appname": True,
         "client": True,
