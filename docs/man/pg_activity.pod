@@ -417,6 +417,8 @@ See: https://www.postgresql.org/docs/current/libpq-envars.html
 
 =item B<t>     Sort by TIME+, descending.
 
+=item B<y>     Copy focused query to clipboard.
+
 =item B<T>     Change duration mode: query, transaction, backend.
 
 =item B<Space> Pause on/off.

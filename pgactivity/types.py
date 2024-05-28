@@ -1168,6 +1168,20 @@ class SelectableProcesses:
         except KeyError:
             self.pinned.add(self.focused)
 
+    def copy_focused_query_to_clipboard(self) -> str:
+        """Copy focused query to system clipboard using ANSI OSC 52 escape sequence."""
+        assert self.focused is not None
+        for proc in self.items:
+            if proc.pid == self.focused:
+                break
+        else:
+            return "no focused process found"
+        if proc.query is None:
+            return "process has no query"
+
+        utils.osc52_copy(proc.query)
+        return f"query of process {proc.pid} copied to clipboard"
+
 
 ActivityStats = Union[
     Iterable[WaitingProcess],

@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import base64
 import functools
 import re
+import sys
 from datetime import datetime, timedelta, timezone
 from typing import IO, Any, Iterable, Mapping
 
@@ -200,6 +202,12 @@ def short_state(state: str) -> str:
         "idle in transaction": "idle in trans",
         "idle in transaction (aborted)": "idle in trans (a)",
     }.get(state, state)
+
+
+def osc52_copy(text: str) -> None:
+    buffer = sys.__stderr__.buffer
+    buffer.write(b";".join([b"\033]52", b"c", base64.b64encode(text.encode())]) + b"\a")
+    buffer.flush()
 
 
 def csv_write(

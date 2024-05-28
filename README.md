@@ -232,6 +232,7 @@ bytes). If your SQL query text look truncated, you should increase
 | `c`       | Sort by CPU%, descending                                         |
 | `m`       | Sort by MEM%, descending                                         |
 | `t`       | Sort by TIME+, descending                                        |
+| `y`       | Copy focused query to clipboard                                  |
 | `T`       | Change duration mode: query, transaction, backend                |
 | `Space`   | Pause on/off                                                     |
 | `v`       | Change queries display mode: full, indented, truncated           |
@@ -301,6 +302,14 @@ Information can also be given via PostgreSQL's environment variables
 
 The password file is preferred since it's more secure (security is deferred to
 the OS). Please avoid password in connection strings at all cost.
+
+**How to copy/paste the query of focused process?**
+
+The `y` shortcut will copy the query of focused process to system clipboard
+using OSC 52 escape sequence. This requires the terminal emulator to support
+this escape sequence and set the clipboard accordingly. If so, the copy even
+works across remote connections (SSH). In general, terminal emulators supporting
+this would use `CTRL+SHIFT+V` to paste from this clipboard.
 
 # Hacking
 

@@ -97,6 +97,9 @@ def main(
                         ui.start_interactive()
                 elif key == keys.SPACE:
                     pg_procs.toggle_pin_focused()
+                elif key == keys.COPY_TO_CLIPBOARD:
+                    msg = pg_procs.copy_focused_query_to_clipboard()
+                    msg_pile.send(msg)
                 elif key.name == keys.CANCEL_SELECTION:
                     pg_procs.reset()
                     ui.end_interactive()

@@ -951,6 +951,116 @@ Interactive mode:
 (Note: we patch boxed() widget to disable border in order to make output
 independent of the number of digits in PIDs.)
 
+>>> keys = ["j", "j", "y", "q"]
+>>> with patch.object(
+...     widgets, "boxed", new=functools.partial(widgets.boxed, border=False),
+... ):
+...     run_ui(options, keys, render_footer=True, render_header=False, width=140)  # doctest: +ELLIPSIS,+NORMALIZE_WHITESPACE
+                                RUNNING QUERIES
+PID    DATABASE              state Query
+...    tests         idle in trans SELECT 42
+...    tests         idle in trans SELECT 43
+...    tests         idle in trans UPDATE t SET s = 'blocking'
+...    tests                active UPDATE t SET s = 'waiting'
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+F1/1 Running queries   F2/2 Waiting queries   F3/3 Blocking queries  Space Pause/unpause    q Quit                 h Help                   
+------------------------------------------------------------- sending key 'j' --------------------------------------------------------------
+                                RUNNING QUERIES
+PID    DATABASE              state Query
+...    tests         idle in trans SELECT 42
+...    tests         idle in trans SELECT 43
+...    tests         idle in trans UPDATE t SET s = 'blocking'
+...    tests                active UPDATE t SET s = 'waiting'
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+C Cancel current query     K Terminate underlying ses Space Tag/untag current qu Other Back to activities   q Quit                          
+------------------------------------------------------------- sending key 'j' --------------------------------------------------------------
+                                RUNNING QUERIES
+PID    DATABASE              state Query
+...    tests         idle in trans SELECT 43
+...    tests         idle in trans UPDATE t SET s = 'blocking'
+...    tests                active UPDATE t SET s = 'waiting'
+...    tests         idle in trans SELECT 42
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+C Cancel current query     K Terminate underlying ses Space Tag/untag current qu Other Back to activities   q Quit                          
+------------------------------------------------------------- sending key 'y' --------------------------------------------------------------
+                                RUNNING QUERIES
+PID    DATABASE              state Query
+...    tests         idle in trans SELECT 43
+...    tests         idle in trans UPDATE t SET s = 'blocking'
+...    tests                active UPDATE t SET s = 'waiting'
+...    tests         idle in trans SELECT 42
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+<BLANKLINE>
+                   query of process ... copied to clipboard
+------------------------------------------------------------- sending key 'q' --------------------------------------------------------------
+
 >>> key_down = {"ucs": "KEY_DOWN", "name": "KEY_DOWN"}
 >>> keys = [key_down, 2, 3, 1, key_down, "C", "n", "K", "y",
 ...         key_down, " ", "j", " ", "K", "y", "q"]

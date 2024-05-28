@@ -9,6 +9,8 @@
 * Add non-negative counterparts of many `--no-...` command-line option, thus
   allowing to enable respective feature/behaviour even if disabled in the
   configuration.  (Requires Python 3.9 or higher.)
+* Add a `y` command to copy focused query to the system clipboard, using
+  OSC 52 escape sequence (#311).
 
 ### Fixed
 
