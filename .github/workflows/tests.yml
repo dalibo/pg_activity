@@ -13,7 +13,7 @@ jobs:
           - python: "3.12"
             psycopg: "psycopg3"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
