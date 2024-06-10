@@ -238,8 +238,8 @@ bytes). If your SQL query text look truncated, you should increase
 | `UP/DOWN` | Scroll processes list                                            |
 | `k/j`     | Scroll processes list                                            |
 | `q`       | Quit                                                             |
-| `+`       | Increase refresh time. Maximum value : 5s                        |
-| `-`       | Decrease refresh time. Minimum Value : 0.5s                      |
+| `+`       | Increase refresh time. Maximum value: 5s                         |
+| `-`       | Decrease refresh time. Minimum Value: 0.5s                       |
 | `F1/1`    | Running queries list                                             |
 | `F2/2`    | Waiting queries list                                             |
 | `F3/3`    | Blocking queries list                                            |
@@ -272,7 +272,7 @@ with the `+` and `-` keys. Any query executed between two scans won't be
 displayed.
 
 
-What is more, `pg_activity` uses different queries to get :
+What is more, `pg_activity` uses different queries to get:
 
 *    settings from `pg_settings`
 *    version info using `version()`
@@ -280,7 +280,7 @@ What is more, `pg_activity` uses different queries to get :
 *    locks from `pg_locks`
 *    tps from `pg_database` using `pg_stat_get_db_xact_commit()` and
      `pg_stat_get_db_xact_rollback()`
-*    and more ( eg : `pg_cancel_backend()` and `pg_terminate_backend()` )
+*    and more (e.g.: `pg_cancel_backend()` and `pg_terminate_backend()`)
 
 Those queries cannot be seen in the query tab because all queries issued from
 the `pg_activity` backend are considered as noise and are not displayed . On
@@ -290,7 +290,7 @@ and `pg_stat_get_db_xact_commit()`. Therefore `pg_activity` will display a non
 zero TPS even with no activity on the database, and/or no activity displayed on
 screen.
 
-**How can I specify a password for authentication ?**
+**How can I specify a password for authentication?**
 
 pg_activity uses libpq to access to PostgreSQL therefore all the traditional
 methods are available.
