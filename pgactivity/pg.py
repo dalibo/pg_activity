@@ -49,7 +49,7 @@ try:
             # This is (more or less) what's done by psql.
             conninfo = conninfo_to_dict(dsn)
             conninfo.setdefault("client_encoding", "auto")
-            dsn = make_conninfo(**conninfo)
+            dsn = make_conninfo("", **conninfo)
         conn = psycopg.connect(dsn, autocommit=True, row_factory=dict_row, **kwargs)
         if conn.info.encoding == "ascii":
             # If client encoding is still 'ascii', fall back to a loader with a replace
