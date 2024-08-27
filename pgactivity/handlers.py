@@ -78,7 +78,7 @@ def query_mode(key: Keystroke) -> QueryMode | None:
     >>> query_mode(k(code=curses.KEY_F3)).name
     'blocking'
     """
-    if key.is_sequence:
+    if key.is_sequence and key.code:
         try:
             return keys.QUERYMODE_FROM_KEYS[key.code]
         except KeyError:
