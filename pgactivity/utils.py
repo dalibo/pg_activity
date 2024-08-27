@@ -205,6 +205,7 @@ def short_state(state: str) -> str:
 
 
 def osc52_copy(text: str) -> None:
+    assert sys.__stderr__ is not None
     buffer = sys.__stderr__.buffer
     buffer.write(b";".join([b"\033]52", b"c", base64.b64encode(text.encode())]) + b"\a")
     buffer.flush()
