@@ -14,7 +14,7 @@ SELECT
       NULL AS query_leader_pid,
       a.backend_type = 'parallel worker' AS is_parallel_worker
  FROM
-      pg_stat_activity a
+      {pg_stat_activity} a
       LEFT OUTER JOIN pg_database b ON a.datid = b.oid
  WHERE
       a.state <> 'idle'

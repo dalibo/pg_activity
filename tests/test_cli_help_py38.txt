@@ -23,6 +23,7 @@ Options:
   --rds                 Enable support for AWS RDS (implies --no-tempfiles and
                         filters out the rdsadmin database from space
                         calculation).
+  --citus               Enable support for Citus.
   --output FILEPATH     Store running queries as CSV.
   --no-db-size          Disable total size of DB.
   --no-tempfiles        Disable tempfile count and size.

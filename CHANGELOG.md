@@ -11,6 +11,8 @@
   configuration.  (Requires Python 3.9 or higher.)
 * Add a `y` command to copy focused query to the system clipboard, using
   OSC 52 escape sequence (#311).
+* Support Citus query activity (`citus_stat_activity`) views, through a new
+  `--citus` command-line option.
 
 ### Fixed
 

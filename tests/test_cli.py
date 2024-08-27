@@ -8,12 +8,13 @@ from pgactivity import cli
 def test_parser() -> None:
     parser = cli.get_parser()
     ns = parser.parse_args(
-        ["--no-db-size", "-w", "-p", "5433", "--no-pid", "--no-app-name"]
+        ["--no-db-size", "-w", "-p", "5433", "--no-pid", "--no-app-name", "--citus"]
     )
     assert vars(ns) == {
         "profile": None,
         "blocksize": 4096,
         "rds": False,
+        "citus": True,
         "output": None,
         "dbsize": False,
         "tempfiles": None,

@@ -252,6 +252,10 @@ required by another session. It shows following information:
 
 	Enable support for AWS RDS (implies --no-tempfiles and filters out the rdsadmin database from space calculation).
 
+=item B<--citus>
+
+	Enable support for Citus.
+
 =item B<--output=FILEPATH>
 
 	Store running queries as CSV.

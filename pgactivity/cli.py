@@ -105,6 +105,13 @@ def get_parser() -> argparse.ArgumentParser:
         default=False,
     )
     group.add_argument(
+        "--citus",
+        dest="citus",
+        action="store_true",
+        help="Enable support for Citus.",
+        default=False,
+    )
+    group.add_argument(
         "--output",
         dest="output",
         help="Store running queries as CSV.",
