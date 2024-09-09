@@ -44,6 +44,7 @@ Default CLI options, passed to ui.main():
 ...     "output": None,
 ...     "port": f"{postgres.info.port}",
 ...     "rds": False,
+...     "citus": False,
 ...     "username": f"{postgres.info.user}",
 ...     "wrap_query": False,
 ...     "header_show_instance": True,
