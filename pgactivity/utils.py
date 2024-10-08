@@ -4,8 +4,9 @@ import base64
 import functools
 import re
 import sys
+from collections.abc import Iterable, Mapping
 from datetime import datetime, timedelta, timezone
-from typing import IO, Any, Iterable, Mapping
+from typing import IO, Any
 
 import attr
 import humanize

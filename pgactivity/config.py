@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import configparser
 import enum
+import importlib.resources
 import io
 import os
 from collections.abc import ItemsView
@@ -11,7 +12,16 @@ from typing import IO, Any, TypeVar, Union
 import attr
 from attr import validators
 
-from .compat import gt, read_resource
+from .compat import gt
+
+
+def read_resource(pkgname: str, dirname: str, *args: str) -> str | None:
+    resource = importlib.resources.files(pkgname).joinpath(dirname)
+    for arg in args:
+        resource = resource.joinpath(arg)
+    if resource.is_file():
+        return resource.read_text()
+    return None
 
 
 class ConfigurationError(Exception):

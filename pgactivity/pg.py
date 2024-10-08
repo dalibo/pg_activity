@@ -2,9 +2,8 @@ from __future__ import annotations
 
 import logging
 import os
+from collections.abc import Callable, Sequence
 from typing import Any, TypeVar, overload
-
-from .compat import Callable, Dict, Sequence
 
 Row = TypeVar("Row")
 
@@ -29,7 +28,7 @@ try:
 
     __version__ = psycopg.__version__
 
-    Connection = psycopg.Connection[Dict[str, Any]]
+    Connection = psycopg.Connection[dict[str, Any]]
 
     class BytesLoader(Loader):
         def load(self, data: Buffer) -> bytes:

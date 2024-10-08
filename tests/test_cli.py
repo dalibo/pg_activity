@@ -1,7 +1,3 @@
-import sys
-
-import pytest
-
 from pgactivity import cli
 
 
@@ -48,7 +44,6 @@ def test_parser() -> None:
     }
 
 
-@pytest.mark.skipif(sys.version_info < (3, 9), reason="require python >= 3.9")
 def test_parser_flag_on() -> None:
     parser = cli.get_parser()
     ns = parser.parse_args(["--pid", "--no-app-name"])

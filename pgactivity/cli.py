@@ -47,14 +47,13 @@ def configure_logger(debug_file: str | None = None) -> StringIO:
 
 def flag(p: Any, spec: str, *, dest: str, feature: str) -> None:
     assert not spec.startswith("--no-") and spec.startswith("--"), spec
-    if sys.version_info < (3, 9):
-        spec = f"--no-{spec[2:]}"
-        action = "store_false"
-        help = f"Disable {feature}."
-    else:
-        action = argparse.BooleanOptionalAction
-        help = f"Enable/disable {feature}."
-    p.add_argument(spec, dest=dest, help=help, action=action, default=None)
+    p.add_argument(
+        spec,
+        dest=dest,
+        help=f"Enable/disable {feature}.",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+    )
 
 
 def get_parser() -> argparse.ArgumentParser:

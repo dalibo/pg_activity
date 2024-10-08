@@ -3,6 +3,7 @@ from __future__ import annotations
 import functools
 import inspect
 import itertools
+from collections.abc import Callable, Iterable, Iterator, Sequence
 from textwrap import TextWrapper, dedent
 from typing import Any, Literal
 
@@ -10,7 +11,7 @@ from blessed import Terminal
 
 from . import colors, utils
 from .activities import sorted as sorted_processes
-from .compat import Callable, Iterable, Iterator, Sequence, link
+from .compat import link
 from .keys import BINDINGS, EXIT_KEY
 from .keys import HELP as HELP_KEY
 from .keys import (

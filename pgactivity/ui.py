@@ -3,7 +3,7 @@ from __future__ import annotations
 import time
 from argparse import Namespace
 from functools import partial
-from typing import List, cast
+from typing import cast
 
 import attr
 from blessed import Terminal
@@ -120,7 +120,7 @@ def main(
                     action_formatter = getattr(term, color)
                     pids = pg_procs.selected
                     if len(pids) > 1:
-                        ptitle = f"processes {', '.join((str(p) for p in pids))}"
+                        ptitle = f"processes {', '.join(str(p) for p in pids)}"
                     else:
                         ptitle = f"process {pids[0]}"
                     with term.location(x=0, y=term.height // 3):
@@ -216,7 +216,7 @@ def main(
                         if is_local:
                             # TODO: Use this logic in waiting and blocking cases.
                             local_pg_procs, io_read, io_write = activities.ps_complete(
-                                cast(List[types.RunningProcess], pg_procs.items),
+                                cast(list[types.RunningProcess], pg_procs.items),
                                 sys_procs,
                                 fs_blocksize,
                             )

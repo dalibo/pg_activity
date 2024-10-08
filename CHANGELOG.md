@@ -8,7 +8,7 @@
   configuration file.
 * Add non-negative counterparts of many `--no-...` command-line option, thus
   allowing to enable respective feature/behaviour even if disabled in the
-  configuration.  (Requires Python 3.9 or higher.)
+  configuration.
 * Add a `y` command to copy focused query to the system clipboard, using
   OSC 52 escape sequence (#311).
 
@@ -19,6 +19,10 @@
 ### Changed
 
 * Exit with status 0 upon keyboard interrupt.
+
+### Removed
+
+* Python 3.8 is no longer supported.
 
 ## pg\_activity 3.5.1 - 2024-04-03
 

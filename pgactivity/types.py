@@ -2,16 +2,16 @@ from __future__ import annotations
 
 import enum
 import functools
+from collections.abc import Callable, Iterable, Iterator, Mapping, MutableSet, Sequence
 from datetime import timedelta
 from ipaddress import IPv4Address, IPv6Address
-from typing import Any, Tuple, TypeVar, Union, overload
+from typing import Any, TypeVar, Union, overload
 
 import attr
 import psutil
 from attr import validators
 
 from . import colors, compat, pg, utils
-from .compat import Callable, Iterable, Iterator, Mapping, MutableSet, Sequence
 from .config import Configuration, Flag, HeaderSection, UISection
 
 
@@ -1186,7 +1186,7 @@ class SelectableProcesses:
 ActivityStats = Union[
     Iterable[WaitingProcess],
     Iterable[RunningProcess],
-    Tuple[Iterable[WaitingProcess], SystemInfo],
-    Tuple[Iterable[BlockingProcess], SystemInfo],
-    Tuple[Iterable[LocalRunningProcess], SystemInfo],
+    tuple[Iterable[WaitingProcess], SystemInfo],
+    tuple[Iterable[BlockingProcess], SystemInfo],
+    tuple[Iterable[LocalRunningProcess], SystemInfo],
 ]
