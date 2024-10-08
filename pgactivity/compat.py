@@ -34,7 +34,7 @@ if sys.version_info >= (3, 9):
 else:
     from typing import Callable, Dict, Iterable, Iterator, Mapping, MutableSet, Sequence
 
-if sys.version_info >= (3, 11):
+if sys.version_info >= (3, 9):
 
     def read_resource(pkgname: str, dirname: str, *args: str) -> str | None:
         resource = importlib.resources.files(pkgname).joinpath(dirname)
