@@ -8,7 +8,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - python: "3.8"
+          - python: "3.9"
             psycopg: "psycopg2"
           - python: "3.12"
             psycopg: "psycopg3"
