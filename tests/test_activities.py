@@ -122,13 +122,13 @@ def test_ps_complete_empty_procs(system_processes):
 def test_mem_swap_load() -> None:
     pmem = namedtuple("pmem", ["total", "free", "buffers", "cached"])
     vmem = namedtuple("vmem", ["total", "free", "used"])
-    with patch(
-        "psutil.virtual_memory", return_value=pmem(45, 6, 6, 7)
-    ) as virtual_memory, patch(
-        "psutil.swap_memory", return_value=vmem(8, 6, 2)
-    ) as swap_memory, patch(
-        "os.getloadavg", return_value=(0.14, 0.27, 0.44)
-    ) as getloadavg:
+    with (
+        patch(
+            "psutil.virtual_memory", return_value=pmem(45, 6, 6, 7)
+        ) as virtual_memory,
+        patch("psutil.swap_memory", return_value=vmem(8, 6, 2)) as swap_memory,
+        patch("os.getloadavg", return_value=(0.14, 0.27, 0.44)) as getloadavg,
+    ):
         memory, swap, load = activities.mem_swap_load()
     virtual_memory.assert_called_once_with()
     swap_memory.assert_called_once_with()
