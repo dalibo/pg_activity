@@ -1,7 +1,7 @@
 >>> import sys
 >>> import pytest
->>> if sys.version_info < (3, 13):
-...     pytest.skip("only applies for Python version >= 3.13")
+>>> if sys.version_info >= (3, 13):
+...     pytest.skip("only applies for Python version < 3.13")
 ...
 
 >>> from pgactivity import cli
@@ -12,7 +12,7 @@ usage: pytest [options] [connection string]
 htop like application for PostgreSQL server activity monitoring.
 <BLANKLINE>
 Configuration:
-  -P, --profile PROFILE
+  -P PROFILE, --profile PROFILE
                         Configuration profile matching a PROFILE.conf file in
                         ${XDG_CONFIG_HOME:~/.config}/pg_activity/ or
                         /etc/pg_activity/, or a built-in profile.
@@ -48,11 +48,13 @@ Options:
 Connection Options:
   connection string     A valid connection string to the database, e.g.:
                         'host=HOSTNAME port=PORT user=USER dbname=DBNAME'.
-  -h, --host HOSTNAME   Database server host or socket directory.
-  -p, --port PORT       Database server port.
-  -U, --username USERNAME
+  -h HOSTNAME, --host HOSTNAME
+                        Database server host or socket directory.
+  -p PORT, --port PORT  Database server port.
+  -U USERNAME, --username USERNAME
                         Database user name.
-  -d, --dbname DBNAME   Database name to connect to.
+  -d DBNAME, --dbname DBNAME
+                        Database name to connect to.
 <BLANKLINE>
 Process table display options:
   These options may be used hide some columns from the processes table.

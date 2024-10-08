@@ -10,7 +10,7 @@ jobs:
         include:
           - python: "3.9"
             psycopg: "psycopg2"
-          - python: "3.12"
+          - python: "3.13"
             psycopg: "psycopg3"
     steps:
       - uses: actions/checkout@v4
@@ -18,6 +18,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
+          allow-prereleases: true
       - name: Install tox
         run: pip install tox
       - name: Add fr_FR and zh_TW for test purposes

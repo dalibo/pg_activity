@@ -87,7 +87,7 @@ ex:
     pg_activity [options] [connection string]
 
     Configuration:
-      -P PROFILE, --profile PROFILE
+      -P, --profile PROFILE
                             Configuration profile matching a PROFILE.conf file in
                             ${XDG_CONFIG_HOME:~/.config}/pg_activity/ or
                             /etc/pg_activity/, or a built-in profile.
@@ -123,13 +123,11 @@ ex:
     Connection Options:
       connection string     A valid connection string to the database, e.g.:
                             'host=HOSTNAME port=PORT user=USER dbname=DBNAME'.
-      -h HOSTNAME, --host HOSTNAME
-                            Database server host or socket directory.
-      -p PORT, --port PORT  Database server port.
-      -U USERNAME, --username USERNAME
+      -h, --host HOSTNAME   Database server host or socket directory.
+      -p, --port PORT       Database server port.
+      -U, --username USERNAME
                             Database user name.
-      -d DBNAME, --dbname DBNAME
-                            Database name to connect to.
+      -d, --dbname DBNAME   Database name to connect to.
 
     Process table display options:
       These options may be used hide some columns from the processes table.
