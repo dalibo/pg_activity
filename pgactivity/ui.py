@@ -39,13 +39,20 @@ def main(
     )
 
     flag = Flag.load(config, is_local=is_local, **vars(options))
-    ui = types.UI.make(
-        header=types.UIHeader.make(
+
+    header: types.UIHeader
+    if options.citus:
+        header = types.DisabledUIHeader()
+    else:
+        header = types.UIHeader.make(
             config.header() if config else None,
             show_instance=options.header_show_instance,
             show_system=options.header_show_system,
             show_workers=options.header_show_workers,
-        ),
+        )
+
+    ui = types.UI.make(
+        header=header,
         config=config,
         flag=flag,
         refresh_time=options.refresh,
@@ -104,11 +111,17 @@ def main(
                     pg_procs.reset()
                     ui.end_interactive()
                 elif keys.is_toggle_header_system(key):
-                    ui.header.toggle_system()
+                    msg = ui.header.toggle_system()
+                    if msg is not None:
+                        msg_pile.send(msg)
                 elif keys.is_toggle_header_instance(key):
-                    ui.header.toggle_instance()
+                    msg = ui.header.toggle_instance()
+                    if msg is not None:
+                        msg_pile.send(msg)
                 elif keys.is_toggle_header_workers(key):
-                    ui.header.toggle_workers()
+                    msg = ui.header.toggle_workers()
+                    if msg is not None:
+                        msg_pile.send(msg)
                 elif pg_procs.selected and key in (
                     keys.PROCESS_CANCEL,
                     keys.PROCESS_KILL,

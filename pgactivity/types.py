@@ -4,7 +4,7 @@ import enum
 import functools
 from datetime import timedelta
 from ipaddress import IPv4Address, IPv6Address
-from typing import Any, Tuple, TypeVar, Union, overload
+from typing import Any, ClassVar, Tuple, TypeVar, Union, overload
 
 import attr
 import psutil
@@ -212,7 +212,7 @@ class UIHeader:
         values.update({k: v for k, v in options.items() if v is not None})
         return cls(**values)
 
-    def toggle_system(self) -> None:
+    def toggle_system(self) -> str | None:
         """Toggle the 'show_system' attribute.
 
         >>> h = UIHeader()
@@ -226,8 +226,9 @@ class UIHeader:
         True
         """
         self.show_system = not self.show_system
+        return None
 
-    def toggle_instance(self) -> None:
+    def toggle_instance(self) -> str | None:
         """Toggle the 'show_instance' attribute.
 
         >>> h = UIHeader()
@@ -241,8 +242,9 @@ class UIHeader:
         True
         """
         self.show_instance = not self.show_instance
+        return None
 
-    def toggle_workers(self) -> None:
+    def toggle_workers(self) -> str | None:
         """Toggle the 'show_workers' attribute.
 
         >>> h = UIHeader()
@@ -256,6 +258,34 @@ class UIHeader:
         True
         """
         self.show_workers = not self.show_workers
+        return None
+
+
+@attr.s(auto_attribs=True, slots=True)
+class DisabledUIHeader(UIHeader):
+    """Disable UI header.
+
+    >>> h = DisabledUIHeader()
+    >>> h.show_instance
+    False
+    >>> h.toggle_workers()
+    'header is disabled globally'
+    """
+
+    show_instance: bool = attr.ib(init=False, default=False)
+    show_system: bool = attr.ib(init=False, default=False)
+    show_workers: bool = attr.ib(init=False, default=False)
+
+    _disabled_msg: ClassVar[str] = "header is disabled globally"
+
+    def toggle_system(self) -> str:
+        return self._disabled_msg
+
+    def toggle_instance(self) -> str:
+        return self._disabled_msg
+
+    def toggle_workers(self) -> str:
+        return self._disabled_msg
 
 
 @attr.s(auto_attribs=True, slots=True)

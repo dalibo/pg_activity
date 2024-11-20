@@ -22,7 +22,7 @@ SELECT
       pg_catalog.pg_encoding_to_char(b.encoding) AS encoding
   FROM
       pg_catalog.pg_locks
-      JOIN pg_catalog.pg_stat_activity a ON (pg_catalog.pg_locks.pid = a.procpid)
+      JOIN {pg_stat_activity} a ON (pg_catalog.pg_locks.pid = a.procpid)
       LEFT OUTER JOIN pg_database b ON a.datid = b.oid
  WHERE
       NOT pg_catalog.pg_locks.granted

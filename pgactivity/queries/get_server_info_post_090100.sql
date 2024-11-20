@@ -40,7 +40,7 @@ WITH dbinfo AS(
                NULL AS max_worker_processes,
                current_setting('max_wal_senders')::int AS max_wal_senders,
                NULL AS max_replication_slots
-          FROM pg_stat_activity
+          FROM {pg_stat_activity}
          WHERE CASE WHEN {dbname_filter} IS NULL THEN true
                     ELSE datname ~* %(dbname_filter)s
                END

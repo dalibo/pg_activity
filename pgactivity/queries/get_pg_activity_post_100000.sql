@@ -17,7 +17,7 @@ SELECT
           AND a.query IS NOT NULL
       ) AS is_parallel_worker
   FROM
-      pg_stat_activity a
+      {pg_stat_activity} a
       LEFT OUTER JOIN pg_database b ON a.datid = b.oid
  WHERE
       state <> 'idle'

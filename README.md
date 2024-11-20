@@ -98,6 +98,7 @@ ex:
       --rds                 Enable support for AWS RDS (implies --no-tempfiles and
                             filters out the rdsadmin database from space
                             calculation).
+      --citus               Enable support for Citus.
       --output FILEPATH     Store running queries as CSV.
       --db-size, --no-db-size
                             Enable/disable total size of DB.

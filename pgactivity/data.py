@@ -73,6 +73,7 @@ class Data:
     filters: Filters
     dsn_parameters: dict[str, str]
     failed_queries: FailedQueriesInfo
+    pg_stat_activity: str
 
     @classmethod
     def pg_connect(
@@ -85,6 +86,7 @@ class Data:
         password: str | None = None,
         database: str = "postgres",
         rds_mode: bool = False,
+        citus: bool = False,
         dsn: str = "",
         hide_queries_in_logs: bool = False,
         filters: Filters = NO_FILTER,
@@ -115,6 +117,7 @@ class Data:
             failed_queries=FailedQueriesInfo(),
             filters=filters,
             dsn_parameters=pg.connection_parameters(pg_conn),
+            pg_stat_activity="citus_stat_activity" if citus else "pg_stat_activity",
         )
 
     def try_reconnect(self) -> Data | None:
@@ -320,7 +323,10 @@ class Data:
         else:
             query = queries.get("get_server_info_oldest")
 
-        qs = sql.SQL(query).format(dbname_filter=self.dbname_filter)
+        qs = sql.SQL(query).format(
+            pg_stat_activity=sql.Identifier(self.pg_stat_activity),
+            dbname_filter=self.dbname_filter,
+        )
         try:
             ret = pg.fetchone(
                 self.pg_conn,
@@ -410,6 +416,7 @@ class Data:
 
         duration_column = self.get_duration_column(duration_mode)
         query = sql.SQL(qs).format(
+            pg_stat_activity=sql.Identifier(self.pg_stat_activity),
             dbname_filter=self.dbname_filter,
             duration_column=sql.Identifier(duration_column),
             min_duration=sql.Literal(self.min_duration),
@@ -437,6 +444,7 @@ class Data:
 
         duration_column = self.get_duration_column(duration_mode)
         query = sql.SQL(qs).format(
+            pg_stat_activity=sql.Identifier(self.pg_stat_activity),
             dbname_filter=self.dbname_filter,
             duration_column=sql.Identifier(duration_column),
             min_duration=sql.Literal(self.min_duration),
@@ -466,6 +474,7 @@ class Data:
 
         duration_column = self.get_duration_column(duration_mode)
         query = sql.SQL(qs).format(
+            pg_stat_activity=sql.Identifier(self.pg_stat_activity),
             dbname_filter=self.dbname_filter,
             duration_column=sql.Identifier(duration_column),
             min_duration=sql.Literal(self.min_duration),
@@ -527,6 +536,7 @@ def pg_connect(
                 password=password,
                 database=options.dbname,
                 rds_mode=options.rds,
+                citus=options.citus,
                 min_duration=min_duration,
                 filters=filters,
                 hide_queries_in_logs=options.hide_queries_in_logs,
