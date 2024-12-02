@@ -15,6 +15,7 @@
 ### Fixed
 
 * Fix configuration of the color of `appname` column (#415).
+* Fix `datetimeutc` column in CSV export showing wrong "minutes" value (#429).
 
 ### Changed
 
