@@ -465,10 +465,17 @@ class UI:
             sort_key=SortKey.write,
             transform=utils.naturalsize,
         )
+        add_column(
+            Flag.XMIN,
+            key="xmin",
+            min_width=8,
+            default_color="cyan",
+        )
 
         columns_key_by_querymode: Mapping[QueryMode, list[str]] = {
             QueryMode.activities: [
                 "pid",
+                "xmin",
                 "database",
                 "application_name",
                 "user",
@@ -916,6 +923,7 @@ class BaseProcess:
 class RunningProcess(BaseProcess):
     """Process for a running query."""
 
+    xmin: int
     wait: bool | None | str
     query_leader_pid: int | None
     is_parallel_worker: bool

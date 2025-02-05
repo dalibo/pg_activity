@@ -221,6 +221,7 @@ def get_parser() -> argparse.ArgumentParser:
         "These options may be used hide some columns from the processes table.",
     )
     flag(group, "--pid", dest="pid", feature="PID")
+    flag(group, "--xmin", dest="xmin", feature="XMIN")
     flag(group, "--database", dest="database", feature="DATABASE")
     flag(group, "--user", dest="user", feature="USER")
     flag(group, "--client", dest="client", feature="CLIENT")

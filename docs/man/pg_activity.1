@@ -182,6 +182,8 @@ The running queries panel shows all running queries, transactions or backends
 .IP "\- \fBPID\fR: process id of the backend which executes the query;" 2
 .IX Item "- PID: process id of the backend which executes the query;"
 .PD 0
+.IP "\- \fBXMIN\fR: xmin horizon of the backend;" 2
+.IX Item "- XMIN: xmin horizon of the backend;"
 .IP "\- \fBDATABASE\fR: database specified in the connection string;" 2
 .IX Item "- DATABASE: database specified in the connection string;"
 .IP "\- \fBAPP\fR: application name specified in the connection string;" 2
@@ -363,6 +365,11 @@ required by another session. It shows following information:
 .IX Item "--pid, --no-pid"
 .Vb 1
 \&        Enable/disable PID.
+.Ve
+.IP "\fB\-\-xmin\fR, \fB\-\-no\-xmin\fR" 2
+.IX Item "--xmin, --no-xmin"
+.Vb 1
+\&        Enable/disable XMIN.
 .Ve
 .IP "\fB\-\-database\fR, \fB\-\-no\-database\fR" 2
 .IX Item "--database, --no-database"

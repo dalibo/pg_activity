@@ -35,6 +35,7 @@ def test_parser() -> None:
         "write": None,
         "time": None,
         "wait": None,
+        "xmin": None,
         "appname": False,
         "header_show_instance": None,
         "header_show_system": None,

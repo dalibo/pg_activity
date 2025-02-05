@@ -41,6 +41,7 @@ Default CLI options, passed to ui.main():
 ...     "user": True,
 ...     "wait": False,
 ...     "write": False,
+...     "xmin": False,
 ...     "output": None,
 ...     "port": f"{postgres.info.port}",
 ...     "rds": False,

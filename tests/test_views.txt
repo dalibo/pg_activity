@@ -212,6 +212,7 @@ Tests for processes_rows()
 >>> processes1 = [
 ...     LocalRunningProcess(
 ...         pid="6239",
+...         xmin=1,
 ...         application_name="pgbench",
 ...         database="pgbench",
 ...         user="postgres",
@@ -231,6 +232,7 @@ Tests for processes_rows()
 ...     ),
 ...     LocalRunningProcess(
 ...         pid="6228",
+...         xmin=2,
 ...         application_name="pgbench",
 ...         database="pgbench",
 ...         user="postgres",
@@ -250,6 +252,7 @@ Tests for processes_rows()
 ...     ),
 ...     LocalRunningProcess(
 ...         pid="1234",
+...         xmin=3,
 ...         application_name="accounting",
 ...         database="business",
 ...         user="bob",
@@ -303,9 +306,9 @@ Tests for processes_rows()
 Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 (TODO: this is buggy, the first line should be wrapped as well if too long)
 >>> processes_rows(term, ui, SelectableProcesses(processes1), 100, width=250)
-6239   pgbench                   pgbench         postgres            local 0.1    1.0  7B       12B       0.000000                N N        idle in trans UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
-6228   pgbench                   pgbench         postgres            local 0.2    1.0  0B       1.08M     0.000413                  Y               active \_ UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
-1234   business               accounting              bob            local 2.4    1.0  9.42M    1.21K     20:34.00 BackendRandomLoc N               active SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id) WHERE s.date >
+6239   1        pgbench                   pgbench         postgres            local 0.1    1.0  7B       12B       0.000000                N N        idle in trans UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
+6228   2        pgbench                   pgbench         postgres            local 0.2    1.0  0B       1.08M     0.000413                  Y               active \_ UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid = 1932841;
+1234   3        business               accounting              bob            local 2.4    1.0  9.42M    1.21K     20:34.00 BackendRandomLoc N               active SELECT product_id, p.name FROM products p LEFT JOIN sales s USING (product_id) WHERE
 
 >>> ui = UI.make(flag=Flag.PID|Flag.DATABASE, wrap_query=False)
 >>> processes_rows(term, ui, SelectableProcesses(processes1), 100)
@@ -374,6 +377,7 @@ Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 >>> processes1b = [
 ...     RunningProcess(
 ...         pid=6239,
+...         xmin=1,
 ...         application_name="pgbench",
 ...         database="pgbench",
 ...         user="postgres",
@@ -388,6 +392,7 @@ Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 ...     ),
 ...     RunningProcess(
 ...         pid=6228,
+...         xmin=2,
 ...         application_name="none",
 ...         database="pgbench",
 ...         user="postgres",
@@ -402,6 +407,7 @@ Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 ...     ),
 ...     RunningProcess(
 ...         pid=1234,
+...         xmin=3,
 ...         application_name="accounting",
 ...         database="business",
 ...         user="bob",

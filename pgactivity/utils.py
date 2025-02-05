@@ -221,24 +221,24 @@ def csv_write(
     """Store process list into CSV file.
 
     >>> processes = [
-    ...     {'pid': 25199, 'application_name': '', 'database': 'pgbench', 'user': None,
+    ...     {'pid': 25199, 'xmin': 1234, 'application_name': '', 'database': 'pgbench', 'user': None,
     ...      'client': 'local', 'cpu': 0.0, 'mem': 0.6504979545924837,
     ...      'read': 0.0, 'write': 0.0, 'state': 'active',
     ...      'query': 'autovacuum: VACUUM ANALYZE public.pgbench_tellers',
     ...      'duration': 0.348789, 'wait': False,
     ...      'io_wait': False, 'is_parallel_worker': False},
-    ...     {'pid': 25068, 'application_name': 'pgbench', 'database': None,
+    ...     {'pid': 25068, 'xmin': 2345, 'application_name': 'pgbench', 'database': None,
     ...      'user': 'postgres', 'client': 'local', 'cpu': 0.0, 'mem': 2.4694780629380646,
     ...      'read': 278536.76590087387, 'write': 835610.2977026217,
     ...      'state': 'idle in transaction',
     ...      'query': 'INSERT INTO pgbench_history (tid, bid, aid, delta, mtime) VALUES (625, 87, 4368910, -341, CURRENT_TIMESTAMP);',
     ...      'duration': 0.000105, 'wait': False, 'io_wait': False,
     ...      'is_parallel_worker': False},
-    ...     {'pid': 25379, 'application_name': 'pgbench', 'database': 'pgbench',
+    ...     {'pid': 25379, 'xmin': 3456, 'application_name': 'pgbench', 'database': 'pgbench',
     ...      'user': 'postgres', 'client': 'local', 'state': 'active',
     ...      'query': 'UPDATE pgbench_branches SET bbalance = bbalance + -49 WHERE bid = 73;',
     ...      'duration': 0, 'wait': False},
-    ...     {'pid': 25392, 'application_name': 'pgbench', 'database': 'pgbench',
+    ...     {'pid': 25392, 'xmin': 4567, 'application_name': 'pgbench', 'database': 'pgbench',
     ...      'user': 'postgres', 'client': 'local', 'state': 'active',
     ...      'query': 'BEGIN;', 'duration': 0, 'wait': False}
     ... ]
@@ -249,11 +249,11 @@ def csv_write(
     ...     _ = f.seek(0)
     ...     content = f.read()
     >>> print(content, end="")  # doctest: +ELLIPSIS
-    datetimeutc;pid;database;appname;user;client;cpu;memory;read;write;duration;wait;io_wait;state;query
-    "...-...-...T...Z";"25199";"pgbench";"";"None";"local";"0.0";"0.6504979545924837";"0.0";"0.0";"0.348789";"N";"N";"active";"autovacuum: VACUUM ANALYZE public.pgbench_tellers"
-    "...-...-...T...Z";"25068";"";"pgbench";"postgres";"local";"0.0";"2.4694780629380646";"278536.76590087387";"835610.2977026217";"0.000105";"N";"N";"idle in transaction";"INSERT INTO pgbench_history (tid, bid, aid, delta, mtime) VALUES (625, 87, 4368910, -341, CURRENT_TIMESTAMP);"
-    "...-...-...T...Z";"25379";"pgbench";"pgbench";"postgres";"local";"N/A";"N/A";"N/A";"N/A";"0";"N";"N/A";"active";"UPDATE pgbench_branches SET bbalance = bbalance + -49 WHERE bid = 73;"
-    "...-...-...T...Z";"25392";"pgbench";"pgbench";"postgres";"local";"N/A";"N/A";"N/A";"N/A";"0";"N";"N/A";"active";"BEGIN;"
+    datetimeutc;pid;xmin;database;appname;user;client;cpu;memory;read;write;duration;wait;io_wait;state;query
+    "...-...-...T...Z";"25199";"1234";"pgbench";"";"None";"local";"0.0";"0.6504979545924837";"0.0";"0.0";"0.348789";"N";"N";"active";"autovacuum: VACUUM ANALYZE public.pgbench_tellers"
+    "...-...-...T...Z";"25068";"2345";"";"pgbench";"postgres";"local";"0.0";"2.4694780629380646";"278536.76590087387";"835610.2977026217";"0.000105";"N";"N";"idle in transaction";"INSERT INTO pgbench_history (tid, bid, aid, delta, mtime) VALUES (625, 87, 4368910, -341, CURRENT_TIMESTAMP);"
+    "...-...-...T...Z";"25379";"3456";"pgbench";"pgbench";"postgres";"local";"N/A";"N/A";"N/A";"N/A";"0";"N";"N/A";"active";"UPDATE pgbench_branches SET bbalance = bbalance + -49 WHERE bid = 73;"
+    "...-...-...T...Z";"25392";"4567";"pgbench";"pgbench";"postgres";"local";"N/A";"N/A";"N/A";"N/A";"0";"N";"N/A";"active";"BEGIN;"
     """
 
     def clean_str_csv(s: str) -> str:
@@ -266,6 +266,7 @@ def csv_write(
                 [
                     "datetimeutc",
                     "pid",
+                    "xmin",
                     "database",
                     "appname",
                     "user",
@@ -292,6 +293,7 @@ def csv_write(
     for p in procs:
         dt = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         pid = p.get("pid", "N/A")
+        xmin = p.get("xmin", "N/A")
         database = p.get("database", "N/A") or ""
         appname = p.get("application_name", "N/A")
         user = p.get("user", "N/A")
@@ -310,6 +312,7 @@ def csv_write(
                 [
                     f'"{dt}"',
                     f'"{pid}"',
+                    f'"{xmin}"',
                     f'"{database}"',
                     f'"{appname}"',
                     f'"{user}"',

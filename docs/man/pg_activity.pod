@@ -136,6 +136,8 @@ B<min duration> seconds. It displays the following information:
 
 =item - B<PID>: process id of the backend which executes the query;
 
+=item - B<XMIN>: xmin horizon of the backend;
+
 =item - B<DATABASE>: database specified in the connection string;
 
 =item - B<APP>: application name specified in the connection string;
@@ -321,6 +323,10 @@ required by another session. It shows following information:
 =item B<--pid>, B<--no-pid>
 
 	Enable/disable PID.
+
+=item B<--xmin>, B<--no-xmin>
+
+	Enable/disable XMIN.
 
 =item B<--database>, B<--no-database>
 

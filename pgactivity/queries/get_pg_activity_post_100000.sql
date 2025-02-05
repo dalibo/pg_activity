@@ -3,6 +3,7 @@
 -- NEW pg_activity.backend_type
 SELECT
       a.pid AS pid,
+      a.backend_xmin AS xmin,
       a.application_name AS application_name,
       a.datname AS database,
       a.client_addr AS client,

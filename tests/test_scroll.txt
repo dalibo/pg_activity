@@ -20,6 +20,7 @@ Tests scrolling in processes_rows()
 ...         query=f"SELECT {x}",
 ...         encoding=None,
 ...         duration=0.0,
+...         xmin=1234,
 ...         wait=False,
 ...         query_leader_pid=x,
 ...         is_parallel_worker=False,
