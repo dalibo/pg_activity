@@ -1,14 +1,13 @@
--- Get data from pg_activity from pg 9.2 to pg 9.5
--- NEW pg_stat_activity.current_query => pg_stat_activity.query
--- NEW pg_stat_activity.procpid => pg_stat_activity.pid
+-- Get data from pg_activity from pg 9.4 to 9.6
+-- NEW pg_stat_activity.backend_xmin
 SELECT
       a.pid AS pid,
-      NULL AS xmin,
+      a.backend_xmin AS xmin,
       a.application_name AS application_name,
       a.datname AS database,
       a.client_addr AS client,
       EXTRACT(epoch FROM (NOW() - a.{duration_column})) AS duration,
-      a.waiting AS wait,
+      a.wait_event AS wait,
       a.usename AS user,
       a.state AS state,
       a.query AS query,

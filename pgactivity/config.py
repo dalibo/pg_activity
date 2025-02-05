@@ -62,9 +62,9 @@ class Flag(enum.Flag):
     """Column flag.
 
     >>> Flag.names()
-    ['database', 'appname', 'client', 'user', 'cpu', 'mem', 'read', 'write', 'time', 'wait', 'relation', 'type', 'mode', 'iowait', 'pid']
+    ['database', 'appname', 'client', 'user', 'cpu', 'mem', 'read', 'write', 'time', 'wait', 'relation', 'type', 'mode', 'iowait', 'pid', 'xmin']
     >>> Flag.all()  # doctest: +ELLIPSIS
-    <Flag...: 32767>
+    <Flag...: 65535>
     """
 
     DATABASE = enum.auto()
@@ -82,6 +82,7 @@ class Flag(enum.Flag):
     MODE = enum.auto()
     IOWAIT = enum.auto()
     PID = enum.auto()
+    XMIN = enum.auto()
 
     @classmethod
     def names(cls) -> list[str]:
@@ -131,6 +132,7 @@ class Flag(enum.Flag):
         user: bool | None,
         wait: bool | None,
         write: bool | None,
+        xmin: bool | None,
         **kwargs: Any,
     ) -> Flag:
         """Build a Flag value from command line options."""
@@ -150,6 +152,7 @@ class Flag(enum.Flag):
             (user, cls.USER),
             (wait, cls.WAIT),
             (write, cls.WRITE),
+            (xmin, cls.XMIN),
         ):
             if opt is True:
                 flag |= value

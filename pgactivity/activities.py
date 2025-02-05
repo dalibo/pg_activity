@@ -151,6 +151,7 @@ def sorted(processes: list[T], *, key: SortKey, reverse: bool = False) -> list[T
     >>> processes = [
     ...     LocalRunningProcess(
     ...         pid="6240",
+    ...         xmin="1234",
     ...         application_name="pgbench",
     ...         database="pgbench",
     ...         user="postgres",
@@ -170,6 +171,7 @@ def sorted(processes: list[T], *, key: SortKey, reverse: bool = False) -> list[T
     ...     ),
     ...     LocalRunningProcess(
     ...         pid="6239",
+    ...         xmin="2345",
     ...         application_name="pgbench",
     ...         database="pgbench",
     ...         user="postgres",
@@ -189,6 +191,7 @@ def sorted(processes: list[T], *, key: SortKey, reverse: bool = False) -> list[T
     ...     ),
     ...     LocalRunningProcess(
     ...         pid="6228",
+    ...         xmin="3456",
     ...         application_name="pgbench",
     ...         database="pgbench",
     ...         user="postgres",
@@ -225,6 +228,7 @@ def sorted(processes: list[T], *, key: SortKey, reverse: bool = False) -> list[T
     >>> processes = [
     ...     LocalRunningProcess(
     ...         pid="6240",
+    ...         xmin="1234",
     ...         application_name="pgbench",
     ...         database="pgbench",
     ...         user="postgres",
@@ -244,6 +248,7 @@ def sorted(processes: list[T], *, key: SortKey, reverse: bool = False) -> list[T
     ...     ),
     ...     LocalRunningProcess(
     ...         pid="6239",
+    ...         xmin="2345",
     ...         application_name="pgbench",
     ...         database="pgbench",
     ...         user="postgres",
@@ -263,6 +268,7 @@ def sorted(processes: list[T], *, key: SortKey, reverse: bool = False) -> list[T
     ...     ),
     ...     LocalRunningProcess(
     ...         pid="6228",
+    ...         xmin="3456",
     ...         application_name="pgbench",
     ...         database="pgbench",
     ...         user="postgres",

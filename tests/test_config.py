@@ -31,6 +31,7 @@ def test_flag_load() -> None:
         "user": True,
         "wait": None,
         "write": True,
+        "xmin": True,
     }
     flag = Flag.load(None, is_local=True, **options)
     assert (
@@ -50,6 +51,7 @@ def test_flag_load() -> None:
         | Flag.CLIENT
         | Flag.APPNAME
         | Flag.DATABASE
+        | Flag.XMIN
     )
     cfg = Configuration(
         name="test",
@@ -71,6 +73,7 @@ def test_flag_load() -> None:
         | Flag.CLIENT
         | Flag.APPNAME
         | Flag.DATABASE
+        | Flag.XMIN
     )
     options["database"] = False
     options["time"] = False
@@ -82,7 +85,13 @@ def test_flag_load() -> None:
     flag = Flag.load(cfg, is_local=False, **options)
     assert (
         flag
-        == Flag.MODE | Flag.TYPE | Flag.WAIT | Flag.USER | Flag.CLIENT | Flag.APPNAME
+        == Flag.MODE
+        | Flag.TYPE
+        | Flag.WAIT
+        | Flag.USER
+        | Flag.CLIENT
+        | Flag.APPNAME
+        | Flag.XMIN
     )
 
 
@@ -137,7 +146,17 @@ def test_lookup(tmp_path: Path) -> None:
 no_header = {
     "header": {k: False for k in ("show_instance", "show_system", "show_workers")}
 }
-columns = ("database", "user", "client", "cpu", "mem", "read", "write", "appname")
+columns = (
+    "database",
+    "user",
+    "client",
+    "cpu",
+    "mem",
+    "read",
+    "write",
+    "appname",
+    "xmin",
+)
 narrow = {k: {"hidden": True, "width": None, "color": None} for k in columns}
 wide = {k: {"hidden": False, "width": None, "color": None} for k in columns}
 minimal = {**no_header, **narrow}

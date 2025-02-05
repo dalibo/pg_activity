@@ -58,6 +58,7 @@ Process table display options:
   These options may be used hide some columns from the processes table.
 <BLANKLINE>
   --pid, --no-pid       Enable/disable PID.
+  --xmin, --no-xmin     Enable/disable XMIN.
   --database, --no-database
                         Enable/disable DATABASE.
   --user, --no-user     Enable/disable USER.

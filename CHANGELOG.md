@@ -11,6 +11,7 @@
   configuration.
 * Add a `y` command to copy focused query to the system clipboard, using
   OSC 52 escape sequence (#311).
+* Add the `xmin` column to the query display (#425).
 
 ### Fixed
 

@@ -1,6 +1,7 @@
 -- Get data from pg_activity before pg 9.2
 SELECT
       a.procpid AS pid,
+      NULL AS xmin,
       '<unknown>' AS application_name,
       a.datname AS database,
       a.client_addr AS client,
