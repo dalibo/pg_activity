@@ -12,7 +12,10 @@ from blessed import Terminal
 from . import colors, utils
 from .activities import sorted as sorted_processes
 from .compat import link
-from .keys import BINDINGS, EXIT_KEY
+from .keys import (
+    BINDINGS,
+    EXIT_KEY,
+)
 from .keys import HELP as HELP_KEY
 from .keys import (
     KEYS_BY_QUERYMODE,
