@@ -3,7 +3,7 @@ from __future__ import annotations
 import time
 from argparse import Namespace
 from functools import partial
-from typing import cast
+from typing import Any, cast
 
 import attr
 from blessed import Terminal
@@ -156,7 +156,7 @@ def main(
                 else:
                     pg_procs.reset()
                     ui.end_interactive()
-                    changes = {
+                    changes: dict[str, Any] = {
                         "duration_mode": handlers.duration_mode(key, ui.duration_mode),
                         "wrap_query": handlers.wrap_query(key, ui.wrap_query),
                     }
