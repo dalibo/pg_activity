@@ -1,6 +1,6 @@
 # Change log
 
-## pg\_activity 3.6.0 - UNRELEASED
+## pg\_activity 3.6.0 - 2025-02-21
 
 ### Added
 
