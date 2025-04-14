@@ -101,6 +101,7 @@ class Data:
         )
         if hide_queries_in_logs:
             pg.execute(pg_conn, queries.get("disable_log_min_duration_statement"))
+            pg.execute(pg_conn, queries.get("disable_log_statement"))
             if pg.server_version(pg_conn) >= 130000:
                 pg.execute(pg_conn, queries.get("disable_log_min_duration_sample"))
         pg_version = pg_get_short_version(pg_get_version(pg_conn))
