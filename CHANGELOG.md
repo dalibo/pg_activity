@@ -1,5 +1,12 @@
 # Change log
 
+## Unreleased 
+
+### Fixed
+
+*  Fix `--hide-queries-in-logs` to also disable log_statements when it is used
+   (Kouber Saparev).
+
 ## pg\_activity 3.6.0 - 2025-02-21
 
 ### Added
