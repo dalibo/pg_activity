@@ -5,9 +5,9 @@
 ...
 
 >>> from pgactivity import cli
->>> parser = cli.get_parser()
+>>> parser = cli.get_parser(prog="pg_activity")
 >>> parser.print_help()
-usage: pytest [options] [connection string]
+usage: pg_activity [options] [connection string]
 <BLANKLINE>
 htop like application for PostgreSQL server activity monitoring.
 <BLANKLINE>
