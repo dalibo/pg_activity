@@ -31,7 +31,7 @@ try:
     Connection = psycopg.Connection[dict[str, Any]]
 
     class BytesLoader(Loader):
-        def load(self, data: Buffer) -> bytes:
+        def load(self, data: Buffer) -> bytes | bytearray:
             if isinstance(data, memoryview):
                 return bytes(data)
             return data
