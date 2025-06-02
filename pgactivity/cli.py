@@ -56,8 +56,9 @@ def flag(p: Any, spec: str, *, dest: str, feature: str) -> None:
     )
 
 
-def get_parser() -> argparse.ArgumentParser:
+def get_parser(prog: str | None = None) -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
+        prog=prog,
         usage="%(prog)s [options] [connection string]",
         description=(
             "htop like application for PostgreSQL server activity monitoring."
