@@ -6,6 +6,8 @@
 
 *  Fix `--hide-queries-in-logs` to also disable log_statements when it is used
    (Kouber Saparev).
+* Fix deprecated syntax of the `license` field in packaging metadata; require
+  setuptools version 77.0.0 or higher accordingly.
 
 ## pg\_activity 3.6.0 - 2025-02-21
 
