@@ -1,5 +1,11 @@
 # Change log
 
+## Unreleased
+
+### Fixed
+
+* Strip comments from SQL queries emitted by pg\_activity (#442).
+
 ## pg\_activity 3.6.1 - 2025-06-03
 
 ### Fixed
