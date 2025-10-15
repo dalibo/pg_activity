@@ -798,7 +798,6 @@ class ServerInformation:
     insert: int
     update: int
     delete: int
-    tuples_returned: int
     total_size: int
     blks_read: int
     blks_hit: int
@@ -833,7 +832,6 @@ class ServerInformation:
     insert_per_second: int
     update_per_second: int
     delete_per_second: int
-    tuples_returned_per_second: int
     cache_hit_ratio_last_snap: Pct | None = attr.ib(
         converter=attr.converters.optional(Pct)
     )
