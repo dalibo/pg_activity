@@ -72,8 +72,6 @@ Activity :
 
 =item - B<delete/s>: number of deletes per second (filtered);
 
-=item - B<tuples returned/s>: number of tuples returned per second (filtered);
-
 =item - B<temp files>: number of temporary files created on the instance;
 
 =item - B<temp size>: total temporary file size on the instance.

@@ -5,6 +5,8 @@
 ### Fixed
 
 * Strip comments from SQL queries emitted by pg\_activity (#442).
+* Remove the "tuples returned/s" metric from the header, it provided misleading 
+  information (#441, reported by @kmoppel)
 
 ## pg\_activity 3.6.1 - 2025-06-03
 
