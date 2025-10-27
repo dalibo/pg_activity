@@ -149,11 +149,9 @@ Force local mode and mock server and system info
 ...             insert=100,
 ...             update=200,
 ...             delete=300,
-...             tuples_returned=400,
 ...             insert_per_second=10,
 ...             update_per_second=20,
 ...             delete_per_second=30,
-...             tuples_returned_per_second=40,
 ...             temporary_file=types.TempFileInfo(
 ...                 temp_files=5,
 ...                 temp_bytes=12054865,
@@ -186,7 +184,7 @@ No activity, first screen followed by help screen:
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s - Duration mode: query
  * Global: 132 days, 3 hours and 21 minutes uptime, 19.53M dbs size - 1.00K/s growth, 90.12% cache hit ratio, 32.11% rollback ratio
    Sessions: 6/100 total, 1 active, 1 idle, 10 idle in txn, 0 idle in txn abrt, 3 waiting
-   Activity: 15 tps, 10 insert/s, 20 update/s, 30 delete/s, 40 tuples returned/s, 5 temp files, 11.50M temp size
+   Activity: 15 tps, 10 insert/s, 20 update/s, 30 delete/s, 5 temp files, 11.50M temp size
  * Worker processes: 3/8 total, 1/8 logical workers, 2/8 parallel workers
    Other processes & info: 3/3 autovacuum workers, 1/10 wal senders, 0 wal receivers, 10/10 repl. slots
  * Mem.: 8B total, 2B (25.00%) free, 2B (25.00%) used, 4B (50.00%) buff+cached
@@ -213,7 +211,7 @@ PID    DATABASE              USER       CLIENT IOW              state Query
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s - Duration mode: query
  * Global: 132 days, 3 hours and 21 minutes uptime, 19.53M dbs size - 1.00K/s growth, 90.12% cache hit ratio, 32.11% rollback ratio
    Sessions: 6/100 total, 1 active, 1 idle, 10 idle in txn, 0 idle in txn abrt, 3 waiting
-   Activity: 15 tps, 10 insert/s, 20 update/s, 30 delete/s, 40 tuples returned/s, 5 temp files, 11.50M temp size
+   Activity: 15 tps, 10 insert/s, 20 update/s, 30 delete/s, 5 temp files, 11.50M temp size
  * Worker processes: 3/8 total, 1/8 logical workers, 2/8 parallel workers
    Other processes & info: 3/3 autovacuum workers, 1/10 wal senders, 0 wal receivers, 10/10 repl. slots
                                 RUNNING QUERIES
@@ -240,7 +238,7 @@ PID    DATABASE              USER       CLIENT IOW              state Query
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s - Duration mode: query
  * Global: 132 days, 3 hours and 21 minutes uptime, 19.53M dbs size - 1.00K/s growth, 90.12% cache hit ratio, 32.11% rollback ratio
    Sessions: 6/100 total, 1 active, 1 idle, 10 idle in txn, 0 idle in txn abrt, 3 waiting
-   Activity: 15 tps, 10 insert/s, 20 update/s, 30 delete/s, 40 tuples returned/s, 5 temp files, 11.50M temp size
+   Activity: 15 tps, 10 insert/s, 20 update/s, 30 delete/s, 5 temp files, 11.50M temp size
                                 RUNNING QUERIES
 PID    DATABASE              USER       CLIENT IOW              state Query
 <BLANKLINE>
@@ -361,7 +359,7 @@ Force non-local mode with the same mock data (and reset the term size)
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s - Duration mode: query
  * Global: 132 days, 3 hours and 21 minutes uptime, 19.53M dbs size - 1.00K/s growth, 90.12% cache hit ratio, 32.11% rollback ratio
    Sessions: 6/100 total, 1 active, 1 idle, 10 idle in txn, 0 idle in txn abrt, 3 waiting
-   Activity: 15 tps, 10 insert/s, 20 update/s, 30 delete/s, 40 tuples returned/s, 5 temp files, 11.50M temp size
+   Activity: 15 tps, 10 insert/s, 20 update/s, 30 delete/s, 5 temp files, 11.50M temp size
  * Worker processes: 3/8 total, 1/8 logical workers, 2/8 parallel workers
    Other processes & info: 3/3 autovacuum workers, 1/10 wal senders, 0 wal receivers, 10/10 repl. slots
                                 RUNNING QUERIES
@@ -408,7 +406,7 @@ Press any key to exit.
 PostgreSQL ... - test - postgres@127.0.0.1:.../tests - Ref.: 2s - Duration mode: query
  * Global: 132 days, 3 hours and 21 minutes uptime, 19.53M dbs size - 1.00K/s growth, 90.12% cache hit ratio, 32.11% rollback ratio
    Sessions: 6/100 total, 1 active, 1 idle, 10 idle in txn, 0 idle in txn abrt, 3 waiting
-   Activity: 15 tps, 10 insert/s, 20 update/s, 30 delete/s, 40 tuples returned/s, 5 temp files, 11.50M temp size
+   Activity: 15 tps, 10 insert/s, 20 update/s, 30 delete/s, 5 temp files, 11.50M temp size
  * Worker processes: 3/8 total, 1/8 logical workers, 2/8 parallel workers
    Other processes & info: 3/3 autovacuum workers, 1/10 wal senders, 0 wal receivers, 10/10 repl. slots
                                 RUNNING QUERIES

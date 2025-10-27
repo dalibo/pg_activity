@@ -112,11 +112,9 @@ Remote host:
 ...     insert=100,
 ...     update=200,
 ...     delete=300,
-...     tuples_returned=400,
 ...     insert_per_second=10,
 ...     update_per_second=20,
 ...     delete_per_second=30,
-...     tuples_returned_per_second=40,
 ...     temporary_file=TempFileInfo(
 ...        temp_files=5,
 ...        temp_bytes=12054865,
@@ -130,7 +128,7 @@ Remote host:
 PostgreSQL 9.6 - server - pgadm@server.prod.tld:5433/app - Ref.: 10s - Duration mode: backend
  * Global: 132 days, 3 hours and 21 minutes uptime, 19.53M dbs size - 1.00K/s growth, 90.12% cache hit ratio, 12.35% rollback ratio
    Sessions: 6/100 total, 1 active, 1 idle, 10 idle in txn, 0 idle in txn abrt, 3 waiting
-   Activity: 15 tps, 10 insert/s, 20 update/s, 30 delete/s, 40 tuples returned/s, 5 temp files, 11.50M temp size
+   Activity: 15 tps, 10 insert/s, 20 update/s, 30 delete/s, 5 temp files, 11.50M temp size
  * Worker processes: 3/8 total, 1/8 logical workers, 2/8 parallel workers
    Other processes & info: 3/3 autovacuum workers, 1/10 wal senders, 0 wal receivers, 10/10 repl. slots
 
@@ -150,7 +148,7 @@ Local host, with privileged access:
 PostgreSQL 9.6 - localhost - tester@host:5432/postgres - Ref.: 10s - Duration mode: backend
  * Global: 132 days, 3 hours and 21 minutes uptime, 19.53M dbs size - 1.00K/s growth, 90.12% cache hit ratio, 12.35% rollback ratio
    Sessions: 6/100 total, 1 active, 1 idle, 10 idle in txn, 0 idle in txn abrt, 3 waiting
-   Activity: 15 tps, 10 insert/s, 20 update/s, 30 delete/s, 40 tuples returned/s, 5 temp files, 11.50M temp size
+   Activity: 15 tps, 10 insert/s, 20 update/s, 30 delete/s, 5 temp files, 11.50M temp size
  * Worker processes: 3/8 total, 1/8 logical workers, 2/8 parallel workers
    Other processes & info: 3/3 autovacuum workers, 1/10 wal senders, 0 wal receivers, 10/10 repl. slots
  * Mem.: 8B total, 2B (25.00%) free, 2B (25.00%) used, 4B (50.00%) buff+cached
@@ -165,7 +163,7 @@ PostgreSQL 9.6 - localhost - tester@host:5432/postgres - Ref.: 10s - Duration mo
 PostgreSQL 9.6 - localhost - tester@host:5432/postgres - Ref.: 10s - Duration mode: backend
  * Global: 132 days, 3 hours and 21 minutes uptime, 19.53M dbs size - 1.00K/s growth, 90.12% cache hit ratio, 12.35% rollback ratio
    Sessions: 6/100 total, 1 active, 1 idle, 10 idle in txn, 0 idle in txn abrt, 3 waiting
-   Activity: 15 tps, 10 insert/s, 20 update/s, 30 delete/s, 40 tuples returned/s, 5 temp files, 11.50M temp size
+   Activity: 15 tps, 10 insert/s, 20 update/s, 30 delete/s, 5 temp files, 11.50M temp size
  * Worker processes: 3/8 total, 1/8 logical workers, 2/8 parallel workers
    Other processes & info: 3/3 autovacuum workers, 1/10 wal senders, 0 wal receivers, 10/10 repl. slots
 
@@ -178,7 +176,7 @@ PostgreSQL 9.6 - localhost - tester@host:5432/postgres - Ref.: 10s - Duration mo
 PostgreSQL 9.6 - localhost - tester@host:5432/postgres - Ref.: 10s - Duration mode: query
  * Global: 132 days, 3 hours and 21 minutes uptime, 19.53M dbs size - 1.00K/s growth, 90.12% cache hit ratio, 12.35% rollback ratio
    Sessions: 6/100 total, 1 active, 1 idle, 10 idle in txn, 0 idle in txn abrt, 3 waiting
-   Activity: 15 tps, 10 insert/s, 20 update/s, 30 delete/s, 40 tuples returned/s, 5 temp files, 11.50M temp size
+   Activity: 15 tps, 10 insert/s, 20 update/s, 30 delete/s, 5 temp files, 11.50M temp size
 
 >>> ui = UI.make(refresh_time=2, min_duration=1.2, duration_mode=DurationMode.transaction)
 >>> ui.header.toggle_system()
@@ -480,11 +478,9 @@ Tests for screen()
 ...     insert=100,
 ...     update=200,
 ...     delete=300,
-...     tuples_returned=400,
 ...     insert_per_second=10,
 ...     update_per_second=20,
 ...     delete_per_second=30,
-...     tuples_returned_per_second=40,
 ...     temporary_file=TempFileInfo(
 ...         temp_files=5,
 ...         temp_bytes=12054865,
@@ -522,7 +518,7 @@ Tests for screen()
 PostgreSQL 13 - localhost - tester@host:5432/postgres - Ref.: 10s - Duration mode: backend - Min. duration: 1s
  * Global: 132 days, 3 hours and 21 minutes uptime, 19.53M dbs size - 1.00K/s growth, 90.12% cache hit ratio, 0.09% rollback ratio
    Sessions: 6/100 total, 1 active, 1 idle, 10 idle in txn, 0 idle in txn abrt, 3 waiting
-   Activity: 15 tps, 10 insert/s, 20 update/s, 30 delete/s, 40 tuples returned/s, 5 temp files, 11.50M temp size
+   Activity: 15 tps, 10 insert/s, 20 update/s, 30 delete/s, 5 temp files, 11.50M temp size
  * Worker processes: 3/8 total, 1/8 logical workers, 2/8 parallel workers
    Other processes & info: 3/3 autovacuum workers, 1/10 wal senders, 0 wal receivers, 10/10 repl. slots
  * Mem.: 8B total, 2B (25.00%) free, 2B (25.00%) used, 4B (50.00%) buff+cached
@@ -558,7 +554,7 @@ F1/1 Running queries    F2/2 Waiting queries    F3/3 Blocking queries   Space Pa
 PostgreSQL 13 - localhost - tester@host:5432/postgres - Ref.: 10s - Duration
  * Global: 132 days, 3 hours and 21 minutes uptime, 19.53M dbs size - 1.00K/s
    Sessions: 6/100 total, 1 active, 1 idle, 10 idle in txn, 0 idle in txn abrt,
-   Activity: 15 tps, 10 insert/s, 20 update/s, 30 delete/s, 40 tuples
+   Activity: 15 tps, 10 insert/s, 20 update/s, 30 delete/s, 5 temp files, 11.50M
  * Worker processes: 3/8 total, 1/8 logical workers, 2/8 parallel workers
    Other processes & info: 3/3 autovacuum workers, 1/10 wal senders, 0 wal
  * Mem.: 8B total, 2B (25.00%) free, 2B (25.00%) used, 4B (50.00%) buff+cached

@@ -6,7 +6,6 @@ WITH dbinfo AS(
                COALESCE(SUM(tup_inserted)::BIGINT, 0) AS insert,
                COALESCE(SUM(tup_updated)::BIGINT, 0) AS update,
                COALESCE(SUM(tup_deleted)::BIGINT, 0) AS delete,
-               COALESCE(SUM(tup_returned)::BIGINT, 0) AS tuples_returned,
                COALESCE(CASE
                    WHEN %(skip_db_size)s THEN %(prev_total_size)s
                    ELSE SUM(pg_database_size(d.datname))

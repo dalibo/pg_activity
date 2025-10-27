@@ -351,7 +351,7 @@ class Data:
 
         hr: Pct | None = None
         rr: Pct | None = None
-        tps, ips, ups, dps, rps = 0, 0, 0, 0, 0
+        tps, ips, ups, dps = 0, 0, 0, 0
         size_ev = 0.0
         if prev_server_info is not None:
             dt = float(ret["epoch"] - prev_server_info.epoch)
@@ -362,9 +362,6 @@ class Data:
                 ips = int((ret["insert"] - prev_server_info.insert) / dt)
                 ups = int((ret["update"] - prev_server_info.update) / dt)
                 dps = int((ret["delete"] - prev_server_info.delete) / dt)
-                rps = int(
-                    (ret["tuples_returned"] - prev_server_info.tuples_returned) / dt
-                )
                 deltaread = ret["blks_read"] - prev_server_info.blks_read
                 deltahit = ret["blks_hit"] - prev_server_info.blks_hit
                 if deltaread + deltahit != 0:
@@ -382,7 +379,6 @@ class Data:
             insert_per_second=ips,
             update_per_second=ups,
             delete_per_second=dps,
-            tuples_returned_per_second=rps,
             cache_hit_ratio_last_snap=hr,
             rollback_ratio_last_snap=rr,
             temporary_file=temporary_file_info,

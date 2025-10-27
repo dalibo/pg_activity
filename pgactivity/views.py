@@ -267,7 +267,6 @@ def header(
             [f"{render(si.insert_per_second)} insert/s"],
             [f"{render(si.update_per_second)} update/s"],
             [f"{render(si.delete_per_second)} delete/s"],
-            [f"{render(si.tuples_returned_per_second)} tuples returned/s"],
             [f"{render(temp_files)} temp files"],
             [f"{render(temp_size)} temp size"],
         ]
