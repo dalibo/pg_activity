@@ -129,12 +129,10 @@ def limit(func: Callable[..., Iterable[str]]) -> Callable[..., None]:
 def help(term: Terminal, version: str, is_local: bool) -> Iterable[str]:
     """Render help menu."""
     project_url = "https://github.com/dalibo/pg_activity"
-    intro = dedent(
-        f"""\
+    intro = dedent(f"""\
     {term.bold_green}pg_activity {version} - {link(term, project_url, project_url)}
     {term.normal}Released under PostgreSQL License.
-    """
-    )
+    """)
 
     def key_mappings(keys: Iterable[Key]) -> Iterable[str]:
         for key in keys:
