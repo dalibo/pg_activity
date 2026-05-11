@@ -71,7 +71,7 @@ def shorten(term: Terminal, text: str, width: int | None = None) -> str:
     """
     if not text:
         return ""
-    wrapped = term.wrap(text, width=width, max_lines=1)
+    wrapped = term.wrap(text, width=width, max_lines=1, placeholder="")
     return wrapped[0] + term.normal
 
 

@@ -7,13 +7,15 @@
 * Strip comments from SQL queries emitted by pg\_activity (#442).
 * Remove the "tuples returned/s" metric from the header, it provided misleading 
   information (#441, reported by @kmoppel)
+* Fix a difference in wrapping behavior introduced in blessed 1.26 (#455,
+  reported by @asarubbo)
 
 ## pg\_activity 3.6.1 - 2025-06-03
 
 ### Fixed
 
-*  Fix `--hide-queries-in-logs` to also disable log_statements when it is used
-   (Kouber Saparev).
+* Fix `--hide-queries-in-logs` to also disable log_statements when it is used
+  (Kouber Saparev).
 * Fix deprecated syntax of the `license` field in packaging metadata; require
   setuptools version 77.0.0 or higher accordingly.
 * Remove dummy `setup.py` file.
