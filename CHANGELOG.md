@@ -1,6 +1,6 @@
 # Change log
 
-## Unreleased
+## pg\_activity 3.6.2 - 2026-05-12
 
 ### Fixed
 
