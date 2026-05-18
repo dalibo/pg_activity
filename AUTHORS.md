@@ -6,7 +6,6 @@ pg_activity is an open project. Feel free to join us and improve this tool.
 ## Maintainers
 
 - Benoit Lobréau <benoit.lobreau@dalibo.com>
-- Denis Laxalde <denis.laxalde@dalibo.com>
 
 
 ## Contributors
