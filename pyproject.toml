@@ -16,7 +16,6 @@ authors = [
     { name = "Dalibo", email = "contact@dalibo.com" },
 ]
 maintainers = [
-    { name = "Denis Laxalde", email = "denis.laxalde@dalibo.com" },
     { name = "Benoit Lobréau", email = "benoit.lobreau@dalibo.com" },
 ]
 keywords = [
