@@ -311,12 +311,7 @@ this would use `CTRL+SHIFT+V` to paste from this clipboard.
 
 **Python version supported and tests**
 
-pg\_activity is confirmed to run with Python 3.8 up to 3.14.
-
-The CI currently use :
-
-* python3.9 with psychopg2;
-* python13 with psychopg3.
+pg\_activity's CI run for version 3.10 to 3.14 included with psychopg3.
 
 # Hacking
 
