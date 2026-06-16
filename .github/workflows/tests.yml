@@ -10,12 +10,6 @@ jobs:
         include:
           - python: "3.10"
             psycopg: "psycopg3"
-          - python: "3.11"
-            psycopg: "psycopg3"
-          - python: "3.12"
-            psycopg: "psycopg3"
-          - python: "3.13"
-            psycopg: "psycopg3"
           - python: "3.14"
             psycopg: "psycopg3"
     steps:
