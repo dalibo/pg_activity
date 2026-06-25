@@ -123,6 +123,13 @@ def get_parser(prog: str | None = None) -> argparse.ArgumentParser:
         default=False,
     )
     group.add_argument(
+        "--strip-comments",
+        dest="strip_comments",
+        action="store_true",
+        help="Strip SQL comments from query text.",
+        default=False,
+    )
+    group.add_argument(
         "--duration-mode",
         dest="durationmode",
         help="Duration mode. Values: 1-QUERY(default), 2-TRANSACTION, 3-BACKEND.",

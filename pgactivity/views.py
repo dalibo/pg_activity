@@ -7,6 +7,7 @@ from collections.abc import Callable, Iterable, Iterator, Sequence
 from textwrap import TextWrapper, dedent
 from typing import Any, Literal
 
+import sqlparse
 from blessed import Terminal
 
 from . import colors, utils
@@ -387,15 +388,21 @@ def get_indent(ui: UI) -> str:
     return " " * sum(c.min_width + 1 for c in ui.columns() if c.name != "Query")
 
 
-def format_query(query: str, is_parallel_worker: bool) -> str:
+def format_query(
+    query: str, is_parallel_worker: bool, *, strip_comments: bool = False
+) -> str:
     r"""Return the query string formatted.
 
     >>> print(format_query("SELECT 1", True))
     \_ SELECT 1
     >>> format_query("SELECT   1", False)
     'SELECT 1'
+    >>> format_query("/* prefix comment */SELECT 1 -- another comment", False, strip_comments=True)
+    'SELECT 1'
     """
     prefix = r"\_ " if is_parallel_worker else ""
+    if strip_comments:
+        query = sqlparse.format(query, strip_comments=True)
     return prefix + utils.clean_str(query)
 
 
@@ -471,7 +478,11 @@ def processes_rows(
         qwidth = width - len(indent)
 
         if qwidth > 0 and process.query is not None:
-            query = format_query(process.query, process.is_parallel_worker)
+            query = format_query(
+                process.query,
+                process.is_parallel_worker,
+                strip_comments=ui.strip_comments,
+            )
 
             if not ui.wrap_query:
                 query_value = query[:qwidth]

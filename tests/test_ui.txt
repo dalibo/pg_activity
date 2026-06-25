@@ -47,6 +47,7 @@ Default CLI options, passed to ui.main():
 ...     "rds": False,
 ...     "username": f"{postgres.info.user}",
 ...     "wrap_query": False,
+...     "strip_comments": False,
 ...     "header_show_instance": True,
 ...     "header_show_workers": True,
 ...     "header_show_system": True,
