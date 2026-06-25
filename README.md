@@ -105,6 +105,7 @@ ex:
       --walreceiver, --no-walreceiver
                             Enable/disable walreceiver checks.
       -w, --wrap-query      Wrap query column instead of truncating.
+    --strip-comments      Strip SQL comments from query text.
       --duration-mode DURATION_MODE
                             Duration mode. Values: 1-QUERY(default),
                             2-TRANSACTION, 3-BACKEND.

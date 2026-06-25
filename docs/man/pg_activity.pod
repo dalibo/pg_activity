@@ -272,6 +272,10 @@ required by another session. It shows following information:
 
 	Wrap query column instead of truncating.
 
+=item B<--strip-comments>
+
+	Strip SQL comments from query text.
+
 =item B<--min-duration=SECONDS>
 
 	Don't display queries with smaller than specified duration (in seconds).

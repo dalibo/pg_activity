@@ -63,3 +63,25 @@ def test_columns_header(capsys, term, ui, width, expected):
     views.columns_header(term, ui, width=width)
     out = capsys.readouterr()[0]
     assert out == expected + "\n"
+
+
+@pytest.mark.parametrize(
+    "query, is_parallel_worker, strip_comments, expected",
+    [
+        ("SELECT 1 -- trailing", False, False, "SELECT 1 -- trailing"),
+        ("SELECT 1 -- trailing", False, True, "SELECT 1"),
+        ("SELECT /* block */ 1", False, False, "SELECT /* block */ 1"),
+        ("SELECT 1 /* block */", False, True, "SELECT 1"),
+    ],
+)
+def test_format_query_strip_comments(
+    query: str, is_parallel_worker: bool, strip_comments: bool, expected: str
+) -> None:
+    assert (
+        views.format_query(
+            query,
+            is_parallel_worker,
+            strip_comments=strip_comments,
+        )
+        == expected
+    )

@@ -38,6 +38,7 @@ dependencies = [
     "blessed >= 1.15.0",
     "humanize >= 0.5.1, !=4.12.0",
     "psutil >= 2.0.0",
+    "sqlparse >= 0.5.0",
 ]
 
 [project.optional-dependencies]

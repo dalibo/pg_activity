@@ -52,6 +52,7 @@ def main(
         min_duration=options.minduration,
         duration_mode=int(options.durationmode),
         wrap_query=options.wrap_query,
+        strip_comments=options.strip_comments,
         max_db_length=min(max(server_information.max_dbname_length, 8), 16),
         filters=data.filters,
     )

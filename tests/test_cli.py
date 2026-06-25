@@ -15,6 +15,7 @@ def test_parser() -> None:
         "tempfiles": None,
         "walreceiver": None,
         "wrap_query": True,
+        "strip_comments": False,
         "durationmode": "1",
         "minduration": 0,
         "filters": [],
@@ -51,3 +52,9 @@ def test_parser_flag_on() -> None:
     assert ns.pid is True
     assert ns.appname is False
     assert ns.wait is None
+
+
+def test_parser_strip_comments() -> None:
+    parser = cli.get_parser()
+    ns = parser.parse_args(["--strip-comments"])
+    assert ns.strip_comments is True

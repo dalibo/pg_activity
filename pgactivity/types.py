@@ -269,6 +269,7 @@ class UI:
         default=DurationMode.query, converter=DurationMode
     )
     wrap_query: bool = False
+    strip_comments: bool = False
     sort_key: SortKey = attr.ib(default=SortKey.default(), converter=SortKey)
     query_mode: QueryMode = attr.ib(default=QueryMode.activities, converter=QueryMode)
     refresh_time: float | int = 2
