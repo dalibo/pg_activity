@@ -138,6 +138,8 @@ B<min duration> seconds. It displays the following information:
 
 =item - B<DATABASE>: database specified in the connection string;
 
+=item - B<QUERYID>: query identifier for the statement;
+
 =item - B<APP>: application name specified in the connection string;
 
 =item - B<USER>: user name specified in the connection string;
@@ -160,8 +162,6 @@ B<min duration> seconds. It displays the following information:
 
 =item - B<state>: state of the backend;
 
-=item - B<QUERYID>: query identifier for the statement;
-
 =item - B<Query>: the query.
 
 =back
@@ -176,6 +176,8 @@ shows the following information:
 =item - B<PID>: process id of the backend which executes the query;
 
 =item - B<DATABASE>: database specified in the connection string;
+
+=item - B<QUERYID>: query identifier for the statement;
 
 =item - B<APP>: application name specified in the connection string;
 
@@ -193,8 +195,6 @@ shows the following information:
 
 =item - B<state>: the state of the transaction;
 
-=item - B<QUERYID>: query identifier for the statement;
-
 =item - B<Query>: the query.
 
 =back
@@ -209,6 +209,8 @@ required by another session. It shows following information:
 =item - B<PID>: process id of the backend which executes the query;
 
 =item - B<DATABASE>: database specified in the connection string;
+
+=item - B<QUERYID>: query identifier for the statement;
 
 =item - B<APP>: application name specified in the connection string;
 
@@ -227,8 +229,6 @@ required by another session. It shows following information:
 =item - B<Waiting>: for PostgreSQL 9.6+: a specific wait event or nothing. Otherwise, a boolean indicating if we are waiting for a Lock;
 
 =item - B<state>: the state of the transaction;
-
-=item - B<QUERYID>: query identifier for the statement;
 
 =item - B<Query>: the query.
 
