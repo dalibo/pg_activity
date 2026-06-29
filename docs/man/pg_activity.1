@@ -184,6 +184,8 @@ The running queries panel shows all running queries, transactions or backends
 .IX Item "- XMIN: xmin horizon of the backend;"
 .IP "\- \fBDATABASE\fR: database specified in the connection string;" 2
 .IX Item "- DATABASE: database specified in the connection string;"
+.IP "\- \fBQUERYID\fR: query identifier for the statement;" 2
+.IX Item "- QUERYID: query identifier for the statement;"
 .IP "\- \fBAPP\fR: application name specified in the connection string;" 2
 .IX Item "- APP: application name specified in the connection string;"
 .IP "\- \fBUSER\fR: user name specified in the connection string;" 2
@@ -206,8 +208,6 @@ The running queries panel shows all running queries, transactions or backends
 .IX Item "- IOW: boolean indicating that the process is waiting for IO as reported by the psutil library;"
 .IP "\- \fBstate\fR: state of the backend;" 2
 .IX Item "- state: state of the backend;"
-.IP "\- \fBQUERYID\fR: query identifier for the statement;" 2
-.IX Item "- QUERYID: query identifier for the statement;"
 .IP "\- \fBQuery\fR: the query." 2
 .IX Item "- Query: the query."
 .PD
@@ -220,6 +220,8 @@ shows the following information:
 .PD 0
 .IP "\- \fBDATABASE\fR: database specified in the connection string;" 2
 .IX Item "- DATABASE: database specified in the connection string;"
+.IP "\- \fBQUERYID\fR: query identifier for the statement;" 2
+.IX Item "- QUERYID: query identifier for the statement;"
 .IP "\- \fBAPP\fR: application name specified in the connection string;" 2
 .IX Item "- APP: application name specified in the connection string;"
 .IP "\- \fBUSER\fR: user name specified in the connection string;" 2
@@ -236,8 +238,6 @@ shows the following information:
 .IX Item "- TIME+: the duration of the query, transaction or session depending on the DURATION_MODE setting;"
 .IP "\- \fBstate\fR: the state of the transaction;" 2
 .IX Item "- state: the state of the transaction;"
-.IP "\- \fBQUERYID\fR: query identifier for the statement;" 2
-.IX Item "- QUERYID: query identifier for the statement;"
 .IP "\- \fBQuery\fR: the query." 2
 .IX Item "- Query: the query."
 .PD
@@ -250,6 +250,8 @@ required by another session. It shows following information:
 .PD 0
 .IP "\- \fBDATABASE\fR: database specified in the connection string;" 2
 .IX Item "- DATABASE: database specified in the connection string;"
+.IP "\- \fBQUERYID\fR: query identifier for the statement;" 2
+.IX Item "- QUERYID: query identifier for the statement;"
 .IP "\- \fBAPP\fR: application name specified in the connection string;" 2
 .IX Item "- APP: application name specified in the connection string;"
 .IP "\- \fBUSER\fR: user name specified in the connection string;" 2
@@ -268,8 +270,6 @@ required by another session. It shows following information:
 .IX Item "- Waiting: for PostgreSQL 9.6+: a specific wait event or nothing. Otherwise, a boolean indicating if we are waiting for a Lock;"
 .IP "\- \fBstate\fR: the state of the transaction;" 2
 .IX Item "- state: the state of the transaction;"
-.IP "\- \fBQUERYID\fR: query identifier for the statement;" 2
-.IX Item "- QUERYID: query identifier for the statement;"
 .IP "\- \fBQuery\fR: the query." 2
 .IX Item "- Query: the query."
 .PD
