@@ -51,6 +51,7 @@ Default CLI options, passed to ui.main():
 ...     "header_show_instance": True,
 ...     "header_show_workers": True,
 ...     "header_show_system": True,
+...     "queryid": False,
 ... }
 >>> options = argparse.Namespace(**defaults)
 

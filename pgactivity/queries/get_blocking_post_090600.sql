@@ -13,7 +13,8 @@ SELECT
       state,
       sq.query AS query,
       pg_catalog.pg_encoding_to_char(b.encoding) AS encoding,
-      wait_event as wait
+      wait_event as wait,
+      NULL::int8 AS query_id
   FROM
       (
       -- Transaction id lock

@@ -75,6 +75,8 @@ Process table display options:
   --wait, --no-wait     Enable/disable W.
   --app-name, --no-app-name
                         Enable/disable APP.
+  --query-id, --no-query-id
+                        Enable/disable QUERYID.
 <BLANKLINE>
 Header display options:
   --no-inst-info        Hide instance information.

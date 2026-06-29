@@ -20,7 +20,8 @@ SELECT
       END AS query,
       pg_catalog.pg_encoding_to_char(b.encoding) AS encoding,
       NULL AS query_leader_pid,
-      false AS is_parallel_worker
+      false AS is_parallel_worker,
+      NULL::int8 AS query_id
   FROM
         pg_stat_activity a
         LEFT OUTER JOIN pg_database b ON a.datid = b.oid

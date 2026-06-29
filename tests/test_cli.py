@@ -27,6 +27,7 @@ def test_parser() -> None:
         "username": None,
         "dbname": None,
         "pid": False,
+        "queryid": False,
         "database": None,
         "user": None,
         "client": None,
@@ -48,8 +49,9 @@ def test_parser() -> None:
 
 def test_parser_flag_on() -> None:
     parser = cli.get_parser()
-    ns = parser.parse_args(["--pid", "--no-app-name"])
+    ns = parser.parse_args(["--pid", "--query-id", "--no-app-name"])
     assert ns.pid is True
+    assert ns.queryid is True
     assert ns.appname is False
     assert ns.wait is None
 
