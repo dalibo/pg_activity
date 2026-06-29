@@ -240,7 +240,7 @@ def get_parser(prog: str | None = None) -> argparse.ArgumentParser:
     flag(group, "--time", dest="time", feature="TIME+")
     flag(group, "--wait", dest="wait", feature="W")
     flag(group, "--app-name", dest="appname", feature="APP")
-    flag(group, "--query-id", dest="queryid", feature="QUERYID", default=False)
+    flag(group, "--query-id", dest="queryid", feature="QUERYID")
 
     group = parser.add_argument_group("Header display options")
     group.add_argument(

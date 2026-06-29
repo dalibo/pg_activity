@@ -26,7 +26,7 @@ def test_parser() -> None:
         "username": None,
         "dbname": None,
         "pid": False,
-        "queryid": False,
+        "queryid": None,
         "database": None,
         "user": None,
         "client": None,
