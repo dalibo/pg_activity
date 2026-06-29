@@ -307,9 +307,9 @@ Tests for processes_rows()
 Terminal is too narrow given selected flags, we switch to wrap_noindent mode
 (TODO: this is buggy, the first line should be wrapped as well if too long)
 >>> processes_rows(term, ui, SelectableProcesses(processes1), 100, width=250)
-6239   1        pgbench                   pgbench         postgres            local 0.1    1.0  7B       12B       0.000000                N N        idle in trans                   -1 UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid
-6228   2        pgbench                   pgbench         postgres            local 0.2    1.0  0B       1.08M     0.000413                  Y               active                   -1 \_ UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE a
-1234   3        business               accounting              bob            local 2.4    1.0  9.42M    1.21K     20:34.00 BackendRandomLoc N               active                   -1 SELECT product_id, p.name FROM products p LEFT JOIN sales s USIN
+6239   1        pgbench                            -1          pgbench         postgres            local 0.1    1.0  7B       12B       0.000000                N N        idle in trans UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE aid
+6228   2        pgbench                            -1          pgbench         postgres            local 0.2    1.0  0B       1.08M     0.000413                  Y               active \_ UPDATE pgbench_accounts SET abalance = abalance + 141 WHERE a
+1234   3        business                           -1       accounting              bob            local 2.4    1.0  9.42M    1.21K     20:34.00 BackendRandomLoc N               active SELECT product_id, p.name FROM products p LEFT JOIN sales s USIN
 
 >>> ui = UI.make(flag=Flag.PID|Flag.DATABASE, wrap_query=False)
 >>> processes_rows(term, ui, SelectableProcesses(processes1), 100)
@@ -372,8 +372,8 @@ Terminal is too narrow given selected flags, we switch to wrap_noindent mode
                                            = bbalance + 1788 WHERE bid = 68;
 >>> ui = UI.make(query_mode=QueryMode.blocking, flag=allflags)
 >>> processes_rows(term, ui, SelectableProcesses(processes2), 100, width=250)
-6239   pgbench                   pgbench         postgres          1.2.3.4      None    transactionid    ExclusiveLock  11:06.00      Client Read            active                      END;
-6228   pgbench                   pgbench         postgres 2001:4f8:3:ba:2e      ahah            tuple RowExclusiveLock  0.000413      Client Read     idle in trans                      UPDATE pgbench_branches SET bbalance = bbalance + 1788 WHERE bid
+6239   pgbench                                        pgbench         postgres          1.2.3.4      None    transactionid    ExclusiveLock  11:06.00      Client Read            active END;
+6228   pgbench                                        pgbench         postgres 2001:4f8:3:ba:2e      ahah            tuple RowExclusiveLock  0.000413      Client Read     idle in trans UPDATE pgbench_branches SET bbalance = bbalance + 1788 WHERE bid
 
 >>> processes1b = [
 ...     RunningProcess(
