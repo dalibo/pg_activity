@@ -160,6 +160,8 @@ B<min duration> seconds. It displays the following information:
 
 =item - B<state>: state of the backend;
 
+=item - B<QUERYID>: query identifier for the statement;
+
 =item - B<Query>: the query.
 
 =back
@@ -190,6 +192,8 @@ shows the following information:
 =item - B<TIME+>: the duration of the query, transaction or session depending on the B<DURATION_MODE> setting;
 
 =item - B<state>: the state of the transaction;
+
+=item - B<QUERYID>: query identifier for the statement;
 
 =item - B<Query>: the query.
 
@@ -223,6 +227,8 @@ required by another session. It shows following information:
 =item - B<Waiting>: for PostgreSQL 9.6+: a specific wait event or nothing. Otherwise, a boolean indicating if we are waiting for a Lock;
 
 =item - B<state>: the state of the transaction;
+
+=item - B<QUERYID>: query identifier for the statement;
 
 =item - B<Query>: the query.
 
@@ -369,6 +375,10 @@ required by another session. It shows following information:
 =item B<--app-name>, B<--no-app-name>
 
 	Enable/disable APP.
+
+=item B<--query-id>, B<--no-query-id>
+
+	Enable/disable QUERYID.
 
 =back
 
