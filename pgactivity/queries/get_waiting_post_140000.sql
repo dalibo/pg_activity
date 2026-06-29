@@ -1,27 +1,25 @@
--- Get data from pg_activity from pg 9.6 to 10
--- In this version there is no way to distinguish parallel workers from the rest
--- NEW pg_stat_activity.waiting => pg_stat_activity.wait_event
+-- Get waiting queries for versions >= 14
 SELECT
-      a.pid AS pid,
-      a.backend_xmin AS xmin,
+      pg_locks.pid AS pid,
       a.application_name AS application_name,
       a.datname AS database,
-      a.client_addr AS client,
-      EXTRACT(epoch FROM (NOW() - a.{duration_column})) AS duration,
-      a.wait_event AS wait,
       a.usename AS user,
-      a.state AS state,
+      a.client_addr AS client,
+      pg_locks.mode AS mode,
+      pg_locks.locktype AS type,
+      pg_locks.relation::regclass AS relation,
+      EXTRACT(epoch FROM (NOW() - a.{duration_column})) AS duration,
+      a.state as state,
       a.query AS query,
       pg_catalog.pg_encoding_to_char(b.encoding) AS encoding,
-      NULL AS query_leader_pid,
-      false AS is_parallel_worker,
-      NULL::int8 AS query_id
+      a.query_id
   FROM
-      pg_stat_activity a
+      pg_catalog.pg_locks
+      JOIN pg_catalog.pg_stat_activity a ON(pg_catalog.pg_locks.pid = a.pid)
       LEFT OUTER JOIN pg_database b ON a.datid = b.oid
  WHERE
-      state <> 'idle'
-  AND pid <> pg_backend_pid()
+      NOT pg_catalog.pg_locks.granted
+  AND a.pid <> pg_backend_pid()
   AND CASE WHEN {min_duration} = 0
           THEN true
           ELSE extract(epoch from now() - {duration_column}) > %(min_duration)s

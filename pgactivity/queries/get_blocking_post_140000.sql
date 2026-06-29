@@ -1,7 +1,4 @@
--- Get blocking queries >= 9.2
--- NEW pg_stat_activity.state
--- NEW pg_stat_activity.current_query => pg_stat_activity.query
--- NEW pg_stat_activity.procpid => pg_stat_activity.pid
+-- Get blocking queries >= 14
 SELECT
       pid,
       application_name,
@@ -15,8 +12,8 @@ SELECT
       state,
       sq.query AS query,
       pg_catalog.pg_encoding_to_char(b.encoding) AS encoding,
-      waiting as wait,
-      NULL::int8 AS query_id
+      wait_event as wait,
+      query_id
   FROM
       (
       -- Transaction id lock
@@ -33,7 +30,8 @@ SELECT
             EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
             pg_stat_activity.state as state,
             blocking.relation::regclass AS relation,
-            pg_stat_activity.waiting
+            pg_stat_activity.wait_event,
+            pg_stat_activity.query_id
         FROM
             pg_locks AS blocking
             JOIN pg_locks AS blocked ON (blocking.transactionid = blocked.transactionid AND blocking.locktype = blocked.locktype)
@@ -63,7 +61,8 @@ SELECT
             EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
             pg_stat_activity.state as state,
             blocking.relation::regclass AS relation,
-            pg_stat_activity.waiting
+            pg_stat_activity.wait_event,
+            pg_stat_activity.query_id
         FROM
             pg_locks AS blocking
             JOIN pg_locks AS blocked ON (blocking.virtualxid = blocked.virtualxid AND blocking.locktype = blocked.locktype)
@@ -93,7 +92,8 @@ SELECT
             EXTRACT(epoch FROM (NOW() - pg_stat_activity.{duration_column})) AS duration,
             pg_stat_activity.state as state,
             blocking.relation::regclass AS relation,
-            pg_stat_activity.waiting
+            pg_stat_activity.wait_event,
+            pg_stat_activity.query_id
         FROM
             pg_locks AS blocking
             JOIN pg_locks AS blocked ON (blocking.database = blocked.database AND blocking.relation = blocked.relation AND blocking.locktype = blocked.locktype)
@@ -124,6 +124,7 @@ GROUP BY
       state,
       query,
       encoding,
-      waiting
+      wait_event,
+      query_id
 ORDER BY
       duration DESC;

@@ -392,7 +392,9 @@ class Data:
         """
         Get activity from pg_stat_activity view.
         """
-        if self.pg_num_version >= 130000:
+        if self.pg_num_version >= 140000:
+            qs = queries.get("get_pg_activity_post_140000")
+        elif self.pg_num_version >= 130000:
             qs = queries.get("get_pg_activity_post_130000")
         elif self.pg_num_version >= 110000:
             qs = queries.get("get_pg_activity_post_110000")
@@ -427,7 +429,9 @@ class Data:
         """
         Get waiting queries.
         """
-        if self.pg_num_version >= 90200:
+        if self.pg_num_version >= 140000:
+            qs = queries.get("get_waiting_post_140000")
+        elif self.pg_num_version >= 90200:
             qs = queries.get("get_waiting_post_090200")
         else:
             qs = queries.get("get_waiting_oldest")
@@ -454,7 +458,9 @@ class Data:
         """
         Get blocking queries
         """
-        if self.pg_num_version >= 90600:
+        if self.pg_num_version >= 140000:
+            qs = queries.get("get_blocking_post_140000")
+        elif self.pg_num_version >= 90600:
             qs = queries.get("get_blocking_post_090600")
         elif self.pg_num_version >= 90200:
             qs = queries.get("get_blocking_post_090200")

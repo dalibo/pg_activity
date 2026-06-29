@@ -25,6 +25,7 @@ def test_flag_load() -> None:
         "database": True,
         "mem": True,
         "pid": None,
+        "queryid": True,
         "read": True,
         "relation": True,
         "time": True,
@@ -51,6 +52,7 @@ def test_flag_load() -> None:
         | Flag.CLIENT
         | Flag.APPNAME
         | Flag.DATABASE
+        | Flag.QUERYID
         | Flag.XMIN
     )
     cfg = Configuration(
@@ -73,11 +75,13 @@ def test_flag_load() -> None:
         | Flag.CLIENT
         | Flag.APPNAME
         | Flag.DATABASE
+        | Flag.QUERYID
         | Flag.XMIN
     )
     options["database"] = False
     options["time"] = False
     options["pid"] = False
+    options["queryid"] = False
     cfg = Configuration(
         name="test",
         values=dict(database=UISection(hidden=False), relation=UISection(hidden=True)),
