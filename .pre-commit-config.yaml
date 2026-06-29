@@ -40,6 +40,6 @@ repos:
         exclude: tests
       - id: codespell
         name: codespell
-        entry: codespell
+        entry: codespell --ignore-words-list USIN
         language: system
         types: [file]

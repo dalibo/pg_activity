@@ -184,6 +184,8 @@ The running queries panel shows all running queries, transactions or backends
 .IX Item "- XMIN: xmin horizon of the backend;"
 .IP "\- \fBDATABASE\fR: database specified in the connection string;" 2
 .IX Item "- DATABASE: database specified in the connection string;"
+.IP "\- \fBQUERYID\fR: query identifier for the statement;" 2
+.IX Item "- QUERYID: query identifier for the statement;"
 .IP "\- \fBAPP\fR: application name specified in the connection string;" 2
 .IX Item "- APP: application name specified in the connection string;"
 .IP "\- \fBUSER\fR: user name specified in the connection string;" 2
@@ -218,6 +220,8 @@ shows the following information:
 .PD 0
 .IP "\- \fBDATABASE\fR: database specified in the connection string;" 2
 .IX Item "- DATABASE: database specified in the connection string;"
+.IP "\- \fBQUERYID\fR: query identifier for the statement;" 2
+.IX Item "- QUERYID: query identifier for the statement;"
 .IP "\- \fBAPP\fR: application name specified in the connection string;" 2
 .IX Item "- APP: application name specified in the connection string;"
 .IP "\- \fBUSER\fR: user name specified in the connection string;" 2
@@ -246,6 +250,8 @@ required by another session. It shows following information:
 .PD 0
 .IP "\- \fBDATABASE\fR: database specified in the connection string;" 2
 .IX Item "- DATABASE: database specified in the connection string;"
+.IP "\- \fBQUERYID\fR: query identifier for the statement;" 2
+.IX Item "- QUERYID: query identifier for the statement;"
 .IP "\- \fBAPP\fR: application name specified in the connection string;" 2
 .IX Item "- APP: application name specified in the connection string;"
 .IP "\- \fBUSER\fR: user name specified in the connection string;" 2
@@ -418,6 +424,11 @@ required by another session. It shows following information:
 .IX Item "--app-name, --no-app-name"
 .Vb 1
 \&        Enable/disable APP.
+.Ve
+.IP "\fB\-\-query\-id\fR, \fB\-\-no\-query\-id\fR" 2
+.IX Item "--query-id, --no-query-id"
+.Vb 1
+\&        Enable/disable QUERYID.
 .Ve
 .SS "HEADER DISPLAY OPTIONS"
 .IX Subsection "HEADER DISPLAY OPTIONS"

@@ -45,14 +45,21 @@ def configure_logger(debug_file: str | None = None) -> StringIO:
     return memory_string
 
 
-def flag(p: Any, spec: str, *, dest: str, feature: str) -> None:
+def flag(
+    p: Any,
+    spec: str,
+    *,
+    dest: str,
+    feature: str,
+    default: bool | None = None,
+) -> None:
     assert not spec.startswith("--no-") and spec.startswith("--"), spec
     p.add_argument(
         spec,
         dest=dest,
         help=f"Enable/disable {feature}.",
         action=argparse.BooleanOptionalAction,
-        default=None,
+        default=default,
     )
 
 
@@ -233,6 +240,7 @@ def get_parser(prog: str | None = None) -> argparse.ArgumentParser:
     flag(group, "--time", dest="time", feature="TIME+")
     flag(group, "--wait", dest="wait", feature="W")
     flag(group, "--app-name", dest="appname", feature="APP")
+    flag(group, "--query-id", dest="queryid", feature="QUERYID", default=False)
 
     group = parser.add_argument_group("Header display options")
     group.add_argument(

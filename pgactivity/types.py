@@ -393,6 +393,15 @@ class UI:
             default_color="cyan",
         )
         add_column(
+            Flag.QUERYID,
+            key="query_id",
+            name="QUERYID",
+            min_width=20,
+            max_width=20,
+            justify="right",
+            default_color="cyan",
+        )
+        add_column(
             "query",
             key="query",
             name="Query",
@@ -477,6 +486,7 @@ class UI:
                 "pid",
                 "xmin",
                 "database",
+                "query_id",
                 "application_name",
                 "user",
                 "client",
@@ -493,6 +503,7 @@ class UI:
             QueryMode.waiting: [
                 "pid",
                 "database",
+                "query_id",
                 "application_name",
                 "user",
                 "client",
@@ -506,6 +517,7 @@ class UI:
             QueryMode.blocking: [
                 "pid",
                 "database",
+                "query_id",
                 "application_name",
                 "user",
                 "client",
@@ -925,6 +937,7 @@ class RunningProcess(BaseProcess):
     wait: bool | None | str
     query_leader_pid: int | None
     is_parallel_worker: bool
+    query_id: int | None = attr.ib(default=None, kw_only=True)
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
@@ -940,6 +953,7 @@ class WaitingProcess(BaseProcess):
     # TODO: update queries to select/compute these column.
     query_leader_pid: int | None = attr.ib(default=None, init=False)
     is_parallel_worker: bool = attr.ib(default=False, init=False)
+    query_id: int | None = None
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
@@ -956,6 +970,7 @@ class BlockingProcess(BaseProcess):
     # TODO: update queries to select/compute these column.
     query_leader_pid: int | None = attr.ib(default=None, init=False)
     is_parallel_worker: bool = attr.ib(default=False, init=False)
+    query_id: int | None = None
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)

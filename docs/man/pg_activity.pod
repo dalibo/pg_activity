@@ -138,6 +138,8 @@ B<min duration> seconds. It displays the following information:
 
 =item - B<DATABASE>: database specified in the connection string;
 
+=item - B<QUERYID>: query identifier for the statement;
+
 =item - B<APP>: application name specified in the connection string;
 
 =item - B<USER>: user name specified in the connection string;
@@ -175,6 +177,8 @@ shows the following information:
 
 =item - B<DATABASE>: database specified in the connection string;
 
+=item - B<QUERYID>: query identifier for the statement;
+
 =item - B<APP>: application name specified in the connection string;
 
 =item - B<USER>: user name specified in the connection string;
@@ -205,6 +209,8 @@ required by another session. It shows following information:
 =item - B<PID>: process id of the backend which executes the query;
 
 =item - B<DATABASE>: database specified in the connection string;
+
+=item - B<QUERYID>: query identifier for the statement;
 
 =item - B<APP>: application name specified in the connection string;
 
@@ -365,6 +371,10 @@ required by another session. It shows following information:
 =item B<--app-name>, B<--no-app-name>
 
 	Enable/disable APP.
+
+=item B<--query-id>, B<--no-query-id>
+
+	Enable/disable QUERYID.
 
 =back
 

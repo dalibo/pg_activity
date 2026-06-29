@@ -63,3 +63,42 @@ def test_columns_header(capsys, term, ui, width, expected):
     views.columns_header(term, ui, width=width)
     out = capsys.readouterr()[0]
     assert out == expected + "\n"
+
+
+@pytest.mark.parametrize(
+    "query_mode, flags",
+    [
+        (QueryMode.activities, Flag.PID | Flag.QUERYID),
+        (
+            QueryMode.waiting,
+            Flag.PID
+            | Flag.QUERYID
+            | Flag.DATABASE
+            | Flag.APPNAME
+            | Flag.CLIENT
+            | Flag.USER
+            | Flag.RELATION
+            | Flag.TYPE
+            | Flag.MODE,
+        ),
+        (
+            QueryMode.blocking,
+            Flag.PID
+            | Flag.QUERYID
+            | Flag.DATABASE
+            | Flag.APPNAME
+            | Flag.CLIENT
+            | Flag.USER
+            | Flag.RELATION
+            | Flag.TYPE
+            | Flag.MODE
+            | Flag.WAIT,
+        ),
+    ],
+    ids=["activities", "waiting", "blocking"],
+)
+def test_columns_header_queryid(capsys, term, query_mode, flags):
+    ui = UI.make(query_mode=query_mode, flag=flags)
+    views.columns_header(term, ui, width=200)
+    out = capsys.readouterr()[0]
+    assert "QUERYID" in out
