@@ -62,9 +62,9 @@ class Flag(enum.Flag):
     """Column flag.
 
     >>> Flag.names()
-    ['database', 'appname', 'client', 'user', 'cpu', 'mem', 'read', 'write', 'time', 'wait', 'relation', 'type', 'mode', 'iowait', 'pid', 'xmin']
+    ['database', 'appname', 'client', 'user', 'cpu', 'mem', 'read', 'write', 'time', 'wait', 'relation', 'type', 'mode', 'iowait', 'pid', 'xmin', 'queryid']
     >>> Flag.all()  # doctest: +ELLIPSIS
-    <Flag...: 65535>
+    <Flag...: 131071>
     """
 
     DATABASE = enum.auto()
@@ -83,6 +83,7 @@ class Flag(enum.Flag):
     IOWAIT = enum.auto()
     PID = enum.auto()
     XMIN = enum.auto()
+    QUERYID = enum.auto()
 
     @classmethod
     def names(cls) -> list[str]:
@@ -127,6 +128,7 @@ class Flag(enum.Flag):
         database: bool | None,
         mem: bool | None,
         pid: bool | None,
+        queryid: bool | None,
         read: bool | None,
         time: bool | None,
         user: bool | None,
@@ -147,6 +149,7 @@ class Flag(enum.Flag):
             (database, cls.DATABASE),
             (mem, cls.MEM),
             (pid, cls.PID),
+            (queryid, cls.QUERYID),
             (read, cls.READ),
             (time, cls.TIME),
             (user, cls.USER),

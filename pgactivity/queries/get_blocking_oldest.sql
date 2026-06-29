@@ -20,7 +20,8 @@ SELECT
           ELSE sq.query
       END AS query,
       pg_catalog.pg_encoding_to_char(b.encoding) AS encoding,
-      waiting AS wait
+      waiting AS wait,
+      NULL::int8 AS query_id
   FROM
       (
       -- Transaction id lock
