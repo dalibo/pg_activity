@@ -76,7 +76,7 @@ Process table display options:
   --app-name, --no-app-name
                         Enable/disable APP.
   --query-id, --no-query-id
-                        Enable/disable QUERYID.
+                        Enable/disable QUERYID. (default: False)
 <BLANKLINE>
 Header display options:
   --no-inst-info        Hide instance information.
