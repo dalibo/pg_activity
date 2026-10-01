@@ -25,6 +25,10 @@ The PostgreSQL Global Development Group (PGDG) also provides packages for
 RPM-based (https://yum.postgresql.org/) and Debian-based distributions
 (https://wiki.postgresql.org/wiki/Apt).
 
+On macOS, pg\_activity is available from [Homebrew](https://brew.sh/):
+
+    $ brew install pg_activity
+
 **Note:** distribution packages may not be up to date with the latest
 pg\_activity releases. Before submitting a bug report here:
 -   check the package version, compare that to our latest release and then
