@@ -104,6 +104,7 @@ class Data:
             pg.execute(pg_conn, queries.get("disable_log_statement"))
             if pg.server_version(pg_conn) >= 130000:
                 pg.execute(pg_conn, queries.get("disable_log_min_duration_sample"))
+        pg.execute(pg_conn, queries.get("set_postgres_intervalstyle"))
         pg_version = pg_get_short_version(pg_get_version(pg_conn))
         server_encoding = pg_conn.info.parameter_status("server_encoding")
         assert server_encoding is not None
