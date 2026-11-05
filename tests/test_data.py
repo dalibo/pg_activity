@@ -191,3 +191,17 @@ def test_filters_dbname(data, execute):
     )
     assert nbconn.active_connections == 2
     assert nbconn_filtered.active_connections == 1
+
+
+def test_pg_get_server_information_iso_8601_intervalstyle(postgresql, monkeypatch):
+    monkeypatch.setenv("PGOPTIONS", "-c intervalstyle=iso_8601")
+    data = Data.pg_connect(
+        host=postgresql.info.host,
+        port=postgresql.info.port,
+        database=postgresql.info.dbname,
+        user=postgresql.info.user,
+    )
+    try:
+        data.pg_get_server_information(None)
+    finally:
+        data.pg_conn.close()
