@@ -119,7 +119,10 @@ def limit(func: Callable[..., Iterable[str]]) -> Callable[..., None]:
         if "width" in signature.parameters:
             kwargs["width"] = width
         for line in func(term, *args, **kwargs):
-            print(shorten(term, line, width) + term.clear_eol)
+            # Clear the line *before* drawing it: an EL issued after the final
+            # "normal" would erase, with the default background, the highlight
+            # extended to the end of the line by the focused row.
+            print(term.clear_eol + shorten(term, line, width))
             if counter is not None and next(counter) == 1:
                 break
 
