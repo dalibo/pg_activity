@@ -53,3 +53,35 @@ def test_ui_settings_survive_reconnect(monkeypatch, paused):
         reconnected.pg_get_waiting.assert_not_called()
     else:
         reconnected.pg_get_waiting.assert_called_once()
+
+
+def test_keys_work_after_reconnect(monkeypatch):
+    """Handling a key after a reconnection needs the display flags."""
+    from blessed.keyboard import Keystroke
+
+    monkeypatch.setattr("sys.argv", ["pg_activity"])
+    data = MagicMock()
+    data.pg_is_local.return_value = False
+    data.filters = types.Filters()
+    data.pg_conn.info.port = "5432"
+    data.pg_get_server_information.return_value.max_dbname_length = 8
+    data.pg_get_activities.return_value = []
+    data.pg_get_waiting.return_value = []
+    reconnected = MagicMock(wraps=data)
+    data.try_reconnect.return_value = reconnected
+    monkeypatch.setattr(cli.data, "pg_connect", lambda *a, **kw: data)
+    monkeypatch.setattr(cli.time, "sleep", lambda _: None)
+    term = MagicMock()
+    term.clear = term.home = ""
+    term.inkey.side_effect = [Keystroke("w"), Keystroke("q")]
+    monkeypatch.setattr(cli, "Terminal", lambda: term)
+    calls = []
+
+    def screen(term, state, **kwargs):
+        calls.append(state)
+        if len(calls) == 1:
+            raise OperationalError("connection lost")
+
+    monkeypatch.setattr(ui.views, "screen", screen)
+    cli.main()
+    assert len(calls) == 3

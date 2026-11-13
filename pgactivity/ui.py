@@ -48,8 +48,8 @@ def main(
 
     if state is None:
         state = UIState()
+    flag = Flag.load(config, is_local=is_local, **vars(options))
     if state.ui is None:
-        flag = Flag.load(config, is_local=is_local, **vars(options))
         state.ui = types.UI.make(
             header=types.UIHeader.make(
                 config.header() if config else None,
