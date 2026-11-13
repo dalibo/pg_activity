@@ -119,7 +119,10 @@ def limit(func: Callable[..., Iterable[str]]) -> Callable[..., None]:
         if "width" in signature.parameters:
             kwargs["width"] = width
         for line in func(term, *args, **kwargs):
-            print(shorten(term, line, width) + term.clear_eol)
+            # Clear the line *before* drawing it: an EL issued after the final
+            # "normal" would erase, with the default background, the highlight
+            # extended to the end of the line by the focused row.
+            print(term.clear_eol + shorten(term, line, width))
             if counter is not None and next(counter) == 1:
                 break
 
@@ -423,6 +426,7 @@ def processes_rows(
         value: Any,
         column: Column,
         cursor: Literal["pinned", "focused"] | None,
+        fill: bool = False,
     ) -> None:
         if cursor is not None:
             if cursor == "pinned":
@@ -436,7 +440,10 @@ def processes_rows(
         color = getattr(term, color_name or "normal")
         # We also restore 'normal' style so that the next item does not
         # inherit from that of the previous one.
-        text.append(f"{color}{column.render(value)}{term.normal}")
+        # When the cell is the last of the row and is highlighted, we extend the
+        # highlight to the end of the line.
+        eol = term.clear_eol if fill and cursor is not None else ""
+        text.append(f"{color}{column.render(value)}{eol}{term.normal}")
 
     position = processes.position()
     if position is None:
@@ -490,7 +497,7 @@ def processes_rows(
                 wrapped_lines = TextWrapper(qwidth).wrap(query)
                 query_value = f"\n{indent}".join(wrapped_lines)
 
-            cell(query_value, ui.column("query"), cursor=cursor)
+            cell(query_value, ui.column("query"), cursor=cursor, fill=True)
 
         yield from (" ".join(text) + term.normal).splitlines()
 
