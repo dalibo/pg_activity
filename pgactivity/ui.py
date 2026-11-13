@@ -13,6 +13,13 @@ from .config import Configuration, Flag
 from .data import Data
 
 
+@attr.s(auto_attribs=True, slots=True)
+class UIState:
+    """Keep UI settings across connection attempts."""
+
+    ui: types.UI | None = None
+
+
 def main(
     term: Terminal,
     config: Configuration | None,
@@ -20,6 +27,7 @@ def main(
     host: types.Host,
     options: Namespace,
     *,
+    state: UIState | None = None,
     render_header: bool = True,
     render_footer: bool = True,
     width: int | None = None,
@@ -38,29 +46,37 @@ def main(
         skip_walreceiver=not options.walreceiver,
     )
 
+    if state is None:
+        state = UIState()
     flag = Flag.load(config, is_local=is_local, **vars(options))
-    ui = types.UI.make(
-        header=types.UIHeader.make(
-            config.header() if config else None,
-            show_instance=options.header_show_instance,
-            show_system=options.header_show_system,
-            show_workers=options.header_show_workers,
-        ),
-        config=config,
-        flag=flag,
-        refresh_time=options.refresh,
-        min_duration=options.minduration,
-        duration_mode=int(options.durationmode),
-        wrap_query=options.wrap_query,
-        strip_comments=options.strip_comments,
-        max_db_length=min(max(server_information.max_dbname_length, 8), 16),
-        filters=data.filters,
-    )
+    if state.ui is None:
+        state.ui = types.UI.make(
+            header=types.UIHeader.make(
+                config.header() if config else None,
+                show_instance=options.header_show_instance,
+                show_system=options.header_show_system,
+                show_workers=options.header_show_workers,
+            ),
+            config=config,
+            flag=flag,
+            refresh_time=options.refresh,
+            min_duration=options.minduration,
+            duration_mode=int(options.durationmode),
+            wrap_query=options.wrap_query,
+            strip_comments=options.strip_comments,
+            max_db_length=min(max(server_information.max_dbname_length, 8), 16),
+            filters=data.filters,
+        )
+    ui = state.ui
+    # Process selections belong to the old connection.
+    ui.end_interactive()
 
     key, in_help = None, False
     sys_procs: dict[int, types.SystemProcess] = {}
     pg_procs = types.SelectableProcesses([])
-    activity_stats: types.ActivityStats
+    activity_stats: types.ActivityStats = (
+        (pg_procs, types.SystemInfo.default()) if is_local else pg_procs
+    )
 
     msg_pile = utils.MessagePile(2)
 
