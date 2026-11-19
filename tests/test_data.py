@@ -208,19 +208,7 @@ def test_pg_get_server_information_iso_8601_intervalstyle(postgresql, monkeypatc
         data.pg_conn.close()
 
 
-@pytest.mark.parametrize(
-    "commits, rollbacks, hits, expected",
-    [
-        (0, 4, 0, 100),
-        (0, 4, 20, 100),
-        (3, 1, 0, 25),
-        (4, 0, 0, 0),
-        (0, 0, 0, None),
-        (0, 0, 20, None),
-    ],
-)
-def test_rollback_ratio(monkeypatch, commits, rollbacks, hits, expected):
-    """Rollback ratios depend on transactions, independently of cache hits."""
+def _server_information_snapshot(**overrides):
     snapshot = dict(
         xact_count=100,
         xact_commit=80,
@@ -251,6 +239,11 @@ def test_rollback_ratio(monkeypatch, commits, rollbacks, hits, expected):
         max_wal_senders=10,
         max_replication_slots=10,
     )
+    snapshot.update(overrides)
+    return snapshot
+
+
+def _server_information(monkeypatch, snapshot, previous=None):
     monkeypatch.setattr(pg, "fetchone", lambda *args: snapshot.copy())
     monkeypatch.setattr(Data, "pg_get_wal_senders", lambda self: 0)
     monkeypatch.setattr(Data, "pg_get_replication_slots", lambda self: 0)
@@ -264,18 +257,74 @@ def test_rollback_ratio(monkeypatch, commits, rollbacks, hits, expected):
         dsn_parameters={},
         failed_queries=types.FailedQueriesInfo(),
     )
-    previous = data.pg_get_server_information(
-        None, skip_tempfile=True, skip_walreceiver=True
+    return data.pg_get_server_information(
+        previous, skip_tempfile=True, skip_walreceiver=True
     )
+
+
+@pytest.mark.parametrize(
+    "commits, rollbacks, hits, expected",
+    [
+        (0, 4, 0, 100),
+        (0, 4, 20, 100),
+        (3, 1, 0, 25),
+        (4, 0, 0, 0),
+        (0, 0, 0, None),
+        (0, 0, 20, None),
+    ],
+)
+def test_rollback_ratio(monkeypatch, commits, rollbacks, hits, expected):
+    """Rollback ratios depend on transactions, independently of cache hits."""
+    previous = _server_information(monkeypatch, _server_information_snapshot())
     assert previous.rollback_ratio_last_snap is None
-    snapshot.update(
+    snapshot = _server_information_snapshot(
         epoch=101,
         xact_count=100 + commits + rollbacks,
         xact_commit=80 + commits,
         xact_rollback=20 + rollbacks,
         blks_hit=100 + hits,
     )
-    current = data.pg_get_server_information(
-        previous, skip_tempfile=True, skip_walreceiver=True
-    )
+    current = _server_information(monkeypatch, snapshot, previous)
     assert current.rollback_ratio_last_snap == expected
+
+
+def test_server_information_values_from_previous_snapshot(monkeypatch):
+    """All values computed from the previous snapshot are derived from deltas."""
+    previous = _server_information(monkeypatch, _server_information_snapshot())
+    assert previous.tps == 0
+    assert previous.size_evolution == 0
+    assert previous.cache_hit_ratio_last_snap is None
+    assert previous.rollback_ratio_last_snap is None
+
+    snapshot = _server_information_snapshot(
+        epoch=102,  # 2 seconds after the previous snapshot
+        xact_count=100 + 40,
+        xact_commit=80 + 30,
+        xact_rollback=20 + 10,
+        insert=10,
+        update=6,
+        delete=4,
+        total_size=2048,
+        blks_read=10,
+        blks_hit=100 + 30,
+    )
+    current = _server_information(monkeypatch, snapshot, previous)
+    assert current.tps == 20
+    assert current.insert_per_second == 5
+    assert current.update_per_second == 3
+    assert current.delete_per_second == 2
+    assert current.size_evolution == 1024.0
+    assert current.cache_hit_ratio_last_snap == 75
+    assert current.rollback_ratio_last_snap == 25
+
+
+def test_server_information_no_activity_between_snapshots(monkeypatch):
+    """Without any new transaction or block access, no ratio is computed."""
+    previous = _server_information(monkeypatch, _server_information_snapshot())
+    current = _server_information(
+        monkeypatch, _server_information_snapshot(epoch=101), previous
+    )
+    assert current.tps == 0
+    assert current.size_evolution == 0
+    assert current.cache_hit_ratio_last_snap is None
+    assert current.rollback_ratio_last_snap is None
