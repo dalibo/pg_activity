@@ -3,7 +3,13 @@ from blessed import Terminal
 
 from pgactivity import views
 from pgactivity.config import Flag
-from pgactivity.types import UI, QueryMode, SortKey
+from pgactivity.types import (
+    UI,
+    LocalRunningProcess,
+    QueryMode,
+    SelectableProcesses,
+    SortKey,
+)
 
 
 @pytest.fixture
@@ -124,3 +130,37 @@ def test_columns_header_queryid(capsys, term, query_mode, flags):
     views.columns_header(term, ui, width=200)
     out = capsys.readouterr()[0]
     assert "QUERYID" in out
+
+
+@pytest.mark.parametrize("wrap_query", [False, True])
+def test_processes_rows_highlight_extends_to_eol(capsys, wrap_query):
+    term = Terminal(force_styling=True)
+    ui = UI.make(flag=Flag.PID)
+    ui.evolve(wrap_query=wrap_query)
+    process = LocalRunningProcess(
+        pid="1",
+        xmin=1,
+        application_name="a",
+        database="db",
+        user="u",
+        client=None,
+        cpu=0.1,
+        mem=1.0,
+        read=1,
+        write=1,
+        state="active",
+        query="SELECT 1",
+        encoding="UTF-8",
+        duration=0.1,
+        wait=False,
+        io_wait=False,
+        query_leader_pid=1,
+        is_parallel_worker=False,
+        query_id=-1,
+    )
+    processes = SelectableProcesses([process])
+    processes.focus_next()
+    views.processes_rows(term, ui, processes, 10, width=80)
+    out = capsys.readouterr().out
+    # The focused row is highlighted up to the end of the line.
+    assert "SELECT 1" + term.clear_eol in out
