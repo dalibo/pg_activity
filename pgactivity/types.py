@@ -1211,4 +1211,6 @@ ActivityStats = Union[
     tuple[Iterable[WaitingProcess], SystemInfo],
     tuple[Iterable[BlockingProcess], SystemInfo],
     tuple[Iterable[LocalRunningProcess], SystemInfo],
+    SelectableProcesses,
+    tuple[SelectableProcesses, SystemInfo],
 ]
