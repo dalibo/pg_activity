@@ -74,9 +74,8 @@ def main(
     key, in_help = None, False
     sys_procs: dict[int, types.SystemProcess] = {}
     pg_procs = types.SelectableProcesses([])
-    activity_stats: types.ActivityStats = (
-        (pg_procs, types.SystemInfo.default()) if is_local else pg_procs
-    )
+    activity_stats: types.ActivityStats
+    activity_stats = (pg_procs, types.SystemInfo.default()) if is_local else pg_procs
 
     msg_pile = utils.MessagePile(2)
 
@@ -257,7 +256,7 @@ def main(
                         else:
                             assert False  # help type checking
 
-                    activity_stats = (pg_procs, system_info) if is_local else pg_procs  # type: ignore[assignment]
+                    activity_stats = (pg_procs, system_info) if is_local else pg_procs
 
                 if options.output is not None:
                     custom_asdict = partial(attr.asdict, recurse=True)
