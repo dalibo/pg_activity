@@ -369,7 +369,7 @@ class Data:
                     hr = Pct(100 * deltahit / (deltaread + deltahit))
                 deltacommit = ret["xact_commit"] - prev_server_info.xact_commit
                 deltarollback = ret["xact_rollback"] - prev_server_info.xact_rollback
-                if deltacommit + deltahit > 0:
+                if deltacommit + deltarollback > 0:
                     rr = Pct(100 * deltarollback / (deltacommit + deltarollback))
             except ZeroDivisionError:
                 pass
