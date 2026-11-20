@@ -332,9 +332,10 @@ def main() -> None:
     )
 
     term = Terminal()
+    state = ui.UIState()
     while True:
         try:
-            ui.main(term, cfg, dataobj, host, args)
+            ui.main(term, cfg, dataobj, host, args, state=state)
         except ConfigurationError as e:
             parser.exit(1, f"error: {e}")
         except OperationalError:
